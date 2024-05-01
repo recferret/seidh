@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:https";
-import { Http3Server } from "@fails-components/webtransport";
+// import { Http3Server } from "@fails-components/webtransport";
 import { WebSocket } from "./ws.js"
 import { WebTransportServerClient } from "./wt.js";
 
@@ -13,8 +13,8 @@ export class ServerTransport {
     private key: Buffer;
     private cert: Buffer;
   
-    private http3Server: Http3Server;
-    private isListening = false;
+    // private http3Server: Http3Server;
+    // private isListening = false;
 
     private webSocketServer: WebSocket;
 
@@ -30,7 +30,7 @@ export class ServerTransport {
             this.key = key;
             this.cert = cert;
             await this.initHttpServer();
-            await this.initHttp3Server();
+            // await this.initHttp3Server();
           });
     }
     
@@ -127,75 +127,45 @@ export class ServerTransport {
            
         this.webSocketServer =new WebSocket(server);
 
-        // const wss = new WebSocketServer({ server });
-    
-        // wss.on('connection', function connection(ws) {
-        //   let wssGameStateInterval = setInterval(() => {
-        //     ws.send(JSON.stringify({ msg: 'gameState', gameStateIndex: 123 }));
-        //   }, 100);
-    
-        //   ws.on('error', function error(error) { 
-        //     console.error(error);
-        //     clearInterval(wssGameStateInterval);
-        //   });
-        // });
-    
         server.listen(port, () => {
           console.log(`server listening at https://localhost:${port}`);
         });
     }
     
-    private async initHttp3Server() {
-        this.http3Server = new Http3Server({
-          host: '0.0.0.0',
-          port: '3000',
-          secret: "changeit",
-          cert: this.cert,
-          privKey: this.key,
-        });
+    // private async initHttp3Server() {
+    //     this.http3Server = new Http3Server({
+    //       host: '0.0.0.0',
+    //       port: '3000',
+    //       secret: "changeit",
+    //       cert: this.cert,
+    //       privKey: this.key,
+    //     });
             
-        this.http3Server.startServer();
-        this.isListening = true;
-        await this.acceptIncomingHttp3Sessions();
-    }
+    //     this.http3Server.startServer();
+    //     this.isListening = true;
+    //     await this.acceptIncomingHttp3Sessions();
+    // }
     
-    private async acceptIncomingHttp3Sessions() {
-        try {
-          const sessionStream = await this.http3Server.sessionStream("/");
-          const sessionReader = sessionStream.getReader();
-          sessionReader.closed.catch((e: any) => console.log("session reader closed with error!", e));
+    // private async acceptIncomingHttp3Sessions() {
+    //     try {
+    //       const sessionStream = await this.http3Server.sessionStream("/");
+    //       const sessionReader = sessionStream.getReader();
+    //       sessionReader.closed.catch((e: any) => console.log("session reader closed with error!", e));
         
-          while (this.isListening) {
-            const { done, value } = await sessionReader.read();
-            if (done) { break; }
+    //       while (this.isListening) {
+    //         const { done, value } = await sessionReader.read();
+    //         if (done) { break; }
     
-            new WebTransportServerClient(value);
-          }
-        } catch (e) {
-          console.error("error:", e);
-        }
-    }
+    //         new WebTransportServerClient(value);
+    //       }
+    //     } catch (e) {
+    //       console.error("error:", e);
+    //     }
+    // }
 
     //
     // Сереализация и десереализация данных
     //
-
-    // public static BinArrayToJson(binArray: any) {
-    //     let str = "";
-    //     for (let i = 0; i < binArray.length; i++) {
-    //       str += String.fromCharCode(parseInt(binArray[i]));
-    //     }
-    //     return JSON.parse(str)
-    // }
-    
-    // public static JsonToBinArray(json: any) {
-    //     const str = JSON.stringify(json, null, 0);
-    //     const ret = new Uint8Array(str.length);
-    //     for (let i = 0; i < str.length; i++) {
-    //       ret[i] = str.charCodeAt(i);
-    //     }
-    //     return ret
-    // };
 
     public static BinArrayToJson(binArray: any, transport: string) {
         if (transport === 'ws') {

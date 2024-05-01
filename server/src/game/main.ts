@@ -29,15 +29,11 @@ type EntityActionCallbackParams = {
 
 class NodeServer {
     
-    // private wsConnectedPlayers = new Set<string>();
-    // private wsServer = new WebSocket();
-
     private transport = new ServerTransport()
-
     private readonly gameEngineInstance:any;
 
-    private readonly maxBots = 50;
-    private botIdIndex = 0;
+    // private readonly maxBots = 50;
+    // private botIdIndex = 0;
     private currentBotsCount = 0;
 
     constructor() {
@@ -61,6 +57,7 @@ class NodeServer {
             });
         });
 
+        // TODO pass params
         Events.eventEmitter.on(EventType.INPUT, (data: InputEvent) => {
             this.gameEngineInstance.addInputCommandServer(data);
         });
@@ -88,37 +85,37 @@ class NodeServer {
             }
         };
         this.gameEngineInstance.postLoopCallback = async () => {
-            await this.transport.notifyAll(this.gameStateMessage(this.gameEngineInstance.getMainEntities()), 'unreliable');
+            await this.transport.notifyAll(this.gameStateMessage(this.gameEngineInstance.getMainEntitiesChanged()), 'unreliable');
         };
         this.gameEngineInstance.entityActionCallback = async (callbackParams: EntityActionCallbackParams[]) => {
             await this.transport.notifyAll(this.performActionMessage(callbackParams), 'reliable');
         };
 
-        setInterval(() => {
-            let skeletonPosX = 400;
-            let skeletonPosY = 400;
+        // setInterval(() => {
+        //     let skeletonPosX = 400;
+        //     let skeletonPosY = 400;
 
-            for (let i = 0; i < 5; i++) {
-                if (this.currentBotsCount < this.maxBots) {
-                    this.gameEngineInstance.buildEngineEntityFromMinimalStruct({
-                        id: 'entity_' + this.botIdIndex++,
-                        ownerId: 1,
-                        x: skeletonPosX,
-                        y: skeletonPosY,
-                        entityType: EntityType.SKELETON_WARRIOR,
-                    });
+        //     for (let i = 0; i < 5; i++) {
+        //         if (this.currentBotsCount < this.maxBots) {
+        //             this.gameEngineInstance.buildEngineEntityFromMinimalStruct({
+        //                 id: 'entity_' + this.botIdIndex++,
+        //                 ownerId: 1,
+        //                 x: skeletonPosX,
+        //                 y: skeletonPosY,
+        //                 entityType: EntityType.SKELETON_WARRIOR,
+        //             });
                 
-                    skeletonPosX += 80;
+        //             skeletonPosX += 80;
                 
-                    if (i == 4) {
-                        skeletonPosY += 80;
-                        skeletonPosX = 400;
-                    }
+        //             if (i == 4) {
+        //                 skeletonPosY += 80;
+        //                 skeletonPosX = 400;
+        //             }
     
-                    this.currentBotsCount++;
-                }
-            }
-        }, 10000);
+        //             this.currentBotsCount++;
+        //         }
+        //     }
+        // }, 10000);
     }
 
     joinGameMessage(entitiesMap:any) {
@@ -137,8 +134,9 @@ class NodeServer {
     gameStateMessage(entitiesMap:any) {
         const entitiesInfo = [];
 
-        for (const entity of entitiesMap.values()){
+        for (const entity of entitiesMap.values()) {
             entitiesInfo.push(entity.getMinEntity());
+            console.log(entity.getMinEntity());
         }
 
         return JSON.stringify({

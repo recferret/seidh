@@ -5,8 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:gamestate": "node build/src/ping/main.js",
-    "start:game": "node build/src/game/main.js",
+    "start": "node build/src/game/main.js",
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json"
   },

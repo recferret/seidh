@@ -36,6 +36,7 @@ export interface PlayerInputType {
 export type InputEvent = {
     playerId: string,
     inputType: PlayerInputType,
+    movAngle: number,
 }
 
 export class Events {

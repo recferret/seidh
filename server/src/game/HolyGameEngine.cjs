@@ -132,10 +132,9 @@ Object.assign(engine_base_BaseObjectEntity.prototype, {
 	__class__: engine_base_BaseObjectEntity
 });
 class engine_base_PlayerInputCommand {
-	constructor(inputType,targetX,targetY,playerId,index) {
+	constructor(inputType,movAngle,playerId,index) {
 		this.inputType = inputType;
-		this.targetX = targetX;
-		this.targetY = targetY;
+		this.movAngle = movAngle;
 		this.playerId = playerId;
 		this.index = index;
 	}
@@ -155,50 +154,6 @@ Object.assign(engine_base_InputCommandEngineWrapped.prototype, {
 	__class__: engine_base_InputCommandEngineWrapped
 });
 class engine_base_MathUtils {
-	static directionToRads(playerInputType) {
-		switch(playerInputType) {
-		case 1:
-			return engine_base_MathUtils.MoveUpRads;
-		case 2:
-			return engine_base_MathUtils.MoveDownRads;
-		case 3:
-			return engine_base_MathUtils.MoveLeftRads;
-		case 4:
-			return engine_base_MathUtils.MoveRightRads;
-		case 5:
-			return engine_base_MathUtils.MoveUpLeftRads;
-		case 6:
-			return engine_base_MathUtils.MoveUpRightRads;
-		case 7:
-			return engine_base_MathUtils.MoveDownLeftRads;
-		case 8:
-			return engine_base_MathUtils.MoveDownRightRads;
-		default:
-			return 0;
-		}
-	}
-	static radsToDirection(rads) {
-		switch(rads) {
-		case engine_base_MathUtils.MoveDownLeftRads:
-			return 7;
-		case engine_base_MathUtils.MoveDownRads:
-			return 2;
-		case engine_base_MathUtils.MoveDownRightRads:
-			return 8;
-		case engine_base_MathUtils.MoveLeftRads:
-			return 3;
-		case engine_base_MathUtils.MoveRightRads:
-			return 4;
-		case engine_base_MathUtils.MoveUpLeftRads:
-			return 5;
-		case engine_base_MathUtils.MoveUpRads:
-			return 1;
-		case engine_base_MathUtils.MoveUpRightRads:
-			return 6;
-		default:
-			return 4;
-		}
-	}
 	static angleBetweenPoints(point1,point2) {
 		return Math.atan2(point2.y - point1.y,point2.x - point1.x);
 	}
@@ -241,6 +196,23 @@ class engine_base_MathUtils {
 	}
 }
 engine_base_MathUtils.__name__ = true;
+class engine_base_EngineUtils {
+	static HashString(str) {
+		let strLen = str.length;
+		if(strLen == 0) {
+			return 0;
+		}
+		let hc = 0;
+		let _g = 0;
+		let _g1 = strLen;
+		while(_g < _g1) {
+			let i = _g++;
+			hc = ((hc << 5) - hc | 0) + HxOverrides.cca(str,i) | 0;
+		}
+		return hc;
+	}
+}
+engine_base_EngineUtils.__name__ = true;
 var engine_base_core_EngineMode = $hxEnums["engine.base.core.EngineMode"] = { __ename__:true,__constructs__:null
 	,Client: {_hx_name:"Client",_hx_index:0,__enum__:"engine.base.core.EngineMode",toString:$estr}
 	,Server: {_hx_name:"Server",_hx_index:1,__enum__:"engine.base.core.EngineMode",toString:$estr}
@@ -327,6 +299,21 @@ class engine_base_core_BaseEngine {
 	getMainEntities() {
 		return this.mainEntityManager.entities;
 	}
+	getMainEntitiesChanged() {
+		let result = [];
+		let jsIterator = this.mainEntityManager.entities.values();
+		let _g_jsIterator = jsIterator;
+		let _g_lastStep = jsIterator.next();
+		while(!_g_lastStep.done) {
+			let v = _g_lastStep.value;
+			_g_lastStep = _g_jsIterator.next();
+			let entity = v;
+			if(entity.isChanged()) {
+				result.push(entity);
+			}
+		}
+		return result;
+	}
 	processCreateEntityQueue() {
 		let _g = 0;
 		let _g1 = this.addMainEntityQueue;
@@ -391,13 +378,13 @@ class engine_base_core_BaseEngine {
 	addInputCommandServer(struct) {
 		let entityId = this.getMainEntityIdByOwnerId(struct.playerId);
 		let allow = false;
-		if(struct.inputType < 9) {
+		if(struct.inputType == 1) {
 			allow = this.checkLocalMovementInputAllowance(entityId,struct.inputType);
 		} else {
 			allow = this.checkLocalActionInputAllowance(entityId,struct.inputType);
 		}
 		if(allow) {
-			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.inputType,0,0,struct.playerId));
+			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.inputType,struct.movAngle,struct.playerId));
 		}
 	}
 	addInputCommandClient(playerInputCommand) {
@@ -700,19 +687,19 @@ class engine_base_entity_EngineBaseGameEntity {
 		let now = HxOverrides.now() / 1000;
 		let hardcodedActionInputDelay = 1;
 		let allow = false;
-		if(playerInputType == 9) {
+		if(playerInputType == 2) {
 			if(this.lastLocalMeleeAttackInputCheck == 0 || this.lastLocalMeleeAttackInputCheck + hardcodedActionInputDelay < now) {
 				this.lastLocalMeleeAttackInputCheck = now;
 				allow = true;
 				this.actionToPerform = this.isRunning ? this.runAttackAction : this.meleeActions[Std.random(this.meleeActions.length)];
 			}
-		} else if(playerInputType == 10) {
+		} else if(playerInputType == 3) {
 			if(this.lastLocalRangedInputCheck == 0 || this.lastLocalRangedInputCheck + hardcodedActionInputDelay < now) {
 				this.lastLocalRangedInputCheck = now;
 				allow = true;
 				this.actionToPerform = this.rangedActions[Std.random(this.rangedActions.length)];
 			}
-		} else if(playerInputType == 11) {
+		} else if(playerInputType == 4) {
 			if(this.lastLocalDefendInputCheck == 0 || this.lastLocalDefendInputCheck + hardcodedActionInputDelay < now) {
 				this.lastLocalDefendInputCheck = now;
 				allow = true;
@@ -781,9 +768,6 @@ class engine_base_entity_EngineBaseGameEntity {
 	}
 	getRotation() {
 		return this.baseObjectEntity.rotation;
-	}
-	getDirection() {
-		return engine_base_MathUtils.radsToDirection(this.baseObjectEntity.rotation);
 	}
 	getCurrentActionRect() {
 		return this.actionToPerform.shape.toRect(this.baseObjectEntity.x,this.baseObjectEntity.y,this.currentDirectionSide);
@@ -919,7 +903,7 @@ class engine_base_geometry_Rectangle {
 		let bottomRightPoint = this.getBottomRightPoint();
 		return { lineA : new engine_base_geometry_Line(topLeftPoint.x,topLeftPoint.y,topRightPoint.x,topRightPoint.y), lineB : new engine_base_geometry_Line(topRightPoint.x,topRightPoint.y,bottomRightPoint.x,bottomRightPoint.y), lineC : new engine_base_geometry_Line(bottomRightPoint.x,bottomRightPoint.y,bottomLeftPoint.x,bottomLeftPoint.y), lineD : new engine_base_geometry_Line(bottomLeftPoint.x,bottomLeftPoint.y,topLeftPoint.x,topLeftPoint.y)};
 	}
-	contains(b) {
+	containsRect(b) {
 		let result = true;
 		if(this.getLeft() >= b.getRight() || b.getLeft() >= this.getRight()) {
 			result = false;
@@ -928,6 +912,13 @@ class engine_base_geometry_Rectangle {
 			result = false;
 		}
 		return result;
+	}
+	containtPoint(p) {
+		if(this.getLeft() <= p.x && this.getRight() >= p.x && this.getTop() <= p.y) {
+			return this.getBottom() >= p.y;
+		} else {
+			return false;
+		}
 	}
 	intersectsWithLine(line) {
 		let lines = this.getLines();
@@ -962,7 +953,7 @@ class engine_base_geometry_Rectangle {
 	}
 	intersectsWithRect(b) {
 		if(this.r == 0 && b.r == 0) {
-			return this.contains(b);
+			return this.containsRect(b);
 		} else {
 			let rA = this.getLines();
 			let rB = b.getLines();
@@ -1017,10 +1008,10 @@ class engine_holy_HolyGameEngine extends engine_base_core_BaseEngine {
 				continue;
 			}
 			this.validatedInputCommands.push(input);
-			if(input.inputType == 9 || input.inputType == 10 || input.inputType == 11) {
+			if(input.inputType == 2 || input.inputType == 3 || input.inputType == 4) {
 				entity.markForAction(input.inputType,2);
 			} else {
-				entity.performMove(input.inputType);
+				entity.performMove(input);
 			}
 		}
 	}
@@ -1055,7 +1046,7 @@ class engine_holy_HolyGameEngine extends engine_base_core_BaseEngine {
 						_g_lastStep = _g_jsIterator.next();
 						let entity2 = v;
 						if(entity2.isAlive && entity.getId() != entity2.getId()) {
-							if(entity.getCurrentActionRect().contains(entity2.getBodyRectangle())) {
+							if(entity.getCurrentActionRect().containsRect(entity2.getBodyRectangle())) {
 								let health = entity2.subtractHealth(entity.actionToPerform.damage);
 								if(health == 0) {
 									entity2.isAlive = false;
@@ -1119,8 +1110,8 @@ class engine_holy_entity_base_HolyBaseEntity extends engine_base_entity_EngineBa
 	constructor(baseObjectEntity) {
 		super(baseObjectEntity);
 	}
-	performMove(playerInputType) {
-		this.setRotation(engine_base_MathUtils.directionToRads(playerInputType));
+	performMove(playerInput) {
+		this.setRotation(playerInput.movAngle);
 		this.determenisticMove();
 	}
 	markForAction(playerInputType,side) {
@@ -1130,13 +1121,15 @@ class engine_holy_entity_base_HolyBaseEntity extends engine_base_entity_EngineBa
 		return true;
 	}
 	canPerformAction(playerInputType) {
-		if(playerInputType == 11 && this.baseObjectEntity.entityType != 1 || playerInputType == 10 && this.baseObjectEntity.entityType == 1) {
+		if(playerInputType == 4 && this.baseObjectEntity.entityType != 1 || playerInputType == 3 && this.baseObjectEntity.entityType == 1) {
 			return false;
 		}
 		return true;
 	}
 	updateHashImpl() {
-		return 123;
+		let e = this.baseObjectEntity;
+		let s = e.id + e.x + e.y + e.health;
+		return engine_base_EngineUtils.HashString(s);
 	}
 }
 engine_holy_entity_base_HolyBaseEntity.__name__ = true;
@@ -2696,14 +2689,6 @@ if( String.fromCodePoint == null ) String.fromCodePoint = function(c) { return c
 	var Enum = { };
 }
 js_Boot.__toStr = ({ }).toString;
-engine_base_MathUtils.MoveUpRads = engine_base_MathUtils.degreeToRads(270);
-engine_base_MathUtils.MoveUpLeftRads = engine_base_MathUtils.degreeToRads(225);
-engine_base_MathUtils.MoveUpRightRads = engine_base_MathUtils.degreeToRads(315);
-engine_base_MathUtils.MoveDownRads = engine_base_MathUtils.degreeToRads(90);
-engine_base_MathUtils.MoveDownLeftRads = engine_base_MathUtils.degreeToRads(135);
-engine_base_MathUtils.MoveDownRightRads = engine_base_MathUtils.degreeToRads(45);
-engine_base_MathUtils.MoveLeftRads = engine_base_MathUtils.degreeToRads(180);
-engine_base_MathUtils.MoveRightRads = engine_base_MathUtils.degreeToRads(0);
 engine_base_core_BaseEngine._hx_skip_constructor = false;
 haxe_Int32._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;

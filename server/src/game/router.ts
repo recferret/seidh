@@ -12,7 +12,11 @@ export class Router {
                 Events.eventEmitter.emit(EventType.JOIN, { playerId: jsonMsg.playerId });
                 break;
             case ProtocolMessage.input:
-                Events.eventEmitter.emit(EventType.INPUT, { playerId: jsonMsg.playerId, inputType: jsonMsg.inputType });
+                Events.eventEmitter.emit(EventType.INPUT, { 
+                    playerId: jsonMsg.playerId, 
+                    inputType: jsonMsg.inputType,
+                    movAngle: jsonMsg.movAngle,
+                });
                 break;
             default:
                 console.log('Unknown message received');
