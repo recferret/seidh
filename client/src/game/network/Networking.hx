@@ -1,0 +1,90 @@
+package game.network;
+
+import engine.holy.HolyGameEngine.EntityActionCallbackParams;
+import engine.base.BaseTypesAndClasses.EntityMinStruct;
+import engine.base.BaseTypesAndClasses.PlayerInputType;
+import game.event.EventManager;
+import haxe.Json;
+
+typedef JoinGamePayload = {
+	entities:Array<Dynamic>,
+}
+
+typedef DeleteEntityPayload = {
+	entityId:String,
+}
+
+typedef GameStatePayload = {
+	entities:Array<EntityMinStruct>,
+}
+
+typedef ActionsPayload = {
+    actions:Array<EntityActionCallbackParams>,
+}
+
+class Networking {
+
+    private var joined = false;
+    private var currentTransport = 0; // 0 - none, 1 - ws, 2 - wt
+
+    public function new() {
+    }
+
+    public function wsConnect() {
+        NativeWindowJS.wsConnect(callback);
+        currentTransport = 1;
+    }
+
+    public function wtConnect() {
+        NativeWindowJS.wtConnect(callback);
+        currentTransport = 2;
+    }
+
+    public function sendLogin() {
+        final message = { msg: 'login', playerId: Player.instance.playerId };
+        sendData(message);
+    }
+
+    public function sendJoin() {
+        final message = { msg: 'join', playerId: Player.instance.playerId };
+        sendData(message);
+    }
+
+    public function sendInput(inputType:PlayerInputType) {
+        final message = { msg: 'input', playerId: Player.instance.playerId, inputType: inputType };
+        sendData(message);
+    }
+
+    private function sendData(message:Dynamic) {
+        if (currentTransport == 1) {
+            NativeWindowJS.wsSend(Json.stringify(message));
+        } else if (currentTransport == 2) {
+            NativeWindowJS.wtSend(Json.stringify(message));
+        }
+    }
+
+    private function callback(data:String) {
+        final json = Json.parse(data);
+        switch (json.msg) {
+            case 'login':
+                sendJoin();
+            case 'joinGame':
+                joined = true;
+                EventManager.instance.notify(EventManager.EVENT_JOIN_GAME, json);
+            case 'gameState':
+                if (joined)
+                    EventManager.instance.notify(EventManager.EVENT_GAME_STATE, json);
+            case 'createEntity':
+                if (joined)
+                    EventManager.instance.notify(EventManager.EVENT_CREATE_ENTITY, json);
+            case 'deleteEntity':
+                if (joined)
+                    EventManager.instance.notify(EventManager.EVENT_DELETE_ENTITY, json);    
+            case 'performAction':
+                if (joined)
+                    EventManager.instance.notify(EventManager.EVENT_PERFORM_ACTION, json);
+            default:
+                trace('Unknown message');
+        }
+    }
+}

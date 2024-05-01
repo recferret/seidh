@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Ping example</title>
+  </head>
+  <body>
+    <p>WebTransport status: <span id="wtStatus">Disconnected</span></p>
+    <p>WebSocket status: <span id="wsStatus">Disconnected</span></p>
+
+    <script>
+      
+      setTimeout(async () => {
+        // const requestTime = Date.now();
+        // const pingResponse = await fetch(`http://176.109.111.197:3000/ping`);
+        // const responseJson = await pingResponse.json();
+        // const responseTime = Date.now();
+        // const roundTripTime = responseTime - requestTime;
+        // const serverTime = responseJson.serverTime;
+        // const timeDiff = Math.abs(responseTime - serverTime - roundTripTime);
+
+        // console.log('timeDiff: ' + timeDiff + ', roundTripTime: ' + roundTripTime);
+
+        const clientTimestamp = Date.now();
+
+        // const pingResponse = await fetch(`http://176.109.111.197:3000/ping`);
+          const response = await fetch(`http://176.109.111.197:3001/systemInfo`);
+          const json = await response.json();
+          const serverTimestamp = json.serverTime;
+
+          const nowTimeStamp  = Date.now()
+          const serverClientResponseDiffTime = nowTimeStamp - serverTimestamp;;
+          const serverClientRequestDiffTime = serverTimestamp - clientTimestamp;
+
+          const responseTime = (serverClientRequestDiffTime - nowTimeStamp + clientTimestamp - serverClientResponseDiffTime ) / 2;
+          const serverTimeOffset = (serverClientResponseDiffTime - responseTime);
+
+          console.log(`responseTime: ${responseTime}, serverTimeOffset: ${serverTimeOffset}`);
+      }, 500);
+
+    </script>
+  </body>
+</html>

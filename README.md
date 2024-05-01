@@ -1,2 +1,2 @@
-# seidh-game
+# HolyJsSpring2024
 
