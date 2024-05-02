@@ -1,7 +1,5 @@
 package game.scene.impl;
 
-import engine.base.MathUtils;
-import h2d.col.Point;
 import engine.holy.HolyGameEngine;
 import game.scene.base.BasicScene;
 
@@ -21,7 +19,8 @@ class SceneInputTest extends BasicScene {
 		createGameEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 200, 200, KNIGHT);
 
 		createGameEntityFromMinimalStruct("1", "1", 50, 200, SKELETON_WARRIOR);
-		createGameEntityFromMinimalStruct("2", "2", 250, 200, SKELETON_WARRIOR);
+		// createGameEntityFromMinimalStruct("2", "2", 450, 200, SKELETON_WARRIOR);
+		// createGameEntityFromMinimalStruct("3", "3", 850, 200, SKELETON_WARRIOR);
 		// createGameEntityFromMinimalStruct("2", "2", 400, 200, SKELETON_WARRIOR);
 		// createGameEntityFromMinimalStruct("3", "3", 500, 200, SKELETON_WARRIOR); 
  

@@ -1,5 +1,3 @@
-import hxd.Window.DisplayMode;
-import game.Player;
 import game.scene.SceneManager;
 import game.scene.base.BasicScene;
 
@@ -8,8 +6,6 @@ class Main extends hxd.App {
 
 	override function init() {
 		engine.backgroundColor = 0xFCDCA1;
-
-		Player.instance;
 
 		this.sceneManager = new SceneManager(function callback(scene:BasicScene) {
 			setScene2D(scene);

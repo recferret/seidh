@@ -1,7 +1,7 @@
 package engine.holy.entity.base;
 
-import engine.base.MathUtils;
 import haxe.Int32;
+import engine.base.Utils.EngineUtils;
 import engine.base.BaseTypesAndClasses;
 import engine.base.entity.EngineBaseGameEntity;
 
@@ -12,12 +12,11 @@ class HolyBaseEntity extends EngineBaseGameEntity {
     }
 
     public function performMove(playerInput:PlayerInputCommand) {
-        // setRotation(MathUtils.directionToRads(playerInputType));
-        setRotation(playerInput.movementAngle);
+        setRotation(playerInput.movAngle);
         determenisticMove();
     }
 
-    public function markForAction(playerInputType:PlayerInputType, side:Side) {
+    public function markForAction() {
         isActing = true;
     }
 
@@ -37,7 +36,9 @@ class HolyBaseEntity extends EngineBaseGameEntity {
     }
 
     public function updateHashImpl():Int32 {
-        return 123;
+        final e = baseObjectEntity;
+		final s:String = e.id + e.x + e.y + e.health;
+        return EngineUtils.HashString(s);
     }
 
 }

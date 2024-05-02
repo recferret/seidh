@@ -54,7 +54,8 @@ class HolyGameEngine extends BaseEngine {
 			validatedInputCommands.push(input);
 
             if (input.inputType == MELEE_ATTACK || input.inputType == RANGED_ATTACK || input.inputType == DEFEND) {
-                entity.markForAction(input.inputType, Side.RIGHT);
+                // TODO RMK
+                entity.markForAction();
             } else {
                 entity.performMove(input);
             }
@@ -74,7 +75,10 @@ class HolyGameEngine extends BaseEngine {
                 if (entity.getEntityType() == EntityType.SKELETON_WARRIOR) {
                     final targetPlayer = getNearestPlayer(entity);
                     if (targetPlayer != null) {
-                        entity.setTargetObject(targetPlayer);
+                        // entity.setTargetObject(targetPlayer);
+                        // if (entity.ifTargetInAttackRange()) {
+                        //     entity.aiMeleeAttack();
+                        // }
                     }
                 }
 

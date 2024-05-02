@@ -57,7 +57,6 @@ class NodeServer {
             });
         });
 
-        // TODO pass params
         Events.eventEmitter.on(EventType.INPUT, (data: InputEvent) => {
             this.gameEngineInstance.addInputCommandServer(data);
         });

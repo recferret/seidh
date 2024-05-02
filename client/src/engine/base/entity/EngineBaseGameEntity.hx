@@ -192,14 +192,17 @@ abstract class EngineBaseGameEntity {
 
 	public function setTargetObject(targetObjectEntity:EngineBaseGameEntity) {
 		this.targetObjectEntity = targetObjectEntity;
-		// baseObjectEntity.rotation = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
 	}
 
 	public function hasTargetObject() {
 		return this.targetObjectEntity != null;
 	}
 
-	public function distanceBetweenTarget() {
+	public function ifTargetInAttackRange() {
+		return distanceBetweenTarget() < 100;
+	}
+
+	private function distanceBetweenTarget() {
 		if (hasTargetObject()) {
 			return getBodyRectangle().getCenter().distance(targetObjectEntity.getBodyRectangle().getCenter());
 		} else {
@@ -210,10 +213,6 @@ abstract class EngineBaseGameEntity {
 	// ------------------------------------------------
 	// Movement and input
 	// ------------------------------------------------
-
-
-	// Refactor to constant movement
-	// Use time delta
 
 	private function renegerateVitality() {
 		if (baseObjectEntity.movement.canRun && !isWalking && !isRunning) {
@@ -244,9 +243,7 @@ abstract class EngineBaseGameEntity {
 	}
 
 	public function moveToTarget() {
-		final dist = getBodyRectangle().getCenter().distance(targetObjectEntity.getBodyRectangle().getCenter());
-
-		if (dist > targetObjectEntity.getFullEntity().entityShape.width) {
+		if (!ifTargetInAttackRange()) {
 			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
 
 			var speed = baseObjectEntity.movement.walkSpeed;
@@ -282,7 +279,7 @@ abstract class EngineBaseGameEntity {
 				lastLocalMeleeAttackInputCheck = now;
 				allow = true;
 
-				actionToPerform = isRunning ? runAttackAction : meleeActions[Std.random(meleeActions.length)];
+				actionToPerform = isRunning ? runAttackAction : getRandomMeleeAction();
 			}
 		} else if (playerInputType == PlayerInputType.RANGED_ATTACK) {
 			if (lastLocalRangedInputCheck == 0 || lastLocalRangedInputCheck + hardcodedActionInputDelay < now) {
@@ -301,6 +298,17 @@ abstract class EngineBaseGameEntity {
 		}
 
 		return allow;
+	}
+
+	public function aiMeleeAttack() {
+		if (checkLocalActionInputAndPrepare(PlayerInputType.MELEE_ATTACK)) {
+			isActing = true;
+		}
+	}
+
+	public function setRandomMeleeAction() {
+		isActing = true;
+		actionToPerform = getRandomMeleeAction();
 	}
 
 	public function setNextActionToPerform(entityActionType:EntityActionType) {
@@ -333,6 +341,10 @@ abstract class EngineBaseGameEntity {
 			baseObjectEntity.health = 0;
 		}
 		return baseObjectEntity.health;
+	}
+
+	private function getRandomMeleeAction() {
+		return meleeActions[Std.random(meleeActions.length)];
 	}
 
 	// ------------------------------------------------
@@ -377,10 +389,6 @@ abstract class EngineBaseGameEntity {
 		return baseObjectEntity.rotation;
 	}
 	
-	public function getDirection() {
-		return MathUtils.radsToDirection(baseObjectEntity.rotation);
-	}
-
 	public function getCurrentActionRect() {
 		return actionToPerform.shape.toRect(baseObjectEntity.x, baseObjectEntity.y, currentDirectionSide);
 	}

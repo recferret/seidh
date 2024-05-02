@@ -139,6 +139,15 @@ abstract class BaseEngine {
 		return mainEntityManager.entities;
 	}
 
+	public function getMainEntitiesChanged() {
+		final result = new Array<EngineBaseGameEntity>();
+		for (entity in mainEntityManager.entities) {
+			if (entity.isChanged()) 
+				result.push(entity);
+		}
+		return result;
+	}
+
 	public function processCreateEntityQueue() {
 		for (queueTask in addMainEntityQueue) {
 			mainEntityManager.add(queueTask.entity);
@@ -192,7 +201,7 @@ abstract class BaseEngine {
 		final entityId = getMainEntityIdByOwnerId(struct.playerId);
 		var allow = false;
 
-		if (struct.inputType < 9) {
+		if (struct.inputType == PlayerInputType.MOVE) {
 			allow = checkLocalMovementInputAllowance(entityId, struct.inputType);
 		} else {
 			allow = checkLocalActionInputAllowance(entityId, struct.inputType);

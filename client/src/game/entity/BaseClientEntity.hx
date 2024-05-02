@@ -1,10 +1,8 @@
 package game.entity;
 
-import engine.base.BaseTypesAndClasses.Side;
 import game.entity.animation.EntityAnimations;
 import game.entity.animation.EntityAnimations.EntityAnimation;
 import engine.base.BaseTypesAndClasses.EntityShape;
-import engine.base.BaseTypesAndClasses.PlayerInputType;
 import engine.base.geometry.Point;
 import engine.base.entity.EngineBaseGameEntity;
 import haxe.Timer;
@@ -100,20 +98,24 @@ abstract class BaseClientEntity extends h2d.Object {
         }, 300);
     }
 
-    private function isRightSide() {
-        if ([MOVE_LEFT, MOVE_UP_LEFT, MOVE_DOWN_LEFT].contains(engineEntity.getDirection())) {
-            return false;
-        } else if ([MOVE_RIGHT, MOVE_UP_RIGHT, MOVE_DOWN_RIGHT].contains(engineEntity.getDirection())) {
-            return true;
-        } else {
-            return true;
-        }
-    }
+    // private function isRightSide() {
+    //     if ([MOVE_LEFT, MOVE_UP_LEFT, MOVE_DOWN_LEFT].contains(engineEntity.getDirection())) {
+    //         return false;
+    //     } else if ([MOVE_RIGHT, MOVE_UP_RIGHT, MOVE_DOWN_RIGHT].contains(engineEntity.getDirection())) {
+    //         return true;
+    //     } else {
+    //         return true;
+    //     }
+    // }
 
     // Getters
 
     public function getId() {
         return engineEntity.getId();
+    }
+
+    public function getOwnerId() {
+        return engineEntity.getOwnerId();
     }
 
     public function getBodyRectangle() {

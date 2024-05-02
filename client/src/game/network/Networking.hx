@@ -1,5 +1,6 @@
 package game.network;
 
+import engine.base.BaseTypesAndClasses.PlayerInputCommand;
 import engine.holy.HolyGameEngine.EntityActionCallbackParams;
 import engine.base.BaseTypesAndClasses.EntityMinStruct;
 import engine.base.BaseTypesAndClasses.PlayerInputType;
@@ -50,8 +51,17 @@ class Networking {
         sendData(message);
     }
 
-    public function sendInput(inputType:PlayerInputType) {
-        final message = { msg: 'input', playerId: Player.instance.playerId, inputType: inputType };
+    public function sendInput(input:PlayerInputCommand) {
+        final message = { 
+            msg: 'input', 
+            playerId: Player.instance.playerId, 
+            inputType: input.inputType,
+            movAngle: null
+        };
+        if (input.inputType == MOVE) {
+            message.movAngle = input.movAngle;
+        }
+        trace(message);
         sendData(message);
     }
 

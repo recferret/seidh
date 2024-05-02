@@ -1,18 +1,19 @@
 package game.scene.base;
 
-import h2d.Scene.ScaleMode;
-import engine.base.geometry.Rectangle;
-import game.utils.Utils;
-import engine.base.MathUtils;
+import h3d.Engine;
+
 import game.network.Networking;
 import game.entity.KnightEntity;
 import game.entity.SamuraiEntity;
 import game.entity.SkeletonWarriorEntity;
 import game.entity.SkeletonArcherEntity;
 import game.entity.BaseClientEntity;
+import game.utils.Utils;
 import engine.base.BaseTypesAndClasses;
+import engine.base.MathUtils;
 import engine.base.entity.EngineBaseGameEntity;
 import engine.base.geometry.Point;
+import engine.base.geometry.Rectangle;
 import engine.holy.HolyGameEngine;
 import hxd.Key in K;
 
@@ -112,8 +113,10 @@ abstract class BasicScene extends h2d.Scene {
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
 
-	private var movementController:MovementController;
+	private var controlsScene:ControlsScene;
 	private var fui:h2d.Flow;
+
+	private var playerEntity:BaseClientEntity;
 
 	final clientMainEntities = new Map<String, BaseClientEntity>();
 
@@ -121,25 +124,10 @@ abstract class BasicScene extends h2d.Scene {
 		super();
 
 		scaleMode = ScaleMode.LetterBox(1280, 720, true, Left, Top);
+		camera.setViewport(1280 / 2 - 50, 720 / 2 - 100, 1280, 720);
 
 		if (baseEngine != null) {
-			movementController = new MovementController(this, function callback(angle:Float) {
-				// TODO pass input here
-				trace(angle);
-
-				final playerId = Player.instance.playerId;
-				final playerEntityId = Player.instance.playerEntityId;
-				final playerMovementInputType = PlayerInputType.MOVE_DIR;
-
-				if (playerMovementInputType != null) {
-					final movementAllowance = baseEngine.checkLocalMovementInputAllowance(playerEntityId, playerMovementInputType);
-					if (movementAllowance) {
-						baseEngine.addInputCommandClient(new PlayerInputCommand(playerMovementInputType, angle, playerId, Player.instance.incrementAndGetInputIndex()));
-					}
-				}
-			});
-  
-			movementController.initiate(150, 720 - 150, 300);
+			controlsScene = new ControlsScene(baseEngine);
 
 			this.baseEngine = baseEngine;
 			this.baseEngine.createMainEntityCallback = function callback(engineEntity:EngineBaseGameEntity) {
@@ -159,6 +147,10 @@ abstract class BasicScene extends h2d.Scene {
 
 				entity.initiateEngineEntity(engineEntity);
 				clientMainEntities.set(entity.getId(), entity);
+
+				if (entity.getOwnerId() == Player.instance.playerId) {
+					playerEntity = entity;
+				}
 			};
 
 			this.baseEngine.deleteMainEntityCallback = function callback(engineEntity:EngineBaseGameEntity) {
@@ -170,7 +162,6 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.baseEngine.postLoopCallback = function callback() {
-				// Only for players and local mode ?
 				for (mainEntity in baseEngine.getMainEntities()) {
 					if (clientMainEntities.exists(mainEntity.getId())) {
 						final clientEntity = clientMainEntities.get(mainEntity.getId());
@@ -181,13 +172,14 @@ abstract class BasicScene extends h2d.Scene {
 				if (networking != null) {
 					for (input in baseEngine.validatedInputCommands) {
 						if (input.playerId == Player.instance.playerId) {
-							networking.sendInput(input.inputType);
+							networking.sendInput(input);
 						}
 					}
 				}
 			};
 
 			this.baseEngine.entityActionCallback = function callback(params:Array<EntityActionCallbackParams>) {
+				trace(params);
 				for (value in params) {
 					// Play action initiator animation
 					final clientEntity = clientMainEntities.get(value.entityId);
@@ -236,7 +228,7 @@ abstract class BasicScene extends h2d.Scene {
 
 		function onEvent(event:hxd.Event) {
 			if (event.kind == EMove) {
-				movementController.updateCursorPosition(event.relX, event.relY);
+				controlsScene.updateCursorPosition(event.relX, event.relY);
 			}
 		}
 
@@ -253,9 +245,20 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public function update(dt:Float, fps:Float) {
-		movementController.update();
+		controlsScene.update();
 		updateInput();
 		customUpdate(dt, fps);
+
+		if (playerEntity != null) {
+			camera.x = playerEntity.x;
+			camera.y = playerEntity.y;
+		}
+
+	}
+
+	public override function render(e:Engine) {
+		controlsScene.render(e);
+		super.render(e);
 	}
 
 	public function getInputScene():h2d.Scene {
@@ -263,48 +266,8 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	private function updateInput() {
-		final left = K.isDown(K.LEFT);
-		final right = K.isDown(K.RIGHT);
-		final up = K.isDown(K.UP);
-		final down = K.isDown(K.DOWN);
 		final space = K.isDown(K.SPACE);
-
-		var playerMovementInputType:PlayerInputType = null;
 		var playerActionInputType:PlayerInputType = null;
-
-		if (up) {
-			if (left) {
-				playerMovementInputType = PlayerInputType.MOVE_UP_LEFT;
-			} else if (right) {
-				playerMovementInputType = PlayerInputType.MOVE_UP_RIGHT;
-			} else  {
-				playerMovementInputType = PlayerInputType.MOVE_UP;
-			}
-		} else if(down) {
-			if (left) {
-				playerMovementInputType = PlayerInputType.MOVE_DOWN_LEFT;
-			} else if (right) {
-				playerMovementInputType = PlayerInputType.MOVE_DOWN_RIGHT;
-			} else  {
-				playerMovementInputType = PlayerInputType.MOVE_DOWN;
-			}
-		} else if (left) {
-			if (up) {
-				playerMovementInputType = PlayerInputType.MOVE_UP_LEFT;
-			} else if (down) {
-				playerMovementInputType = PlayerInputType.MOVE_DOWN_LEFT;
-			} else {
-				playerMovementInputType = PlayerInputType.MOVE_LEFT;
-			}
-		} else if (right) {
-			if (up) {
-				playerMovementInputType = PlayerInputType.MOVE_UP_RIGHT;
-			} else if (down) {
-				playerMovementInputType = PlayerInputType.MOVE_DOWN_RIGHT;
-			} else {
-				playerMovementInputType = PlayerInputType.MOVE_RIGHT;
-			}
-		}
 
 		if (space) {
 			playerActionInputType = PlayerInputType.MELEE_ATTACK;
@@ -312,13 +275,6 @@ abstract class BasicScene extends h2d.Scene {
 
 		final playerId = Player.instance.playerId;
 		final playerEntityId = Player.instance.playerEntityId;
-
-		if (playerMovementInputType != null) {
-			final movementAllowance = baseEngine.checkLocalMovementInputAllowance(playerEntityId, playerMovementInputType);
-			if (playerMovementInputType != null && (up || down || left || right) && movementAllowance) {
-				baseEngine.addInputCommandClient(new PlayerInputCommand(playerMovementInputType, 0, playerId, Player.instance.incrementAndGetInputIndex()));
-			}
-		}
 
 		if (playerActionInputType != null) {
 			final actionAllowance = baseEngine.checkLocalActionInputAllowance(playerEntityId, playerActionInputType);
@@ -345,8 +301,6 @@ abstract class BasicScene extends h2d.Scene {
 	// ----------------------------------
 	// GUI
 	// ----------------------------------
-
-	// TODO move to separate class
 
 	private function getFont() {
 		return hxd.res.DefaultFont.get();

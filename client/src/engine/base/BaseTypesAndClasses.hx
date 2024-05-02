@@ -182,32 +182,21 @@ typedef EntityMinStruct = {
 }
 
 enum abstract PlayerInputType(Int) {
-	var MOVE_UP = 1;
-	var MOVE_DOWN = 2;
-	var MOVE_LEFT = 3;
-	var MOVE_RIGHT = 4;
-
-	var MOVE_UP_LEFT = 5;
-	var MOVE_UP_RIGHT = 6;
-	var MOVE_DOWN_LEFT = 7;
-	var MOVE_DOWN_RIGHT = 8;
-
-	var MELEE_ATTACK = 9;
-	var RANGED_ATTACK = 10;
-	var DEFEND = 11;
-
-	var MOVE_DIR = 12;
+	var MOVE = 1;
+	var MELEE_ATTACK = 2;
+	var RANGED_ATTACK = 3;
+	var DEFEND = 4;
 }
 
 class PlayerInputCommand {
 	public var index:Int;
 	public var inputType:PlayerInputType;
-	public var movementAngle: Float;
+	public var movAngle: Float;
 	public var playerId:String;
 
-	public function new(inputType:PlayerInputType, movementAngle:Float, playerId:String, ?index:Int) {
+	public function new(inputType:PlayerInputType, movAngle:Float, playerId:String, ?index:Int) {
 		this.inputType = inputType;
-		this.movementAngle = movementAngle;
+		this.movAngle = movAngle;
 		this.playerId = playerId;
 		this.index = index;
 	}
