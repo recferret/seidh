@@ -123,8 +123,8 @@ abstract class BasicScene extends h2d.Scene {
 	public function new(baseEngine:HolyGameEngine) {
 		super();
 
-		scaleMode = ScaleMode.LetterBox(1280, 720, true, Left, Top);
-		camera.setViewport(1280 / 2 - 50, 720 / 2 - 100, 1280, 720);
+		// scaleMode = ScaleMode.LetterBox(1280, 720, true, Left, Top);
+		// camera.setViewport(1280 / 2 - 50, 720 / 2 - 100, 1280, 720);
 
 		// scale(2);
 
