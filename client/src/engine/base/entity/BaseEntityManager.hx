@@ -3,14 +3,14 @@ package engine.base.entity;
 import js.lib.Map;
 import engine.base.entity.EngineBaseGameEntity;
 
+// TODO impl base manager
+// TODO impl base entity object
+
 class BaseEntityManager {
 	public final entities = new js.lib.Map<String, EngineBaseGameEntity>();
 
-	private var updateCallback:Null<EngineBaseGameEntity->Void>;
-
 	public function destroy() {
 		entities.clear();
-		updateCallback = null;
 	}
 
 	public function getChangedEntities() {

@@ -5,6 +5,7 @@ import engine.holy.HolyGameEngine.EntityActionCallbackParams;
 import engine.base.BaseTypesAndClasses.EntityMinStruct;
 import engine.base.BaseTypesAndClasses.PlayerInputType;
 import game.event.EventManager;
+import game.js.NativeWindowJS;
 import haxe.Json;
 
 typedef JoinGamePayload = {

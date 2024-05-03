@@ -165,12 +165,6 @@ abstract class EngineBaseGameEntity {
 		}
 	}
 
-	public function collides(isCollides:Bool) {
-		this.isCollides = isCollides;
-		if (customCollide != null)
-			customCollide.onCollide();
-	}
-
 	public function isChanged() {
 		return previousTickHash != currentTickHash;
 	}

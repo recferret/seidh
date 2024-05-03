@@ -27,7 +27,6 @@ class SceneGeomTest extends BasicScene {
 	}
 
 	public function customUpdate(dt:Float, fps:Float) {
-		debugGraphics.clear();
 		// ------------------------------------------
 		// Two rect collide test
 		// ------------------------------------------

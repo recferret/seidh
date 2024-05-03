@@ -1,5 +1,6 @@
 package engine.base.core;
 
+import engine.base.entity.EngineProjectileEntity;
 import engine.base.BaseTypesAndClasses;
 import engine.base.core.GameLoop;
 import engine.base.entity.EngineBaseGameEntity;
@@ -28,14 +29,21 @@ abstract class BaseEngine {
 	public var postLoopCallback:Void->Void;
 	public var createMainEntityCallback:EngineBaseGameEntity->Void;
 	public var deleteMainEntityCallback:EngineBaseGameEntity->Void;
+	public var createProjectileCallback:EngineProjectileEntity->Void;
+	public var deleteProjectileCallback:EngineProjectileEntity->Void;
 
 	public final mainEntityManager:BaseEntityManager;
+	// public final projectileEntityManager:BaseEntityManager;
+
 	public final playerToEntityMap = new Map<String, String>();
 
 	public var validatedInputCommands = new Array<PlayerInputCommand>();
 
-	private var addMainEntityQueue = new Array<CreateMainEntityTask>();
+	private var createMainEntityQueue = new Array<CreateMainEntityTask>();
 	private var removeMainEntityQueue = new Array<String>();
+
+	private var createProjectileEntityQueue = new Array<CreateMainEntityTask>();
+	private var removeProjectileEntityQueue = new Array<String>();
 
 	// Команды от пользователей, которые будут применены в начале каждого тика
 	private var hotInputCommands = new Array<InputCommandEngineWrapped>();
@@ -61,6 +69,9 @@ abstract class BaseEngine {
 
 			processCreateEntityQueue();
 			processRemoveEntityQueue();
+
+			processCreateProjectileQueue();
+			processRemoveProjectileQueue();
 
 			// Apply inputs
 			if (hotInputCommands.length > 0) {
@@ -95,7 +106,7 @@ abstract class BaseEngine {
 	// -----------------------------------
 
 	function createMainEntity(entity:EngineBaseGameEntity, fireCallback = false) {
-		addMainEntityQueue.push({
+		createMainEntityQueue.push({
 			entity: entity,
 			fireCallback: fireCallback
 		});
@@ -149,7 +160,7 @@ abstract class BaseEngine {
 	}
 
 	public function processCreateEntityQueue() {
-		for (queueTask in addMainEntityQueue) {
+		for (queueTask in createMainEntityQueue) {
 			mainEntityManager.add(queueTask.entity);
 			playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
 			if (queueTask.fireCallback) {
@@ -158,7 +169,7 @@ abstract class BaseEngine {
 				}
 			}
 		}
-		addMainEntityQueue = [];
+		createMainEntityQueue = [];
 	}
 
 	public function processRemoveEntityQueue() {
@@ -173,6 +184,33 @@ abstract class BaseEngine {
 			}
 		}
 		removeMainEntityQueue = [];
+	}
+
+	// -----------------------------------
+	// Projectiles
+	// -----------------------------------
+
+	public function processCreateProjectileQueue() {
+		for (queueTask in createProjectileEntityQueue) {
+			mainEntityManager.add(queueTask.entity);
+			if (createMainEntityCallback != null) {
+				createMainEntityCallback(queueTask.entity);
+			}
+		}
+		createProjectileEntityQueue = [];
+	}
+
+	public function processRemoveProjectileQueue() {
+		for (entityId in removeProjectileEntityQueue) {
+			final entity = mainEntityManager.getEntityById(entityId);
+			if (entity != null) {
+				if (deleteMainEntityCallback != null) {
+					deleteMainEntityCallback(entity);
+				}
+				mainEntityManager.remove(entity.getId());
+			}
+		}
+		removeProjectileEntityQueue = [];
 	}
 
 	// -----------------------------------
@@ -193,7 +231,13 @@ abstract class BaseEngine {
 		if (entity == null) {
 			return false;
 		} else {
-			return entity.checkLocalActionInputAndPrepare(playerInputType) && entity.canPerformAction(playerInputType);
+			final allow = entity.checkLocalActionInputAndPrepare(playerInputType) && entity.canPerformAction(playerInputType);
+			
+			// if (createMainEntityCallback != null) {
+			// 	createMainEntityCallback(queueTask.entity);
+			// }
+
+			return allow;
 		}
 	}
 

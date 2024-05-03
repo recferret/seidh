@@ -128,10 +128,9 @@ engine_base_BaseObjectEntity.prototype = {
 	}
 	,__class__: engine_base_BaseObjectEntity
 };
-var engine_base_PlayerInputCommand = function(inputType,targetX,targetY,playerId,index) {
+var engine_base_PlayerInputCommand = function(inputType,movAngle,playerId,index) {
 	this.inputType = inputType;
-	this.targetX = targetX;
-	this.targetY = targetY;
+	this.movAngle = movAngle;
 	this.playerId = playerId;
 	this.index = index;
 };
@@ -149,50 +148,6 @@ engine_base_InputCommandEngineWrapped.prototype = {
 };
 var engine_base_MathUtils = function() { };
 engine_base_MathUtils.__name__ = true;
-engine_base_MathUtils.directionToRads = function(playerInputType) {
-	switch(playerInputType) {
-	case 1:
-		return engine_base_MathUtils.MoveUpRads;
-	case 2:
-		return engine_base_MathUtils.MoveDownRads;
-	case 3:
-		return engine_base_MathUtils.MoveLeftRads;
-	case 4:
-		return engine_base_MathUtils.MoveRightRads;
-	case 5:
-		return engine_base_MathUtils.MoveUpLeftRads;
-	case 6:
-		return engine_base_MathUtils.MoveUpRightRads;
-	case 7:
-		return engine_base_MathUtils.MoveDownLeftRads;
-	case 8:
-		return engine_base_MathUtils.MoveDownRightRads;
-	default:
-		return 0;
-	}
-};
-engine_base_MathUtils.radsToDirection = function(rads) {
-	switch(rads) {
-	case engine_base_MathUtils.MoveDownLeftRads:
-		return 7;
-	case engine_base_MathUtils.MoveDownRads:
-		return 2;
-	case engine_base_MathUtils.MoveDownRightRads:
-		return 8;
-	case engine_base_MathUtils.MoveLeftRads:
-		return 3;
-	case engine_base_MathUtils.MoveRightRads:
-		return 4;
-	case engine_base_MathUtils.MoveUpLeftRads:
-		return 5;
-	case engine_base_MathUtils.MoveUpRads:
-		return 1;
-	case engine_base_MathUtils.MoveUpRightRads:
-		return 6;
-	default:
-		return 4;
-	}
-};
 engine_base_MathUtils.angleBetweenPoints = function(point1,point2) {
 	return Math.atan2(point2.y - point1.y,point2.x - point1.x);
 };
@@ -232,6 +187,22 @@ engine_base_MathUtils.lineToLineIntersection = function(lineA,lineB) {
 };
 engine_base_MathUtils.differ = function(a,b,error) {
 	return Math.abs(a - b) > (error == 0 ? 1 : error);
+};
+var engine_base_EngineUtils = function() { };
+engine_base_EngineUtils.__name__ = true;
+engine_base_EngineUtils.HashString = function(str) {
+	var strLen = str.length;
+	if(strLen == 0) {
+		return 0;
+	}
+	var hc = 0;
+	var _g = 0;
+	var _g1 = strLen;
+	while(_g < _g1) {
+		var i = _g++;
+		hc = ((hc << 5) - hc | 0) + HxOverrides.cca(str,i) | 0;
+	}
+	return hc;
 };
 var engine_base_core_EngineMode = $hxEnums["engine.base.core.EngineMode"] = { __ename__:true,__constructs__:null
 	,Client: {_hx_name:"Client",_hx_index:0,__enum__:"engine.base.core.EngineMode",toString:$estr}
@@ -314,6 +285,21 @@ engine_base_core_BaseEngine.prototype = {
 	,getMainEntities: function() {
 		return this.mainEntityManager.entities;
 	}
+	,getMainEntitiesChanged: function() {
+		var result = [];
+		var jsIterator = this.mainEntityManager.entities.values();
+		var _g_jsIterator = jsIterator;
+		var _g_lastStep = jsIterator.next();
+		while(!_g_lastStep.done) {
+			var v = _g_lastStep.value;
+			_g_lastStep = _g_jsIterator.next();
+			var entity = v;
+			if(entity.isChanged()) {
+				result.push(entity);
+			}
+		}
+		return result;
+	}
 	,processCreateEntityQueue: function() {
 		var _g = 0;
 		var _g1 = this.addMainEntityQueue;
@@ -378,13 +364,13 @@ engine_base_core_BaseEngine.prototype = {
 	,addInputCommandServer: function(struct) {
 		var entityId = this.getMainEntityIdByOwnerId(struct.playerId);
 		var allow = false;
-		if(struct.inputType < 9) {
+		if(struct.inputType == 1) {
 			allow = this.checkLocalMovementInputAllowance(entityId,struct.inputType);
 		} else {
 			allow = this.checkLocalActionInputAllowance(entityId,struct.inputType);
 		}
 		if(allow) {
-			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.inputType,0,0,struct.playerId));
+			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.inputType,struct.movAngle,struct.playerId));
 		}
 	}
 	,addInputCommandClient: function(playerInputCommand) {
@@ -612,6 +598,9 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 	,hasTargetObject: function() {
 		return this.targetObjectEntity != null;
 	}
+	,ifTargetInAttackRange: function() {
+		return this.distanceBetweenTarget() < 100;
+	}
 	,distanceBetweenTarget: function() {
 		if(this.hasTargetObject()) {
 			var _this = this.getBodyRectangle().getCenter();
@@ -646,12 +635,7 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 		this.baseObjectEntity.y += this.dy | 0;
 	}
 	,moveToTarget: function() {
-		var _this = this.getBodyRectangle().getCenter();
-		var p = this.targetObjectEntity.getBodyRectangle().getCenter();
-		var dx = _this.x - p.x;
-		var dy = _this.y - p.y;
-		var dist = Math.sqrt(dx * dx + dy * dy);
-		if(dist > this.targetObjectEntity.getFullEntity().entityShape.width) {
+		if(!this.ifTargetInAttackRange()) {
 			var angleBetweenEntities = engine_base_MathUtils.angleBetweenPoints(this.getBodyRectangle().getCenter(),this.targetObjectEntity.getBodyRectangle().getCenter());
 			var speed = this.baseObjectEntity.movement.walkSpeed;
 			this.dx = speed * Math.cos(angleBetweenEntities) * this.lastDeltaTime;
@@ -674,19 +658,19 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 		var now = HxOverrides.now() / 1000;
 		var hardcodedActionInputDelay = 1;
 		var allow = false;
-		if(playerInputType == 9) {
+		if(playerInputType == 2) {
 			if(this.lastLocalMeleeAttackInputCheck == 0 || this.lastLocalMeleeAttackInputCheck + hardcodedActionInputDelay < now) {
 				this.lastLocalMeleeAttackInputCheck = now;
 				allow = true;
-				this.actionToPerform = this.isRunning ? this.runAttackAction : this.meleeActions[Std.random(this.meleeActions.length)];
+				this.actionToPerform = this.isRunning ? this.runAttackAction : this.getRandomMeleeAction();
 			}
-		} else if(playerInputType == 10) {
+		} else if(playerInputType == 3) {
 			if(this.lastLocalRangedInputCheck == 0 || this.lastLocalRangedInputCheck + hardcodedActionInputDelay < now) {
 				this.lastLocalRangedInputCheck = now;
 				allow = true;
 				this.actionToPerform = this.rangedActions[Std.random(this.rangedActions.length)];
 			}
-		} else if(playerInputType == 11) {
+		} else if(playerInputType == 4) {
 			if(this.lastLocalDefendInputCheck == 0 || this.lastLocalDefendInputCheck + hardcodedActionInputDelay < now) {
 				this.lastLocalDefendInputCheck = now;
 				allow = true;
@@ -694,6 +678,15 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 			}
 		}
 		return allow;
+	}
+	,aiMeleeAttack: function() {
+		if(this.checkLocalActionInputAndPrepare(2)) {
+			this.isActing = true;
+		}
+	}
+	,setRandomMeleeAction: function() {
+		this.isActing = true;
+		this.actionToPerform = this.getRandomMeleeAction();
 	}
 	,setNextActionToPerform: function(entityActionType) {
 		this.isActing = true;
@@ -731,6 +724,9 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 		}
 		return this.baseObjectEntity.health;
 	}
+	,getRandomMeleeAction: function() {
+		return this.meleeActions[Std.random(this.meleeActions.length)];
+	}
 	,getFullEntity: function() {
 		return this.baseObjectEntity;
 	}
@@ -755,9 +751,6 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 	}
 	,getRotation: function() {
 		return this.baseObjectEntity.rotation;
-	}
-	,getDirection: function() {
-		return engine_base_MathUtils.radsToDirection(this.baseObjectEntity.rotation);
 	}
 	,getCurrentActionRect: function() {
 		return this.actionToPerform.shape.toRect(this.baseObjectEntity.x,this.baseObjectEntity.y,this.currentDirectionSide);
@@ -887,7 +880,7 @@ engine_base_geometry_Rectangle.prototype = {
 		var bottomRightPoint = this.getBottomRightPoint();
 		return { lineA : new engine_base_geometry_Line(topLeftPoint.x,topLeftPoint.y,topRightPoint.x,topRightPoint.y), lineB : new engine_base_geometry_Line(topRightPoint.x,topRightPoint.y,bottomRightPoint.x,bottomRightPoint.y), lineC : new engine_base_geometry_Line(bottomRightPoint.x,bottomRightPoint.y,bottomLeftPoint.x,bottomLeftPoint.y), lineD : new engine_base_geometry_Line(bottomLeftPoint.x,bottomLeftPoint.y,topLeftPoint.x,topLeftPoint.y)};
 	}
-	,contains: function(b) {
+	,containsRect: function(b) {
 		var result = true;
 		if(this.getLeft() >= b.getRight() || b.getLeft() >= this.getRight()) {
 			result = false;
@@ -896,6 +889,13 @@ engine_base_geometry_Rectangle.prototype = {
 			result = false;
 		}
 		return result;
+	}
+	,containtPoint: function(p) {
+		if(this.getLeft() <= p.x && this.getRight() >= p.x && this.getTop() <= p.y) {
+			return this.getBottom() >= p.y;
+		} else {
+			return false;
+		}
 	}
 	,intersectsWithLine: function(line) {
 		var lines = this.getLines();
@@ -930,7 +930,7 @@ engine_base_geometry_Rectangle.prototype = {
 	}
 	,intersectsWithRect: function(b) {
 		if(this.r == 0 && b.r == 0) {
-			return this.contains(b);
+			return this.containsRect(b);
 		} else {
 			var rA = this.getLines();
 			var rB = b.getLines();
@@ -980,10 +980,10 @@ engine_holy_HolyGameEngine.prototype = $extend(engine_base_core_BaseEngine.proto
 				continue;
 			}
 			this.validatedInputCommands.push(input);
-			if(input.inputType == 9 || input.inputType == 10 || input.inputType == 11) {
-				entity.markForAction(input.inputType,2);
+			if(input.inputType == 2 || input.inputType == 3 || input.inputType == 4) {
+				entity.markForAction();
 			} else {
-				entity.performMove(input.inputType);
+				entity.performMove(input);
 			}
 		}
 	}
@@ -1018,7 +1018,7 @@ engine_holy_HolyGameEngine.prototype = $extend(engine_base_core_BaseEngine.proto
 						_g_lastStep1 = _g_jsIterator1.next();
 						var entity2 = v1;
 						if(entity2.isAlive && entity.getId() != entity2.getId()) {
-							if(entity.getCurrentActionRect().contains(entity2.getBodyRectangle())) {
+							if(entity.getCurrentActionRect().containsRect(entity2.getBodyRectangle())) {
 								var health = entity2.subtractHealth(entity.actionToPerform.damage);
 								if(health == 0) {
 									entity2.isAlive = false;
@@ -1077,24 +1077,26 @@ var engine_holy_entity_base_HolyBaseEntity = function(baseObjectEntity) {
 engine_holy_entity_base_HolyBaseEntity.__name__ = true;
 engine_holy_entity_base_HolyBaseEntity.__super__ = engine_base_entity_EngineBaseGameEntity;
 engine_holy_entity_base_HolyBaseEntity.prototype = $extend(engine_base_entity_EngineBaseGameEntity.prototype,{
-	performMove: function(playerInputType) {
-		this.setRotation(engine_base_MathUtils.directionToRads(playerInputType));
+	performMove: function(playerInput) {
+		this.setRotation(playerInput.movAngle);
 		this.determenisticMove();
 	}
-	,markForAction: function(playerInputType,side) {
+	,markForAction: function() {
 		this.isActing = true;
 	}
 	,canPerformMove: function(playerInputType) {
 		return true;
 	}
 	,canPerformAction: function(playerInputType) {
-		if(playerInputType == 11 && this.baseObjectEntity.entityType != 1 || playerInputType == 10 && this.baseObjectEntity.entityType == 1) {
+		if(playerInputType == 4 && this.baseObjectEntity.entityType != 1 || playerInputType == 3 && this.baseObjectEntity.entityType == 1) {
 			return false;
 		}
 		return true;
 	}
 	,updateHashImpl: function() {
-		return 123;
+		var e = this.baseObjectEntity;
+		var s = e.id + e.x + e.y + e.health;
+		return engine_base_EngineUtils.HashString(s);
 	}
 	,__class__: engine_holy_entity_base_HolyBaseEntity
 });
@@ -2613,14 +2615,6 @@ var Bool = Boolean;
 var Class = { };
 var Enum = { };
 js_Boot.__toStr = ({ }).toString;
-engine_base_MathUtils.MoveUpRads = engine_base_MathUtils.degreeToRads(270);
-engine_base_MathUtils.MoveUpLeftRads = engine_base_MathUtils.degreeToRads(225);
-engine_base_MathUtils.MoveUpRightRads = engine_base_MathUtils.degreeToRads(315);
-engine_base_MathUtils.MoveDownRads = engine_base_MathUtils.degreeToRads(90);
-engine_base_MathUtils.MoveDownLeftRads = engine_base_MathUtils.degreeToRads(135);
-engine_base_MathUtils.MoveDownRightRads = engine_base_MathUtils.degreeToRads(45);
-engine_base_MathUtils.MoveLeftRads = engine_base_MathUtils.degreeToRads(180);
-engine_base_MathUtils.MoveRightRads = engine_base_MathUtils.degreeToRads(0);
 haxe_Int32._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
 };

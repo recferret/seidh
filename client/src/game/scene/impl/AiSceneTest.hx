@@ -37,8 +37,6 @@ class SceneAiTest extends BasicScene {
 	}
 
 	public function customUpdate(dt:Float, fps:Float) {
-		debugGraphics.clear();
-
 		// player.update(dt);
 		// enemy.update(dt);
 

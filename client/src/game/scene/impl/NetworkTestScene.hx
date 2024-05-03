@@ -65,9 +65,6 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 
 	// Update client part and visuals
 	public function customUpdate(dt:Float, fps:Float) {
-		if (GameConfig.DebugDraw) {
-			debugGraphics.clear();
-		}
 		for (clientEntity in clientMainEntities) {
 			clientEntity.update(dt);
 

@@ -126,6 +126,8 @@ abstract class BasicScene extends h2d.Scene {
 		scaleMode = ScaleMode.LetterBox(1280, 720, true, Left, Top);
 		camera.setViewport(1280 / 2 - 50, 720 / 2 - 100, 1280, 720);
 
+		// scale(2);
+
 		if (baseEngine != null) {
 			controlsScene = new ControlsScene(baseEngine);
 
@@ -229,6 +231,10 @@ abstract class BasicScene extends h2d.Scene {
 		function onEvent(event:hxd.Event) {
 			if (event.kind == EMove) {
 				controlsScene.updateCursorPosition(event.relX, event.relY);
+			} else {
+				if (event.kind == ERelease) {
+					// TODO simple shot
+				}
 			}
 		}
 
@@ -245,6 +251,8 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public function update(dt:Float, fps:Float) {
+		debugGraphics.clear();
+
 		controlsScene.update();
 		updateInput();
 		customUpdate(dt, fps);
@@ -252,6 +260,20 @@ abstract class BasicScene extends h2d.Scene {
 		if (playerEntity != null) {
 			camera.x = playerEntity.x;
 			camera.y = playerEntity.y;
+		}
+		
+		// TODO write debug field
+
+		var y = 0;
+		for (i in 0...13) {
+			Utils.DrawLine(debugGraphics, new h2d.col.Point(0, y), new h2d.col.Point(64 * 12, y), GameConfig.RedColor);
+			y += 64;
+		}
+
+		var x = 0;
+		for (i in 0...13) {
+			Utils.DrawLine(debugGraphics, new h2d.col.Point(x, 0), new h2d.col.Point(x, 64 * 12), GameConfig.RedColor);
+			x += 64;
 		}
 
 	}

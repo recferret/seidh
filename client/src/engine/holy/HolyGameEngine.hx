@@ -75,7 +75,7 @@ class HolyGameEngine extends BaseEngine {
                 if (entity.getEntityType() == EntityType.SKELETON_WARRIOR) {
                     final targetPlayer = getNearestPlayer(entity);
                     if (targetPlayer != null) {
-                        // entity.setTargetObject(targetPlayer);
+                        entity.setTargetObject(targetPlayer);
                         // if (entity.ifTargetInAttackRange()) {
                         //     entity.aiMeleeAttack();
                         // }
