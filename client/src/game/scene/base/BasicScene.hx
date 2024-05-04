@@ -147,7 +147,12 @@ abstract class BasicScene extends h2d.Scene {
 		addChild(text);
 		addChild(text2);
 
+	
+
+
 		onResize();
+
+	
 
 		// scaleMode = ScaleMode.LetterBox(720, 1590, true, Left, Top);
 		// scaleMode = ScaleMode.Zoom(2);
@@ -255,6 +260,12 @@ abstract class BasicScene extends h2d.Scene {
 		fui.layout = Vertical;
 		fui.verticalSpacing = 5;
 		fui.padding = 10;
+
+		addButton('TG FULLSCREEN', function callback(button:h2d.Flow) {
+			// hxd.Window.getInstance().displayMode = hxd.Window.DisplayMode.FullscreenResize;
+			NativeWindowJS.tgExpand();
+			fui.removeChild(button);
+        });
 
 		function onEvent(event:hxd.Event) {
 			if (controlsScene != null) {
