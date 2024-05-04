@@ -1,13 +1,15 @@
 package game.scene.base;
 
+import h2d.Scene.ScaleMode;
 import h3d.Engine;
 
-import game.network.Networking;
 import game.entity.KnightEntity;
 import game.entity.SamuraiEntity;
 import game.entity.SkeletonWarriorEntity;
 import game.entity.SkeletonArcherEntity;
 import game.entity.BaseClientEntity;
+import game.js.NativeWindowJS;
+import game.network.Networking;
 import game.utils.Utils;
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
@@ -120,11 +122,37 @@ abstract class BasicScene extends h2d.Scene {
 
 	final clientMainEntities = new Map<String, BaseClientEntity>();
 
+	var text:h2d.Text;
+	var text2:h2d.Text;
+	
 	public function new(baseEngine:HolyGameEngine) {
 		super();
 
-		// scaleMode = ScaleMode.LetterBox(1280, 720, true, Left, Top);
-		// camera.setViewport(1280 / 2 - 50, 720 / 2 - 100, 1280, 720);
+		// scaleMode = ScaleMode.Resize;
+		// scaleMode = ScaleMode.LetterBox(720, 1280, true, Left, Top);
+		// camera.setViewport(720 / 2 - 50, 1280 / 2 - 100, 720, 1280);
+
+		var font : h2d.Font = hxd.res.DefaultFont.get();
+		text = new h2d.Text(font);
+		text.scale(4);
+		text.setPosition(400, 900);
+		text.textAlign = Center;
+
+		text2 = new h2d.Text(font);
+		text2.scale(4);
+		text2.setPosition(400, 1000);
+		text2.textAlign = Center;
+		
+		// add to any parent, in this case we append to root
+		addChild(text);
+		addChild(text2);
+
+		onResize();
+
+		// scaleMode = ScaleMode.LetterBox(720, 1590, true, Left, Top);
+		// scaleMode = ScaleMode.Zoom(2);
+		// scaleMode = ScaleMode.AutoZoom(720, 1590, true);
+		// camera.setViewport(720 / 2, 1590 / 2, 720, 1590);
 
 		// scale(2);
 
@@ -229,11 +257,13 @@ abstract class BasicScene extends h2d.Scene {
 		fui.padding = 10;
 
 		function onEvent(event:hxd.Event) {
-			if (event.kind == EMove) {
-				controlsScene.updateCursorPosition(event.relX, event.relY);
-			} else {
-				if (event.kind == ERelease) {
-					// TODO simple shot
+			if (controlsScene != null) {
+				if (event.kind == EMove) {
+					controlsScene.updateCursorPosition(event.relX, event.relY);
+				} else {
+					if (event.kind == ERelease) {
+						// TODO simple shot
+					}
 				}
 			}
 		}
@@ -250,10 +280,66 @@ abstract class BasicScene extends h2d.Scene {
 			networking = new Networking();
 	}
 
+	public function onResize() {
+		final mobile = NativeWindowJS.getMobile();
+		var isMobile = false;
+
+		if (mobile != null) {
+			if (mobile != 'null' || mobile != 'undefined') {
+				isMobile = true;
+			}
+		}
+
+		if (isMobile) {
+			final jsScreenParams = NativeWindowJS.getScreenParams();
+
+			if (jsScreenParams.orientation == 'portrait') {
+				final ratio1 = jsScreenParams.screenHeight / jsScreenParams.screenWidth;				// 2.21
+				final ratio2 = jsScreenParams.windowOuterHeight / jsScreenParams.windowOuterWidth;		// 1.84
+				final ratio3 = ratio1 - ratio2;															// 0.37
+				final h = 720;
+				final w = Std.int(h * (ratio1 + ratio3));
+				scaleMode = ScaleMode.Stretch(h, w);
+
+				// TODO ask user to play landscape ?
+				camera.setViewport(0, 0, h, w);
+			} else {
+				final ratio = jsScreenParams.windowOuterWidth / jsScreenParams.windowOuterHeight;		// 1.84
+				final h = 720;
+				final w = Std.int(h * (ratio));
+				scaleMode = ScaleMode.Stretch(w, h);
+
+				camera.setViewport(0, 0, w, h);
+			}
+		} else {
+			final w = hxd.Window.getInstance().height;
+			final h = hxd.Window.getInstance().width;
+			final ratio = 720 * (h / w);
+			final targetWidth = Std.int(ratio);
+			final targetHeight = 720;
+
+			scaleMode = ScaleMode.Stretch(targetWidth, targetHeight);
+
+			camera.setViewport(0, 0, w, h);
+		}
+	}
+
 	public function update(dt:Float, fps:Float) {
+
+		// height	
+
+		// final wh = hxd.Window.getInstance().height;
+		// final ww = hxd.Window.getInstance().width;
+
+		text.text = "h: " + height + ", w: " + width;
+		text2.text = "mobile: " + NativeWindowJS.getMobile();
+
 		debugGraphics.clear();
 
-		controlsScene.update();
+		if (controlsScene != null) {
+			controlsScene.update();
+		}
+
 		updateInput();
 		customUpdate(dt, fps);
 
@@ -279,7 +365,9 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public override function render(e:Engine) {
-		controlsScene.render(e);
+		if (controlsScene != null) {
+			controlsScene.render(e);
+		}
 		super.render(e);
 	}
 

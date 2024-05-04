@@ -214,8 +214,10 @@ var engine_base_core_BaseEngine = $hx_exports["engine"]["base"]["core"]["BaseEng
 	this.coldInputCommandsTreshhold = 10;
 	this.ticksSinceLastPop = 0;
 	this.hotInputCommands = [];
+	this.removeProjectileEntityQueue = [];
+	this.createProjectileEntityQueue = [];
 	this.removeMainEntityQueue = [];
-	this.addMainEntityQueue = [];
+	this.createMainEntityQueue = [];
 	this.validatedInputCommands = [];
 	this.playerToEntityMap = new haxe_ds_StringMap();
 	var _gthis = this;
@@ -230,6 +232,8 @@ var engine_base_core_BaseEngine = $hx_exports["engine"]["base"]["core"]["BaseEng
 		_gthis.ticksSinceLastPop++;
 		_gthis.processCreateEntityQueue();
 		_gthis.processRemoveEntityQueue();
+		_gthis.processCreateProjectileQueue();
+		_gthis.processRemoveProjectileQueue();
 		if(_gthis.hotInputCommands.length > 0) {
 			_gthis.processInputCommands(_gthis.hotInputCommands);
 			_gthis.hotInputCommands = [];
@@ -249,7 +253,7 @@ engine_base_core_BaseEngine.prototype = {
 		if(fireCallback == null) {
 			fireCallback = false;
 		}
-		this.addMainEntityQueue.push({ entity : entity, fireCallback : fireCallback});
+		this.createMainEntityQueue.push({ entity : entity, fireCallback : fireCallback});
 	}
 	,removeMainEntity: function(entityId) {
 		this.removeMainEntityQueue.push(entityId);
@@ -302,7 +306,7 @@ engine_base_core_BaseEngine.prototype = {
 	}
 	,processCreateEntityQueue: function() {
 		var _g = 0;
-		var _g1 = this.addMainEntityQueue;
+		var _g1 = this.createMainEntityQueue;
 		while(_g < _g1.length) {
 			var queueTask = _g1[_g];
 			++_g;
@@ -317,7 +321,7 @@ engine_base_core_BaseEngine.prototype = {
 				}
 			}
 		}
-		this.addMainEntityQueue = [];
+		this.createMainEntityQueue = [];
 	}
 	,processRemoveEntityQueue: function() {
 		var _g = 0;
@@ -341,6 +345,35 @@ engine_base_core_BaseEngine.prototype = {
 		}
 		this.removeMainEntityQueue = [];
 	}
+	,processCreateProjectileQueue: function() {
+		var _g = 0;
+		var _g1 = this.createProjectileEntityQueue;
+		while(_g < _g1.length) {
+			var queueTask = _g1[_g];
+			++_g;
+			this.mainEntityManager.add(queueTask.entity);
+			if(this.createMainEntityCallback != null) {
+				this.createMainEntityCallback(queueTask.entity);
+			}
+		}
+		this.createProjectileEntityQueue = [];
+	}
+	,processRemoveProjectileQueue: function() {
+		var _g = 0;
+		var _g1 = this.removeProjectileEntityQueue;
+		while(_g < _g1.length) {
+			var entityId = _g1[_g];
+			++_g;
+			var entity = this.mainEntityManager.getEntityById(entityId);
+			if(entity != null) {
+				if(this.deleteMainEntityCallback != null) {
+					this.deleteMainEntityCallback(entity);
+				}
+				this.mainEntityManager.remove(entity.getId());
+			}
+		}
+		this.removeProjectileEntityQueue = [];
+	}
 	,checkLocalMovementInputAllowance: function(entityId,playerInputType) {
 		var entity = this.mainEntityManager.getEntityById(entityId);
 		if(entity == null) {
@@ -355,10 +388,9 @@ engine_base_core_BaseEngine.prototype = {
 		var entity = this.mainEntityManager.getEntityById(entityId);
 		if(entity == null) {
 			return false;
-		} else if(entity.checkLocalActionInputAndPrepare(playerInputType)) {
-			return entity.canPerformAction(playerInputType);
 		} else {
-			return false;
+			var allow = entity.checkLocalActionInputAndPrepare(playerInputType) && entity.canPerformAction(playerInputType);
+			return allow;
 		}
 	}
 	,addInputCommandServer: function(struct) {
@@ -441,7 +473,6 @@ engine_base_entity_BaseEntityManager.__name__ = true;
 engine_base_entity_BaseEntityManager.prototype = {
 	destroy: function() {
 		this.entities.clear();
-		this.updateCallback = null;
 	}
 	,getChangedEntities: function() {
 		var result = [];
@@ -572,12 +603,6 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 		var x = rect.getCenter().x;
 		var y = rect.getCenter().y;
 		return { p1 : rect.getCenter(), p2 : engine_base_MathUtils.rotatePointAroundCenter(x + lineLength,y,x,y,this.baseObjectEntity.rotation)};
-	}
-	,collides: function(isCollides) {
-		this.isCollides = isCollides;
-		if(this.customCollide != null) {
-			this.customCollide.onCollide();
-		}
 	}
 	,isChanged: function() {
 		return this.previousTickHash != this.currentTickHash;
@@ -768,6 +793,31 @@ engine_base_entity_EngineBaseGameEntity.prototype = {
 		this.baseObjectEntity.rotation = r;
 	}
 	,__class__: engine_base_entity_EngineBaseGameEntity
+};
+var engine_base_entity_EngineProjectileEntity = function(ownerId,x,y,r,speed,aoeSize,travelDistance) {
+	this.traveledDistance = 0.0;
+	this.allowMovement = true;
+	this.ownerId = ownerId;
+	this.x = x;
+	this.y = y;
+	this.r = r;
+	this.speed = speed;
+	this.aoeSize = aoeSize;
+	this.travelDistance = travelDistance;
+};
+engine_base_entity_EngineProjectileEntity.__name__ = true;
+engine_base_entity_EngineProjectileEntity.prototype = {
+	update: function(dt) {
+		if(this.allowMovement) {
+			var dx = this.speed * Math.cos(this.r) * dt;
+			var dy = this.speed * Math.sin(this.r) * dt;
+			this.traveledDistance += dx + dy;
+			if(this.traveledDistance > this.travelDistance) {
+				this.allowMovement = false;
+			}
+		}
+	}
+	,__class__: engine_base_entity_EngineProjectileEntity
 };
 var engine_base_geometry_Line = function(x1,y1,x2,y2) {
 	if(y2 == null) {

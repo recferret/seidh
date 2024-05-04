@@ -9,4 +9,8 @@ extern class NativeWindowJS {
     static function wtSend(message:Dynamic):Void;
 
     static function tgExpand():Void;
+
+    static function getMobile():String;
+    static function getScreenParams():Dynamic;
+    static function alertScreenParams():Void;
 }

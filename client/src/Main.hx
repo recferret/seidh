@@ -11,15 +11,14 @@ class Main extends hxd.App {
 			setScene2D(scene);
 			sevents.addScene(scene.getInputScene());
 		});
-
-		trace(hxd.Window.getInstance().displayMode);
-
-
-		// hxd.DisplayMode = Fullscreen;
 	}
 
 	override function update(dt:Float) {
 		sceneManager.getCurrentScene().update(dt, engine.fps);
+	}
+
+	override function onResize() {
+		this.sceneManager.onResize();
 	}
 
 	static function main() {

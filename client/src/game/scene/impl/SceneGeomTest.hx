@@ -17,6 +17,10 @@ class SceneGeomTest extends BasicScene {
 
 	public function new() {
 		super(null);
+
+		// camera.setPosition(1280 / 2, 720 / 2);
+
+		// camera.scale(0.5, 0.5);
 	}
 
 	// --------------------------------------
