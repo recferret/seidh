@@ -3,20 +3,16 @@ package game.scene.base;
 import h2d.Scene.ScaleMode;
 import h3d.Engine;
 
-import game.entity.KnightEntity;
-import game.entity.SamuraiEntity;
-import game.entity.SkeletonWarriorEntity;
-import game.entity.SkeletonArcherEntity;
-import game.entity.BaseClientEntity;
+import game.entity.character.ClientCharacterEntity;
 import game.js.NativeWindowJS;
 import game.network.Networking;
 import game.utils.Utils;
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
-import engine.base.entity.EngineBaseGameEntity;
+import engine.base.entity.base.EngineBaseEntity;
 import engine.base.geometry.Point;
 import engine.base.geometry.Rectangle;
-import engine.holy.HolyGameEngine;
+import engine.seidh.SeidhGameEngine;
 import hxd.Key in K;
 
 enum abstract GameState(Int) {
@@ -111,74 +107,28 @@ class MovementController extends h2d.Object {
 }
 
 abstract class BasicScene extends h2d.Scene {
-	public final baseEngine:HolyGameEngine;
+	public final baseEngine:SeidhGameEngine;
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
 
 	private var controlsScene:ControlsScene;
 	private var fui:h2d.Flow;
 
-	private var playerEntity:BaseClientEntity;
+	private var playerEntity:ClientBaseEntity;
 
-	final clientMainEntities = new Map<String, BaseClientEntity>();
-
-	var text:h2d.Text;
-	var text2:h2d.Text;
+	final clientMainEntities = new Map<String, ClientBaseEntity>();
 	
-	public function new(baseEngine:HolyGameEngine) {
+	public function new(baseEngine:SeidhGameEngine) {
 		super();
 
-		// scaleMode = ScaleMode.Resize;
-		// scaleMode = ScaleMode.LetterBox(720, 1280, true, Left, Top);
-		// camera.setViewport(720 / 2 - 50, 1280 / 2 - 100, 720, 1280);
-
-		var font : h2d.Font = hxd.res.DefaultFont.get();
-		text = new h2d.Text(font);
-		text.scale(4);
-		text.setPosition(400, 900);
-		text.textAlign = Center;
-
-		text2 = new h2d.Text(font);
-		text2.scale(4);
-		text2.setPosition(400, 1000);
-		text2.textAlign = Center;
-		
-		// add to any parent, in this case we append to root
-		addChild(text);
-		addChild(text2);
-
-	
-
-
 		onResize();
-
-	
-
-		// scaleMode = ScaleMode.LetterBox(720, 1590, true, Left, Top);
-		// scaleMode = ScaleMode.Zoom(2);
-		// scaleMode = ScaleMode.AutoZoom(720, 1590, true);
-		// camera.setViewport(720 / 2, 1590 / 2, 720, 1590);
-
-		// scale(2);
 
 		if (baseEngine != null) {
 			controlsScene = new ControlsScene(baseEngine);
 
 			this.baseEngine = baseEngine;
-			this.baseEngine.createMainEntityCallback = function callback(engineEntity:EngineBaseGameEntity) {
-				var entity: BaseClientEntity = null;
-
-				switch (engineEntity.getEntityType()) {
-					case KNIGHT:
-						entity = new KnightEntity(this);
-					case SAMURAI:
-						entity = new SamuraiEntity(this);
-					case SKELETON_WARRIOR:	
-						entity = new SkeletonWarriorEntity(this);
-					case SKELETON_ARCHER:	
-						entity = new SkeletonArcherEntity(this);
-					default:	
-				}
+			this.baseEngine.createCharacterCallback = function callback(engineEntity:EngineBaseEntity) {
+				final entity = new ClientBaseEntity(this);
 
 				entity.initiateEngineEntity(engineEntity);
 				clientMainEntities.set(entity.getId(), entity);
@@ -188,7 +138,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.deleteMainEntityCallback = function callback(engineEntity:EngineBaseGameEntity) {
+			this.baseEngine.deleteCharacterCallback = function callback(engineEntity:EngineBaseGameEntity) {
 				final entity = clientMainEntities.get(engineEntity.getId());
 				if (entity != null) {
 					entity.animation.setAnimationState(DEAD);
@@ -213,26 +163,26 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.entityActionCallback = function callback(params:Array<EntityActionCallbackParams>) {
+			this.baseEngine.characterActionCallback = function callback(params:Array<EntityActionCallbackParams>) {
 				trace(params);
 				for (value in params) {
 					// Play action initiator animation
 					final clientEntity = clientMainEntities.get(value.entityId);
 					switch (value.actionType) {
 						case MELEE_ATTACK_1:
-							clientEntity.animation.setAnimationState(EntityAnimationState.ATTACK_1);
+							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
 						case MELEE_ATTACK_2:
-							clientEntity.animation.setAnimationState(EntityAnimationState.ATTACK_2);
+							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_2);
 						case MELEE_ATTACK_3:
-							clientEntity.animation.setAnimationState(EntityAnimationState.ATTACK_3);
+							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
 						case RUN_ATTACK:
-							clientEntity.animation.setAnimationState(EntityAnimationState.ATTACK_RUN);
+							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_RUN);
 						case RANGED_ATTACK1:
-							clientEntity.animation.setAnimationState(EntityAnimationState.SHOT_1);
+							clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_1);
 						case RANGED_ATTACK2:
-							clientEntity.animation.setAnimationState(EntityAnimationState.SHOT_2);
+							clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_2);
 						case DEFEND:
-							clientEntity.animation.setAnimationState(EntityAnimationState.DEFEND);
+							clientEntity.animation.setAnimationState(CharacterAnimationState.DEFEND);
 					}
 					clientEntity.setDebugActionShape(value.shape);
 
@@ -261,12 +211,6 @@ abstract class BasicScene extends h2d.Scene {
 		fui.verticalSpacing = 5;
 		fui.padding = 10;
 
-		addButton('TG FULLSCREEN', function callback(button:h2d.Flow) {
-			// hxd.Window.getInstance().displayMode = hxd.Window.DisplayMode.FullscreenResize;
-			NativeWindowJS.tgExpand();
-			fui.removeChild(button);
-        });
-
 		function onEvent(event:hxd.Event) {
 			if (controlsScene != null) {
 				if (event.kind == EMove) {
@@ -274,6 +218,7 @@ abstract class BasicScene extends h2d.Scene {
 				} else {
 					if (event.kind == ERelease) {
 						// TODO simple shot
+						controlsScene.release();
 					}
 				}
 			}
@@ -301,6 +246,9 @@ abstract class BasicScene extends h2d.Scene {
 			}
 		}
 
+		var w = 0;
+		var h = 0;
+
 		if (isMobile) {
 			final jsScreenParams = NativeWindowJS.getScreenParams();
 
@@ -308,43 +256,34 @@ abstract class BasicScene extends h2d.Scene {
 				final ratio1 = jsScreenParams.screenHeight / jsScreenParams.screenWidth;				// 2.21
 				final ratio2 = jsScreenParams.windowOuterHeight / jsScreenParams.windowOuterWidth;		// 1.84
 				final ratio3 = ratio1 - ratio2;															// 0.37
-				final h = 720;
-				final w = Std.int(h * (ratio1 + ratio3));
+				h = 720;
+				w = Std.int(h * (ratio1 + ratio3));
 				scaleMode = ScaleMode.Stretch(h, w);
 
 				// TODO ask user to play landscape ?
-				camera.setViewport(0, 0, h, w);
+				// camera.setViewport(Std.int(w / 2), Std.int(h / 2.5), w, h);
 			} else {
 				final ratio = jsScreenParams.windowOuterWidth / jsScreenParams.windowOuterHeight;		// 1.84
-				final h = 720;
-				final w = Std.int(h * (ratio));
+				h = 720;
+				w = Std.int(h * (ratio));
 				scaleMode = ScaleMode.Stretch(w, h);
 
-				camera.setViewport(0, 0, w, h);
+				camera.setViewport(Std.int(w / 2), Std.int(h / 2.5), w, h);
 			}
 		} else {
-			final w = hxd.Window.getInstance().height;
-			final h = hxd.Window.getInstance().width;
-			final ratio = 720 * (h / w);
+			w = hxd.Window.getInstance().width;
+			h = hxd.Window.getInstance().height;
+			final ratio = 720 * (w / h);
 			final targetWidth = Std.int(ratio);
 			final targetHeight = 720;
 
 			scaleMode = ScaleMode.Stretch(targetWidth, targetHeight);
 
-			camera.setViewport(0, 0, w, h);
+			camera.setViewport(Std.int(targetWidth / 2), Std.int(targetHeight / 3), targetWidth, targetHeight);
 		}
 	}
 
 	public function update(dt:Float, fps:Float) {
-
-		// height	
-
-		// final wh = hxd.Window.getInstance().height;
-		// final ww = hxd.Window.getInstance().width;
-
-		text.text = "h: " + height + ", w: " + width;
-		text2.text = "mobile: " + NativeWindowJS.getMobile();
-
 		debugGraphics.clear();
 
 		if (controlsScene != null) {
@@ -359,20 +298,17 @@ abstract class BasicScene extends h2d.Scene {
 			camera.y = playerEntity.y;
 		}
 		
-		// TODO write debug field
+		// var y = 0;
+		// for (i in 0...13) {
+		// 	Utils.DrawLine(debugGraphics, new h2d.col.Point(0, y), new h2d.col.Point(64 * 12, y), GameConfig.RedColor);
+		// 	y += 64;
+		// }
 
-		var y = 0;
-		for (i in 0...13) {
-			Utils.DrawLine(debugGraphics, new h2d.col.Point(0, y), new h2d.col.Point(64 * 12, y), GameConfig.RedColor);
-			y += 64;
-		}
-
-		var x = 0;
-		for (i in 0...13) {
-			Utils.DrawLine(debugGraphics, new h2d.col.Point(x, 0), new h2d.col.Point(x, 64 * 12), GameConfig.RedColor);
-			x += 64;
-		}
-
+		// var x = 0;
+		// for (i in 0...13) {
+		// 	Utils.DrawLine(debugGraphics, new h2d.col.Point(x, 0), new h2d.col.Point(x, 64 * 12), GameConfig.RedColor);
+		// 	x += 64;
+		// }
 	}
 
 	public override function render(e:Engine) {
@@ -409,8 +345,8 @@ abstract class BasicScene extends h2d.Scene {
 	// Entities
 	// ----------------------------------
 
-	public function createGameEntityFromMinimalStruct(id: String, ownerId: String, x:Int, y:Int, entityType:EntityType) {
-		baseEngine.buildEngineEntityFromMinimalStruct({
+	public function createCharacterEntityFromMinimalStruct(id: String, ownerId: String, x:Int, y:Int, entityType:EntityType) {
+		baseEngine.createCharacterEntityFromMinimalStruct({
 			id: id, 
 			ownerId: ownerId, 
 			x: x, 

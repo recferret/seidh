@@ -4,12 +4,12 @@ import game.event.EventManager;
 import game.event.EventManager.EventListener;
 import game.network.Networking;
 import game.scene.base.BasicScene;
-import engine.holy.HolyGameEngine;
+import engine.seidh.SeidhGameEngine;
 
 class SceneNetworkTest extends BasicScene implements EventListener {
 
     public function new() {
-		super(new HolyGameEngine());
+		super(new SeidhGameEngine());
 
 		camera.scale(2, 2);
 
@@ -52,9 +52,9 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 			case EventManager.EVENT_GAME_STATE:
 				processGameStateEvent(message);
 			case EventManager.EVENT_CREATE_ENTITY:
-				processCreacteEntityEvent(message);
+				processCreateCharacterEntityEvent(message);
 			case EventManager.EVENT_DELETE_ENTITY:
-				processDeleteEntityEvent(message);
+				processRemoveCharacterEntityEvent(message);
 			case EventManager.EVENT_PERFORM_ACTION:
 				processPerformActionEvent(message);
 		}
@@ -78,20 +78,20 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 
 	private function processJoinGameEvent(payload:JoinGamePayload) {
 		for (entityStruct in payload.entities) {
-			baseEngine.buildEngineEntityFromMinimalStruct(entityStruct);
+			baseEngine.createCharacterEntityFromMinimalStruct(entityStruct);
 		}
 	}
 
 	private function processGameStateEvent(payload:GameStatePayload) {
-		baseEngine.updateEntitiesByServer(payload.entities);
+		baseEngine.updateCharacterEntitiesByServer(payload.entities);
 	}
 
-	private function processCreacteEntityEvent(payload:Dynamic) {
-		baseEngine.buildEngineEntityFromMinimalStruct(payload.entity);
+	private function processCreateCharacterEntityEvent(payload:Dynamic) {
+		baseEngine.createCharacterEntityFromMinimalStruct(payload.entity);
 	}
 
-	private function processDeleteEntityEvent(payload:DeleteEntityPayload) {
-		baseEngine.removeMainEntity(payload.entityId);
+	private function processRemoveCharacterEntityEvent(payload:DeleteEntityPayload) {
+		baseEngine.removeCharacterEntity(payload.entityId);
 	}
 
 	private function processPerformActionEvent(payload:ActionsPayload) {

@@ -1,19 +1,25 @@
 package engine.base.core;
 
-import engine.base.entity.EngineProjectileEntity;
+import engine.base.entity.base.EngineBaseEntity;
+import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.BaseTypesAndClasses;
 import engine.base.core.GameLoop;
-import engine.base.entity.EngineBaseGameEntity;
-import engine.base.entity.BaseEntityManager;
+import engine.base.entity.impl.EngineCharacterEntity;
+import engine.base.entity.impl.EngineProjectileEntity;
 
 enum EngineMode {
 	Client;
 	Server;
 }
 
-typedef CreateMainEntityTask = {
+typedef CreateCharacterEntityTask = {
 	var fireCallback:Bool;
-	var entity:EngineBaseGameEntity;
+	var entity:EngineCharacterEntity;
+}
+
+typedef CreateProjectileEntityTask = {
+	var fireCallback:Bool;
+	var entity:EngineProjectileEntity;
 }
 
 @:expose
@@ -27,22 +33,22 @@ abstract class BaseEngine {
 	public final engineMode:EngineMode;
 
 	public var postLoopCallback:Void->Void;
-	public var createMainEntityCallback:EngineBaseGameEntity->Void;
-	public var deleteMainEntityCallback:EngineBaseGameEntity->Void;
+	public var createCharacterCallback:EngineCharacterEntity->Void;
+	public var deleteCharacterCallback:EngineCharacterEntity->Void;
 	public var createProjectileCallback:EngineProjectileEntity->Void;
 	public var deleteProjectileCallback:EngineProjectileEntity->Void;
 
-	public final mainEntityManager:BaseEntityManager;
-	// public final projectileEntityManager:BaseEntityManager;
+	public final characterEntityManager = new EngineBaseEntityManager();
+	public final projectileEntityManager = new EngineBaseEntityManager();
 
 	public final playerToEntityMap = new Map<String, String>();
 
 	public var validatedInputCommands = new Array<PlayerInputCommand>();
 
-	private var createMainEntityQueue = new Array<CreateMainEntityTask>();
-	private var removeMainEntityQueue = new Array<String>();
+	private var createCharacterEntityQueue = new Array<CreateCharacterEntityTask>();
+	private var removeCharacterEntityQueue = new Array<String>();
 
-	private var createProjectileEntityQueue = new Array<CreateMainEntityTask>();
+	private var createProjectileEntityQueue = new Array<CreateProjectileEntityTask>();
 	private var removeProjectileEntityQueue = new Array<String>();
 
 	// Команды от пользователей, которые будут применены в начале каждого тика
@@ -53,10 +59,9 @@ abstract class BaseEngine {
 	public final coldInputCommandsTreshhold = 10;
 	public final coldInputCommands = new Array<InputCommandEngineWrapped>();
 
-	public function new(engineMode:EngineMode, mainEntityManager:BaseEntityManager) {
+	public function new(engineMode:EngineMode) {
 		this.engineMode = engineMode;
-		this.mainEntityManager = mainEntityManager;
-
+		
 		gameLoop = new GameLoop(function loop(dt:Float, tick:Int) {
 			this.tick = tick;
 
@@ -67,8 +72,8 @@ abstract class BaseEngine {
 			}
 			ticksSinceLastPop++;
 
-			processCreateEntityQueue();
-			processRemoveEntityQueue();
+			processCreateCharacterQueue();
+			processRemoveCharacterQueue();
 
 			processCreateProjectileQueue();
 			processRemoveProjectileQueue();
@@ -102,22 +107,22 @@ abstract class BaseEngine {
 	public abstract function customDestroy():Void;
 
 	// -----------------------------------
-	// Main entity management
+	// Character entity management
 	// -----------------------------------
 
-	function createMainEntity(entity:EngineBaseGameEntity, fireCallback = false) {
-		createMainEntityQueue.push({
+	function createCharacterEntity(entity:EngineCharacterEntity, fireCallback = false) {
+		createCharacterEntityQueue.push({
 			entity: entity,
 			fireCallback: fireCallback
 		});
 	}
 
-	public function removeMainEntity(entityId:String) {
-		removeMainEntityQueue.push(entityId);
+	public function removeCharacterEntity(entityId:String) {
+		removeCharacterEntityQueue.push(entityId);
 	}
 
-	public function getMainEntityById(id:String) {
-		return mainEntityManager.getEntityById(id);
+	public function getCharacterEntityById(id:String) {
+		return characterEntityManager.getEntityById(id);
 	}
 
 	public function getMainEntityIdByOwnerId(id:String) {
@@ -125,65 +130,65 @@ abstract class BaseEngine {
 	}
 
 	public function getMainEntityByOwnerId(id:String) {
-		return mainEntityManager.getEntityById(playerToEntityMap.get(id));
+		return characterEntityManager.getEntityById(playerToEntityMap.get(id));
 	}
 
-	public function updateEntitiesByServer(minEntities:Array<EntityMinStruct>) {
+	public function updateCharacterEntitiesByServer(minEntities:Array<CharacterEntityMinStruct>) {
 		for (minEntity in minEntities) {
-			final entity = mainEntityManager.entities.get(minEntity.id);
+			final entity = characterEntityManager.entities.get(minEntity.id);
 			if (entity != null) {
 				entity.setX(minEntity.x);
 				entity.setY(minEntity.y);
-				entity.currentDirectionSide = minEntity.side;
+				cast (entity, EngineCharacterEntity).currentDirectionSide = minEntity.side;
 			}
 		}
 	}
 
-	public function setEntityNextActionToPerform(entityId:String, entityActionType:EntityActionType) {
-		final entity = mainEntityManager.getEntityById(entityId);
+	public function setEntityNextActionToPerform(entityId:String, characterActionType:CharacterActionType) {
+		final entity = characterEntityManager.getEntityById(entityId);
 		if (entity != null) {
-			entity.setNextActionToPerform(entityActionType);
+			cast (entity, EngineCharacterEntity).setNextActionToPerform(characterActionType);
 		}
 	}
 
-	public function getMainEntities() {
-		return mainEntityManager.entities;
+	public function getCharacterEntities() {
+		return characterEntityManager.entities;
 	}
 
-	public function getMainEntitiesChanged() {
-		final result = new Array<EngineBaseGameEntity>();
-		for (entity in mainEntityManager.entities) {
+	public function getCharacterEntitiesChanged() {
+		final result = new Array<EngineBaseEntity>();
+		for (entity in characterEntityManager.entities) {
 			if (entity.isChanged()) 
 				result.push(entity);
 		}
 		return result;
 	}
 
-	public function processCreateEntityQueue() {
-		for (queueTask in createMainEntityQueue) {
-			mainEntityManager.add(queueTask.entity);
+	public function processCreateCharacterQueue() {
+		for (queueTask in createCharacterEntityQueue) {
+			characterEntityManager.add(queueTask.entity);
 			playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
 			if (queueTask.fireCallback) {
-				if (createMainEntityCallback != null) {
-					createMainEntityCallback(queueTask.entity);
+				if (createCharacterCallback != null) {
+					createCharacterCallback(queueTask.entity);
 				}
 			}
 		}
-		createMainEntityQueue = [];
+		createCharacterEntityQueue = [];
 	}
 
-	public function processRemoveEntityQueue() {
-		for (entityId in removeMainEntityQueue) {
-			final entity = mainEntityManager.getEntityById(entityId);
+	public function processRemoveCharacterQueue() {
+		for (entityId in removeCharacterEntityQueue) {
+			final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 			if (entity != null) {
-				if (deleteMainEntityCallback != null) {
-					deleteMainEntityCallback(entity);
+				if (deleteCharacterCallback != null) {
+					deleteCharacterCallback(cast (entity, EngineCharacterEntity));
 				}
 				playerToEntityMap.remove(entity.getOwnerId());
-				mainEntityManager.remove(entity.getId());
+				characterEntityManager.remove(entity.getId());
 			}
 		}
-		removeMainEntityQueue = [];
+		removeCharacterEntityQueue = [];
 	}
 
 	// -----------------------------------
@@ -192,9 +197,9 @@ abstract class BaseEngine {
 
 	public function processCreateProjectileQueue() {
 		for (queueTask in createProjectileEntityQueue) {
-			mainEntityManager.add(queueTask.entity);
-			if (createMainEntityCallback != null) {
-				createMainEntityCallback(queueTask.entity);
+			projectileEntityManager.add(queueTask.entity);
+			if (createProjectileCallback != null) {
+				createProjectileCallback(queueTask.entity);
 			}
 		}
 		createProjectileEntityQueue = [];
@@ -202,12 +207,12 @@ abstract class BaseEngine {
 
 	public function processRemoveProjectileQueue() {
 		for (entityId in removeProjectileEntityQueue) {
-			final entity = mainEntityManager.getEntityById(entityId);
+			final entity = cast (projectileEntityManager.getEntityById(entityId), EngineProjectileEntity);
 			if (entity != null) {
-				if (deleteMainEntityCallback != null) {
-					deleteMainEntityCallback(entity);
+				if (deleteProjectileCallback != null) {
+					deleteProjectileCallback(entity);
 				}
-				mainEntityManager.remove(entity.getId());
+				projectileEntityManager.remove(entity.getId());
 			}
 		}
 		removeProjectileEntityQueue = [];
@@ -218,7 +223,7 @@ abstract class BaseEngine {
 	// -----------------------------------
 
 	public function checkLocalMovementInputAllowance(entityId:String, playerInputType:PlayerInputType) {
-		final entity = mainEntityManager.getEntityById(entityId);
+		final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 		if (entity == null) {
 			return false;
 		} else {
@@ -227,7 +232,7 @@ abstract class BaseEngine {
 	}
 
 	public function checkLocalActionInputAllowance(entityId:String, playerInputType:PlayerInputType) {
-		final entity = mainEntityManager.getEntityById(entityId);
+		final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 		if (entity == null) {
 			return false;
 		} else {
@@ -269,13 +274,16 @@ abstract class BaseEngine {
 	// -----------------------------------
 
 	public function destroy() {
+		postLoopCallback = null;
+		createCharacterCallback = null;
+		deleteCharacterCallback = null;
+		createProjectileCallback = null;
+		deleteProjectileCallback = null;
+
 		gameLoop.stopLoop();
 
-		mainEntityManager.destroy();
-
-		postLoopCallback = null;
-		createMainEntityCallback = null;
-		deleteMainEntityCallback = null;
+		characterEntityManager.destroy();
+		projectileEntityManager.destroy();
 
 		customDestroy();
 	}

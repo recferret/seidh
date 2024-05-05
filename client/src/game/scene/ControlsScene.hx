@@ -5,7 +5,7 @@ import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
 import engine.base.geometry.Point;
 import engine.base.geometry.Rectangle;
-import engine.holy.HolyGameEngine;
+import engine.seidh.SeidhGameEngine;
 
 class MovementController extends h2d.Object {
 
@@ -36,6 +36,13 @@ class MovementController extends h2d.Object {
 		
 		innerCircleDefaultPos();
     }
+
+	public function release() {
+		innerCircle.alpha = 1;
+		inputActive = false;
+
+		innerCircleDefaultPos();
+	}
 
 	public function updateCursorPosition(x:Float, y:Float) {
 		var p = new h2d.col.Point(x, y);
@@ -97,7 +104,7 @@ class ControlsScene extends h2d.Scene {
 
 	private var movementController:MovementController;
     
-    public function new(baseEngine:HolyGameEngine) {
+    public function new(baseEngine:SeidhGameEngine) {
         super();
 
         scaleMode = ScaleMode.Zoom(2);
@@ -115,12 +122,16 @@ class ControlsScene extends h2d.Scene {
             }
         });
 
-        movementController.initiate(150, 720 - 150, 300);
+        movementController.initiate(150, 150, 300);
     }
 
     public function update() {
 		movementController.update();
     }
+
+	public function release() {
+		movementController.release();
+	}
 
     public function updateCursorPosition(x:Float, y:Float) {
         movementController.updateCursorPosition(x, y);

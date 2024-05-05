@@ -12,7 +12,7 @@ enum abstract Side(Int) {
 	var RIGHT = 2;
 }
 
-enum abstract EntityAnimationState(Int) {
+enum abstract CharacterAnimationState(Int) {
 	var IDLE = 1;
 	var RUN = 2;
 	var WALK = 3;
@@ -32,7 +32,7 @@ enum abstract EntityAnimationState(Int) {
 	var DODGE = 13;
 }
 
-enum abstract EntityActionType(Int) {
+enum abstract CharacterActionType(Int) {
 	var MELEE_ATTACK_1 = 1;
 	var MELEE_ATTACK_2 = 2;
 	var MELEE_ATTACK_3 = 3;
@@ -86,7 +86,7 @@ class EntityShape {
 	}
 }
 
-typedef EntityMovementStruct = {
+typedef CharacterMovementStruct = {
 	canWalk:Bool,
 	canRun:Bool,
 	walkSpeed:Int,
@@ -97,76 +97,88 @@ typedef EntityMovementStruct = {
 	vitalityRegenPerSec:Int,
 }
 
-typedef EntityActionStruct = {
-	actionType:EntityActionType,
-	damage:Int,
+typedef ProjectileStruct = {
 	aoe:Bool,
 	penetration:Bool,
+	speed:Float,
+	travelDistance:Float,
+	projectiles:Int,
+	shape: EntityShape,
+}
+
+typedef CharacterActionStruct = {
+	actionType:CharacterActionType,
+	damage:Int,
 	shape: EntityShape,
 	inputDelay:Float,
 }
 
-typedef BaseObjectEntityStruct = {
+typedef BaseEntityStruct = {
 	x:Int,
 	y:Int,
 	?entityType:EntityType,
 	?entityShape:EntityShape,
-	?entityMovementStruct:EntityMovementStruct,
-	?entityActionStruct:Array<EntityActionStruct>,
-	?dodgeChance:Int,
-	?health:Int,
 	?id:String,
 	?ownerId:String,
 	?rotation:Float,
 }
 
-class BaseObjectEntity {
+typedef CharacterEntityStruct = {
+	base:BaseEntityStruct,
+	characterMovementStruct:CharacterMovementStruct,
+	characterActionStruct:Array<CharacterActionStruct>,
+	dodgeChance:Int,
+	health:Int,
+}
+
+class BaseEntity {
 	public var x:Int;
 	public var y:Int;
 	public var entityType:EntityType;
 	public var entityShape:EntityShape;
 	public var id:String;
-	public var health:Int;
 	public var ownerId:String;
-	public var dodgeChance:Int;
 	public var rotation:Float;
-	public var movement:EntityMovementStruct;
-	public var actions:Array<EntityActionStruct>;
 
-	public function new(struct:BaseObjectEntityStruct) {
+	public function new(struct:BaseEntityStruct) {
 		this.x = struct.x;
 		this.y = struct.y;
 		this.entityType = struct.entityType;
 		this.entityShape = struct.entityShape;
 		this.id = struct.id;
+		this.ownerId = struct.ownerId;
+		this.rotation = struct.rotation;
+	}
+}
+
+class CharacterEntity extends BaseEntity {
+	public var health:Int;
+	public var dodgeChance:Int;
+	public var movement:CharacterMovementStruct;
+	public var actions:Array<CharacterActionStruct>;
+
+	public function new(struct:CharacterEntityStruct) {
+		super(struct.base);
+
 		this.health = struct.health;
 		this.dodgeChance = struct.dodgeChance;
-		this.ownerId = struct.ownerId;
-
-		if (struct.rotation != null) {
-			this.rotation = struct.rotation;
-		} else {
-			this.rotation = 0;
-		}
-
-		this.movement = struct.entityMovementStruct;
-		this.actions = struct.entityActionStruct;
+		this.movement = struct.characterMovementStruct;
+		this.actions = struct.characterActionStruct;
 	}
+}
 
-	public function toJson() {
-		return Json.stringify({
-			id: id,
-			ownerId: ownerId,
-			entityType: entityType,
-			entityShape: entityShape,
-			x: x,
-			y: y,
-			health: health,
-			dodgeChance: dodgeChance,
-			rotation: rotation,
-			movement: movement,
-			actions: actions,
-		});
+typedef ProjectileEntityStruct = {
+	base:BaseEntityStruct,
+	projectile:ProjectileStruct,
+}
+
+class ProjectileEntity extends BaseEntity {
+	public var projectile:ProjectileStruct;
+
+	public function new(struct:ProjectileEntityStruct) {
+		super(struct.base);
+
+		this.projectile = struct.projectile;
 	}
 }
 
@@ -174,7 +186,9 @@ class BaseObjectEntity {
 // Multiplayer
 // -------------------------------
 
-typedef EntityMinStruct = {
+// NEED SIDE ?
+
+typedef CharacterEntityMinStruct = {
 	id:String,
 	x:Int,
 	y:Int,

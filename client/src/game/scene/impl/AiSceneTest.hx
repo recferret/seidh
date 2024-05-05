@@ -1,6 +1,6 @@
 package game.scene.impl;
 
-import engine.holy.HolyGameEngine;
+import engine.seidh.SeidhGameEngine;
 import game.scene.base.BasicScene;
 
 class SceneAiTest extends BasicScene {
@@ -9,7 +9,7 @@ class SceneAiTest extends BasicScene {
 	// private var enemy: Character;
 
     public function new() {
-		super(new HolyGameEngine());
+		super(new SeidhGameEngine());
 
 		trace('Scene AI test');
 

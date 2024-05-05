@@ -1,9 +1,9 @@
 package game.network;
 
 import engine.base.BaseTypesAndClasses.PlayerInputCommand;
-import engine.holy.HolyGameEngine.EntityActionCallbackParams;
-import engine.base.BaseTypesAndClasses.EntityMinStruct;
+import engine.base.BaseTypesAndClasses.CharacterEntityMinStruct;
 import engine.base.BaseTypesAndClasses.PlayerInputType;
+import engine.seidh.SeidhGameEngine.CharacterActionCallbackParams;
 import game.event.EventManager;
 import game.js.NativeWindowJS;
 import haxe.Json;
@@ -17,11 +17,11 @@ typedef DeleteEntityPayload = {
 }
 
 typedef GameStatePayload = {
-	entities:Array<EntityMinStruct>,
+	entities:Array<CharacterEntityMinStruct>,
 }
 
 typedef ActionsPayload = {
-    actions:Array<EntityActionCallbackParams>,
+    actions:Array<CharacterActionCallbackParams>,
 }
 
 class Networking {

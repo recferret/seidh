@@ -1,6 +1,6 @@
 -cp src
 -lib uuid
--js HolyGameEngine.js
--main engine.holy.HolyGameEngine
+-js SeidhGameEngine.js
+-main engine.seidh.SeidhGameEngine
 
 # haxe .\compileEngine.hxml -D js-es=6
