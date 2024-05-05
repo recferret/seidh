@@ -1,11 +1,5 @@
 package game.scene.impl;
 
-import game.entity.KnightEntity;
-import game.entity.MageEntity;
-import game.entity.SamuraiEntity;
-import game.entity.SkeletonWarriorEntity;
-import game.entity.SkeletonArcherEntity;
-
 import game.effects.SlashEffect;
 import game.effects.SlashEffect.SlashEffectType;
 import h2d.Tile;

@@ -1,16 +1,16 @@
 package game.entity.character;
 
-import game.entity.character.animation.EntityAnimations;
-import game.entity.character.animation.EntityAnimations.EntityAnimation;
-import engine.base.BaseTypesAndClasses.EntityShape;
+import game.utils.Utils;
+import game.entity.character.animation.CharacterAnimations;
+import engine.base.BaseTypesAndClasses;
 import engine.base.geometry.Point;
 import engine.base.entity.impl.EngineCharacterEntity;
 import haxe.Timer;
 import hxd.Math;
 
-abstract class ClientBaseEntity extends h2d.Object {
+class ClientCharacterEntity extends h2d.Object {
 
-    public var animation:EntityAnimation;
+    public var animation:CharacterAnimation;
 
     private var debugActionShape:EntityShape;
 
@@ -23,11 +23,15 @@ abstract class ClientBaseEntity extends h2d.Object {
 
     // ------------------------------------------------------------
     // General
-    //-------------------------------------------------------------
+    // ------------------------------------------------------------
 
     public function update(dt:Float) {
         moveToServerPosition(dt);
     }
+
+    // ------------------------------------------------------------
+    // ABSTRACTION ?
+    // ------------------------------------------------------------
 
 	public function debugDraw(graphics:h2d.Graphics) {
         final debugActionShape = getDebugActionShape();
@@ -43,18 +47,18 @@ abstract class ClientBaseEntity extends h2d.Object {
 		setPosition(engineEntity.getX(), engineEntity.getY());
 
         switch (engineEntity.getEntityType()) {
-            case KNIGHT:
+            case EntityType.KNIGHT:
                 animation = CharacterAnimations.LoadKnightAnimation(this);
-            case SAMURAI:
+            case EntityType.SAMURAI:
                 animation = CharacterAnimations.LoadSamuraiAnimation(this);
-            case SKELETON_WARRIOR:
+            case EntityType.SKELETON_WARRIOR:
                 animation = CharacterAnimations.LoadSkeletonWarriorAnimation(this);
-            case SKELETON_ARCHER:
+            case EntityType.SKELETON_ARCHER:
                 animation = CharacterAnimations.LoadSkeletonArcherAnimation(this);
             default:
         }
 	}
-
+ 
     public function setTragetServerPosition(x:Int, y:Int) {
         targetServerPosition.x = x;
         targetServerPosition.y = y;
@@ -102,16 +106,6 @@ abstract class ClientBaseEntity extends h2d.Object {
             debugActionShape = null;
         }, 300);
     }
-
-    // private function isRightSide() {
-    //     if ([MOVE_LEFT, MOVE_UP_LEFT, MOVE_DOWN_LEFT].contains(engineEntity.getDirection())) {
-    //         return false;
-    //     } else if ([MOVE_RIGHT, MOVE_UP_RIGHT, MOVE_DOWN_RIGHT].contains(engineEntity.getDirection())) {
-    //         return true;
-    //     } else {
-    //         return true;
-    //     }
-    // }
 
     // Getters
 

@@ -1,5 +1,6 @@
 package game.scene.base;
 
+import engine.base.entity.impl.EngineCharacterEntity;
 import h2d.Scene.ScaleMode;
 import h3d.Engine;
 
@@ -114,9 +115,9 @@ abstract class BasicScene extends h2d.Scene {
 	private var controlsScene:ControlsScene;
 	private var fui:h2d.Flow;
 
-	private var playerEntity:ClientBaseEntity;
+	private var playerEntity:ClientCharacterEntity;
 
-	final clientMainEntities = new Map<String, ClientBaseEntity>();
+	final clientMainEntities = new Map<String, ClientCharacterEntity>();
 	
 	public function new(baseEngine:SeidhGameEngine) {
 		super();
@@ -128,9 +129,9 @@ abstract class BasicScene extends h2d.Scene {
 
 			this.baseEngine = baseEngine;
 			this.baseEngine.createCharacterCallback = function callback(engineEntity:EngineBaseEntity) {
-				final entity = new ClientBaseEntity(this);
+				final entity = new ClientCharacterEntity(this);
 
-				entity.initiateEngineEntity(engineEntity);
+				entity.initiateEngineEntity(cast(engineEntity, EngineCharacterEntity));
 				clientMainEntities.set(entity.getId(), entity);
 
 				if (entity.getOwnerId() == Player.instance.playerId) {
@@ -138,7 +139,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.deleteCharacterCallback = function callback(engineEntity:EngineBaseGameEntity) {
+			this.baseEngine.deleteCharacterCallback = function callback(engineEntity:EngineBaseEntity) {
 				final entity = clientMainEntities.get(engineEntity.getId());
 				if (entity != null) {
 					entity.animation.setAnimationState(DEAD);
@@ -147,7 +148,7 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.baseEngine.postLoopCallback = function callback() {
-				for (mainEntity in baseEngine.getMainEntities()) {
+				for (mainEntity in baseEngine.getCharacterEntities()) {
 					if (clientMainEntities.exists(mainEntity.getId())) {
 						final clientEntity = clientMainEntities.get(mainEntity.getId());
 						clientEntity.setTragetServerPosition(mainEntity.getX(), mainEntity.getY());
@@ -163,7 +164,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.characterActionCallback = function callback(params:Array<EntityActionCallbackParams>) {
+			this.baseEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
 				trace(params);
 				for (value in params) {
 					// Play action initiator animation

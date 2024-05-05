@@ -48,6 +48,8 @@ enum abstract EntityType(Int) {
 	var MAGE = 3;
 	var SKELETON_WARRIOR = 4;
 	var SKELETON_ARCHER = 5;
+	var PROJECTILE_MAGIC_ARROW = 6;
+	var PROJECTILE_MAGIC_SPHERE = 6;
 }
 
 class EntityShape {
