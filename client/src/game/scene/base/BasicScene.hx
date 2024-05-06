@@ -1,21 +1,24 @@
 package game.scene.base;
 
-import engine.base.entity.impl.EngineProjectileEntity;
-import engine.base.entity.impl.EngineCharacterEntity;
+
 import h2d.Scene.ScaleMode;
 import h3d.Engine;
+import hxd.Key in K;
 
 import game.entity.character.ClientCharacterEntity;
+import game.entity.projectile.ClientProjectileEntity;
 import game.js.NativeWindowJS;
 import game.network.Networking;
 import game.utils.Utils;
+
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
 import engine.base.entity.base.EngineBaseEntity;
+import engine.base.entity.impl.EngineProjectileEntity;
+import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.geometry.Point;
 import engine.base.geometry.Rectangle;
 import engine.seidh.SeidhGameEngine;
-import hxd.Key in K;
 
 enum abstract GameState(Int) {
 	var INIT = 1;
@@ -118,7 +121,8 @@ abstract class BasicScene extends h2d.Scene {
 
 	private var playerEntity:ClientCharacterEntity;
 
-	final clientMainEntities = new Map<String, ClientCharacterEntity>();
+	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
+	final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
 	
 	public function new(baseEngine:SeidhGameEngine) {
 		super();
@@ -131,37 +135,39 @@ abstract class BasicScene extends h2d.Scene {
 			this.baseEngine = baseEngine;
 
 			this.baseEngine.createCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
-				final entity = new ClientCharacterEntity(this);
+				final character = new ClientCharacterEntity(this);
+				character.initiateEngineEntity(characterEntity);
+				clientCharacterEntities.set(character.getId(), character);
 
-				// entity.initiateEngineEntity(cast(engineEntity, EngineCharacterEntity));
-				entity.initiateEngineEntity(characterEntity);
-				clientMainEntities.set(entity.getId(), entity);
-
-				if (entity.getOwnerId() == Player.instance.playerId) {
-					playerEntity = entity;
+				if (character.getOwnerId() == Player.instance.playerId) {
+					playerEntity = character;
 				}
 			};
 
 			this.baseEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
-				final entity = clientMainEntities.get(characterEntity.getId());
+				final entity = clientCharacterEntities.get(characterEntity.getId());
 				if (entity != null) {
 					entity.animation.setAnimationState(DEAD);
-					clientMainEntities.remove(characterEntity.getId());
+					clientCharacterEntities.remove(characterEntity.getId());
 				}
 			};
 
 			this.baseEngine.createProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
 				trace('CREATE PROJECTILE ON THE CLIENT SIDE');
+
+				final projectile = new ClientProjectileEntity(this);
+				projectile.initiateEngineEntity(projectileEntity);
+				clientProjectileEntities.set(projectileEntity.getId(), projectile);
 			};
 
 			this.baseEngine.deleteProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
-
+				trace('DELETE PROJECTILE ON THE CLIENT SIDE');
 			};
 
 			this.baseEngine.postLoopCallback = function callback() {
 				for (mainEntity in baseEngine.getCharacterEntities()) {
-					if (clientMainEntities.exists(mainEntity.getId())) {
-						final clientEntity = clientMainEntities.get(mainEntity.getId());
+					if (clientCharacterEntities.exists(mainEntity.getId())) {
+						final clientEntity = clientCharacterEntities.get(mainEntity.getId());
 						clientEntity.setTragetServerPosition(mainEntity.getX(), mainEntity.getY());
 					}
 				}
@@ -176,11 +182,18 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.baseEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
-				trace('CHARACTER ACTION ON THE CLIENT SIDE');
 				for (value in params) {
+					trace('PERFORM ' + value.actionType);
+
 					// Play action initiator animation
-					// final clientEntity = clientMainEntities.get(value.entityId);
-					// switch (value.actionType) {
+					final clientEntity = clientCharacterEntities.get(value.entityId);
+					switch (value.actionType) {
+						case CharacterActionType.ACTION_MAIN:
+							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
+						case CharacterActionType.ACTION_1:
+							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
+						default: 
+					}
 						// case MELEE_ATTACK_1:
 						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
 						// case MELEE_ATTACK_2:
@@ -198,17 +211,19 @@ abstract class BasicScene extends h2d.Scene {
 						// case DEFEND:
 						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.DEFEND);
 					// }
-					// clientEntity.setDebugActionShape(value.shape);
+
+					// Draw shape only for melee attacks
+					clientEntity.setDebugActionShape(value.shape);
 
 					// Play hurt and dead animations
 					for (value in value.hurtEntities) {
-						final clientEntity = clientMainEntities.get(value);
+						final clientEntity = clientCharacterEntities.get(value);
 						if (clientEntity != null) {
 							clientEntity.animation.setAnimationState(HURT);
 						}
 					}
 					for (value in value.deadEntities) {
-						final clientEntity = clientMainEntities.get(value);
+						final clientEntity = clientCharacterEntities.get(value);
 						if (clientEntity != null) {
 							clientEntity.animation.setAnimationState(DEAD);
 						}

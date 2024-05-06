@@ -25,4 +25,8 @@ class SeidhEntityFactory {
         return entity;
     }
 
+    public static function InitiateProjectile() {
+        
+    }
+
 }

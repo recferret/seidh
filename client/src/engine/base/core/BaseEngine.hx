@@ -78,14 +78,14 @@ abstract class BaseEngine {
 			processCreateProjectileQueue();
 			processRemoveProjectileQueue();
 
+			// Update all entities
+			engineLoopUpdate(dt);
+
 			// Apply inputs
 			if (hotInputCommands.length > 0) {
 				processInputCommands(hotInputCommands);
 				hotInputCommands = [];
 			}
-
-			// Update all entities
-			engineLoopUpdate(dt);
 
 			if (postLoopCallback != null) {
 				postLoopCallback();
@@ -164,20 +164,18 @@ abstract class BaseEngine {
 		return result;
 	}
 
-	public function processCreateCharacterQueue() {
+	function processCreateCharacterQueue() {
 		for (queueTask in createCharacterEntityQueue) {
 			characterEntityManager.add(queueTask.entity);
 			playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
-			if (queueTask.fireCallback) {
-				if (createCharacterCallback != null) {
-					createCharacterCallback(queueTask.entity);
-				}
+			if (queueTask.fireCallback && createCharacterCallback != null) {
+				createCharacterCallback(queueTask.entity);
 			}
 		}
 		createCharacterEntityQueue = [];
 	}
 
-	public function processRemoveCharacterQueue() {
+	function processRemoveCharacterQueue() {
 		for (entityId in removeCharacterEntityQueue) {
 			final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 			if (entity != null) {
@@ -195,17 +193,24 @@ abstract class BaseEngine {
 	// Projectiles
 	// -----------------------------------
 
-	public function processCreateProjectileQueue() {
+	function createProjectileEntity(entity:EngineProjectileEntity, fireCallback = false) {
+		createProjectileEntityQueue.push({
+			entity: entity,
+			fireCallback: fireCallback
+		});
+	}
+
+	function processCreateProjectileQueue() {
 		for (queueTask in createProjectileEntityQueue) {
 			projectileEntityManager.add(queueTask.entity);
-			if (createProjectileCallback != null) {
+			if (queueTask.fireCallback && createProjectileCallback != null) {
 				createProjectileCallback(queueTask.entity);
 			}
 		}
 		createProjectileEntityQueue = [];
 	}
 
-	public function processRemoveProjectileQueue() {
+	function processRemoveProjectileQueue() {
 		for (entityId in removeProjectileEntityQueue) {
 			final entity = cast (projectileEntityManager.getEntityById(entityId), EngineProjectileEntity);
 			if (entity != null) {

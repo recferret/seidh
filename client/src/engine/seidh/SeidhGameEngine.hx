@@ -1,13 +1,13 @@
 package engine.seidh;
 
-import engine.base.entity.base.EngineBaseEntity;
 import js.lib.Date;
 
 import engine.base.BaseTypesAndClasses;
+import engine.base.entity.base.EngineBaseEntity;
+import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.core.BaseEngine;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.seidh.entity.base.SeidhBaseEntity;
-
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
 typedef CharacterActionCallbackParams = { 
@@ -70,54 +70,65 @@ class SeidhGameEngine extends BaseEngine {
 
         final characterActionCallbackParams = new Array<CharacterActionCallbackParams>();
 
+        for (e in projectileEntityManager.entities) {
+            e.update(dt);
+        }
+
         for (e in characterEntityManager.entities) {
-            final entity = cast(e, EngineCharacterEntity);
-            if (entity.isAlive) {
-                if (entity.getEntityType() == EntityType.SKELETON_WARRIOR) {
-                    final targetPlayer = getNearestPlayer(entity);
+            final character = cast(e, EngineCharacterEntity);
+            if (character.isAlive) {
+                if (character.getEntityType() == EntityType.SKELETON_WARRIOR) {
+                    final targetPlayer = getNearestPlayer(character);
                     if (targetPlayer != null) {
-                        entity.setTargetObject(targetPlayer);
+                        character.setTargetObject(targetPlayer);
                         // if (entity.ifTargetInAttackRange()) {
                         //     entity.aiMeleeAttack();
                         // }
                     }
                 }
 
-                entity.update(dt);
+                character.update(dt);
 
-                if (entity.isActing) {
+                if (character.isActing) {
                     final hurtEntities = new Array<String>();
                     final deadEntities = new Array<String>();
 
-                    for (e2 in characterEntityManager.entities) {
-                        final entity2 = cast(e2, EngineCharacterEntity);
-                        if (entity2.isAlive && entity.getId() != entity2.getId()) {
-                            if (entity.getCurrentActionRect().containsRect(entity2.getBodyRectangle())) {
-                                final health = entity2.subtractHealth(entity.actionToPerform.damage);
-                                if (health == 0) {
-                                    entity2.isAlive = false;
-                                    deadEntities.push(entity2.getId());
-                                    removeCharacterEntity(entity2.getId());
-                                } else {
-                                    hurtEntities.push(entity2.getId());
-                                }
-                            }
-                        }
+                    if (character.actionToPerform.projectileStruct != null) {
+                        trace('LOOKS LIKE A PROJECTILE TYPE ACTION');
+                        createProjectileEntity(createProjectileByCharacter(character), true);
+                    } else {
+                        trace('LOOKS LIKE A MELEE TYPE ACTION');
                     }
 
+                    // for (e2 in characterEntityManager.entities) {
+                    //     final entity2 = cast(e2, EngineCharacterEntity);
+                    //     if (entity2.isAlive && entity.getId() != entity2.getId()) {
+                    //         if (entity.getCurrentActionRect().containsRect(entity2.getBodyRectangle())) {
+                    //             final health = entity2.subtractHealth(entity.actionToPerform.damage);
+                    //             if (health == 0) {
+                    //                 entity2.isAlive = false;
+                    //                 deadEntities.push(entity2.getId());
+                    //                 removeCharacterEntity(entity2.getId());
+                    //             } else {
+                    //                 hurtEntities.push(entity2.getId());
+                    //             }
+                    //         }
+                    //     }
+                    // }
+
                     characterActionCallbackParams.push({
-                        entityId: entity.getId(),
-                        actionType: entity.actionToPerform.actionType,
-                        shape: entity.actionToPerform.shape,
+                        entityId: character.getId(),
+                        actionType: character.actionToPerform.actionType,
+                        shape: character.actionToPerform.shape,
                         hurtEntities: hurtEntities,
                         deadEntities: deadEntities,
                     });
 
-                    entity.isActing = false;
+                    character.isActing = false;
                 }
 
-                entity.isRunning = false;
-                entity.isWalking = false;
+                character.isRunning = false;
+                character.isWalking = false;
             }
         }
 
@@ -126,6 +137,22 @@ class SeidhGameEngine extends BaseEngine {
         }
 
         recentEngineLoopTime = Date.now() - beginTime;
+    }
+
+    private function createProjectileByCharacter(character:EngineCharacterEntity) {
+        final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
+            base: {
+                x: character.getX(),
+                y: character.getY(),
+                entityType: EntityType.PROJECTILE_MAGIC_ARROW,
+                entityShape: character.actionToPerform.shape,
+                id: character.getId(),
+                ownerId: character.getOwnerId(),
+                rotation: character.getRotation(),
+            },
+	        projectile: character.actionToPerform.projectileStruct
+        }));
+        return projectileEntity;
     }
 
     private function getNearestPlayer(entity:EngineBaseEntity) {

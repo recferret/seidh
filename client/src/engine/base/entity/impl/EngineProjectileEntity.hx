@@ -3,7 +3,7 @@ package engine.base.entity.impl;
 import engine.base.BaseTypesAndClasses;
 import engine.base.entity.base.EngineBaseEntity;
 
-abstract class EngineProjectileEntity extends EngineBaseEntity {
+class EngineProjectileEntity extends EngineBaseEntity {
 
     // ------------------------------------------------
 	// General
@@ -20,6 +20,7 @@ abstract class EngineProjectileEntity extends EngineBaseEntity {
     }
 
     public function update(dt:Float) {
+		trace('engine projectile movement');
 		if (allowMovement) {
 			final dx = projectileEntity.projectile.speed * Math.cos(baseEntity.rotation) * dt;
 			final dy = projectileEntity.projectile.speed * Math.sin(baseEntity.rotation) * dt;
