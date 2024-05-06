@@ -16,22 +16,15 @@ class SeidhBaseEntity extends EngineCharacterEntity {
         determenisticMove();
     }
 
-    public function markForAction() {
-        isActing = true;
-    }
-
 	// ------------------------------------------------
 	// Abstract implementation
 	// ------------------------------------------------
 
-    public function canPerformMove(playerInputType:PlayerInputType):Bool {
+    public function canPerformMove():Bool {
         return true;
     }
 
-    public function canPerformAction(playerInputType:PlayerInputType):Bool {
-        if (playerInputType == PlayerInputType.DEFEND && baseEntity.entityType != EntityType.KNIGHT || 
-            playerInputType == PlayerInputType.RANGED_ATTACK && baseEntity.entityType == EntityType.KNIGHT)
-            return false;
+    public function canPerformAction(characterActionType:CharacterActionType):Bool {
         return true;
     }
 

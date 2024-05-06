@@ -144,7 +144,7 @@ abstract class BaseEngine {
 		}
 	}
 
-	public function setEntityNextActionToPerform(entityId:String, characterActionType:CharacterActionType) {
+	public function setCharacterNextActionToPerform(entityId:String, characterActionType:CharacterActionType) {
 		final entity = characterEntityManager.getEntityById(entityId);
 		if (entity != null) {
 			cast (entity, EngineCharacterEntity).setNextActionToPerform(characterActionType);
@@ -222,27 +222,21 @@ abstract class BaseEngine {
 	// Input
 	// -----------------------------------
 
-	public function checkLocalMovementInputAllowance(entityId:String, playerInputType:PlayerInputType) {
+	public function checkLocalMovementInputAllowance(entityId:String) {
 		final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 		if (entity == null) {
 			return false;
 		} else {
-			return entity.checkLocalMovementInput() && entity.canPerformMove(playerInputType);
+			return entity.checkLocalMovementInput() && entity.canPerformMove();
 		}
 	}
 
-	public function checkLocalActionInputAllowance(entityId:String, playerInputType:PlayerInputType) {
+	public function checkLocalActionInputAllowance(entityId:String, characterActionType:CharacterActionType) {
 		final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 		if (entity == null) {
 			return false;
 		} else {
-			final allow = entity.checkLocalActionInputAndPrepare(playerInputType) && entity.canPerformAction(playerInputType);
-			
-			// if (createMainEntityCallback != null) {
-			// 	createMainEntityCallback(queueTask.entity);
-			// }
-
-			return allow;
+			return entity.checkLocalActionInput(characterActionType) && entity.canPerformAction(characterActionType);
 		}
 	}
 
@@ -250,19 +244,19 @@ abstract class BaseEngine {
 		final entityId = getMainEntityIdByOwnerId(struct.playerId);
 		var allow = false;
 
-		if (struct.inputType == PlayerInputType.MOVE) {
-			allow = checkLocalMovementInputAllowance(entityId, struct.inputType);
+		if (struct.actionType == CharacterActionType.MOVE) {
+			allow = checkLocalMovementInputAllowance(entityId);
 		} else {
-			allow = checkLocalActionInputAllowance(entityId, struct.inputType);
+			allow = checkLocalActionInputAllowance(entityId, struct.actionType);
 		}
 
 		if (allow) {
-			addInputCommandClient(new PlayerInputCommand(struct.inputType, struct.movAngle, struct.playerId));
+			addInputCommandClient(new PlayerInputCommand(struct.actionType, struct.movAngle, struct.playerId));
 		}
 	}
 
 	public function addInputCommandClient(playerInputCommand:PlayerInputCommand) {
-		if (playerInputCommand.inputType != null && playerInputCommand.playerId != null) {
+		if (playerInputCommand.actionType != null && playerInputCommand.playerId != null) {
 			final wrappedCommand = new InputCommandEngineWrapped(playerInputCommand, tick);
 			hotInputCommands.push(wrappedCommand);
 			coldInputCommands.push(wrappedCommand);

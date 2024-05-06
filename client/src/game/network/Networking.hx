@@ -1,8 +1,6 @@
 package game.network;
 
-import engine.base.BaseTypesAndClasses.PlayerInputCommand;
-import engine.base.BaseTypesAndClasses.CharacterEntityMinStruct;
-import engine.base.BaseTypesAndClasses.PlayerInputType;
+import engine.base.BaseTypesAndClasses;
 import engine.seidh.SeidhGameEngine.CharacterActionCallbackParams;
 import game.event.EventManager;
 import game.js.NativeWindowJS;
@@ -56,10 +54,10 @@ class Networking {
         final message = { 
             msg: 'input', 
             playerId: Player.instance.playerId, 
-            inputType: input.inputType,
+            actionType: input.actionType,
             movAngle: null
         };
-        if (input.inputType == MOVE) {
+        if (input.actionType == CharacterActionType.MOVE) {
             message.movAngle = input.movAngle;
         }
         trace(message);

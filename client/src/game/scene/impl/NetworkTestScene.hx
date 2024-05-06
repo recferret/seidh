@@ -97,7 +97,7 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 	private function processPerformActionEvent(payload:ActionsPayload) {
 		for (action in payload.actions) {
 			if (action.entityId != Player.instance.playerEntityId) {
-				baseEngine.setEntityNextActionToPerform(action.entityId, action.actionType);
+				baseEngine.setCharacterNextActionToPerform(action.entityId, action.actionType);
 			}
 		}
 	}

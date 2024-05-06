@@ -32,16 +32,6 @@ enum abstract CharacterAnimationState(Int) {
 	var DODGE = 13;
 }
 
-enum abstract CharacterActionType(Int) {
-	var MELEE_ATTACK_1 = 1;
-	var MELEE_ATTACK_2 = 2;
-	var MELEE_ATTACK_3 = 3;
-	var RUN_ATTACK = 4;
-	var RANGED_ATTACK1 = 5;
-	var RANGED_ATTACK2 = 6;
-	var DEFEND = 7;
-}
-
 enum abstract EntityType(Int) {
 	var KNIGHT = 1;
 	var SAMURAI = 2;
@@ -105,7 +95,7 @@ typedef ProjectileStruct = {
 	speed:Float,
 	travelDistance:Float,
 	projectiles:Int,
-	shape: EntityShape,
+	?aoeShape: EntityShape,
 }
 
 typedef CharacterActionStruct = {
@@ -113,6 +103,7 @@ typedef CharacterActionStruct = {
 	damage:Int,
 	shape: EntityShape,
 	inputDelay:Float,
+	?projectileStruct:ProjectileStruct,
 }
 
 typedef BaseEntityStruct = {
@@ -128,7 +119,11 @@ typedef BaseEntityStruct = {
 typedef CharacterEntityStruct = {
 	base:BaseEntityStruct,
 	characterMovementStruct:CharacterMovementStruct,
-	characterActionStruct:Array<CharacterActionStruct>,
+	characterActionMainStruct:CharacterActionStruct,
+	?characterAction1Struct:CharacterActionStruct,
+	?characterAction2Struct:CharacterActionStruct,
+	?characterAction3Struct:CharacterActionStruct,
+	?characterActionUltimate:CharacterActionStruct,
 	dodgeChance:Int,
 	health:Int,
 }
@@ -157,7 +152,11 @@ class CharacterEntity extends BaseEntity {
 	public var health:Int;
 	public var dodgeChance:Int;
 	public var movement:CharacterMovementStruct;
-	public var actions:Array<CharacterActionStruct>;
+	public var actionMain:CharacterActionStruct;
+	public var action1:CharacterActionStruct;
+	public var action2:CharacterActionStruct;
+	public var action3:CharacterActionStruct;
+	public var actionUltimate:CharacterActionStruct;
 
 	public function new(struct:CharacterEntityStruct) {
 		super(struct.base);
@@ -165,7 +164,11 @@ class CharacterEntity extends BaseEntity {
 		this.health = struct.health;
 		this.dodgeChance = struct.dodgeChance;
 		this.movement = struct.characterMovementStruct;
-		this.actions = struct.characterActionStruct;
+		this.actionMain = struct.characterActionMainStruct;
+		this.action1 = struct.characterAction1Struct;
+		this.action2 = struct.characterAction2Struct;
+		this.action3 = struct.characterAction3Struct;
+		this.actionUltimate = struct.characterActionUltimate;
 	}
 }
 
@@ -197,21 +200,23 @@ typedef CharacterEntityMinStruct = {
 	side:Side
 }
 
-enum abstract PlayerInputType(Int) {
+enum abstract CharacterActionType(Int) {
 	var MOVE = 1;
-	var MELEE_ATTACK = 2;
-	var RANGED_ATTACK = 3;
-	var DEFEND = 4;
+	var ACTION_MAIN = 2;
+	var ACTION_1 = 3;
+	var ACTION_2 = 4;
+	var ACTION_3 = 5;
+	var ACTION_ULTIMATE = 6;
 }
 
 class PlayerInputCommand {
 	public var index:Int;
-	public var inputType:PlayerInputType;
+	public var actionType:CharacterActionType;
 	public var movAngle: Float;
 	public var playerId:String;
 
-	public function new(inputType:PlayerInputType, movAngle:Float, playerId:String, ?index:Int) {
-		this.inputType = inputType;
+	public function new(actionType:CharacterActionType, movAngle:Float, playerId:String, ?index:Int) {
+		this.actionType = actionType;
 		this.movAngle = movAngle;
 		this.playerId = playerId;
 		this.index = index;

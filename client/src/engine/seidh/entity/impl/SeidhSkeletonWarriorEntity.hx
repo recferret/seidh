@@ -25,53 +25,23 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
             },
             health: 10,
             dodgeChance: 0,
-            characterMovementStruct: GetMovementStruct(),
-            characterActionStruct: GetActionsStruct()
+            characterMovementStruct: {
+                canWalk: true,
+                canRun: true,
+                walkSpeed: 20,
+                runSpeed: 35,
+                movementDelay: 0.100,
+                vitality: 100,
+                vitalityConsumptionPerSec: 20,
+                vitalityRegenPerSec: 10,
+            },
+            characterActionMainStruct: {
+                actionType: CharacterActionType.ACTION_MAIN,
+                damage: 10,
+                shape: new EntityShape(140, 100, 80, 100),
+                inputDelay: 1,
+            }
         });
     }
-
-    public static function GetMovementStruct() {
-        final movement:CharacterMovementStruct = {
-            canWalk: true,
-            canRun: true,
-            walkSpeed: 20,
-            runSpeed: 35,
-            movementDelay: 0.100,
-            vitality: 100,
-            vitalityConsumptionPerSec: 20,
-            vitalityRegenPerSec: 10,
-        };
-        return movement;
-    }
-
-    public static function GetActionsStruct() {
-        final actions = new Array<CharacterActionStruct>();
-
-        actions.push({
-            actionType: CharacterActionType.MELEE_ATTACK_1,
-            damage: 10,
-            shape: new EntityShape(140, 100, 80, 100),
-            inputDelay: 1,
-        });
-        actions.push({
-            actionType: CharacterActionType.MELEE_ATTACK_2,
-            damage: 10,
-            shape: new EntityShape(140, 100, 80, 100),
-            inputDelay: 1,
-        });
-        actions.push({
-            actionType: CharacterActionType.MELEE_ATTACK_3,
-            damage: 10,
-            shape: new EntityShape(140, 100, 80, 100),
-            inputDelay: 1,
-        });
-        actions.push({
-            actionType: CharacterActionType.RUN_ATTACK,
-            damage: 10,
-            shape: new EntityShape(140, 100, 80, 100),
-            inputDelay: 1,
-        });
-
-        return actions;
-    }
+    
 }

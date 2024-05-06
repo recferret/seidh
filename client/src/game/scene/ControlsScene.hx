@@ -112,10 +112,10 @@ class ControlsScene extends h2d.Scene {
         movementController = new MovementController(this, function callback(angle:Float) {
             final playerId = Player.instance.playerId;
             final playerEntityId = Player.instance.playerEntityId;
-            final playerMovementInputType = PlayerInputType.MOVE;
+            final playerMovementInputType = CharacterActionType.MOVE;
 
             if (playerMovementInputType != null) {
-                final movementAllowance = baseEngine.checkLocalMovementInputAllowance(playerEntityId, playerMovementInputType);
+                final movementAllowance = baseEngine.checkLocalMovementInputAllowance(playerEntityId);
                 if (movementAllowance) {
                     baseEngine.addInputCommandClient(new PlayerInputCommand(playerMovementInputType, angle, playerId, Player.instance.incrementAndGetInputIndex()));
                 }

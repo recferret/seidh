@@ -122,7 +122,11 @@ var engine_base_CharacterEntity = function(struct) {
 	this.health = struct.health;
 	this.dodgeChance = struct.dodgeChance;
 	this.movement = struct.characterMovementStruct;
-	this.actions = struct.characterActionStruct;
+	this.actionMain = struct.characterActionMainStruct;
+	this.action1 = struct.characterAction1Struct;
+	this.action2 = struct.characterAction2Struct;
+	this.action3 = struct.characterAction3Struct;
+	this.actionUltimate = struct.characterActionUltimate;
 };
 engine_base_CharacterEntity.__name__ = true;
 engine_base_CharacterEntity.__super__ = engine_base_BaseEntity;
@@ -138,8 +142,8 @@ engine_base_ProjectileEntity.__super__ = engine_base_BaseEntity;
 engine_base_ProjectileEntity.prototype = $extend(engine_base_BaseEntity.prototype,{
 	__class__: engine_base_ProjectileEntity
 });
-var engine_base_PlayerInputCommand = function(inputType,movAngle,playerId,index) {
-	this.inputType = inputType;
+var engine_base_PlayerInputCommand = function(actionType,movAngle,playerId,index) {
+	this.actionType = actionType;
 	this.movAngle = movAngle;
 	this.playerId = playerId;
 	this.index = index;
@@ -291,7 +295,7 @@ engine_base_core_BaseEngine.prototype = {
 			}
 		}
 	}
-	,setEntityNextActionToPerform: function(entityId,characterActionType) {
+	,setCharacterNextActionToPerform: function(entityId,characterActionType) {
 		var entity = this.characterEntityManager.getEntityById(entityId);
 		if(entity != null) {
 			(js_Boot.__cast(entity , engine_base_entity_impl_EngineCharacterEntity)).setNextActionToPerform(characterActionType);
@@ -385,39 +389,40 @@ engine_base_core_BaseEngine.prototype = {
 		}
 		this.removeProjectileEntityQueue = [];
 	}
-	,checkLocalMovementInputAllowance: function(entityId,playerInputType) {
+	,checkLocalMovementInputAllowance: function(entityId) {
 		var entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
 		if(entity == null) {
 			return false;
 		} else if(entity.checkLocalMovementInput()) {
-			return entity.canPerformMove(playerInputType);
+			return entity.canPerformMove();
 		} else {
 			return false;
 		}
 	}
-	,checkLocalActionInputAllowance: function(entityId,playerInputType) {
+	,checkLocalActionInputAllowance: function(entityId,characterActionType) {
 		var entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
 		if(entity == null) {
 			return false;
+		} else if(entity.checkLocalActionInput(characterActionType)) {
+			return entity.canPerformAction(characterActionType);
 		} else {
-			var allow = entity.checkLocalActionInputAndPrepare(playerInputType) && entity.canPerformAction(playerInputType);
-			return allow;
+			return false;
 		}
 	}
 	,addInputCommandServer: function(struct) {
 		var entityId = this.getMainEntityIdByOwnerId(struct.playerId);
 		var allow = false;
-		if(struct.inputType == 1) {
-			allow = this.checkLocalMovementInputAllowance(entityId,struct.inputType);
+		if(struct.actionType == 1) {
+			allow = this.checkLocalMovementInputAllowance(entityId);
 		} else {
-			allow = this.checkLocalActionInputAllowance(entityId,struct.inputType);
+			allow = this.checkLocalActionInputAllowance(entityId,struct.actionType);
 		}
 		if(allow) {
-			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.inputType,struct.movAngle,struct.playerId));
+			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.actionType,struct.movAngle,struct.playerId));
 		}
 	}
 	,addInputCommandClient: function(playerInputCommand) {
-		if(playerInputCommand.inputType != null && playerInputCommand.playerId != null) {
+		if(playerInputCommand.actionType != null && playerInputCommand.playerId != null) {
 			var wrappedCommand = new engine_base_InputCommandEngineWrapped(playerInputCommand,this.tick);
 			this.hotInputCommands.push(wrappedCommand);
 			this.coldInputCommands.push(wrappedCommand);
@@ -567,11 +572,11 @@ engine_base_entity_impl_GameEntityCustomCollide.prototype = {
 	__class__: engine_base_entity_impl_GameEntityCustomCollide
 };
 var engine_base_entity_impl_EngineCharacterEntity = function(characterEntity) {
-	this.rangedActions = [];
-	this.meleeActions = [];
-	this.lastLocalDefendInputCheck = 0.0;
-	this.lastLocalRangedInputCheck = 0.0;
-	this.lastLocalMeleeAttackInputCheck = 0.0;
+	this.lastActionUltimateInputCheck = 0.0;
+	this.lastAction3InputCheck = 0.0;
+	this.lastAction2InputCheck = 0.0;
+	this.lastAction1InputCheck = 0.0;
+	this.lastActionMainInputCheck = 0.0;
 	this.isActing = false;
 	this.dy = 0.0;
 	this.dx = 0.0;
@@ -591,35 +596,11 @@ var engine_base_entity_impl_EngineCharacterEntity = function(characterEntity) {
 		this.baseEntity.ownerId = uuid_Uuid.short();
 	}
 	this.currentVitality = this.characterEntity.movement.vitality;
-	var _g = 0;
-	var _g1 = this.characterEntity.actions;
-	while(_g < _g1.length) {
-		var action = _g1[_g];
-		++_g;
-		switch(action.actionType) {
-		case 1:
-			this.meleeActions.push(action);
-			break;
-		case 2:
-			this.meleeActions.push(action);
-			break;
-		case 3:
-			this.meleeActions.push(action);
-			break;
-		case 4:
-			this.runAttackAction = action;
-			break;
-		case 5:
-			this.rangedActions.push(action);
-			break;
-		case 6:
-			this.rangedActions.push(action);
-			break;
-		case 7:
-			this.defendAction = action;
-			break;
-		}
-	}
+	this.actionMain = this.characterEntity.actionMain;
+	this.action1 = this.characterEntity.action1;
+	this.action2 = this.characterEntity.action2;
+	this.action3 = this.characterEntity.action3;
+	this.actionUltimate = this.characterEntity.actionUltimate;
 };
 engine_base_entity_impl_EngineCharacterEntity.__name__ = true;
 engine_base_entity_impl_EngineCharacterEntity.__super__ = engine_base_entity_base_EngineBaseEntity;
@@ -729,64 +710,68 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 			return false;
 		}
 	}
-	,checkLocalActionInputAndPrepare: function(playerInputType) {
+	,checkLocalActionInput: function(characterActionType) {
 		var now = HxOverrides.now() / 1000;
-		var hardcodedActionInputDelay = 1;
 		var allow = false;
-		if(playerInputType == 2) {
-			if(this.lastLocalMeleeAttackInputCheck == 0 || this.lastLocalMeleeAttackInputCheck + hardcodedActionInputDelay < now) {
-				this.lastLocalMeleeAttackInputCheck = now;
+		switch(characterActionType) {
+		case 2:
+			if(this.lastActionMainInputCheck == 0 || this.lastActionMainInputCheck + this.actionMain.inputDelay < now) {
+				this.lastActionMainInputCheck = now;
 				allow = true;
-				this.actionToPerform = this.isRunning ? this.runAttackAction : this.getRandomMeleeAction();
 			}
-		} else if(playerInputType == 3) {
-			if(this.lastLocalRangedInputCheck == 0 || this.lastLocalRangedInputCheck + hardcodedActionInputDelay < now) {
-				this.lastLocalRangedInputCheck = now;
+			break;
+		case 3:
+			if(this.lastAction1InputCheck == 0 || this.lastAction1InputCheck + this.action1.inputDelay < now) {
+				this.lastAction1InputCheck = now;
 				allow = true;
-				this.actionToPerform = this.rangedActions[Std.random(this.rangedActions.length)];
 			}
-		} else if(playerInputType == 4) {
-			if(this.lastLocalDefendInputCheck == 0 || this.lastLocalDefendInputCheck + hardcodedActionInputDelay < now) {
-				this.lastLocalDefendInputCheck = now;
+			break;
+		case 4:
+			if(this.lastAction2InputCheck == 0 || this.lastAction2InputCheck + this.action2.inputDelay < now) {
+				this.lastAction2InputCheck = now;
 				allow = true;
-				this.actionToPerform = this.defendAction;
 			}
+			break;
+		case 5:
+			if(this.lastAction3InputCheck == 0 || this.lastAction3InputCheck + this.action3.inputDelay < now) {
+				this.lastAction3InputCheck = now;
+				allow = true;
+			}
+			break;
+		case 6:
+			if(this.lastActionUltimateInputCheck == 0 || this.lastActionUltimateInputCheck + this.actionUltimate.inputDelay < now) {
+				this.lastActionUltimateInputCheck = now;
+				allow = true;
+			}
+			break;
+		default:
 		}
 		return allow;
 	}
 	,aiMeleeAttack: function() {
-		if(this.checkLocalActionInputAndPrepare(2)) {
+		if(this.checkLocalActionInput(2)) {
 			this.isActing = true;
 		}
-	}
-	,setRandomMeleeAction: function() {
-		this.isActing = true;
-		this.actionToPerform = this.getRandomMeleeAction();
 	}
 	,setNextActionToPerform: function(characterActionType) {
 		this.isActing = true;
 		switch(characterActionType) {
-		case 1:
-			this.actionToPerform = this.meleeActions[0];
-			break;
 		case 2:
-			this.actionToPerform = this.meleeActions[1];
+			this.actionToPerform = this.actionMain;
 			break;
 		case 3:
-			this.actionToPerform = this.meleeActions[2];
+			this.actionToPerform = this.action1;
 			break;
 		case 4:
-			this.actionToPerform = this.runAttackAction;
+			this.actionToPerform = this.action2;
 			break;
 		case 5:
-			this.actionToPerform = this.rangedActions[0];
+			this.actionToPerform = this.action3;
 			break;
 		case 6:
-			this.actionToPerform = this.rangedActions[1];
+			this.actionToPerform = this.actionUltimate;
 			break;
-		case 7:
-			this.actionToPerform = this.defendAction;
-			break;
+		default:
 		}
 	}
 	,addHealth: function(add) {
@@ -798,9 +783,6 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 			this.characterEntity.health = 0;
 		}
 		return this.characterEntity.health;
-	}
-	,getRandomMeleeAction: function() {
-		return this.meleeActions[Std.random(this.meleeActions.length)];
 	}
 	,getFullEntity: function() {
 		return this.characterEntity;
@@ -1049,10 +1031,10 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 				continue;
 			}
 			this.validatedInputCommands.push(input);
-			if(input.inputType == 2 || input.inputType == 3 || input.inputType == 4) {
-				entity.markForAction();
-			} else {
+			if(input.actionType == 1) {
 				entity.performMove(input);
+			} else {
+				entity.markForAction();
 			}
 		}
 	}
@@ -1155,13 +1137,10 @@ engine_seidh_entity_base_SeidhBaseEntity.prototype = $extend(engine_base_entity_
 	,markForAction: function() {
 		this.isActing = true;
 	}
-	,canPerformMove: function(playerInputType) {
+	,canPerformMove: function() {
 		return true;
 	}
-	,canPerformAction: function(playerInputType) {
-		if(playerInputType == 4 && this.baseEntity.entityType != 1 || playerInputType == 3 && this.baseEntity.entityType == 1) {
-			return false;
-		}
+	,canPerformAction: function(characterActionType) {
 		return true;
 	}
 	,updateHashImpl: function() {
@@ -1180,14 +1159,8 @@ engine_seidh_entity_factory_SeidhEntityFactory.InitiateEntity = function(id,owne
 	case 1:
 		entity = new engine_seidh_entity_impl_SeidhKnightEntity(engine_seidh_entity_impl_SeidhKnightEntity.GenerateObjectEntity(id,ownerId,x,y));
 		break;
-	case 2:
-		entity = new engine_seidh_entity_impl_SeidhSamuraiEntity(engine_seidh_entity_impl_SeidhSamuraiEntity.GenerateObjectEntity(id,ownerId,x,y));
-		break;
 	case 4:
 		entity = new engine_seidh_entity_impl_SeidhSkeletonWarriorEntity(engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GenerateObjectEntity(id,ownerId,x,y));
-		break;
-	case 5:
-		entity = new engine_seidh_entity_impl_SeidhSkeletonArcherEntity(engine_seidh_entity_impl_SeidhSkeletonArcherEntity.GenerateObjectEntity(id,ownerId,x,y));
 		break;
 	default:
 	}
@@ -1198,90 +1171,22 @@ var engine_seidh_entity_impl_SeidhKnightEntity = function(characterEntity) {
 };
 engine_seidh_entity_impl_SeidhKnightEntity.__name__ = true;
 engine_seidh_entity_impl_SeidhKnightEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
-	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 1, entityShape : new engine_base_EntityShape(64,64,32,100), id : id, ownerId : ownerId}, health : 100, dodgeChance : 0, characterMovementStruct : engine_seidh_entity_impl_SeidhKnightEntity.GetMovementStruct(), characterActionStruct : engine_seidh_entity_impl_SeidhKnightEntity.GetActionsStruct()});
-};
-engine_seidh_entity_impl_SeidhKnightEntity.GetMovementStruct = function() {
-	var movement = { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10};
-	return movement;
-};
-engine_seidh_entity_impl_SeidhKnightEntity.GetActionsStruct = function() {
-	var actions = [];
-	actions.push({ actionType : 1, damage : 5, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1});
-	actions.push({ actionType : 2, damage : 5, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1});
-	actions.push({ actionType : 3, damage : 5, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1});
-	actions.push({ actionType : 4, damage : 10, shape : new engine_base_EntityShape(10,10), inputDelay : 3});
-	actions.push({ actionType : 7, damage : 0, shape : new engine_base_EntityShape(100,100), inputDelay : 3});
-	return actions;
+	var tmp = { x : x, y : y, entityType : 1, entityShape : new engine_base_EntityShape(64,64,32,100), id : id, ownerId : ownerId};
+	var tmp1 = { actionType : 2, damage : 5, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1};
+	var tmp2 = { actionType : 3, damage : 5, shape : new engine_base_EntityShape(10,10,0,0), inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 10, travelDistance : 200, projectiles : 1}};
+	var tmp3 = { actionType : 4, damage : 5, shape : new engine_base_EntityShape(25,25,0,0), inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : new engine_base_EntityShape(100,100,0,0)}};
+	return new engine_base_CharacterEntity({ base : tmp, health : 100, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : tmp1, characterAction1Struct : tmp2, characterAction2Struct : tmp3, characterAction3Struct : { actionType : 5, damage : 0, shape : new engine_base_EntityShape(100,100), inputDelay : 3}});
 };
 engine_seidh_entity_impl_SeidhKnightEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
 engine_seidh_entity_impl_SeidhKnightEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{
 	__class__: engine_seidh_entity_impl_SeidhKnightEntity
-});
-var engine_seidh_entity_impl_SeidhSamuraiEntity = function(characterEntity) {
-	engine_seidh_entity_base_SeidhBaseEntity.call(this,characterEntity);
-};
-engine_seidh_entity_impl_SeidhSamuraiEntity.__name__ = true;
-engine_seidh_entity_impl_SeidhSamuraiEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
-	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 2, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId}, health : 100, dodgeChance : 0, characterMovementStruct : engine_seidh_entity_impl_SeidhSamuraiEntity.GetMovementStruct(), characterActionStruct : engine_seidh_entity_impl_SeidhSamuraiEntity.GetActionsStruct()});
-};
-engine_seidh_entity_impl_SeidhSamuraiEntity.GetMovementStruct = function() {
-	var movement = { canWalk : true, canRun : true, walkSpeed : 10, runSpeed : 20, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10};
-	return movement;
-};
-engine_seidh_entity_impl_SeidhSamuraiEntity.GetActionsStruct = function() {
-	var actions = [];
-	actions.push({ actionType : 1, damage : 10, shape : new engine_base_EntityShape(100,100), inputDelay : 1});
-	actions.push({ actionType : 2, damage : 10, shape : new engine_base_EntityShape(100,100), inputDelay : 1});
-	actions.push({ actionType : 3, damage : 10, shape : new engine_base_EntityShape(100,100), inputDelay : 1});
-	actions.push({ actionType : 5, damage : 10, shape : new engine_base_EntityShape(10,10), inputDelay : 3});
-	return actions;
-};
-engine_seidh_entity_impl_SeidhSamuraiEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
-engine_seidh_entity_impl_SeidhSamuraiEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{
-	__class__: engine_seidh_entity_impl_SeidhSamuraiEntity
-});
-var engine_seidh_entity_impl_SeidhSkeletonArcherEntity = function(characterEntity) {
-	engine_seidh_entity_base_SeidhBaseEntity.call(this,characterEntity);
-};
-engine_seidh_entity_impl_SeidhSkeletonArcherEntity.__name__ = true;
-engine_seidh_entity_impl_SeidhSkeletonArcherEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
-	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 5, entityShape : new engine_base_EntityShape(64,64,32,100), id : id, ownerId : ownerId}, health : 100, dodgeChance : 20, characterMovementStruct : engine_seidh_entity_impl_SeidhSkeletonArcherEntity.GetMovementStruct(), characterActionStruct : engine_seidh_entity_impl_SeidhSkeletonArcherEntity.GetActionsStruct()});
-};
-engine_seidh_entity_impl_SeidhSkeletonArcherEntity.GetMovementStruct = function() {
-	var movement = { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 0, vitalityConsumptionPerSec : 0, vitalityRegenPerSec : 0};
-	return movement;
-};
-engine_seidh_entity_impl_SeidhSkeletonArcherEntity.GetActionsStruct = function() {
-	var actions = [];
-	actions.push({ actionType : 1, damage : 10, shape : new engine_base_EntityShape(100,100), inputDelay : 1});
-	actions.push({ actionType : 2, damage : 10, shape : new engine_base_EntityShape(100,100), inputDelay : 1});
-	actions.push({ actionType : 3, damage : 10, shape : new engine_base_EntityShape(100,100), inputDelay : 1});
-	actions.push({ actionType : 5, damage : 10, shape : new engine_base_EntityShape(10,10), inputDelay : 3});
-	actions.push({ actionType : 6, damage : 10, shape : new engine_base_EntityShape(10,10), inputDelay : 3});
-	return actions;
-};
-engine_seidh_entity_impl_SeidhSkeletonArcherEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
-engine_seidh_entity_impl_SeidhSkeletonArcherEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{
-	__class__: engine_seidh_entity_impl_SeidhSkeletonArcherEntity
 });
 var engine_seidh_entity_impl_SeidhSkeletonWarriorEntity = function(characterEntity) {
 	engine_seidh_entity_base_SeidhBaseEntity.call(this,characterEntity);
 };
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__name__ = true;
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
-	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId}, health : 10, dodgeChance : 0, characterMovementStruct : engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GetMovementStruct(), characterActionStruct : engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GetActionsStruct()});
-};
-engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GetMovementStruct = function() {
-	var movement = { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10};
-	return movement;
-};
-engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GetActionsStruct = function() {
-	var actions = [];
-	actions.push({ actionType : 1, damage : 10, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1});
-	actions.push({ actionType : 2, damage : 10, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1});
-	actions.push({ actionType : 3, damage : 10, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1});
-	actions.push({ actionType : 4, damage : 10, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1});
-	return actions;
+	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId}, health : 10, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : { actionType : 2, damage : 10, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1}});
 };
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{

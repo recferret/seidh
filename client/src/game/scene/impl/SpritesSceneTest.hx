@@ -3,7 +3,7 @@ package game.scene.impl;
 import game.effects.SlashEffect;
 import game.effects.SlashEffect.SlashEffectType;
 import h2d.Tile;
-import engine.base.BaseTypesAndClasses.EntityAnimationState;
+// import engine.base.BaseTypesAndClasses.EntityAnimationState;
 // import engine.seidh.SeidhGameEngine;
 import game.scene.base.BasicScene;
 

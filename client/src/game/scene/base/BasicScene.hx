@@ -1,5 +1,6 @@
 package game.scene.base;
 
+import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
 import h2d.Scene.ScaleMode;
 import h3d.Engine;
@@ -128,10 +129,12 @@ abstract class BasicScene extends h2d.Scene {
 			controlsScene = new ControlsScene(baseEngine);
 
 			this.baseEngine = baseEngine;
-			this.baseEngine.createCharacterCallback = function callback(engineEntity:EngineBaseEntity) {
+
+			this.baseEngine.createCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
 				final entity = new ClientCharacterEntity(this);
 
-				entity.initiateEngineEntity(cast(engineEntity, EngineCharacterEntity));
+				// entity.initiateEngineEntity(cast(engineEntity, EngineCharacterEntity));
+				entity.initiateEngineEntity(characterEntity);
 				clientMainEntities.set(entity.getId(), entity);
 
 				if (entity.getOwnerId() == Player.instance.playerId) {
@@ -139,12 +142,20 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.deleteCharacterCallback = function callback(engineEntity:EngineBaseEntity) {
-				final entity = clientMainEntities.get(engineEntity.getId());
+			this.baseEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
+				final entity = clientMainEntities.get(characterEntity.getId());
 				if (entity != null) {
 					entity.animation.setAnimationState(DEAD);
-					clientMainEntities.remove(engineEntity.getId());
+					clientMainEntities.remove(characterEntity.getId());
 				}
+			};
+
+			this.baseEngine.createProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
+				trace('CREATE PROJECTILE ON THE CLIENT SIDE');
+			};
+
+			this.baseEngine.deleteProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
+
 			};
 
 			this.baseEngine.postLoopCallback = function callback() {
@@ -165,27 +176,29 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.baseEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
-				trace(params);
+				trace('CHARACTER ACTION ON THE CLIENT SIDE');
 				for (value in params) {
 					// Play action initiator animation
-					final clientEntity = clientMainEntities.get(value.entityId);
-					switch (value.actionType) {
-						case MELEE_ATTACK_1:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
-						case MELEE_ATTACK_2:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_2);
-						case MELEE_ATTACK_3:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
-						case RUN_ATTACK:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_RUN);
-						case RANGED_ATTACK1:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_1);
-						case RANGED_ATTACK2:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_2);
-						case DEFEND:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.DEFEND);
-					}
-					clientEntity.setDebugActionShape(value.shape);
+					// final clientEntity = clientMainEntities.get(value.entityId);
+					// switch (value.actionType) {
+						// case MELEE_ATTACK_1:
+						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
+						// case MELEE_ATTACK_2:
+						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_2);
+						// case MELEE_ATTACK_3:
+						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
+						// case RUN_ATTACK:
+						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_RUN);
+						// case RANGED_ATTACK1:
+						// 	// clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_1);
+						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
+						// case RANGED_ATTACK2:
+						// 	// clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_2);
+						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_2);
+						// case DEFEND:
+						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.DEFEND);
+					// }
+					// clientEntity.setDebugActionShape(value.shape);
 
 					// Play hurt and dead animations
 					for (value in value.hurtEntities) {
@@ -325,10 +338,13 @@ abstract class BasicScene extends h2d.Scene {
 
 	private function updateInput() {
 		final space = K.isDown(K.SPACE);
-		var playerActionInputType:PlayerInputType = null;
+		final backspace = K.isDown(K.BACKSPACE);
+		var playerActionInputType:CharacterActionType = null;
 
 		if (space) {
-			playerActionInputType = PlayerInputType.MELEE_ATTACK;
+			playerActionInputType = CharacterActionType.ACTION_MAIN;
+		} else if (backspace) {
+			playerActionInputType = CharacterActionType.ACTION_1;
 		}
 
 		final playerId = Player.instance.playerId;
@@ -336,7 +352,7 @@ abstract class BasicScene extends h2d.Scene {
 
 		if (playerActionInputType != null) {
 			final actionAllowance = baseEngine.checkLocalActionInputAllowance(playerEntityId, playerActionInputType);
-			if (playerActionInputType != null && (space) && actionAllowance) {
+			if (playerActionInputType != null && (space || backspace) && actionAllowance) {
 				baseEngine.addInputCommandClient(new PlayerInputCommand(playerActionInputType, 0, playerId, Player.instance.incrementAndGetInputIndex()));
 			}
 		}

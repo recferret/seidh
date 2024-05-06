@@ -51,14 +51,17 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public var isActing = false;
 	public var actionToPerform:CharacterActionStruct;
 
-	private var lastLocalMeleeAttackInputCheck = 0.0;
-	private var lastLocalRangedInputCheck = 0.0;
-	private var lastLocalDefendInputCheck = 0.0;
+	private var lastActionMainInputCheck = 0.0;
+	private var lastAction1InputCheck = 0.0;
+	private var lastAction2InputCheck = 0.0;
+	private var lastAction3InputCheck = 0.0;
+	private var lastActionUltimateInputCheck = 0.0;
 
-	private final meleeActions = new Array<CharacterActionStruct>();
-	private final rangedActions = new Array<CharacterActionStruct>();
-	private var defendAction:CharacterActionStruct;
-	private var runAttackAction:CharacterActionStruct;
+	private final actionMain:CharacterActionStruct;
+	private final action1:CharacterActionStruct;
+	private final action2:CharacterActionStruct;
+	private final action3:CharacterActionStruct;
+	private final actionUltimate:CharacterActionStruct;
 
 	// ------------------------------------------------
 	// Callbacks
@@ -83,33 +86,20 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 		currentVitality = this.characterEntity.movement.vitality;
 
-		for (action in this.characterEntity.actions) {
-			switch (action.actionType) {
-				case CharacterActionType.MELEE_ATTACK_1:
-					meleeActions.push(action);
-				case CharacterActionType.MELEE_ATTACK_2:
-					meleeActions.push(action);
-				case CharacterActionType.MELEE_ATTACK_3:
-					meleeActions.push(action);
-				case CharacterActionType.RUN_ATTACK:
-					runAttackAction = action;
-				case CharacterActionType.RANGED_ATTACK1:
-					rangedActions.push(action);
-				case CharacterActionType.RANGED_ATTACK2:
-					rangedActions.push(action);
-				case CharacterActionType.DEFEND:
-					defendAction = action;
-			}
-		}
+		actionMain = this.characterEntity.actionMain;
+		action1 = this.characterEntity.action1;
+		action2 = this.characterEntity.action2;
+		action3 = this.characterEntity.action3;
+		actionUltimate = this.characterEntity.actionUltimate;
 	}
 
 	// ------------------------------------------------
 	// Abstract
 	// ------------------------------------------------
 
-	public abstract function canPerformMove(playerInputType:PlayerInputType):Bool;
+	public abstract function canPerformMove():Bool;
 
-	public abstract function canPerformAction(playerInputType:PlayerInputType):Bool;
+	public abstract function canPerformAction(characterActionType:CharacterActionType):Bool;
 
 	public abstract function updateHashImpl():Int32;
 
@@ -247,66 +237,62 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		}
 	}
 
-	public function checkLocalActionInputAndPrepare(playerInputType:PlayerInputType) {
+	public function checkLocalActionInput(characterActionType:CharacterActionType) {
 		final now = haxe.Timer.stamp();
-		final hardcodedActionInputDelay = 1;
-
 		var allow = false;
 
-		if (playerInputType == PlayerInputType.MELEE_ATTACK) {
-			if (lastLocalMeleeAttackInputCheck == 0 || lastLocalMeleeAttackInputCheck + hardcodedActionInputDelay < now) {
-				lastLocalMeleeAttackInputCheck = now;
-				allow = true;
-
-				actionToPerform = isRunning ? runAttackAction : getRandomMeleeAction();
-			}
-		} else if (playerInputType == PlayerInputType.RANGED_ATTACK) {
-			if (lastLocalRangedInputCheck == 0 || lastLocalRangedInputCheck + hardcodedActionInputDelay < now) {
-				lastLocalRangedInputCheck = now;
-				allow = true;
-
-				actionToPerform = rangedActions[Std.random(rangedActions.length)];
-			}
-		} else if (playerInputType == PlayerInputType.DEFEND) {
-			if (lastLocalDefendInputCheck == 0 || lastLocalDefendInputCheck + hardcodedActionInputDelay < now) {
-				lastLocalDefendInputCheck = now;
-				allow = true;
-
-				actionToPerform = defendAction;
-			}
+		switch (characterActionType) {
+			case CharacterActionType.ACTION_MAIN:
+				if (lastActionMainInputCheck == 0 || lastActionMainInputCheck + actionMain.inputDelay < now) {
+					lastActionMainInputCheck = now;
+					allow = true;
+				}
+			case CharacterActionType.ACTION_1:
+				if (lastAction1InputCheck == 0 || lastAction1InputCheck + action1.inputDelay < now) {
+					lastAction1InputCheck = now;
+					allow = true;
+				}
+			case CharacterActionType.ACTION_2:
+				if (lastAction2InputCheck == 0 || lastAction2InputCheck + action2.inputDelay < now) {
+					lastAction2InputCheck = now;
+					allow = true;
+				}
+			case CharacterActionType.ACTION_3:
+				if (lastAction3InputCheck == 0 || lastAction3InputCheck + action3.inputDelay < now) {
+					lastAction3InputCheck = now;
+					allow = true;
+				}
+			case CharacterActionType.ACTION_ULTIMATE:
+				if (lastActionUltimateInputCheck == 0 || lastActionUltimateInputCheck + actionUltimate.inputDelay < now) {
+					lastActionUltimateInputCheck = now;
+					allow = true;
+				}
+			default:
 		}
 
 		return allow;
 	}
 
 	public function aiMeleeAttack() {
-		if (checkLocalActionInputAndPrepare(PlayerInputType.MELEE_ATTACK)) {
+		if (checkLocalActionInput(CharacterActionType.ACTION_MAIN)) {
 			isActing = true;
 		}
-	}
-
-	public function setRandomMeleeAction() {
-		isActing = true;
-		actionToPerform = getRandomMeleeAction();
 	}
 
 	public function setNextActionToPerform(characterActionType:CharacterActionType) {
 		isActing = true;
 		switch (characterActionType) {
-			case MELEE_ATTACK_1:
-				actionToPerform = meleeActions[0];
-			case MELEE_ATTACK_2:
-				actionToPerform = meleeActions[1];
-			case MELEE_ATTACK_3:
-				actionToPerform = meleeActions[2];
-			case RUN_ATTACK:
-				actionToPerform = runAttackAction;
-			case RANGED_ATTACK1:
-				actionToPerform = rangedActions[0];
-			case RANGED_ATTACK2:
-				actionToPerform = rangedActions[1];
-			case DEFEND:
-				actionToPerform = defendAction;
+			case CharacterActionType.ACTION_MAIN:
+				actionToPerform = actionMain;
+			case CharacterActionType.ACTION_1:
+				actionToPerform = action1;
+			case CharacterActionType.ACTION_2:
+				actionToPerform = action2;
+			case CharacterActionType.ACTION_3:
+				actionToPerform = action3;
+			case CharacterActionType.ACTION_ULTIMATE:
+				actionToPerform = actionUltimate;
+			default:
 		}
 	}
 
@@ -320,10 +306,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			characterEntity.health = 0;
 		}
 		return characterEntity.health;
-	}
-
-	private function getRandomMeleeAction() {
-		return meleeActions[Std.random(meleeActions.length)];
 	}
 
 	// ------------------------------------------------

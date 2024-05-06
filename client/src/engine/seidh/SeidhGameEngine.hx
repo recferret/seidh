@@ -54,11 +54,10 @@ class SeidhGameEngine extends BaseEngine {
             // Server request queue
 			validatedInputCommands.push(input);
 
-            if (input.inputType == MELEE_ATTACK || input.inputType == RANGED_ATTACK || input.inputType == DEFEND) {
-                // TODO RMK
-                entity.markForAction();
-            } else {
+            if (input.actionType == CharacterActionType.MOVE) {
                 entity.performMove(input);
+            } else {
+                entity.setNextActionToPerform(input.actionType);
             }
 		}
     }

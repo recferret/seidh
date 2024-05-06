@@ -1,8 +1,6 @@
 package game.scene.impl;
 
 import engine.seidh.SeidhGameEngine;
-import game.js.NativeWindowJS;
-import game.effects.ProjectileSphere;
 import game.scene.base.BasicScene;
 
 class SceneInputTest extends BasicScene {
