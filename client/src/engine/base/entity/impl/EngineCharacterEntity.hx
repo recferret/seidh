@@ -327,7 +327,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 	
 	public function getCurrentActionRect() {
-		return actionToPerform.shape.toRect(baseEntity.x, baseEntity.y, currentDirectionSide);
+		return actionToPerform.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, currentDirectionSide);
 	}
 
 	public function getHealth() {

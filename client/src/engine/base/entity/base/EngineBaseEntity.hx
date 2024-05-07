@@ -33,14 +33,14 @@ abstract class EngineBaseEntity {
     // Getters
     // ------------------------------------------------
 
-	public function getBodyRectangle() {
+	public function getBodyRectangle(rotated:Bool = false) {
 		final shapeWidth = baseEntity.entityShape.width;
 		final shapeHeight = baseEntity.entityShape.height;
 		final rectOffsetX = baseEntity.entityShape.rectOffsetX;
 		final rectOffsetY = baseEntity.entityShape.rectOffsetY;
 		final x = baseEntity.x;
 		final y = baseEntity.y;
-		return new Rectangle(x + rectOffsetX, y + rectOffsetY, shapeWidth, shapeHeight, baseEntity.entityShape.rotation);
+		return new Rectangle(x + rectOffsetX, y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
 	}
 
     public function getX() {

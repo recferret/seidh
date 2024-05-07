@@ -47,7 +47,6 @@ class EntityShape {
 	public var height:Int;
 	public var rectOffsetX:Int;
 	public var rectOffsetY:Int;
-	public var rotation = 0.0;
 
 	public function new(width:Int, height:Int, rectOffsetX:Int = 0, rectOffsetY:Int = 0) {
 		this.width = width;
@@ -62,9 +61,9 @@ class EntityShape {
 		}
 	}
 
-	public function toRect(x:Float, y:Float, side:Side) {
+	public function toRect(x:Float, y:Float, rotation:Float, side:Side) {
 		final sideOffset = side == RIGHT ? 0 : -width + 45;
-		return new Rectangle(x + this.rectOffsetX + sideOffset, y + this.rectOffsetY, width, height, 0);
+		return new Rectangle(x + this.rectOffsetX + sideOffset, y + this.rectOffsetY, width, height, rotation);
 	}
 
 	public function toJson() {
@@ -73,7 +72,6 @@ class EntityShape {
 			height: height,
 			rectOffsetX: rectOffsetX,
 			rectOffsetY: rectOffsetY,
-			rotation: rotation,
 		});
 	}
 }

@@ -45,13 +45,13 @@ class SeidhKnightEntity extends SeidhBaseEntity {
             characterAction1Struct: {
                 actionType: CharacterActionType.ACTION_1,
                 damage: 5,
-                shape: new EntityShape(30, 10, 30, 33),
+                shape: new EntityShape(30, 10, 0, 0),
                 inputDelay: 1,
                 projectileStruct: {
                     aoe: false,
                     penetration: false,
                     speed: 100,
-                    travelDistance: 200,
+                    travelDistance: 900,
                     projectiles: 1,
                 },
             },

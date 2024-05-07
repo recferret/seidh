@@ -32,15 +32,13 @@ class ClientProjectileEntity extends h2d.Object {
         //     Utils.DrawRect(graphics, debugActionShape.toRect(x, y, engineEntity.currentDirectionSide), GameConfig.GreenColor);
         // }
 
-        Utils.DrawRect(graphics, projectileEntity.getBodyRectangle(), GameConfig.GreenColor);
+        Utils.DrawRect(graphics, projectileEntity.getBodyRectangle(true), GameConfig.GreenColor);
     }
 
     public function initiateEngineEntity(projectileEntity:EngineProjectileEntity) {
 		this.projectileEntity = projectileEntity;
-		setPosition(projectileEntity.getX(), projectileEntity.getY());
-
-        trace('PROJECTILE POSITION:');
-        trace(projectileEntity.getX(), projectileEntity.getY());
+        rotate(projectileEntity.getRotation());
+		setPosition(projectileEntity.getBodyRectangle().getCenter().x, projectileEntity.getBodyRectangle().getCenter().y);
 
         switch (projectileEntity.getEntityType()) {
             case EntityType.PROJECTILE_MAGIC_ARROW:

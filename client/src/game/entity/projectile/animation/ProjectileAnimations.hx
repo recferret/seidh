@@ -45,12 +45,12 @@ class ProjectileAnimations {
                 // hxd.Res.mage.arrow._4.toTile(),
                 // hxd.Res.mage.arrow._5.toTile(),
                 // hxd.Res.mage.arrow._6.toTile(),
-                hxd.Res.samurai.arrow.toTile(),
+                hxd.Res.samurai.arrow.toTile().center(),
             ]
         );
         animation.loadHit(
             [
-                hxd.Res.samurai.arrow.toTile(),
+                hxd.Res.samurai.arrow.toTile().center(),
             ]
         );
 

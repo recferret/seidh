@@ -142,9 +142,8 @@ class SeidhGameEngine extends BaseEngine {
         final ownerRect = character.getBodyRectangle();
         final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
             base: {
-                // Need an offset because of current char sprites
                 x: ownerRect.getCenter().x,
-                y: ownerRect.getCenter().y - 50,
+                y: ownerRect.getCenter().y,
                 entityType: EntityType.PROJECTILE_MAGIC_ARROW,
                 entityShape: character.actionToPerform.shape,
                 id: character.getId(),
