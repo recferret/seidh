@@ -1,7 +1,6 @@
 package game.scene.base;
 
 
-import h2d.Scene.ScaleMode;
 import h3d.Engine;
 import hxd.Key in K;
 
@@ -9,11 +8,11 @@ import game.entity.character.ClientCharacterEntity;
 import game.entity.projectile.ClientProjectileEntity;
 import game.js.NativeWindowJS;
 import game.network.Networking;
+import game.scene.ControlsScene.ButtonPressed;
 import game.utils.Utils;
 
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
-import engine.base.entity.base.EngineBaseEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.geometry.Point;
@@ -130,7 +129,15 @@ abstract class BasicScene extends h2d.Scene {
 		onResize();
 
 		if (baseEngine != null) {
-			controlsScene = new ControlsScene(baseEngine);
+			controlsScene = new ControlsScene(baseEngine, function callback(buttonPressed:ButtonPressed) {
+				switch (buttonPressed) {
+					case ButtonPressed.A:
+						addInputCommand(CharacterActionType.ACTION_MAIN);
+					case ButtonPressed.B:
+						addInputCommand(CharacterActionType.ACTION_1);
+					default:
+				}
+			});
 
 			this.baseEngine = baseEngine;
 
@@ -299,6 +306,8 @@ abstract class BasicScene extends h2d.Scene {
 				scaleMode = ScaleMode.Stretch(w, h);
 
 				camera.setViewport(Std.int(w / 2), Std.int(h / 2.5), w, h);
+
+				camera.scale(2, 2);
 			}
 		} else {
 			w = hxd.Window.getInstance().width;
@@ -349,7 +358,7 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public function getInputScene():h2d.Scene {
-		return this;
+		return controlsScene != null ? controlsScene : this;
 	}
 
 	private function updateInput() {
@@ -363,13 +372,17 @@ abstract class BasicScene extends h2d.Scene {
 			playerActionInputType = CharacterActionType.ACTION_1;
 		}
 
+		addInputCommand(playerActionInputType);
+	}
+
+	private function addInputCommand(characterActionType:CharacterActionType) {
 		final playerId = Player.instance.playerId;
 		final playerEntityId = Player.instance.playerEntityId;
 
-		if (playerActionInputType != null) {
-			final actionAllowance = baseEngine.checkLocalActionInputAllowance(playerEntityId, playerActionInputType);
-			if (playerActionInputType != null && (space || backspace) && actionAllowance) {
-				baseEngine.addInputCommandClient(new PlayerInputCommand(playerActionInputType, 0, playerId, Player.instance.incrementAndGetInputIndex()));
+		if (characterActionType != null) {
+			final actionAllowance = baseEngine.checkLocalActionInputAllowance(playerEntityId, characterActionType);
+			if (characterActionType != null && actionAllowance) {
+				baseEngine.addInputCommandClient(new PlayerInputCommand(characterActionType, 0, playerId, Player.instance.incrementAndGetInputIndex()));
 			}
 		}
 	}
@@ -392,16 +405,12 @@ abstract class BasicScene extends h2d.Scene {
 	// GUI
 	// ----------------------------------
 
-	private function getFont() {
-		return hxd.res.DefaultFont.get();
-	}
-
 	public function addButton(label: String, onClick: h2d.Flow -> Void) {
 		var f = new h2d.Flow(fui);
 		f.padding = 25;
 		f.paddingBottom = 7;
 		f.backgroundTile = h2d.Tile.fromColor(0x404040);
-		var tf = new h2d.Text(getFont(), f);
+		var tf = new h2d.Text(hxd.res.DefaultFont.get(), f);
 		tf.text = label;
 		f.enableInteractive = true;
 		f.interactive.cursor = Button;

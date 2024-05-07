@@ -1,5 +1,6 @@
 package engine.base.entity.impl;
 
+import uuid.Uuid;
 import engine.base.BaseTypesAndClasses;
 import engine.base.entity.base.EngineBaseEntity;
 
@@ -17,6 +18,13 @@ class EngineProjectileEntity extends EngineBaseEntity {
 		super(projectileEntity);
 
         this.projectileEntity = projectileEntity;
+
+		if (baseEntity.id == null) {
+			baseEntity.id = Uuid.short();
+		}
+		if (baseEntity.ownerId == null) {
+			baseEntity.ownerId = Uuid.short();
+		}
     }
 
     public function update(dt:Float) {

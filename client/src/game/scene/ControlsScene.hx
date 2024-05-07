@@ -100,11 +100,19 @@ class MovementController extends h2d.Object {
 	}
 }
 
+enum abstract ButtonPressed(Int) {
+	var A = 1;
+	var B = 2;
+	var X = 3;
+	var Y = 4;
+}
+
 class ControlsScene extends h2d.Scene {
 
-	private var movementController:MovementController;
+	private final movementController:MovementController;
+	private final text:h2d.Text;
     
-    public function new(baseEngine:SeidhGameEngine) {
+    public function new(baseEngine:SeidhGameEngine, buttonPressedCallback:ButtonPressed->Void) {
         super();
 
         scaleMode = ScaleMode.Zoom(2);
@@ -121,8 +129,43 @@ class ControlsScene extends h2d.Scene {
                 }
             }
         });
+        movementController.initiate(250, 250, 400);
 
-        movementController.initiate(150, 150, 300);
+		final buttonScale = 2;
+		final buttonSize = 80;
+		final buttonScaledSize = buttonScale * buttonSize;
+
+		final buttonA = new h2d.Bitmap(hxd.Res.input.button_a.toTile(), this);
+		final buttonB = new h2d.Bitmap(hxd.Res.input.button_b.toTile(), this);
+
+		buttonA.scale(buttonScale);
+		buttonB.scale(buttonScale);
+
+		buttonA.setPosition(width - (buttonScaledSize * 2), buttonScaledSize / 2);
+		buttonB.setPosition(width - (buttonScaledSize * 2), buttonScaledSize * 2);
+
+		final interactionButtonA = new h2d.Interactive(buttonSize, buttonSize, buttonA);
+		interactionButtonA.onClick = function(event : hxd.Event) {
+			if (buttonPressedCallback != null) {
+				buttonPressedCallback(ButtonPressed.A);
+			}
+		}
+
+		final interactionButtonB = new h2d.Interactive(buttonSize, buttonSize, buttonB);
+		interactionButtonB.onClick = function(event : hxd.Event) {
+			if (buttonPressedCallback != null) {
+				buttonPressedCallback(ButtonPressed.B);
+			}
+		}
+
+		// Debug interface
+
+		final fui = new h2d.Flow(this);
+		fui.layout = Vertical;
+		fui.verticalSpacing = 5;
+		fui.padding = 10;
+
+		text = new h2d.Text(hxd.res.DefaultFont.get(), fui);
     }
 
     public function update() {

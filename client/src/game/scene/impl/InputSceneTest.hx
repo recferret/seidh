@@ -24,7 +24,7 @@ class SceneInputTest extends BasicScene {
 
 		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 200, 200, KNIGHT);
 
-		// createCharacterEntityFromMinimalStruct("1", "1", 50, 200, SKELETON_WARRIOR);
+		createCharacterEntityFromMinimalStruct("1", "1", 400, 200, SKELETON_WARRIOR);
 		// createCharacterEntityFromMinimalStruct("3", "3", 20, 300, SKELETON_WARRIOR);
 
 		// createGameEntityFromMinimalStruct("2", "2", 50, 300, SKELETON_WARRIOR);

@@ -1,5 +1,6 @@
 package engine.seidh;
 
+import engine.base.EngineConfig;
 import js.lib.Date;
 
 import engine.base.BaseTypesAndClasses;
@@ -84,16 +85,36 @@ class SeidhGameEngine extends BaseEngine {
             final character = cast(e, EngineCharacterEntity);
             if (character.isAlive) {
                 if (character.getEntityType() == EntityType.SKELETON_WARRIOR) {
-                    final targetPlayer = getNearestPlayer(character);
-                    if (targetPlayer != null) {
-                        character.setTargetObject(targetPlayer);
-                        // if (entity.ifTargetInAttackRange()) {
-                        //     entity.aiMeleeAttack();
-                        // }
+                    if (EngineConfig.AI_ENABLED) {
+                        final targetPlayer = getNearestPlayer(character);
+                        if (targetPlayer != null) {
+                            character.setTargetObject(targetPlayer);
+                            // if (entity.ifTargetInAttackRange()) {
+                            //     entity.aiMeleeAttack();
+                            // }
+                        }
                     }
                 }
 
                 character.update(dt);
+            
+                // Check projectile collisions against characters
+                for (e in projectileEntityManager.entities) {
+                    final projectile = cast(e, EngineProjectileEntity);
+
+                    // Skip self collision
+                    if (projectile.getOwnerId() != character.getOwnerId()) {
+                        final projectileRect = projectile.getBodyRectangle();
+                        final characterRect = character.getBodyRectangle();
+
+                        // Skip far collisions
+                        if (projectileRect.getCenter().distance(characterRect.getCenter()) < characterRect.w) {
+                            // TODO hit by projectile
+                            projectile.allowMovement = false;
+                        }
+                    }
+                }
+
 
                 if (character.isActing) {
                     final hurtEntities = new Array<String>();
@@ -152,7 +173,6 @@ class SeidhGameEngine extends BaseEngine {
                 y: ownerRect.getCenter().y,
                 entityType: EntityType.PROJECTILE_MAGIC_ARROW,
                 entityShape: character.actionToPerform.shape,
-                id: character.getId(),
                 ownerId: character.getOwnerId(),
                 rotation: character.getRotation(),
             },

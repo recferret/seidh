@@ -77,6 +77,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 		this.isPlayer = [EntityType.KNIGHT, EntityType.SAMURAI].contains(baseEntity.entityType);
 
+		// TODO base stuff
 		if (baseEntity.id == null) {
 			baseEntity.id = Uuid.short();
 		}
