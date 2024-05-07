@@ -20,16 +20,25 @@ class EngineProjectileEntity extends EngineBaseEntity {
     }
 
     public function update(dt:Float) {
-		trace('engine projectile movement');
 		if (allowMovement) {
-			final dx = projectileEntity.projectile.speed * Math.cos(baseEntity.rotation) * dt;
-			final dy = projectileEntity.projectile.speed * Math.sin(baseEntity.rotation) * dt;
-	
-			traveledDistance += (dx + dy);
-	
-			if (traveledDistance > projectileEntity.projectile.travelDistance) {
-				allowMovement = false;
-			}
+			final step = calculateAndGetFrameMoveStep(dt);
+			moveBy(step.dx, step.dy);
+		}
+	}
+
+	public function calculateAndGetFrameMoveStep(dt:Float) {
+		final dx = projectileEntity.projectile.speed * Math.cos(baseEntity.rotation) * dt;
+		final dy = projectileEntity.projectile.speed * Math.sin(baseEntity.rotation) * dt;
+		traveledDistance += (dx + dy);
+
+		if (traveledDistance > projectileEntity.projectile.travelDistance) {
+			allowMovement = false;
+		}
+
+		return {
+			dx: dx,
+			dy: dy,
+			allowMovement: allowMovement
 		}
 	}
 

@@ -22,6 +22,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                 entityShape: new EntityShape(64, 64, 32, 100),
                 id: id,
                 ownerId: ownerId,
+                rotation: 0
             },
             health: 100,
             dodgeChance: 0,
@@ -44,12 +45,12 @@ class SeidhKnightEntity extends SeidhBaseEntity {
             characterAction1Struct: {
                 actionType: CharacterActionType.ACTION_1,
                 damage: 5,
-                shape: new EntityShape(10, 10, 0, 0),
+                shape: new EntityShape(30, 10, 30, 33),
                 inputDelay: 1,
                 projectileStruct: {
                     aoe: false,
                     penetration: false,
-                    speed: 10,
+                    speed: 100,
                     travelDistance: 200,
                     projectiles: 1,
                 },

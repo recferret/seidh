@@ -94,10 +94,9 @@ class SeidhGameEngine extends BaseEngine {
                     final deadEntities = new Array<String>();
 
                     if (character.actionToPerform.projectileStruct != null) {
-                        trace('LOOKS LIKE A PROJECTILE TYPE ACTION');
                         createProjectileEntity(createProjectileByCharacter(character), true);
                     } else {
-                        trace('LOOKS LIKE A MELEE TYPE ACTION');
+                        
                     }
 
                     // for (e2 in characterEntityManager.entities) {
@@ -140,10 +139,12 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     private function createProjectileByCharacter(character:EngineCharacterEntity) {
+        final ownerRect = character.getBodyRectangle();
         final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
             base: {
-                x: character.getX(),
-                y: character.getY(),
+                // Need an offset because of current char sprites
+                x: ownerRect.getCenter().x,
+                y: ownerRect.getCenter().y - 50,
                 entityType: EntityType.PROJECTILE_MAGIC_ARROW,
                 entityShape: character.actionToPerform.shape,
                 id: character.getId(),

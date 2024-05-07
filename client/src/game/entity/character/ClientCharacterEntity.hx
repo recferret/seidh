@@ -34,9 +34,9 @@ class ClientCharacterEntity extends h2d.Object {
     // ------------------------------------------------------------
 
 	public function debugDraw(graphics:h2d.Graphics) {
-        final debugActionShape = getDebugActionShape();
+        // TODO rmk shape for melee attacks
         if (debugActionShape != null) {
-            Utils.DrawRect(graphics, debugActionShape.toRect(x, y, engineEntity.currentDirectionSide), GameConfig.GreenColor);
+            // Utils.DrawRect(graphics, debugActionShape.toRect(x, y, engineEntity.currentDirectionSide), GameConfig.GreenColor);
         }
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
@@ -45,6 +45,9 @@ class ClientCharacterEntity extends h2d.Object {
     public function initiateEngineEntity(engineEntity:EngineCharacterEntity) {
 		this.engineEntity = engineEntity;
 		setPosition(engineEntity.getX(), engineEntity.getY());
+
+        trace('CHARACTER POSITION:');
+        trace(engineEntity.getX(), engineEntity.getY());
 
         switch (engineEntity.getEntityType()) {
             case EntityType.KNIGHT:
@@ -59,7 +62,7 @@ class ClientCharacterEntity extends h2d.Object {
         }
 	}
  
-    public function setTragetServerPosition(x:Int, y:Int) {
+    public function setTragetServerPosition(x:Float, y:Float) {
         targetServerPosition.x = x;
         targetServerPosition.y = y;
     }

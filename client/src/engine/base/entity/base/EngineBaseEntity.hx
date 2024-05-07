@@ -21,6 +21,15 @@ abstract class EngineBaseEntity {
 	}
 
     // ------------------------------------------------
+    // General
+    // ------------------------------------------------
+
+	public function moveBy(x:Float, y:Float) {
+		baseEntity.x += x;
+		baseEntity.y += y;
+	}
+
+    // ------------------------------------------------
     // Getters
     // ------------------------------------------------
 
@@ -62,11 +71,11 @@ abstract class EngineBaseEntity {
     // Setters
     // ------------------------------------------------
 
-    public function setX(x:Int) {
+    public function setX(x:Float) {
 		baseEntity.x = x;
 	}
 
-	public function setY(y:Int) {
+	public function setY(y:Float) {
 		baseEntity.y = y;
 	}
 

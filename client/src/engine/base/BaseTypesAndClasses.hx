@@ -107,8 +107,8 @@ typedef CharacterActionStruct = {
 }
 
 typedef BaseEntityStruct = {
-	x:Int,
-	y:Int,
+	x:Float,
+	y:Float,
 	?entityType:EntityType,
 	?entityShape:EntityShape,
 	?id:String,
@@ -129,8 +129,8 @@ typedef CharacterEntityStruct = {
 }
 
 class BaseEntity {
-	public var x:Int;
-	public var y:Int;
+	public var x:Float;
+	public var y:Float;
 	public var entityType:EntityType;
 	public var entityShape:EntityShape;
 	public var id:String;
@@ -195,8 +195,8 @@ class ProjectileEntity extends BaseEntity {
 
 typedef CharacterEntityMinStruct = {
 	id:String,
-	x:Int,
-	y:Int,
+	x:Float,
+	y:Float,
 	side:Side
 }
 

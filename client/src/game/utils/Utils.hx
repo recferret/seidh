@@ -25,7 +25,7 @@ class Utils {
 	}
 
 	public static function DrawRect(graphics:h2d.Graphics, rect:Rectangle, color:Int) {
-		graphics.lineStyle(6, color);
+		graphics.lineStyle(2, color);
 
 		// Top line
 		graphics.lineTo(rect.getTopLeftPoint().x, rect.getTopLeftPoint().y);

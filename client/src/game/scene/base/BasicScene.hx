@@ -183,8 +183,6 @@ abstract class BasicScene extends h2d.Scene {
 
 			this.baseEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
 				for (value in params) {
-					trace('PERFORM ' + value.actionType);
-
 					// Play action initiator animation
 					final clientEntity = clientCharacterEntities.get(value.entityId);
 					switch (value.actionType) {
