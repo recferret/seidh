@@ -200,6 +200,10 @@ abstract class BaseEngine {
 		});
 	}
 
+	function removeProjectileEntity(entityId:String) {
+		removeProjectileEntityQueue.push(entityId);
+	}
+
 	function processCreateProjectileQueue() {
 		for (queueTask in createProjectileEntityQueue) {
 			projectileEntityManager.add(queueTask.entity);

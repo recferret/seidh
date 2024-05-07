@@ -9,7 +9,7 @@ class EngineProjectileEntity extends EngineBaseEntity {
 	// General
 	// ------------------------------------------------
 
-    private var allowMovement = true;
+    public var allowMovement = true;
     private var traveledDistance = 0.0;
 	private var projectileEntity:ProjectileEntity;
 

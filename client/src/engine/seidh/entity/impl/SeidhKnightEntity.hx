@@ -51,7 +51,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     aoe: false,
                     penetration: false,
                     speed: 100,
-                    travelDistance: 900,
+                    travelDistance: 300,
                     projectiles: 1,
                 },
             },

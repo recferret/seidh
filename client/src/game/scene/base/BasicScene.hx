@@ -145,23 +145,26 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.baseEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
-				final entity = clientCharacterEntities.get(characterEntity.getId());
-				if (entity != null) {
-					entity.animation.setAnimationState(DEAD);
+				final character = clientCharacterEntities.get(characterEntity.getId());
+				if (character != null) {
+					character.animation.setAnimationState(DEAD);
 					clientCharacterEntities.remove(characterEntity.getId());
 				}
 			};
 
 			this.baseEngine.createProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
-				trace('CREATE PROJECTILE ON THE CLIENT SIDE');
-
 				final projectile = new ClientProjectileEntity(this);
 				projectile.initiateEngineEntity(projectileEntity);
 				clientProjectileEntities.set(projectileEntity.getId(), projectile);
 			};
 
 			this.baseEngine.deleteProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
-				trace('DELETE PROJECTILE ON THE CLIENT SIDE');
+				final projectile = clientProjectileEntities.get(projectileEntity.getId());
+				if (projectile != null) {
+					// TODO play some animation 
+					clientProjectileEntities.remove(projectileEntity.getId());
+					removeChild(projectile);
+				}
 			};
 
 			this.baseEngine.postLoopCallback = function callback() {

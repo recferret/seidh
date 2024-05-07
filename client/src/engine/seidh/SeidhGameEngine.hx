@@ -71,7 +71,13 @@ class SeidhGameEngine extends BaseEngine {
         final characterActionCallbackParams = new Array<CharacterActionCallbackParams>();
 
         for (e in projectileEntityManager.entities) {
-            e.update(dt);
+            final projectile = cast(e, EngineProjectileEntity);
+
+            if (projectile.allowMovement) {
+                projectile.update(dt);
+            } else {
+                removeProjectileEntity(projectile.getId());
+            }
         }
 
         for (e in characterEntityManager.entities) {
