@@ -39,13 +39,15 @@ class SeidhKnightEntity extends SeidhBaseEntity {
             characterActionMainStruct: {
                 actionType: CharacterActionType.ACTION_MAIN,
                 damage: 5,
-                shape: new EntityShape(140, 100, 80, 100),
                 inputDelay: 1,
+                meleeStruct: {
+                    aoe: true,
+                    shape: new EntityShape(140, 100, 80, 100),
+                }
             },
             characterAction1Struct: {
                 actionType: CharacterActionType.ACTION_1,
                 damage: 5,
-                shape: new EntityShape(30, 10, 0, 0),
                 inputDelay: 1,
                 projectileStruct: {
                     aoe: false,
@@ -53,12 +55,12 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     speed: 200,
                     travelDistance: 900,
                     projectiles: 1,
+                    shape: new EntityShape(30, 10, 0, 0),
                 },
             },
             characterAction2Struct: {
                 actionType: CharacterActionType.ACTION_2,
                 damage: 5,
-                shape: new EntityShape(25, 25, 0, 0),
                 inputDelay: 1,
                 projectileStruct: {
                     aoe: true,
@@ -67,13 +69,17 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     travelDistance: 200,
                     projectiles: 1,
                     aoeShape: new EntityShape(100, 100, 0, 0),
+                    shape: new EntityShape(25, 25, 0, 0),
                 },
             },
             characterAction3Struct: {
                 actionType: CharacterActionType.ACTION_3,
                 damage: 0,
-                shape: new EntityShape(100, 100),
                 inputDelay: 3,
+                meleeStruct: {
+                    aoe: true,
+                    shape: new EntityShape(100, 100),
+                }
             }
         });
     }

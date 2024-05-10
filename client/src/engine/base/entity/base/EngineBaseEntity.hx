@@ -67,6 +67,10 @@ abstract class EngineBaseEntity {
 		return baseEntity.rotation;
 	}
 
+	public function isPlayer() {
+		return baseEntity.entityType == EntityType.KNIGHT;
+	}
+
     // ------------------------------------------------
     // Setters
     // ------------------------------------------------

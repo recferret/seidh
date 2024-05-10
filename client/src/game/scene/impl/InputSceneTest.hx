@@ -22,10 +22,10 @@ class SceneInputTest extends BasicScene {
         // });
 
 
-		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 200, 200, KNIGHT);
+		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 300, 100, KNIGHT);
 
 		createCharacterEntityFromMinimalStruct("1", "1", 400, 200, SKELETON_WARRIOR);
-		// createCharacterEntityFromMinimalStruct("3", "3", 20, 300, SKELETON_WARRIOR);
+		createCharacterEntityFromMinimalStruct("2", "2", 470, 300, SKELETON_WARRIOR);
 
 		// createGameEntityFromMinimalStruct("2", "2", 50, 300, SKELETON_WARRIOR);
 		// createGameEntityFromMinimalStruct("3", "3", 850, 200, SKELETON_WARRIOR);
@@ -42,23 +42,7 @@ class SceneInputTest extends BasicScene {
 	public function start() {
 	}
 
-	// Update client part and visuals
 	public function customUpdate(dt:Float, fps:Float) {
-		for (projectile in clientProjectileEntities) {
-			projectile.update(dt);
-
-			if (GameConfig.DebugDraw) {
-				projectile.debugDraw(debugGraphics);
-			}
-		}
-
-		for (character in clientCharacterEntities) {
-			character.update(dt);
-
-			if (GameConfig.DebugDraw) {
-				character.debugDraw(debugGraphics);
-			}
-		}
 	}
 
 }

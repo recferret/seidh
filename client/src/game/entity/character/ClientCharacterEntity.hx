@@ -13,8 +13,8 @@ class ClientCharacterEntity extends h2d.Object {
     public var animation:CharacterAnimation;
 
     private var debugActionShape:EntityShape;
+    private var engineEntity:EngineCharacterEntity;
 
-    var engineEntity:EngineCharacterEntity;
     var targetServerPosition = new Point();
 
     public function new(s2d:h2d.Scene) {
@@ -34,9 +34,14 @@ class ClientCharacterEntity extends h2d.Object {
     // ------------------------------------------------------------
 
 	public function debugDraw(graphics:h2d.Graphics) {
-        // TODO rmk shape for melee attacks
+        if (engineEntity.botForwardLookingLine != null) {
+            final p1 = new h2d.col.Point(engineEntity.botForwardLookingLine.x1, engineEntity.botForwardLookingLine.y1);
+            final p2 = new h2d.col.Point(engineEntity.botForwardLookingLine.x2, engineEntity.botForwardLookingLine.y2);
+            Utils.DrawLine(graphics, p1, p2, engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);    
+        }
+
         if (debugActionShape != null) {
-            // Utils.DrawRect(graphics, debugActionShape.toRect(x, y, engineEntity.currentDirectionSide), GameConfig.GreenColor);
+            Utils.DrawRect(graphics, debugActionShape.toRect(x, y, 0, engineEntity.currentDirectionSide), GameConfig.GreenColor);
         }
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
@@ -45,9 +50,6 @@ class ClientCharacterEntity extends h2d.Object {
     public function initiateEngineEntity(engineEntity:EngineCharacterEntity) {
 		this.engineEntity = engineEntity;
 		setPosition(engineEntity.getX(), engineEntity.getY());
-
-        trace('CHARACTER POSITION:');
-        trace(engineEntity.getX(), engineEntity.getY());
 
         switch (engineEntity.getEntityType()) {
             case EntityType.KNIGHT:
@@ -77,7 +79,7 @@ class ClientCharacterEntity extends h2d.Object {
             //     animation.setSide(isRightSide() ? RIGHT : LEFT);
             // }
 
-            animation.setSide(this.engineEntity.currentDirectionSide);
+            animation.setSide(engineEntity.currentDirectionSide);
 
             final distance = targetServerPosition.distance(new Point(x, y));
             if (distance > 1) {
@@ -123,6 +125,14 @@ class ClientCharacterEntity extends h2d.Object {
     public function getBodyRectangle() {
 		return engineEntity.getBodyRectangle();
 	}
+
+    public function intersectsWithCharacter() {
+        return engineEntity.intersectsWithCharacter;
+    }
+
+    public function getForwardLookingLine(lineLength:Int) {
+        return engineEntity.getForwardLookingLine(lineLength);
+    }
 
     public function getDebugActionShape() {
         return debugActionShape;

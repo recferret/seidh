@@ -22,6 +22,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
                 entityShape: new EntityShape(64, 64, 64, 100),
                 id: id,
                 ownerId: ownerId,
+                rotation: 0
             },
             health: 10,
             dodgeChance: 0,
@@ -38,8 +39,11 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
             characterActionMainStruct: {
                 actionType: CharacterActionType.ACTION_MAIN,
                 damage: 10,
-                shape: new EntityShape(140, 100, 80, 100),
                 inputDelay: 1,
+                meleeStruct: {
+                    aoe: false,
+                    shape: new EntityShape(140, 100, 80, 100),
+                }
             }
         });
     }

@@ -87,20 +87,26 @@ typedef CharacterMovementStruct = {
 	vitalityRegenPerSec:Int,
 }
 
+typedef MeleeStruct = {
+	aoe:Bool,
+	shape: EntityShape,
+}
+
 typedef ProjectileStruct = {
 	aoe:Bool,
 	penetration:Bool,
 	speed:Float,
 	travelDistance:Float,
 	projectiles:Int,
+	shape: EntityShape,
 	?aoeShape: EntityShape,
 }
 
 typedef CharacterActionStruct = {
 	actionType:CharacterActionType,
 	damage:Int,
-	shape: EntityShape,
 	inputDelay:Float,
+	?meleeStruct:MeleeStruct,
 	?projectileStruct:ProjectileStruct,
 }
 

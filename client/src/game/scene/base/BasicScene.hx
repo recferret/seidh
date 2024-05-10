@@ -24,6 +24,11 @@ enum abstract GameState(Int) {
 	var PLAYING = 2;
 }
 
+typedef BasicSceneCallback = {
+	clickX:Float,
+	clickY:Float,
+} 
+
 class MovementController extends h2d.Object {
 
 	private var outerCircle:h2d.Bitmap;
@@ -119,11 +124,12 @@ abstract class BasicScene extends h2d.Scene {
 	private var fui:h2d.Flow;
 
 	private var playerEntity:ClientCharacterEntity;
+	private var targetCursor:h2d.Bitmap;
 
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
 	final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
 	
-	public function new(baseEngine:SeidhGameEngine) {
+	public function new(baseEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneCallback->Void) {
 		super();
 
 		onResize();
@@ -148,6 +154,7 @@ abstract class BasicScene extends h2d.Scene {
 
 				if (character.getOwnerId() == Player.instance.playerId) {
 					playerEntity = character;
+					targetCursor = new h2d.Bitmap(hxd.Res.input.target.toTile().center(), this);
 				}
 			};
 
@@ -252,10 +259,16 @@ abstract class BasicScene extends h2d.Scene {
 			if (controlsScene != null) {
 				if (event.kind == EMove) {
 					controlsScene.updateCursorPosition(event.relX, event.relY);
+				} else if (event.kind == ERelease) {
+					controlsScene.release();
 				} else {
-					if (event.kind == ERelease) {
-						// TODO simple shot
-						controlsScene.release();
+					if (event.kind == EPush && basicSceneCallback != null) {
+						final clickPos = new h2d.col.Point(event.relX, event.relY);
+						camera.screenToCamera(clickPos);
+						basicSceneCallback({
+							clickX: clickPos.x,
+							clickY: clickPos.y
+						});
 					}
 				}
 			}
@@ -332,9 +345,22 @@ abstract class BasicScene extends h2d.Scene {
 		updateInput();
 		customUpdate(dt, fps);
 
+		for (projectile in clientProjectileEntities) {
+			projectile.update(dt);
+		}
+
+		for (character in clientCharacterEntities) {
+			character.update(dt);
+		}
+
 		if (playerEntity != null) {
 			camera.x = playerEntity.x;
 			camera.y = playerEntity.y;
+
+			// TODO smooth movement
+
+			final line = playerEntity.getForwardLookingLine(80);	
+			targetCursor.setPosition(line.p2.x, line.p2.y);
 		}
 		
 		// var y = 0;
@@ -353,6 +379,17 @@ abstract class BasicScene extends h2d.Scene {
 	public override function render(e:Engine) {
 		if (controlsScene != null) {
 			controlsScene.render(e);
+		}
+		for (projectile in clientProjectileEntities) {
+			if (GameConfig.DebugDraw) {
+				projectile.debugDraw(debugGraphics);
+			}
+		}
+
+		for (character in clientCharacterEntities) {
+			if (GameConfig.DebugDraw) {
+				character.debugDraw(debugGraphics);
+			}
 		}
 		super.render(e);
 	}

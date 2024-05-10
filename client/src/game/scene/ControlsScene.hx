@@ -110,6 +110,7 @@ enum abstract ButtonPressed(Int) {
 class ControlsScene extends h2d.Scene {
 
 	private final movementController:MovementController;
+	
 	private final text:h2d.Text;
     
     public function new(baseEngine:SeidhGameEngine, buttonPressedCallback:ButtonPressed->Void) {
@@ -130,6 +131,8 @@ class ControlsScene extends h2d.Scene {
             }
         });
         movementController.initiate(250, 250, 400);
+
+		// Buttons
 
 		final buttonScale = 2;
 		final buttonSize = 80;

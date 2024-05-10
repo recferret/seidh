@@ -4,6 +4,8 @@ import haxe.Int32;
 import uuid.Uuid;
 import engine.base.BaseTypesAndClasses;
 import engine.base.entity.base.EngineBaseEntity;
+import engine.base.geometry.Point;
+import engine.base.geometry.Line;
 
 interface GameEntityCustomUpdate {
 	public function onUpdate():Void;
@@ -22,13 +24,19 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	private var characterEntity:CharacterEntity;
 	private var targetObjectEntity:EngineBaseEntity;
+	private var randomizedTargetPos = new Point();
+
 	private var lastDeltaTime:Float;
 
-	public final isPlayer:Bool;
 	public var isAlive = true;
 	public var isCollides = true;
+	public var canMove = true;
+	public var intersectsWithCharacter = false;
 
 	public var killerId:String;
+
+	public var botForwardLookingLine:Line;
+	private final botForwardLookingLineLength = 20;
 
 	// ------------------------------------------------
 	// Movement
@@ -75,7 +83,9 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 		this.characterEntity = characterEntity;
 
-		this.isPlayer = [EntityType.KNIGHT, EntityType.SAMURAI].contains(baseEntity.entityType);
+		if (!isPlayer()) {
+			botForwardLookingLine = new Line();
+		} 
 
 		// TODO base stuff
 		if (baseEntity.id == null) {
@@ -122,6 +132,19 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 		renegerateVitality();
 		updateHash();
+
+		if (!this.isPlayer()) {
+			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(randomizedTargetPos.x, randomizedTargetPos.y), targetObjectEntity.getBodyRectangle().getCenter());
+			baseEntity.rotation = angleBetweenEntities;
+
+			final l = getForwardLookingLine(botForwardLookingLineLength);
+			botForwardLookingLine.x1 = l.p1.x;
+			botForwardLookingLine.y1 = l.p1.y; 
+			botForwardLookingLine.x2 = l.p2.x;
+			botForwardLookingLine.y2 = l.p2.y;
+
+				// baseEntity.rotation = MathUtils.angleBetweenPoints(this.targetObjectEntity.getBodyRectangle().getCenter(), getBodyRectangle().getCenter());
+		}
 	}
 
 	public function getVirtualBodyRectangleInFuture(ticks:Int) {
@@ -161,8 +184,26 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// Target
 	// ------------------------------------------------
 
-	public function setTargetObject(targetObjectEntity:EngineBaseEntity) {
+	public function setTargetObject(targetObjectEntity:EngineBaseEntity, randomizePos:Bool = false) {
 		this.targetObjectEntity = targetObjectEntity;
+
+		if (randomizePos) {
+			final minusX = MathUtils.randomIntInRange(1, 2) == 1 ? true : false;
+			final minusY = MathUtils.randomIntInRange(1, 2) == 1 ? true : false;
+			final rndX = MathUtils.randomIntInRange(1, 30);
+			final rndY = MathUtils.randomIntInRange(1, 30);
+			randomizedTargetPos.x = minusX ? -rndX : rndX;
+			randomizedTargetPos.y = minusY ? -rndY : rndY;
+		} else {
+			randomizedTargetPos.x = 0;
+			randomizedTargetPos.y = 0;
+		}
+
+		baseEntity.rotation = MathUtils.angleBetweenPoints(this.targetObjectEntity.getBodyRectangle().getCenter(), getBodyRectangle().getCenter());
+	}
+
+	public function getTargetObject() {
+		return targetObjectEntity;
 	}
 
 	public function hasTargetObject() {
@@ -170,7 +211,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	public function ifTargetInAttackRange() {
-		return distanceBetweenTarget() < 100;
+		return distanceBetweenTarget() < 80;
 	}
 
 	private function distanceBetweenTarget() {
@@ -214,17 +255,16 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	public function moveToTarget() {
-		if (!ifTargetInAttackRange()) {
-			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
+		if (canMove && !ifTargetInAttackRange()) {
 			final speed = characterEntity.movement.walkSpeed;
 
-			dx = speed * Math.cos(angleBetweenEntities) * lastDeltaTime;
-			dy = speed * Math.sin(angleBetweenEntities) * lastDeltaTime;
+			dx = speed * Math.cos(baseEntity.rotation) * lastDeltaTime;
+			dy = speed * Math.sin(baseEntity.rotation) * lastDeltaTime;
 
 			currentDirectionSide = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
 
-			baseEntity.x += Std.int(dx);
-			baseEntity.y += Std.int(dy);
+			baseEntity.x += dx;
+			baseEntity.y += dy;
 		}
 	}
 
@@ -328,7 +368,13 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 	
 	public function getCurrentActionRect() {
-		return actionToPerform.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, currentDirectionSide);
+		if (actionToPerform.meleeStruct != null) {
+			return actionToPerform.meleeStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, currentDirectionSide);
+		} else if (actionToPerform.projectileStruct != null) {
+			return actionToPerform.projectileStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, currentDirectionSide);
+		} else {
+			return null;
+		}
 	}
 
 	public function getHealth() {

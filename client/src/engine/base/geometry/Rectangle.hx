@@ -24,8 +24,8 @@ class Rectangle {
 		this.r = r;
 	}
 
-	public function getCenter() {
-		return new Point(x, y);
+	public function getCenter(offsetX:Float = 0, offsetY:Float = 0) {
+		return new Point(x + offsetX, y + offsetY);
 	}
 
 	public function getMaxSide() {
