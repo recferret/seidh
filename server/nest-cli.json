@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true
+  },
+  "monorepo": true,
+  "root": "apps",
+  "projects": {
+    "ws-gateway": {
+      "type": "application",
+      "root": "apps/ws-gateway",
+      "sourceRoot": "apps/ws-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ws-gateway/tsconfig.app.json"
+      }
+    },
+    "gameplay": {
+      "type": "application",
+      "root": "apps/gameplay",
+      "sourceRoot": "apps/gameplay/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gameplay/tsconfig.app.json"
+      }
+    },
+    "seidh-common": {
+      "type": "library",
+      "root": "libs/seidh-common",
+      "sourceRoot": "libs/seidh-common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/seidh-common/tsconfig.lib.json"
+      }
+    },
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
+      }
+    },
+    "gameplay-lobby": {
+      "type": "application",
+      "root": "apps/gameplay-lobby",
+      "entryFile": "main",
+      "sourceRoot": "apps/gameplay-lobby/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gameplay-lobby/tsconfig.app.json"
+      }
+    }
+  }
+}
