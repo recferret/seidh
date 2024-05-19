@@ -5,18 +5,11 @@ $hx_exports["engine"]["base"] = $hx_exports["engine"]["base"] || {};
 $hx_exports["engine"]["base"]["core"] = $hx_exports["engine"]["base"]["core"] || {};
 ;$hx_exports["engine"]["seidh"] = $hx_exports["engine"]["seidh"] || {};
 var $estr = function() { return js_Boot.__string_rec(this,''); },$hxEnums = $hxEnums || {},$_;
-function $extend(from, fields) {
-	var proto = Object.create(from);
-	for (var name in fields) proto[name] = fields[name];
-	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
-	return proto;
-}
-var EReg = function(r,opt) {
-	this.r = new RegExp(r,opt.split("u").join(""));
-};
-EReg.__name__ = true;
-EReg.prototype = {
-	match: function(s) {
+class EReg {
+	constructor(r,opt) {
+		this.r = new RegExp(r,opt.split("u").join(""));
+	}
+	match(s) {
 		if(this.r.global) {
 			this.r.lastIndex = 0;
 		}
@@ -24,270 +17,300 @@ EReg.prototype = {
 		this.r.s = s;
 		return this.r.m != null;
 	}
-	,__class__: EReg
-};
-var HxOverrides = function() { };
-HxOverrides.__name__ = true;
-HxOverrides.cca = function(s,index) {
-	var x = s.charCodeAt(index);
-	if(x != x) {
-		return undefined;
+}
+EReg.__name__ = true;
+Object.assign(EReg.prototype, {
+	__class__: EReg
+});
+class HxOverrides {
+	static cca(s,index) {
+		let x = s.charCodeAt(index);
+		if(x != x) {
+			return undefined;
+		}
+		return x;
 	}
-	return x;
-};
-HxOverrides.substr = function(s,pos,len) {
-	if(len == null) {
-		len = s.length;
-	} else if(len < 0) {
-		if(pos == 0) {
-			len = s.length + len;
+	static substr(s,pos,len) {
+		if(len == null) {
+			len = s.length;
+		} else if(len < 0) {
+			if(pos == 0) {
+				len = s.length + len;
+			} else {
+				return "";
+			}
+		}
+		return s.substr(pos,len);
+	}
+	static now() {
+		return Date.now();
+	}
+}
+HxOverrides.__name__ = true;
+Math.__name__ = true;
+class Std {
+	static string(s) {
+		return js_Boot.__string_rec(s,"");
+	}
+	static parseInt(x) {
+		let v = parseInt(x);
+		if(isNaN(v)) {
+			return null;
+		}
+		return v;
+	}
+	static random(x) {
+		if(x <= 0) {
+			return 0;
 		} else {
-			return "";
+			return Math.floor(Math.random() * x);
 		}
 	}
-	return s.substr(pos,len);
-};
-HxOverrides.now = function() {
-	return Date.now();
-};
-Math.__name__ = true;
-var Std = function() { };
+}
 Std.__name__ = true;
-Std.string = function(s) {
-	return js_Boot.__string_rec(s,"");
-};
-Std.parseInt = function(x) {
-	var v = parseInt(x);
-	if(isNaN(v)) {
-		return null;
+class StringTools {
+	static replace(s,sub,by) {
+		return s.split(sub).join(by);
 	}
-	return v;
-};
-Std.random = function(x) {
-	if(x <= 0) {
-		return 0;
-	} else {
-		return Math.floor(Math.random() * x);
-	}
-};
-var StringTools = function() { };
+}
 StringTools.__name__ = true;
-StringTools.replace = function(s,sub,by) {
-	return s.split(sub).join(by);
-};
-var engine_base_EntityShape = function(width,height,rectOffsetX,rectOffsetY) {
-	if(rectOffsetY == null) {
-		rectOffsetY = 0;
+class engine_base_EntityShape {
+	constructor(width,height,rectOffsetX,rectOffsetY) {
+		if(rectOffsetY == null) {
+			rectOffsetY = 0;
+		}
+		if(rectOffsetX == null) {
+			rectOffsetX = 0;
+		}
+		this.width = width;
+		this.height = height;
+		if(rectOffsetX == 0 && rectOffsetY == 0) {
+			this.rectOffsetX = width / 2 | 0;
+			this.rectOffsetY = height / 2 | 0;
+		} else {
+			this.rectOffsetX = rectOffsetX;
+			this.rectOffsetY = rectOffsetY;
+		}
 	}
-	if(rectOffsetX == null) {
-		rectOffsetX = 0;
+	toRect(x,y,rotation,side) {
+		let sideOffset = side == 2 ? 0 : -this.width + 45;
+		return new engine_base_geometry_Rectangle(x + this.rectOffsetX + sideOffset,y + this.rectOffsetY,this.width,this.height,rotation);
 	}
-	this.rotation = 0.0;
-	this.width = width;
-	this.height = height;
-	if(rectOffsetX == 0 && rectOffsetY == 0) {
-		this.rectOffsetX = width / 2 | 0;
-		this.rectOffsetY = height / 2 | 0;
-	} else {
-		this.rectOffsetX = rectOffsetX;
-		this.rectOffsetY = rectOffsetY;
+	toJson() {
+		return JSON.stringify({ width : this.width, height : this.height, rectOffsetX : this.rectOffsetX, rectOffsetY : this.rectOffsetY});
 	}
-};
+}
 engine_base_EntityShape.__name__ = true;
-engine_base_EntityShape.prototype = {
-	toRect: function(x,y,side) {
-		var sideOffset = side == 2 ? 0 : -this.width + 45;
-		return new engine_base_geometry_Rectangle(x + this.rectOffsetX + sideOffset,y + this.rectOffsetY,this.width,this.height,0);
+Object.assign(engine_base_EntityShape.prototype, {
+	__class__: engine_base_EntityShape
+});
+class engine_base_BaseEntity {
+	constructor(struct) {
+		this.x = struct.x;
+		this.y = struct.y;
+		this.entityType = struct.entityType;
+		this.entityShape = struct.entityShape;
+		this.id = struct.id;
+		this.ownerId = struct.ownerId;
+		this.rotation = struct.rotation;
 	}
-	,toJson: function() {
-		return JSON.stringify({ width : this.width, height : this.height, rectOffsetX : this.rectOffsetX, rectOffsetY : this.rectOffsetY, rotation : this.rotation});
-	}
-	,__class__: engine_base_EntityShape
-};
-var engine_base_BaseEntity = function(struct) {
-	this.x = struct.x;
-	this.y = struct.y;
-	this.entityType = struct.entityType;
-	this.entityShape = struct.entityShape;
-	this.id = struct.id;
-	this.ownerId = struct.ownerId;
-	this.rotation = struct.rotation;
-};
+}
 engine_base_BaseEntity.__name__ = true;
-engine_base_BaseEntity.prototype = {
+Object.assign(engine_base_BaseEntity.prototype, {
 	__class__: engine_base_BaseEntity
-};
-var engine_base_CharacterEntity = function(struct) {
-	engine_base_BaseEntity.call(this,struct.base);
-	this.health = struct.health;
-	this.dodgeChance = struct.dodgeChance;
-	this.movement = struct.characterMovementStruct;
-	this.actionMain = struct.characterActionMainStruct;
-	this.action1 = struct.characterAction1Struct;
-	this.action2 = struct.characterAction2Struct;
-	this.action3 = struct.characterAction3Struct;
-	this.actionUltimate = struct.characterActionUltimate;
-};
+});
+class engine_base_CharacterEntity extends engine_base_BaseEntity {
+	constructor(struct) {
+		super(struct.base);
+		this.health = struct.health;
+		this.dodgeChance = struct.dodgeChance;
+		this.movement = struct.characterMovementStruct;
+		this.actionMain = struct.characterActionMainStruct;
+		this.action1 = struct.characterAction1Struct;
+		this.action2 = struct.characterAction2Struct;
+		this.action3 = struct.characterAction3Struct;
+		this.actionUltimate = struct.characterActionUltimate;
+	}
+}
 engine_base_CharacterEntity.__name__ = true;
 engine_base_CharacterEntity.__super__ = engine_base_BaseEntity;
-engine_base_CharacterEntity.prototype = $extend(engine_base_BaseEntity.prototype,{
+Object.assign(engine_base_CharacterEntity.prototype, {
 	__class__: engine_base_CharacterEntity
 });
-var engine_base_ProjectileEntity = function(struct) {
-	engine_base_BaseEntity.call(this,struct.base);
-	this.projectile = struct.projectile;
-};
+class engine_base_ProjectileEntity extends engine_base_BaseEntity {
+	constructor(struct) {
+		super(struct.base);
+		this.projectile = struct.projectile;
+	}
+}
 engine_base_ProjectileEntity.__name__ = true;
 engine_base_ProjectileEntity.__super__ = engine_base_BaseEntity;
-engine_base_ProjectileEntity.prototype = $extend(engine_base_BaseEntity.prototype,{
+Object.assign(engine_base_ProjectileEntity.prototype, {
 	__class__: engine_base_ProjectileEntity
 });
-var engine_base_PlayerInputCommand = function(actionType,movAngle,playerId,index) {
-	this.actionType = actionType;
-	this.movAngle = movAngle;
-	this.playerId = playerId;
-	this.index = index;
-};
+class engine_base_PlayerInputCommand {
+	constructor(actionType,movAngle,playerId,index) {
+		this.actionType = actionType;
+		this.movAngle = movAngle;
+		this.playerId = playerId;
+		this.index = index;
+	}
+}
 engine_base_PlayerInputCommand.__name__ = true;
-engine_base_PlayerInputCommand.prototype = {
+Object.assign(engine_base_PlayerInputCommand.prototype, {
 	__class__: engine_base_PlayerInputCommand
-};
-var engine_base_InputCommandEngineWrapped = function(playerInputCommand,tick) {
-	this.playerInputCommand = playerInputCommand;
-	this.tick = tick;
-};
+});
+class engine_base_InputCommandEngineWrapped {
+	constructor(playerInputCommand,tick) {
+		this.playerInputCommand = playerInputCommand;
+		this.tick = tick;
+	}
+}
 engine_base_InputCommandEngineWrapped.__name__ = true;
-engine_base_InputCommandEngineWrapped.prototype = {
+Object.assign(engine_base_InputCommandEngineWrapped.prototype, {
 	__class__: engine_base_InputCommandEngineWrapped
-};
-var engine_base_MathUtils = function() { };
+});
+class engine_base_EngineConfig {
+}
+engine_base_EngineConfig.__name__ = true;
+class engine_base_MathUtils {
+	static angleBetweenPoints(point1,point2) {
+		return Math.atan2(point2.y - point1.y,point2.x - point1.x);
+	}
+	static degreeToRads(degrees) {
+		return Math.PI / 180 * degrees;
+	}
+	static radsToDegree(rads) {
+		return rads * (180 / Math.PI);
+	}
+	static normalizeAngle(rads) {
+		rads %= 2 * Math.PI;
+		if(rads >= 0) {
+			return rads;
+		} else {
+			return rads + 2 * Math.PI;
+		}
+	}
+	static rotatePointAroundCenter(x,y,cx,cy,r) {
+		let cos = Math.cos(r);
+		let sin = Math.sin(r);
+		return new engine_base_geometry_Point(cos * (x - cx) - sin * (y - cy) + cx,cos * (y - cy) + sin * (x - cx) + cy);
+	}
+	static lineToLineIntersection(lineA,lineB) {
+		let numA = (lineB.x2 - lineB.x1) * (lineA.y1 - lineB.y1) - (lineB.y2 - lineB.y1) * (lineA.x1 - lineB.x1);
+		let numB = (lineA.x2 - lineA.x1) * (lineA.y1 - lineB.y1) - (lineA.y2 - lineA.y1) * (lineA.x1 - lineB.x1);
+		let deNom = (lineB.y2 - lineB.y1) * (lineA.x2 - lineA.x1) - (lineB.x2 - lineB.x1) * (lineA.y2 - lineA.y1);
+		if(deNom == 0) {
+			return false;
+		}
+		let uA = numA / deNom;
+		let uB = numB / deNom;
+		if(uA >= 0 && uA <= 1 && uB >= 0) {
+			return uB <= 1;
+		} else {
+			return false;
+		}
+	}
+	static differ(a,b,error) {
+		return Math.abs(a - b) > (error == 0 ? 1 : error);
+	}
+	static randomIntInRange(from,to) {
+		return from + Math.floor((to - from + 1) * Math.random());
+	}
+}
 engine_base_MathUtils.__name__ = true;
-engine_base_MathUtils.angleBetweenPoints = function(point1,point2) {
-	return Math.atan2(point2.y - point1.y,point2.x - point1.x);
-};
-engine_base_MathUtils.degreeToRads = function(degrees) {
-	return Math.PI / 180 * degrees;
-};
-engine_base_MathUtils.radsToDegree = function(rads) {
-	return rads * (180 / Math.PI);
-};
-engine_base_MathUtils.normalizeAngle = function(rads) {
-	rads %= 2 * Math.PI;
-	if(rads >= 0) {
-		return rads;
-	} else {
-		return rads + 2 * Math.PI;
+class engine_base_EngineUtils {
+	static HashString(str) {
+		let strLen = str.length;
+		if(strLen == 0) {
+			return 0;
+		}
+		let hc = 0;
+		let _g = 0;
+		let _g1 = strLen;
+		while(_g < _g1) {
+			let i = _g++;
+			hc = ((hc << 5) - hc | 0) + HxOverrides.cca(str,i) | 0;
+		}
+		return hc;
 	}
-};
-engine_base_MathUtils.rotatePointAroundCenter = function(x,y,cx,cy,r) {
-	var cos = Math.cos(r);
-	var sin = Math.sin(r);
-	return new engine_base_geometry_Point(cos * (x - cx) - sin * (y - cy) + cx,cos * (y - cy) + sin * (x - cx) + cy);
-};
-engine_base_MathUtils.lineToLineIntersection = function(lineA,lineB) {
-	var numA = (lineB.x2 - lineB.x1) * (lineA.y1 - lineB.y1) - (lineB.y2 - lineB.y1) * (lineA.x1 - lineB.x1);
-	var numB = (lineA.x2 - lineA.x1) * (lineA.y1 - lineB.y1) - (lineA.y2 - lineA.y1) * (lineA.x1 - lineB.x1);
-	var deNom = (lineB.y2 - lineB.y1) * (lineA.x2 - lineA.x1) - (lineB.x2 - lineB.x1) * (lineA.y2 - lineA.y1);
-	if(deNom == 0) {
-		return false;
-	}
-	var uA = numA / deNom;
-	var uB = numB / deNom;
-	if(uA >= 0 && uA <= 1 && uB >= 0) {
-		return uB <= 1;
-	} else {
-		return false;
-	}
-};
-engine_base_MathUtils.differ = function(a,b,error) {
-	return Math.abs(a - b) > (error == 0 ? 1 : error);
-};
-var engine_base_EngineUtils = function() { };
+}
 engine_base_EngineUtils.__name__ = true;
-engine_base_EngineUtils.HashString = function(str) {
-	var strLen = str.length;
-	if(strLen == 0) {
-		return 0;
-	}
-	var hc = 0;
-	var _g = 0;
-	var _g1 = strLen;
-	while(_g < _g1) {
-		var i = _g++;
-		hc = ((hc << 5) - hc | 0) + HxOverrides.cca(str,i) | 0;
-	}
-	return hc;
-};
 var engine_base_core_EngineMode = $hxEnums["engine.base.core.EngineMode"] = { __ename__:true,__constructs__:null
 	,Client: {_hx_name:"Client",_hx_index:0,__enum__:"engine.base.core.EngineMode",toString:$estr}
 	,Server: {_hx_name:"Server",_hx_index:1,__enum__:"engine.base.core.EngineMode",toString:$estr}
 };
 engine_base_core_EngineMode.__constructs__ = [engine_base_core_EngineMode.Client,engine_base_core_EngineMode.Server];
-var engine_base_core_BaseEngine = $hx_exports["engine"]["base"]["core"]["BaseEngine"] = function(engineMode) {
-	this.coldInputCommands = [];
-	this.coldInputCommandsTreshhold = 10;
-	this.ticksSinceLastPop = 0;
-	this.hotInputCommands = [];
-	this.removeProjectileEntityQueue = [];
-	this.createProjectileEntityQueue = [];
-	this.removeCharacterEntityQueue = [];
-	this.createCharacterEntityQueue = [];
-	this.validatedInputCommands = [];
-	this.playerToEntityMap = new haxe_ds_StringMap();
-	this.projectileEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
-	this.characterEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
-	var _gthis = this;
-	this.engineMode = engineMode;
-	var loop = function(dt,tick) {
-		_gthis.tick = tick;
-		if(_gthis.ticksSinceLastPop == _gthis.coldInputCommandsTreshhold) {
-			_gthis.ticksSinceLastPop = 0;
-			_gthis.coldInputCommands.shift();
+class engine_base_core_BaseEngine {
+	constructor(engineMode) {
+		if(engine_base_core_BaseEngine._hx_skip_constructor) {
+			return;
 		}
-		_gthis.ticksSinceLastPop++;
-		_gthis.processCreateCharacterQueue();
-		_gthis.processRemoveCharacterQueue();
-		_gthis.processCreateProjectileQueue();
-		_gthis.processRemoveProjectileQueue();
-		if(_gthis.hotInputCommands.length > 0) {
-			_gthis.processInputCommands(_gthis.hotInputCommands);
-			_gthis.hotInputCommands = [];
-		}
-		_gthis.engineLoopUpdate(dt);
-		if(_gthis.postLoopCallback != null) {
-			_gthis.postLoopCallback();
-		}
-		_gthis.validatedInputCommands = [];
-	};
-	this.gameLoop = new engine_base_core_GameLoop(loop);
-	this.okLoopTime = 1000 / this.gameLoop.targetFps | 0;
-};
-engine_base_core_BaseEngine.__name__ = true;
-engine_base_core_BaseEngine.prototype = {
-	createCharacterEntity: function(entity,fireCallback) {
+		this._hx_constructor(engineMode);
+	}
+	_hx_constructor(engineMode) {
+		this.coldInputCommands = [];
+		this.coldInputCommandsTreshhold = 10;
+		this.ticksSinceLastPop = 0;
+		this.hotInputCommands = [];
+		this.removeProjectileEntityQueue = [];
+		this.createProjectileEntityQueue = [];
+		this.removeCharacterEntityQueue = [];
+		this.createCharacterEntityQueue = [];
+		this.validatedInputCommands = [];
+		this.playerToEntityMap = new haxe_ds_StringMap();
+		this.projectileEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
+		this.characterEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
+		this.engineMode = engineMode;
+		let _gthis = this;
+		let loop = function(dt,tick) {
+			_gthis.tick = tick;
+			if(_gthis.ticksSinceLastPop == _gthis.coldInputCommandsTreshhold) {
+				_gthis.ticksSinceLastPop = 0;
+				_gthis.coldInputCommands.shift();
+			}
+			_gthis.ticksSinceLastPop++;
+			_gthis.processCreateCharacterQueue();
+			_gthis.processRemoveCharacterQueue();
+			_gthis.processCreateProjectileQueue();
+			_gthis.processRemoveProjectileQueue();
+			_gthis.engineLoopUpdate(dt);
+			if(_gthis.hotInputCommands.length > 0) {
+				_gthis.processInputCommands(_gthis.hotInputCommands);
+				_gthis.hotInputCommands = [];
+			}
+			if(_gthis.postLoopCallback != null) {
+				_gthis.postLoopCallback();
+			}
+			_gthis.validatedInputCommands = [];
+		};
+		this.gameLoop = new engine_base_core_GameLoop(loop);
+		this.okLoopTime = 1000 / this.gameLoop.targetFps | 0;
+	}
+	createCharacterEntity(entity,fireCallback) {
 		if(fireCallback == null) {
 			fireCallback = false;
 		}
 		this.createCharacterEntityQueue.push({ entity : entity, fireCallback : fireCallback});
 	}
-	,removeCharacterEntity: function(entityId) {
+	removeCharacterEntity(entityId) {
 		this.removeCharacterEntityQueue.push(entityId);
 	}
-	,getCharacterEntityById: function(id) {
+	getCharacterEntityById(id) {
 		return this.characterEntityManager.getEntityById(id);
 	}
-	,getMainEntityIdByOwnerId: function(id) {
+	getMainEntityIdByOwnerId(id) {
 		return this.playerToEntityMap.h[id];
 	}
-	,getMainEntityByOwnerId: function(id) {
+	getMainEntityByOwnerId(id) {
 		return this.characterEntityManager.getEntityById(this.playerToEntityMap.h[id]);
 	}
-	,updateCharacterEntitiesByServer: function(minEntities) {
-		var _g = 0;
+	updateCharacterEntitiesByServer(minEntities) {
+		let _g = 0;
 		while(_g < minEntities.length) {
-			var minEntity = minEntities[_g];
+			let minEntity = minEntities[_g];
 			++_g;
-			var entity = this.characterEntityManager.entities.get(minEntity.id);
+			let entity = this.characterEntityManager.entities.get(minEntity.id);
 			if(entity != null) {
 				entity.setX(minEntity.x);
 				entity.setY(minEntity.y);
@@ -295,63 +318,61 @@ engine_base_core_BaseEngine.prototype = {
 			}
 		}
 	}
-	,setCharacterNextActionToPerform: function(entityId,characterActionType) {
-		var entity = this.characterEntityManager.getEntityById(entityId);
+	setCharacterNextActionToPerform(entityId,characterActionType) {
+		let entity = this.characterEntityManager.getEntityById(entityId);
 		if(entity != null) {
 			(js_Boot.__cast(entity , engine_base_entity_impl_EngineCharacterEntity)).setNextActionToPerform(characterActionType);
 		}
 	}
-	,getCharacterEntities: function() {
+	getCharacterEntities() {
 		return this.characterEntityManager.entities;
 	}
-	,getCharacterEntitiesChanged: function() {
-		var result = [];
-		var jsIterator = this.characterEntityManager.entities.values();
-		var _g_jsIterator = jsIterator;
-		var _g_lastStep = jsIterator.next();
+	getCharacterEntitiesChanged() {
+		let result = [];
+		let jsIterator = this.characterEntityManager.entities.values();
+		let _g_jsIterator = jsIterator;
+		let _g_lastStep = jsIterator.next();
 		while(!_g_lastStep.done) {
-			var v = _g_lastStep.value;
+			let v = _g_lastStep.value;
 			_g_lastStep = _g_jsIterator.next();
-			var entity = v;
+			let entity = v;
 			if(entity.isChanged()) {
 				result.push(entity);
 			}
 		}
 		return result;
 	}
-	,processCreateCharacterQueue: function() {
-		var _g = 0;
-		var _g1 = this.createCharacterEntityQueue;
+	processCreateCharacterQueue() {
+		let _g = 0;
+		let _g1 = this.createCharacterEntityQueue;
 		while(_g < _g1.length) {
-			var queueTask = _g1[_g];
+			let queueTask = _g1[_g];
 			++_g;
 			this.characterEntityManager.add(queueTask.entity);
-			var this1 = this.playerToEntityMap;
-			var key = queueTask.entity.getOwnerId();
-			var value = queueTask.entity.getId();
+			let this1 = this.playerToEntityMap;
+			let key = queueTask.entity.getOwnerId();
+			let value = queueTask.entity.getId();
 			this1.h[key] = value;
-			if(queueTask.fireCallback) {
-				if(this.createCharacterCallback != null) {
-					this.createCharacterCallback(queueTask.entity);
-				}
+			if(queueTask.fireCallback && this.createCharacterCallback != null) {
+				this.createCharacterCallback(queueTask.entity);
 			}
 		}
 		this.createCharacterEntityQueue = [];
 	}
-	,processRemoveCharacterQueue: function() {
-		var _g = 0;
-		var _g1 = this.removeCharacterEntityQueue;
+	processRemoveCharacterQueue() {
+		let _g = 0;
+		let _g1 = this.removeCharacterEntityQueue;
 		while(_g < _g1.length) {
-			var entityId = _g1[_g];
+			let entityId = _g1[_g];
 			++_g;
-			var entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
+			let entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
 			if(entity != null) {
 				if(this.deleteCharacterCallback != null) {
 					this.deleteCharacterCallback(js_Boot.__cast(entity , engine_base_entity_impl_EngineCharacterEntity));
 				}
-				var this1 = this.playerToEntityMap;
-				var key = entity.getOwnerId();
-				var _this = this1;
+				let this1 = this.playerToEntityMap;
+				let key = entity.getOwnerId();
+				let _this = this1;
 				if(Object.prototype.hasOwnProperty.call(_this.h,key)) {
 					delete(_this.h[key]);
 				}
@@ -360,26 +381,35 @@ engine_base_core_BaseEngine.prototype = {
 		}
 		this.removeCharacterEntityQueue = [];
 	}
-	,processCreateProjectileQueue: function() {
-		var _g = 0;
-		var _g1 = this.createProjectileEntityQueue;
+	createProjectileEntity(entity,fireCallback) {
+		if(fireCallback == null) {
+			fireCallback = false;
+		}
+		this.createProjectileEntityQueue.push({ entity : entity, fireCallback : fireCallback});
+	}
+	removeProjectileEntity(entityId) {
+		this.removeProjectileEntityQueue.push(entityId);
+	}
+	processCreateProjectileQueue() {
+		let _g = 0;
+		let _g1 = this.createProjectileEntityQueue;
 		while(_g < _g1.length) {
-			var queueTask = _g1[_g];
+			let queueTask = _g1[_g];
 			++_g;
 			this.projectileEntityManager.add(queueTask.entity);
-			if(this.createProjectileCallback != null) {
+			if(queueTask.fireCallback && this.createProjectileCallback != null) {
 				this.createProjectileCallback(queueTask.entity);
 			}
 		}
 		this.createProjectileEntityQueue = [];
 	}
-	,processRemoveProjectileQueue: function() {
-		var _g = 0;
-		var _g1 = this.removeProjectileEntityQueue;
+	processRemoveProjectileQueue() {
+		let _g = 0;
+		let _g1 = this.removeProjectileEntityQueue;
 		while(_g < _g1.length) {
-			var entityId = _g1[_g];
+			let entityId = _g1[_g];
 			++_g;
-			var entity = js_Boot.__cast(this.projectileEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineProjectileEntity);
+			let entity = js_Boot.__cast(this.projectileEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineProjectileEntity);
 			if(entity != null) {
 				if(this.deleteProjectileCallback != null) {
 					this.deleteProjectileCallback(entity);
@@ -389,8 +419,8 @@ engine_base_core_BaseEngine.prototype = {
 		}
 		this.removeProjectileEntityQueue = [];
 	}
-	,checkLocalMovementInputAllowance: function(entityId) {
-		var entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
+	checkLocalMovementInputAllowance(entityId) {
+		let entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
 		if(entity == null) {
 			return false;
 		} else if(entity.checkLocalMovementInput()) {
@@ -399,8 +429,8 @@ engine_base_core_BaseEngine.prototype = {
 			return false;
 		}
 	}
-	,checkLocalActionInputAllowance: function(entityId,characterActionType) {
-		var entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
+	checkLocalActionInputAllowance(entityId,characterActionType) {
+		let entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
 		if(entity == null) {
 			return false;
 		} else if(entity.checkLocalActionInput(characterActionType)) {
@@ -409,9 +439,9 @@ engine_base_core_BaseEngine.prototype = {
 			return false;
 		}
 	}
-	,addInputCommandServer: function(struct) {
-		var entityId = this.getMainEntityIdByOwnerId(struct.playerId);
-		var allow = false;
+	addInputCommandServer(struct) {
+		let entityId = this.getMainEntityIdByOwnerId(struct.playerId);
+		let allow = false;
 		if(struct.actionType == 1) {
 			allow = this.checkLocalMovementInputAllowance(entityId);
 		} else {
@@ -421,14 +451,14 @@ engine_base_core_BaseEngine.prototype = {
 			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.actionType,struct.movAngle,struct.playerId));
 		}
 	}
-	,addInputCommandClient: function(playerInputCommand) {
+	addInputCommandClient(playerInputCommand) {
 		if(playerInputCommand.actionType != null && playerInputCommand.playerId != null) {
-			var wrappedCommand = new engine_base_InputCommandEngineWrapped(playerInputCommand,this.tick);
+			let wrappedCommand = new engine_base_InputCommandEngineWrapped(playerInputCommand,this.tick);
 			this.hotInputCommands.push(wrappedCommand);
 			this.coldInputCommands.push(wrappedCommand);
 		}
 	}
-	,destroy: function() {
+	destroy() {
 		this.postLoopCallback = null;
 		this.createCharacterCallback = null;
 		this.deleteCharacterCallback = null;
@@ -439,108 +469,135 @@ engine_base_core_BaseEngine.prototype = {
 		this.projectileEntityManager.destroy();
 		this.customDestroy();
 	}
-	,__class__: engine_base_core_BaseEngine
-};
-var engine_base_core_Loop = function() { };
+}
+$hx_exports["engine"]["base"]["core"]["BaseEngine"] = engine_base_core_BaseEngine;
+engine_base_core_BaseEngine.__name__ = true;
+Object.assign(engine_base_core_BaseEngine.prototype, {
+	__class__: engine_base_core_BaseEngine
+});
+class engine_base_core_Loop {
+}
 engine_base_core_Loop.__name__ = true;
 engine_base_core_Loop.__isInterface__ = true;
-engine_base_core_Loop.prototype = {
+Object.assign(engine_base_core_Loop.prototype, {
 	__class__: engine_base_core_Loop
-};
-var engine_base_core_GameLoop = $hx_exports["engine"]["base"]["core"]["GameLoop"] = function(update) {
-	this.targetFps = 10;
-	this.gameLoop = new engine_base_core_DummyJsLoop(update,this.targetFps);
-};
-engine_base_core_GameLoop.__name__ = true;
-engine_base_core_GameLoop.prototype = {
-	stopLoop: function() {
+});
+class engine_base_core_GameLoop {
+	constructor(update) {
+		this.targetFps = engine_base_EngineConfig.TARGET_FPS;
+		this.gameLoop = new engine_base_core_DummyJsLoop(update,this.targetFps);
+	}
+	stopLoop() {
 		this.gameLoop.stopLoop();
 	}
-	,__class__: engine_base_core_GameLoop
-};
-var engine_base_core_DummyJsLoop = function(update,targetFps) {
-	this.active = true;
-	this.delta = 0.0;
-	this.previous = Date.now();
-	this.tick = 0;
-	this.targetFPSMillis = Math.floor(1000 / targetFps);
-	this.update = update;
-	this.loop();
-};
-engine_base_core_DummyJsLoop.__name__ = true;
-engine_base_core_DummyJsLoop.__interfaces__ = [engine_base_core_Loop];
-engine_base_core_DummyJsLoop.prototype = {
-	stopLoop: function() {
+}
+$hx_exports["engine"]["base"]["core"]["GameLoop"] = engine_base_core_GameLoop;
+engine_base_core_GameLoop.__name__ = true;
+Object.assign(engine_base_core_GameLoop.prototype, {
+	__class__: engine_base_core_GameLoop
+});
+class engine_base_core_DummyJsLoop {
+	constructor(update,targetFps) {
+		this.active = true;
+		this.delta = 0.0;
+		this.previous = Date.now();
+		this.tick = 0;
+		this.targetFPSMillis = Math.floor(1000 / targetFps);
+		this.update = update;
+		this.loop();
+	}
+	stopLoop() {
 		this.active = false;
 	}
-	,loop: function() {
+	loop() {
 		if(this.active) {
 			haxe_Timer.delay($bind(this,this.loop),this.targetFPSMillis);
-			var now = Date.now();
+			let now = Date.now();
 			this.delta = (now - this.previous) / 1000;
 			this.update(this.delta,this.tick);
 			this.previous = now;
 			this.tick++;
 		}
 	}
-	,__class__: engine_base_core_DummyJsLoop
-};
-var engine_base_entity_base_EngineBaseEntity = function(baseEntity) {
-	this.baseEntity = baseEntity;
-};
-engine_base_entity_base_EngineBaseEntity.__name__ = true;
-engine_base_entity_base_EngineBaseEntity.prototype = {
-	isChanged: function() {
+}
+engine_base_core_DummyJsLoop.__name__ = true;
+engine_base_core_DummyJsLoop.__interfaces__ = [engine_base_core_Loop];
+Object.assign(engine_base_core_DummyJsLoop.prototype, {
+	__class__: engine_base_core_DummyJsLoop
+});
+class engine_base_entity_base_EngineBaseEntity {
+	constructor(baseEntity) {
+		if(engine_base_entity_base_EngineBaseEntity._hx_skip_constructor) {
+			return;
+		}
+		this._hx_constructor(baseEntity);
+	}
+	_hx_constructor(baseEntity) {
+		this.baseEntity = baseEntity;
+	}
+	isChanged() {
 		return this.previousTickHash != this.currentTickHash;
 	}
-	,getBodyRectangle: function() {
-		var shapeWidth = this.baseEntity.entityShape.width;
-		var shapeHeight = this.baseEntity.entityShape.height;
-		var rectOffsetX = this.baseEntity.entityShape.rectOffsetX;
-		var rectOffsetY = this.baseEntity.entityShape.rectOffsetY;
-		var x = this.baseEntity.x;
-		var y = this.baseEntity.y;
-		return new engine_base_geometry_Rectangle(x + rectOffsetX,y + rectOffsetY,shapeWidth,shapeHeight,this.baseEntity.entityShape.rotation);
+	moveBy(x,y) {
+		this.baseEntity.x += x;
+		this.baseEntity.y += y;
 	}
-	,getX: function() {
+	getBodyRectangle(rotated) {
+		if(rotated == null) {
+			rotated = false;
+		}
+		let shapeWidth = this.baseEntity.entityShape.width;
+		let shapeHeight = this.baseEntity.entityShape.height;
+		let rectOffsetX = this.baseEntity.entityShape.rectOffsetX;
+		let rectOffsetY = this.baseEntity.entityShape.rectOffsetY;
+		let x = this.baseEntity.x;
+		let y = this.baseEntity.y;
+		return new engine_base_geometry_Rectangle(x + rectOffsetX,y + rectOffsetY,shapeWidth,shapeHeight,rotated ? this.baseEntity.rotation : 0);
+	}
+	getX() {
 		return this.baseEntity.x;
 	}
-	,getY: function() {
+	getY() {
 		return this.baseEntity.y;
 	}
-	,getId: function() {
+	getId() {
 		return this.baseEntity.id;
 	}
-	,getEntityType: function() {
+	getEntityType() {
 		return this.baseEntity.entityType;
 	}
-	,getOwnerId: function() {
+	getOwnerId() {
 		return this.baseEntity.ownerId;
 	}
-	,getRotation: function() {
+	getRotation() {
 		return this.baseEntity.rotation;
 	}
-	,setX: function(x) {
+	isPlayer() {
+		return this.baseEntity.entityType == 1;
+	}
+	setX(x) {
 		this.baseEntity.x = x;
 	}
-	,setY: function(y) {
+	setY(y) {
 		this.baseEntity.y = y;
 	}
-	,setRotation: function(r) {
+	setRotation(r) {
 		this.baseEntity.rotation = r;
 	}
-	,__class__: engine_base_entity_base_EngineBaseEntity
-};
-var engine_base_entity_base_EngineBaseEntityManager = function() {
-	this.entities = new Map();
-};
-engine_base_entity_base_EngineBaseEntityManager.__name__ = true;
-engine_base_entity_base_EngineBaseEntityManager.prototype = {
-	destroy: function() {
+}
+engine_base_entity_base_EngineBaseEntity.__name__ = true;
+Object.assign(engine_base_entity_base_EngineBaseEntity.prototype, {
+	__class__: engine_base_entity_base_EngineBaseEntity
+});
+class engine_base_entity_base_EngineBaseEntityManager {
+	constructor() {
+		this.entities = new Map();
+	}
+	destroy() {
 		this.entities.clear();
 	}
-	,getChangedEntities: function() {
-		var result = [];
+	getChangedEntities() {
+		let result = [];
 		this.entities.forEach(function(value,key,map) {
 			if(value.isChanged()) {
 				result.push(value);
@@ -548,64 +605,79 @@ engine_base_entity_base_EngineBaseEntityManager.prototype = {
 		});
 		return result;
 	}
-	,add: function(entity) {
+	add(entity) {
 		this.entities.set(entity.getId(),entity);
 	}
-	,remove: function(id) {
+	remove(id) {
 		this.entities.delete(id);
 	}
-	,getEntityById: function(id) {
+	getEntityById(id) {
 		return this.entities.get(id);
 	}
-	,__class__: engine_base_entity_base_EngineBaseEntityManager
-};
-var engine_base_entity_impl_GameEntityCustomUpdate = function() { };
+}
+engine_base_entity_base_EngineBaseEntityManager.__name__ = true;
+Object.assign(engine_base_entity_base_EngineBaseEntityManager.prototype, {
+	__class__: engine_base_entity_base_EngineBaseEntityManager
+});
+class engine_base_entity_impl_GameEntityCustomUpdate {
+}
 engine_base_entity_impl_GameEntityCustomUpdate.__name__ = true;
 engine_base_entity_impl_GameEntityCustomUpdate.__isInterface__ = true;
-engine_base_entity_impl_GameEntityCustomUpdate.prototype = {
+Object.assign(engine_base_entity_impl_GameEntityCustomUpdate.prototype, {
 	__class__: engine_base_entity_impl_GameEntityCustomUpdate
-};
-var engine_base_entity_impl_GameEntityCustomCollide = function() { };
+});
+class engine_base_entity_impl_GameEntityCustomCollide {
+}
 engine_base_entity_impl_GameEntityCustomCollide.__name__ = true;
 engine_base_entity_impl_GameEntityCustomCollide.__isInterface__ = true;
-engine_base_entity_impl_GameEntityCustomCollide.prototype = {
+Object.assign(engine_base_entity_impl_GameEntityCustomCollide.prototype, {
 	__class__: engine_base_entity_impl_GameEntityCustomCollide
-};
-var engine_base_entity_impl_EngineCharacterEntity = function(characterEntity) {
-	this.lastActionUltimateInputCheck = 0.0;
-	this.lastAction3InputCheck = 0.0;
-	this.lastAction2InputCheck = 0.0;
-	this.lastAction1InputCheck = 0.0;
-	this.lastActionMainInputCheck = 0.0;
-	this.isActing = false;
-	this.dy = 0.0;
-	this.dx = 0.0;
-	this.lastLocalMovementInputCheck = 0.0;
-	this.isRunning = false;
-	this.isWalking = false;
-	this.currentDirectionSide = 2;
-	this.isCollides = true;
-	this.isAlive = true;
-	engine_base_entity_base_EngineBaseEntity.call(this,characterEntity);
-	this.characterEntity = characterEntity;
-	this.isPlayer = [1,2].indexOf(this.baseEntity.entityType) != -1;
-	if(this.baseEntity.id == null) {
-		this.baseEntity.id = uuid_Uuid.short();
+});
+class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_base_EngineBaseEntity {
+	constructor(characterEntity) {
+		engine_base_entity_base_EngineBaseEntity._hx_skip_constructor = true;
+		super();
+		engine_base_entity_base_EngineBaseEntity._hx_skip_constructor = false;
+		this._hx_constructor(characterEntity);
 	}
-	if(this.baseEntity.ownerId == null) {
-		this.baseEntity.ownerId = uuid_Uuid.short();
+	_hx_constructor(characterEntity) {
+		this.lastActionUltimateInputCheck = 0.0;
+		this.lastAction3InputCheck = 0.0;
+		this.lastAction2InputCheck = 0.0;
+		this.lastAction1InputCheck = 0.0;
+		this.lastActionMainInputCheck = 0.0;
+		this.isActing = false;
+		this.dy = 0.0;
+		this.dx = 0.0;
+		this.lastLocalMovementInputCheck = 0.0;
+		this.isRunning = false;
+		this.isWalking = false;
+		this.currentDirectionSide = 2;
+		this.botForwardLookingLineLength = 20;
+		this.intersectsWithCharacter = false;
+		this.canMove = true;
+		this.isCollides = true;
+		this.isAlive = true;
+		this.randomizedTargetPos = new engine_base_geometry_Point();
+		super._hx_constructor(characterEntity);
+		this.characterEntity = characterEntity;
+		if(!this.isPlayer()) {
+			this.botForwardLookingLine = new engine_base_geometry_Line();
+		}
+		if(this.baseEntity.id == null) {
+			this.baseEntity.id = uuid_Uuid.short();
+		}
+		if(this.baseEntity.ownerId == null) {
+			this.baseEntity.ownerId = uuid_Uuid.short();
+		}
+		this.currentVitality = this.characterEntity.movement.vitality;
+		this.actionMain = this.characterEntity.actionMain;
+		this.action1 = this.characterEntity.action1;
+		this.action2 = this.characterEntity.action2;
+		this.action3 = this.characterEntity.action3;
+		this.actionUltimate = this.characterEntity.actionUltimate;
 	}
-	this.currentVitality = this.characterEntity.movement.vitality;
-	this.actionMain = this.characterEntity.actionMain;
-	this.action1 = this.characterEntity.action1;
-	this.action2 = this.characterEntity.action2;
-	this.action3 = this.characterEntity.action3;
-	this.actionUltimate = this.characterEntity.actionUltimate;
-};
-engine_base_entity_impl_EngineCharacterEntity.__name__ = true;
-engine_base_entity_impl_EngineCharacterEntity.__super__ = engine_base_entity_base_EngineBaseEntity;
-engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_entity_base_EngineBaseEntity.prototype,{
-	update: function(dt) {
+	update(dt) {
 		this.lastDeltaTime = dt;
 		if(this.customUpdate != null) {
 			this.customUpdate.onUpdate();
@@ -618,28 +690,37 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 		}
 		this.renegerateVitality();
 		this.updateHash();
-	}
-	,getVirtualBodyRectangleInFuture: function(ticks) {
-		var cachedPositionX = this.baseEntity.x;
-		var cachedPositionY = this.baseEntity.y;
-		var _g = 0;
-		var _g1 = ticks;
-		while(_g < _g1) {
-			var i = _g++;
+		if(!this.isPlayer()) {
+			let angleBetweenEntities = engine_base_MathUtils.angleBetweenPoints(this.getBodyRectangle().getCenter(this.randomizedTargetPos.x,this.randomizedTargetPos.y),this.targetObjectEntity.getBodyRectangle().getCenter());
+			this.baseEntity.rotation = angleBetweenEntities;
+			let l = this.getForwardLookingLine(this.botForwardLookingLineLength);
+			this.botForwardLookingLine.x1 = l.p1.x;
+			this.botForwardLookingLine.y1 = l.p1.y;
+			this.botForwardLookingLine.x2 = l.p2.x;
+			this.botForwardLookingLine.y2 = l.p2.y;
 		}
-		var resultingRect = this.getBodyRectangle();
+	}
+	getVirtualBodyRectangleInFuture(ticks) {
+		let cachedPositionX = this.baseEntity.x;
+		let cachedPositionY = this.baseEntity.y;
+		let _g = 0;
+		let _g1 = ticks;
+		while(_g < _g1) {
+			let i = _g++;
+		}
+		let resultingRect = this.getBodyRectangle();
 		this.baseEntity.x = cachedPositionX;
 		this.baseEntity.y = cachedPositionY;
 		return resultingRect;
 	}
-	,getForwardLookingLine: function(lineLength) {
-		var rect = this.getBodyRectangle();
-		var x = rect.getCenter().x;
-		var y = rect.getCenter().y;
+	getForwardLookingLine(lineLength) {
+		let rect = this.getBodyRectangle();
+		let x = rect.getCenter().x;
+		let y = rect.getCenter().y;
 		return { p1 : rect.getCenter(), p2 : engine_base_MathUtils.rotatePointAroundCenter(x + lineLength,y,x,y,this.baseEntity.rotation)};
 	}
-	,updateHash: function() {
-		var hash = this.updateHashImpl();
+	updateHash() {
+		let hash = this.updateHashImpl();
 		if(this.previousTickHash == null && this.currentTickHash == null) {
 			this.previousTickHash = hash;
 			this.currentTickHash = hash;
@@ -648,33 +729,53 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 			this.currentTickHash = hash;
 		}
 	}
-	,setTargetObject: function(targetObjectEntity) {
+	setTargetObject(targetObjectEntity,randomizePos) {
+		if(randomizePos == null) {
+			randomizePos = false;
+		}
 		this.targetObjectEntity = targetObjectEntity;
+		if(randomizePos) {
+			let minusX = engine_base_MathUtils.randomIntInRange(1,2) == 1;
+			let minusY = engine_base_MathUtils.randomIntInRange(1,2) == 1;
+			let rndX = engine_base_MathUtils.randomIntInRange(1,30);
+			let rndY = engine_base_MathUtils.randomIntInRange(1,30);
+			this.randomizedTargetPos.x = minusX ? -rndX : rndX;
+			this.randomizedTargetPos.y = minusY ? -rndY : rndY;
+		} else {
+			this.randomizedTargetPos.x = 0;
+			this.randomizedTargetPos.y = 0;
+		}
+		let tmp = this.targetObjectEntity.getBodyRectangle().getCenter();
+		let tmp1 = this.getBodyRectangle().getCenter();
+		this.baseEntity.rotation = engine_base_MathUtils.angleBetweenPoints(tmp,tmp1);
 	}
-	,hasTargetObject: function() {
+	getTargetObject() {
+		return this.targetObjectEntity;
+	}
+	hasTargetObject() {
 		return this.targetObjectEntity != null;
 	}
-	,ifTargetInAttackRange: function() {
-		return this.distanceBetweenTarget() < 100;
+	ifTargetInAttackRange() {
+		return this.distanceBetweenTarget() < 80;
 	}
-	,distanceBetweenTarget: function() {
+	distanceBetweenTarget() {
 		if(this.hasTargetObject()) {
-			var _this = this.getBodyRectangle().getCenter();
-			var p = this.targetObjectEntity.getBodyRectangle().getCenter();
-			var dx = _this.x - p.x;
-			var dy = _this.y - p.y;
+			let _this = this.getBodyRectangle().getCenter();
+			let p = this.targetObjectEntity.getBodyRectangle().getCenter();
+			let dx = _this.x - p.x;
+			let dy = _this.y - p.y;
 			return Math.sqrt(dx * dx + dy * dy);
 		} else {
 			return 0;
 		}
 	}
-	,renegerateVitality: function() {
+	renegerateVitality() {
 		if(this.characterEntity.movement.canRun && !this.isWalking && !this.isRunning) {
 			this.currentVitality += this.characterEntity.movement.vitalityRegenPerSec;
 		}
 	}
-	,determenisticMove: function() {
-		var speed = this.characterEntity.movement.walkSpeed;
+	determenisticMove() {
+		let speed = this.characterEntity.movement.walkSpeed;
 		if(this.characterEntity.movement.canRun && this.currentVitality > 0) {
 			this.currentVitality -= this.characterEntity.movement.vitalityConsumptionPerSec;
 			speed = this.characterEntity.movement.runSpeed;
@@ -690,19 +791,18 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 		this.baseEntity.x += this.dx | 0;
 		this.baseEntity.y += this.dy | 0;
 	}
-	,moveToTarget: function() {
-		if(!this.ifTargetInAttackRange()) {
-			var angleBetweenEntities = engine_base_MathUtils.angleBetweenPoints(this.getBodyRectangle().getCenter(),this.targetObjectEntity.getBodyRectangle().getCenter());
-			var speed = this.characterEntity.movement.walkSpeed;
-			this.dx = speed * Math.cos(angleBetweenEntities) * this.lastDeltaTime;
-			this.dy = speed * Math.sin(angleBetweenEntities) * this.lastDeltaTime;
+	moveToTarget() {
+		if(this.canMove && !this.ifTargetInAttackRange()) {
+			let speed = this.characterEntity.movement.walkSpeed;
+			this.dx = speed * Math.cos(this.baseEntity.rotation) * this.lastDeltaTime;
+			this.dy = speed * Math.sin(this.baseEntity.rotation) * this.lastDeltaTime;
 			this.currentDirectionSide = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
-			this.baseEntity.x += this.dx | 0;
-			this.baseEntity.y += this.dy | 0;
+			this.baseEntity.x += this.dx;
+			this.baseEntity.y += this.dy;
 		}
 	}
-	,checkLocalMovementInput: function() {
-		var now = HxOverrides.now() / 1000;
+	checkLocalMovementInput() {
+		let now = HxOverrides.now() / 1000;
 		if(this.lastLocalMovementInputCheck == 0 || this.lastLocalMovementInputCheck + this.characterEntity.movement.movementDelay < now) {
 			this.lastLocalMovementInputCheck = now;
 			return true;
@@ -710,9 +810,9 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 			return false;
 		}
 	}
-	,checkLocalActionInput: function(characterActionType) {
-		var now = HxOverrides.now() / 1000;
-		var allow = false;
+	checkLocalActionInput(characterActionType) {
+		let now = HxOverrides.now() / 1000;
+		let allow = false;
 		switch(characterActionType) {
 		case 2:
 			if(this.lastActionMainInputCheck == 0 || this.lastActionMainInputCheck + this.actionMain.inputDelay < now) {
@@ -748,12 +848,12 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 		}
 		return allow;
 	}
-	,aiMeleeAttack: function() {
+	aiMeleeAttack() {
 		if(this.checkLocalActionInput(2)) {
 			this.isActing = true;
 		}
 	}
-	,setNextActionToPerform: function(characterActionType) {
+	setNextActionToPerform(characterActionType) {
 		this.isActing = true;
 		switch(characterActionType) {
 		case 2:
@@ -774,165 +874,203 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 		default:
 		}
 	}
-	,addHealth: function(add) {
+	addHealth(add) {
 		this.characterEntity.health += add;
 	}
-	,subtractHealth: function(subtract) {
+	subtractHealth(subtract) {
 		this.characterEntity.health -= subtract;
 		if(this.characterEntity.health < 0) {
 			this.characterEntity.health = 0;
 		}
 		return this.characterEntity.health;
 	}
-	,getFullEntity: function() {
+	getFullEntity() {
 		return this.characterEntity;
 	}
-	,getMinEntity: function() {
-		var minEntity = { id : this.baseEntity.id, x : this.baseEntity.x, y : this.baseEntity.y, side : this.currentDirectionSide};
+	getMinEntity() {
+		let minEntity = { id : this.baseEntity.id, x : this.baseEntity.x, y : this.baseEntity.y, side : this.currentDirectionSide};
 		return minEntity;
 	}
-	,getCurrentActionRect: function() {
-		return this.actionToPerform.shape.toRect(this.baseEntity.x,this.baseEntity.y,this.currentDirectionSide);
-	}
-	,getHealth: function() {
-		return this.characterEntity.health;
-	}
-	,__class__: engine_base_entity_impl_EngineCharacterEntity
-});
-var engine_base_entity_impl_EngineProjectileEntity = function(projectileEntity) {
-	this.traveledDistance = 0.0;
-	this.allowMovement = true;
-	engine_base_entity_base_EngineBaseEntity.call(this,projectileEntity);
-	this.projectileEntity = projectileEntity;
-};
-engine_base_entity_impl_EngineProjectileEntity.__name__ = true;
-engine_base_entity_impl_EngineProjectileEntity.__super__ = engine_base_entity_base_EngineBaseEntity;
-engine_base_entity_impl_EngineProjectileEntity.prototype = $extend(engine_base_entity_base_EngineBaseEntity.prototype,{
-	update: function(dt) {
-		if(this.allowMovement) {
-			var dx = this.projectileEntity.projectile.speed * Math.cos(this.baseEntity.rotation) * dt;
-			var dy = this.projectileEntity.projectile.speed * Math.sin(this.baseEntity.rotation) * dt;
-			this.traveledDistance += dx + dy;
-			if(this.traveledDistance > this.projectileEntity.projectile.travelDistance) {
-				this.allowMovement = false;
-			}
+	getCurrentActionRect() {
+		if(this.actionToPerform.meleeStruct != null) {
+			return this.actionToPerform.meleeStruct.shape.toRect(this.baseEntity.x,this.baseEntity.y,this.baseEntity.rotation,this.currentDirectionSide);
+		} else if(this.actionToPerform.projectileStruct != null) {
+			return this.actionToPerform.projectileStruct.shape.toRect(this.baseEntity.x,this.baseEntity.y,this.baseEntity.rotation,this.currentDirectionSide);
+		} else {
+			return null;
 		}
 	}
-	,__class__: engine_base_entity_impl_EngineProjectileEntity
+	getHealth() {
+		return this.characterEntity.health;
+	}
+}
+engine_base_entity_impl_EngineCharacterEntity.__name__ = true;
+engine_base_entity_impl_EngineCharacterEntity.__super__ = engine_base_entity_base_EngineBaseEntity;
+Object.assign(engine_base_entity_impl_EngineCharacterEntity.prototype, {
+	__class__: engine_base_entity_impl_EngineCharacterEntity
 });
-var engine_base_geometry_Line = function(x1,y1,x2,y2) {
-	if(y2 == null) {
-		y2 = 0;
+class engine_base_entity_impl_EngineProjectileEntity extends engine_base_entity_base_EngineBaseEntity {
+	constructor(projectileEntity) {
+		engine_base_entity_base_EngineBaseEntity._hx_skip_constructor = true;
+		super();
+		engine_base_entity_base_EngineBaseEntity._hx_skip_constructor = false;
+		this._hx_constructor(projectileEntity);
 	}
-	if(x2 == null) {
-		x2 = 0;
+	_hx_constructor(projectileEntity) {
+		this.traveledDistance = 0.0;
+		this.allowMovement = true;
+		super._hx_constructor(projectileEntity);
+		this.projectileEntity = projectileEntity;
+		if(this.baseEntity.id == null) {
+			this.baseEntity.id = uuid_Uuid.short();
+		}
+		if(this.baseEntity.ownerId == null) {
+			this.baseEntity.ownerId = uuid_Uuid.short();
+		}
 	}
-	if(y1 == null) {
-		y1 = 0;
+	update(dt) {
+		if(this.allowMovement) {
+			let step = this.calculateAndGetFrameMoveStep(dt);
+			this.moveBy(step.dx,step.dy);
+		}
 	}
-	if(x1 == null) {
-		x1 = 0;
+	calculateAndGetFrameMoveStep(dt) {
+		let dx = this.projectileEntity.projectile.speed * Math.cos(this.baseEntity.rotation) * dt;
+		let dy = this.projectileEntity.projectile.speed * Math.sin(this.baseEntity.rotation) * dt;
+		this.traveledDistance += dx + dy;
+		if(this.traveledDistance > this.projectileEntity.projectile.travelDistance) {
+			this.allowMovement = false;
+		}
+		return { dx : dx, dy : dy, allowMovement : this.allowMovement};
 	}
-	this.x1 = x1;
-	this.y1 = y1;
-	this.x2 = x2;
-	this.y2 = y2;
-};
-engine_base_geometry_Line.__name__ = true;
-engine_base_geometry_Line.prototype = {
-	getMidPoint: function() {
+}
+engine_base_entity_impl_EngineProjectileEntity.__name__ = true;
+engine_base_entity_impl_EngineProjectileEntity.__super__ = engine_base_entity_base_EngineBaseEntity;
+Object.assign(engine_base_entity_impl_EngineProjectileEntity.prototype, {
+	__class__: engine_base_entity_impl_EngineProjectileEntity
+});
+class engine_base_geometry_Line {
+	constructor(x1,y1,x2,y2) {
+		if(y2 == null) {
+			y2 = 0;
+		}
+		if(x2 == null) {
+			x2 = 0;
+		}
+		if(y1 == null) {
+			y1 = 0;
+		}
+		if(x1 == null) {
+			x1 = 0;
+		}
+		this.x1 = x1;
+		this.y1 = y1;
+		this.x2 = x2;
+		this.y2 = y2;
+	}
+	getMidPoint() {
 		return new engine_base_geometry_Point((this.x1 + this.x2) / 2,(this.y1 + this.y2) / 2);
 	}
-	,intersectsWithLine: function(line) {
+	intersectsWithLine(line) {
 		return engine_base_MathUtils.lineToLineIntersection(this,line);
 	}
-	,__class__: engine_base_geometry_Line
-};
-var engine_base_geometry_Point = function(x,y) {
-	if(y == null) {
-		y = 0;
+}
+engine_base_geometry_Line.__name__ = true;
+Object.assign(engine_base_geometry_Line.prototype, {
+	__class__: engine_base_geometry_Line
+});
+class engine_base_geometry_Point {
+	constructor(x,y) {
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this.x = x;
+		this.y = y;
 	}
-	if(x == null) {
-		x = 0;
-	}
-	this.x = x;
-	this.y = y;
-};
-engine_base_geometry_Point.__name__ = true;
-engine_base_geometry_Point.prototype = {
-	distanceSq: function(p) {
-		var dx = this.x - p.x;
-		var dy = this.y - p.y;
+	distanceSq(p) {
+		let dx = this.x - p.x;
+		let dy = this.y - p.y;
 		return dx * dx + dy * dy;
 	}
-	,distance: function(p) {
-		var dx = this.x - p.x;
-		var dy = this.y - p.y;
+	distance(p) {
+		let dx = this.x - p.x;
+		let dy = this.y - p.y;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
-	,__class__: engine_base_geometry_Point
-};
-var engine_base_geometry_Rectangle = function(x,y,w,h,r) {
-	this.x = x;
-	this.y = y;
-	this.w = w;
-	this.h = h;
-	this.r = r;
-};
-engine_base_geometry_Rectangle.__name__ = true;
-engine_base_geometry_Rectangle.prototype = {
-	updatePosition: function(x,y,r) {
+}
+engine_base_geometry_Point.__name__ = true;
+Object.assign(engine_base_geometry_Point.prototype, {
+	__class__: engine_base_geometry_Point
+});
+class engine_base_geometry_Rectangle {
+	constructor(x,y,w,h,r) {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+		this.r = r;
+	}
+	updatePosition(x,y,r) {
 		this.x = x;
 		this.y = y;
 		this.r = r;
 	}
-	,getCenter: function() {
-		return new engine_base_geometry_Point(this.x,this.y);
+	getCenter(offsetX,offsetY) {
+		if(offsetY == null) {
+			offsetY = 0;
+		}
+		if(offsetX == null) {
+			offsetX = 0;
+		}
+		return new engine_base_geometry_Point(this.x + offsetX,this.y + offsetY);
 	}
-	,getMaxSide: function() {
+	getMaxSide() {
 		if(this.w > this.h) {
 			return this.w;
 		} else {
 			return this.h;
 		}
 	}
-	,getLeft: function() {
+	getLeft() {
 		return this.x - this.w / 2;
 	}
-	,getRight: function() {
+	getRight() {
 		return this.x + this.w / 2;
 	}
-	,getTop: function() {
+	getTop() {
 		return this.y - this.h / 2;
 	}
-	,getBottom: function() {
+	getBottom() {
 		return this.y + this.h / 2;
 	}
-	,getTopLeftPoint: function() {
-		var rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getLeft(),this.getTop(),this.x,this.y,this.r);
+	getTopLeftPoint() {
+		let rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getLeft(),this.getTop(),this.x,this.y,this.r);
 		return new engine_base_geometry_Point(rotatedCoords.x,rotatedCoords.y);
 	}
-	,getBottomLeftPoint: function() {
-		var rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getLeft(),this.getBottom(),this.x,this.y,this.r);
+	getBottomLeftPoint() {
+		let rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getLeft(),this.getBottom(),this.x,this.y,this.r);
 		return new engine_base_geometry_Point(rotatedCoords.x,rotatedCoords.y);
 	}
-	,getTopRightPoint: function() {
-		var rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getRight(),this.getTop(),this.x,this.y,this.r);
+	getTopRightPoint() {
+		let rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getRight(),this.getTop(),this.x,this.y,this.r);
 		return new engine_base_geometry_Point(rotatedCoords.x,rotatedCoords.y);
 	}
-	,getBottomRightPoint: function() {
-		var rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getRight(),this.getBottom(),this.x,this.y,this.r);
+	getBottomRightPoint() {
+		let rotatedCoords = engine_base_MathUtils.rotatePointAroundCenter(this.getRight(),this.getBottom(),this.x,this.y,this.r);
 		return new engine_base_geometry_Point(rotatedCoords.x,rotatedCoords.y);
 	}
-	,getLines: function() {
-		var topLeftPoint = this.getTopLeftPoint();
-		var bottomLeftPoint = this.getBottomLeftPoint();
-		var topRightPoint = this.getTopRightPoint();
-		var bottomRightPoint = this.getBottomRightPoint();
+	getLines() {
+		let topLeftPoint = this.getTopLeftPoint();
+		let bottomLeftPoint = this.getBottomLeftPoint();
+		let topRightPoint = this.getTopRightPoint();
+		let bottomRightPoint = this.getBottomRightPoint();
 		return { lineA : new engine_base_geometry_Line(topLeftPoint.x,topLeftPoint.y,topRightPoint.x,topRightPoint.y), lineB : new engine_base_geometry_Line(topRightPoint.x,topRightPoint.y,bottomRightPoint.x,bottomRightPoint.y), lineC : new engine_base_geometry_Line(bottomRightPoint.x,bottomRightPoint.y,bottomLeftPoint.x,bottomLeftPoint.y), lineD : new engine_base_geometry_Line(bottomLeftPoint.x,bottomLeftPoint.y,topLeftPoint.x,topLeftPoint.y)};
 	}
-	,containsRect: function(b) {
-		var result = true;
+	containsRect(b) {
+		let result = true;
 		if(this.getLeft() >= b.getRight() || b.getLeft() >= this.getRight()) {
 			result = false;
 		}
@@ -941,15 +1079,15 @@ engine_base_geometry_Rectangle.prototype = {
 		}
 		return result;
 	}
-	,containtPoint: function(p) {
+	containtPoint(p) {
 		if(this.getLeft() <= p.x && this.getRight() >= p.x && this.getTop() <= p.y) {
 			return this.getBottom() >= p.y;
 		} else {
 			return false;
 		}
 	}
-	,intersectsWithLine: function(line) {
-		var lines = this.getLines();
+	intersectsWithLine(line) {
+		let lines = this.getLines();
 		if(lines.lineA.intersectsWithLine(line)) {
 			return true;
 		} else if(lines.lineB.intersectsWithLine(line)) {
@@ -961,7 +1099,7 @@ engine_base_geometry_Rectangle.prototype = {
 		}
 		return false;
 	}
-	,intersectsWithPoint: function(point) {
+	intersectsWithPoint(point) {
 		if(this.r == 0) {
 			if(Math.abs(this.x - point.x) < this.w / 2) {
 				return Math.abs(this.y - point.y) < this.h / 2;
@@ -969,22 +1107,22 @@ engine_base_geometry_Rectangle.prototype = {
 				return false;
 			}
 		}
-		var tx = Math.cos(this.r) * point.x - Math.sin(this.r) * point.y;
-		var ty = Math.cos(this.r) * point.y + Math.sin(this.r) * point.x;
-		var cx = Math.cos(this.r) * this.x - Math.sin(this.r) * this.y;
-		var cy = Math.cos(this.r) * this.y + Math.sin(this.r) * this.x;
+		let tx = Math.cos(this.r) * point.x - Math.sin(this.r) * point.y;
+		let ty = Math.cos(this.r) * point.y + Math.sin(this.r) * point.x;
+		let cx = Math.cos(this.r) * this.x - Math.sin(this.r) * this.y;
+		let cy = Math.cos(this.r) * this.y + Math.sin(this.r) * this.x;
 		if(Math.abs(cx - tx) < this.w / 2) {
 			return Math.abs(cy - ty) < this.h / 2;
 		} else {
 			return false;
 		}
 	}
-	,intersectsWithRect: function(b) {
+	intersectsWithRect(b) {
 		if(this.r == 0 && b.r == 0) {
 			return this.containsRect(b);
 		} else {
-			var rA = this.getLines();
-			var rB = b.getLines();
+			let rA = this.getLines();
+			let rB = b.getLines();
 			if(rA.lineA.intersectsWithLine(rB.lineA) || rA.lineA.intersectsWithLine(rB.lineB) || rA.lineA.intersectsWithLine(rB.lineC) || rA.lineA.intersectsWithLine(rB.lineD)) {
 				return true;
 			}
@@ -1000,33 +1138,38 @@ engine_base_geometry_Rectangle.prototype = {
 			return false;
 		}
 	}
-	,__class__: engine_base_geometry_Rectangle
-};
-var engine_seidh_SeidhGameEngine = $hx_exports["engine"]["seidh"]["SeidhGameEngine"] = function(engineMode) {
-	if(engineMode == null) {
-		engineMode = engine_base_core_EngineMode.Server;
+}
+engine_base_geometry_Rectangle.__name__ = true;
+Object.assign(engine_base_geometry_Rectangle.prototype, {
+	__class__: engine_base_geometry_Rectangle
+});
+class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
+	constructor(engineMode) {
+		engine_base_core_BaseEngine._hx_skip_constructor = true;
+		super();
+		engine_base_core_BaseEngine._hx_skip_constructor = false;
+		this._hx_constructor(engineMode);
 	}
-	this.timePassed = 0.0;
-	this.framesPassed = 0;
-	engine_base_core_BaseEngine.call(this,engineMode);
-};
-engine_seidh_SeidhGameEngine.__name__ = true;
-engine_seidh_SeidhGameEngine.main = function() {
-};
-engine_seidh_SeidhGameEngine.__super__ = engine_base_core_BaseEngine;
-engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.prototype,{
-	createCharacterEntityFromMinimalStruct: function(struct) {
+	_hx_constructor(engineMode) {
+		if(engineMode == null) {
+			engineMode = engine_base_core_EngineMode.Server;
+		}
+		this.timePassed = 0.0;
+		this.framesPassed = 0;
+		super._hx_constructor(engineMode);
+	}
+	createCharacterEntityFromMinimalStruct(struct) {
 		this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateEntity(struct.id,struct.ownerId,struct.x,struct.y,struct.entityType),true);
 	}
-	,processInputCommands: function(playerInputCommands) {
-		var _g = 0;
+	processInputCommands(playerInputCommands) {
+		let _g = 0;
 		while(_g < playerInputCommands.length) {
-			var i = playerInputCommands[_g];
+			let i = playerInputCommands[_g];
 			++_g;
-			var input = js_Boot.__cast(i.playerInputCommand , engine_base_PlayerInputCommand);
-			var inputInitiator = input.playerId;
-			var entityId = this.playerToEntityMap.h[inputInitiator];
-			var entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_seidh_entity_base_SeidhBaseEntity);
+			let input = js_Boot.__cast(i.playerInputCommand , engine_base_PlayerInputCommand);
+			let inputInitiator = input.playerId;
+			let entityId = this.playerToEntityMap.h[inputInitiator];
+			let entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_seidh_entity_base_SeidhBaseEntity);
 			if(entity == null || entity.getOwnerId() != inputInitiator) {
 				continue;
 			}
@@ -1034,60 +1177,132 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 			if(input.actionType == 1) {
 				entity.performMove(input);
 			} else {
-				entity.markForAction();
+				entity.setNextActionToPerform(input.actionType);
 			}
 		}
 	}
-	,engineLoopUpdate: function(dt) {
-		var beginTime = Date.now();
+	engineLoopUpdate(dt) {
+		let beginTime = Date.now();
 		this.framesPassed++;
 		this.timePassed += dt;
-		var characterActionCallbackParams = [];
-		var jsIterator = this.characterEntityManager.entities.values();
-		var _g_jsIterator = jsIterator;
-		var _g_lastStep = jsIterator.next();
+		let characterActionCallbackParams = [];
+		let jsIterator = this.projectileEntityManager.entities.values();
+		let _g_jsIterator = jsIterator;
+		let _g_lastStep = jsIterator.next();
 		while(!_g_lastStep.done) {
-			var v = _g_lastStep.value;
+			let v = _g_lastStep.value;
 			_g_lastStep = _g_jsIterator.next();
-			var e = v;
-			var entity = js_Boot.__cast(e , engine_base_entity_impl_EngineCharacterEntity);
-			if(entity.isAlive) {
-				if(entity.getEntityType() == 4) {
-					var targetPlayer = this.getNearestPlayer(entity);
-					if(targetPlayer != null) {
-						entity.setTargetObject(targetPlayer);
+			let e = v;
+			let projectile = js_Boot.__cast(e , engine_base_entity_impl_EngineProjectileEntity);
+			if(projectile.allowMovement) {
+				projectile.update(dt);
+			} else {
+				this.removeProjectileEntity(projectile.getId());
+			}
+		}
+		let jsIterator1 = this.characterEntityManager.entities.values();
+		let _g_jsIterator1 = jsIterator1;
+		let _g_lastStep1 = jsIterator1.next();
+		while(!_g_lastStep1.done) {
+			let v = _g_lastStep1.value;
+			_g_lastStep1 = _g_jsIterator1.next();
+			let e1 = v;
+			let character1 = js_Boot.__cast(e1 , engine_base_entity_impl_EngineCharacterEntity);
+			if(character1.isAlive && !character1.isPlayer()) {
+				if(engine_base_EngineConfig.AI_ENABLED) {
+					let targetPlayer = this.getNearestPlayer(character1);
+					if(targetPlayer != null && character1.getTargetObject() != targetPlayer) {
+						character1.setTargetObject(targetPlayer,true);
 					}
 				}
-				entity.update(dt);
-				if(entity.isActing) {
-					var hurtEntities = [];
-					var deadEntities = [];
-					var jsIterator = this.characterEntityManager.entities.values();
-					var _g_jsIterator1 = jsIterator;
-					var _g_lastStep1 = jsIterator.next();
-					while(!_g_lastStep1.done) {
-						var v1 = _g_lastStep1.value;
-						_g_lastStep1 = _g_jsIterator1.next();
-						var e2 = v1;
-						var entity2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
-						if(entity2.isAlive && entity.getId() != entity2.getId()) {
-							if(entity.getCurrentActionRect().containsRect(entity2.getBodyRectangle())) {
-								var health = entity2.subtractHealth(entity.actionToPerform.damage);
+				let jsIterator = this.characterEntityManager.entities.values();
+				let _g_jsIterator = jsIterator;
+				let _g_lastStep = jsIterator.next();
+				while(!_g_lastStep.done) {
+					let v = _g_lastStep.value;
+					_g_lastStep = _g_jsIterator.next();
+					let e2 = v;
+					let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
+					if(!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
+						if(character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
+							character1.intersectsWithCharacter = true;
+							character1.canMove = false;
+						}
+					}
+				}
+				character1.update(dt);
+				character1.intersectsWithCharacter = false;
+				character1.canMove = true;
+			}
+		}
+		let jsIterator2 = this.characterEntityManager.entities.values();
+		let _g_jsIterator2 = jsIterator2;
+		let _g_lastStep2 = jsIterator2.next();
+		while(!_g_lastStep2.done) {
+			let v = _g_lastStep2.value;
+			_g_lastStep2 = _g_jsIterator2.next();
+			let e = v;
+			let character1 = js_Boot.__cast(e , engine_base_entity_impl_EngineCharacterEntity);
+			if(character1.isAlive) {
+				if(character1.isPlayer()) {
+					character1.update(dt);
+				}
+				let jsIterator = this.projectileEntityManager.entities.values();
+				let _g_jsIterator = jsIterator;
+				let _g_lastStep = jsIterator.next();
+				while(!_g_lastStep.done) {
+					let v = _g_lastStep.value;
+					_g_lastStep = _g_jsIterator.next();
+					let e = v;
+					let projectile = js_Boot.__cast(e , engine_base_entity_impl_EngineProjectileEntity);
+					if(projectile.getOwnerId() != character1.getOwnerId()) {
+						let projectileRect = projectile.getBodyRectangle();
+						let characterRect = character1.getBodyRectangle();
+						let _this = projectileRect.getCenter();
+						let p = characterRect.getCenter();
+						let dx = _this.x - p.x;
+						let dy = _this.y - p.y;
+						if(Math.sqrt(dx * dx + dy * dy) < characterRect.w) {
+							projectile.allowMovement = false;
+						}
+					}
+				}
+				if(character1.isActing) {
+					let hurtEntities = [];
+					let deadEntities = [];
+					let actionShape = null;
+					if(character1.actionToPerform.projectileStruct != null) {
+						this.createProjectileEntity(this.createProjectileByCharacter(character1),true);
+						actionShape = character1.actionToPerform.projectileStruct.shape;
+					} else if(character1.actionToPerform.meleeStruct != null) {
+						actionShape = character1.actionToPerform.meleeStruct.shape;
+					}
+					let jsIterator = this.characterEntityManager.entities.values();
+					let _g_jsIterator = jsIterator;
+					let _g_lastStep = jsIterator.next();
+					while(!_g_lastStep.done) {
+						let v = _g_lastStep.value;
+						_g_lastStep = _g_jsIterator.next();
+						let e2 = v;
+						let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
+						if(character2.isAlive && character1.getId() != character2.getId()) {
+							if(character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+								let health = character2.subtractHealth(character1.actionToPerform.damage);
 								if(health == 0) {
-									entity2.isAlive = false;
-									deadEntities.push(entity2.getId());
-									this.removeCharacterEntity(entity2.getId());
+									character2.isAlive = false;
+									deadEntities.push(character2.getId());
+									this.removeCharacterEntity(character2.getId());
 								} else {
-									hurtEntities.push(entity2.getId());
+									hurtEntities.push(character2.getId());
 								}
 							}
 						}
 					}
-					characterActionCallbackParams.push({ entityId : entity.getId(), actionType : entity.actionToPerform.actionType, shape : entity.actionToPerform.shape, hurtEntities : hurtEntities, deadEntities : deadEntities});
-					entity.isActing = false;
+					characterActionCallbackParams.push({ entityId : character1.getId(), actionType : character1.actionToPerform.actionType, shape : actionShape, hurtEntities : hurtEntities, deadEntities : deadEntities});
+					character1.isActing = false;
 				}
-				entity.isRunning = false;
-				entity.isWalking = false;
+				character1.isRunning = false;
+				character1.isWalking = false;
 			}
 		}
 		if(this.characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
@@ -1095,22 +1310,27 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 		}
 		this.recentEngineLoopTime = Date.now() - beginTime;
 	}
-	,getNearestPlayer: function(entity) {
-		var nearestPlayer = null;
-		var nearestPlayerDistance = 0.0;
-		var jsIterator = this.characterEntityManager.entities.values();
-		var _g_jsIterator = jsIterator;
-		var _g_lastStep = jsIterator.next();
+	createProjectileByCharacter(character) {
+		let ownerRect = character.getBodyRectangle();
+		let projectileEntity = new engine_base_entity_impl_EngineProjectileEntity(new engine_base_ProjectileEntity({ base : { x : ownerRect.getCenter().x, y : ownerRect.getCenter().y, entityType : 6, entityShape : character.actionToPerform.projectileStruct.shape, ownerId : character.getOwnerId(), rotation : character.getRotation()}, projectile : character.actionToPerform.projectileStruct}));
+		return projectileEntity;
+	}
+	getNearestPlayer(entity) {
+		let nearestPlayer = null;
+		let nearestPlayerDistance = 0.0;
+		let jsIterator = this.characterEntityManager.entities.values();
+		let _g_jsIterator = jsIterator;
+		let _g_lastStep = jsIterator.next();
 		while(!_g_lastStep.done) {
-			var v = _g_lastStep.value;
+			let v = _g_lastStep.value;
 			_g_lastStep = _g_jsIterator.next();
-			var targetEntity = v;
+			let targetEntity = v;
 			if(targetEntity.getEntityType() == 1) {
-				var _this = entity.getBodyRectangle().getCenter();
-				var p = targetEntity.getBodyRectangle().getCenter();
-				var dx = _this.x - p.x;
-				var dy = _this.y - p.y;
-				var dist = Math.sqrt(dx * dx + dy * dy);
+				let _this = entity.getBodyRectangle().getCenter();
+				let p = targetEntity.getBodyRectangle().getCenter();
+				let dx = _this.x - p.x;
+				let dy = _this.y - p.y;
+				let dist = Math.sqrt(dx * dx + dy * dy);
 				if(nearestPlayer == null || dist < nearestPlayerDistance) {
 					nearestPlayer = targetEntity;
 					nearestPlayerDistance = dist;
@@ -1119,403 +1339,381 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 		}
 		return nearestPlayer;
 	}
-	,customDestroy: function() {
+	customDestroy() {
 		this.characterActionCallbacks = null;
 	}
-	,__class__: engine_seidh_SeidhGameEngine
+	static main() {
+	}
+}
+$hx_exports["engine"]["seidh"]["SeidhGameEngine"] = engine_seidh_SeidhGameEngine;
+engine_seidh_SeidhGameEngine.__name__ = true;
+engine_seidh_SeidhGameEngine.__super__ = engine_base_core_BaseEngine;
+Object.assign(engine_seidh_SeidhGameEngine.prototype, {
+	__class__: engine_seidh_SeidhGameEngine
 });
-var engine_seidh_entity_base_SeidhBaseEntity = function(characterEntity) {
-	engine_base_entity_impl_EngineCharacterEntity.call(this,characterEntity);
-};
-engine_seidh_entity_base_SeidhBaseEntity.__name__ = true;
-engine_seidh_entity_base_SeidhBaseEntity.__super__ = engine_base_entity_impl_EngineCharacterEntity;
-engine_seidh_entity_base_SeidhBaseEntity.prototype = $extend(engine_base_entity_impl_EngineCharacterEntity.prototype,{
-	performMove: function(playerInput) {
+class engine_seidh_entity_base_SeidhBaseEntity extends engine_base_entity_impl_EngineCharacterEntity {
+	constructor(characterEntity) {
+		super(characterEntity);
+	}
+	performMove(playerInput) {
 		this.setRotation(playerInput.movAngle);
 		this.determenisticMove();
 	}
-	,markForAction: function() {
-		this.isActing = true;
-	}
-	,canPerformMove: function() {
+	canPerformMove() {
 		return true;
 	}
-	,canPerformAction: function(characterActionType) {
+	canPerformAction(characterActionType) {
 		return true;
 	}
-	,updateHashImpl: function() {
-		var e = this.baseEntity;
-		var c = this.characterEntity;
-		var s = e.id + e.x + e.y + c.health;
+	updateHashImpl() {
+		let e = this.baseEntity;
+		let c = this.characterEntity;
+		let s = e.id + e.x + e.y + c.health;
 		return engine_base_EngineUtils.HashString(s);
 	}
-	,__class__: engine_seidh_entity_base_SeidhBaseEntity
+}
+engine_seidh_entity_base_SeidhBaseEntity.__name__ = true;
+engine_seidh_entity_base_SeidhBaseEntity.__super__ = engine_base_entity_impl_EngineCharacterEntity;
+Object.assign(engine_seidh_entity_base_SeidhBaseEntity.prototype, {
+	__class__: engine_seidh_entity_base_SeidhBaseEntity
 });
-var engine_seidh_entity_factory_SeidhEntityFactory = function() { };
-engine_seidh_entity_factory_SeidhEntityFactory.__name__ = true;
-engine_seidh_entity_factory_SeidhEntityFactory.InitiateEntity = function(id,ownerId,x,y,entityType) {
-	var entity = null;
-	switch(entityType) {
-	case 1:
-		entity = new engine_seidh_entity_impl_SeidhKnightEntity(engine_seidh_entity_impl_SeidhKnightEntity.GenerateObjectEntity(id,ownerId,x,y));
-		break;
-	case 4:
-		entity = new engine_seidh_entity_impl_SeidhSkeletonWarriorEntity(engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GenerateObjectEntity(id,ownerId,x,y));
-		break;
-	default:
+class engine_seidh_entity_factory_SeidhEntityFactory {
+	static InitiateEntity(id,ownerId,x,y,entityType) {
+		let entity = null;
+		switch(entityType) {
+		case 1:
+			entity = new engine_seidh_entity_impl_SeidhKnightEntity(engine_seidh_entity_impl_SeidhKnightEntity.GenerateObjectEntity(id,ownerId,x,y));
+			break;
+		case 4:
+			entity = new engine_seidh_entity_impl_SeidhSkeletonWarriorEntity(engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GenerateObjectEntity(id,ownerId,x,y));
+			break;
+		default:
+		}
+		return entity;
 	}
-	return entity;
-};
-var engine_seidh_entity_impl_SeidhKnightEntity = function(characterEntity) {
-	engine_seidh_entity_base_SeidhBaseEntity.call(this,characterEntity);
-};
+	static InitiateProjectile() {
+	}
+}
+engine_seidh_entity_factory_SeidhEntityFactory.__name__ = true;
+class engine_seidh_entity_impl_SeidhKnightEntity extends engine_seidh_entity_base_SeidhBaseEntity {
+	constructor(characterEntity) {
+		super(characterEntity);
+	}
+	static GenerateObjectEntity(id,ownerId,x,y) {
+		let tmp = { x : x, y : y, entityType : 1, entityShape : new engine_base_EntityShape(64,64,32,100), id : id, ownerId : ownerId, rotation : 0};
+		let tmp1 = { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(140,100,80,100)}};
+		let tmp2 = { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : new engine_base_EntityShape(30,10,0,0)}};
+		let tmp3 = { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : new engine_base_EntityShape(100,100,0,0), shape : new engine_base_EntityShape(25,25,0,0)}};
+		return new engine_base_CharacterEntity({ base : tmp, health : 100, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : tmp1, characterAction1Struct : tmp2, characterAction2Struct : tmp3, characterAction3Struct : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
+	}
+}
 engine_seidh_entity_impl_SeidhKnightEntity.__name__ = true;
-engine_seidh_entity_impl_SeidhKnightEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
-	var tmp = { x : x, y : y, entityType : 1, entityShape : new engine_base_EntityShape(64,64,32,100), id : id, ownerId : ownerId};
-	var tmp1 = { actionType : 2, damage : 5, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1};
-	var tmp2 = { actionType : 3, damage : 5, shape : new engine_base_EntityShape(10,10,0,0), inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 10, travelDistance : 200, projectiles : 1}};
-	var tmp3 = { actionType : 4, damage : 5, shape : new engine_base_EntityShape(25,25,0,0), inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : new engine_base_EntityShape(100,100,0,0)}};
-	return new engine_base_CharacterEntity({ base : tmp, health : 100, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : tmp1, characterAction1Struct : tmp2, characterAction2Struct : tmp3, characterAction3Struct : { actionType : 5, damage : 0, shape : new engine_base_EntityShape(100,100), inputDelay : 3}});
-};
 engine_seidh_entity_impl_SeidhKnightEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
-engine_seidh_entity_impl_SeidhKnightEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{
+Object.assign(engine_seidh_entity_impl_SeidhKnightEntity.prototype, {
 	__class__: engine_seidh_entity_impl_SeidhKnightEntity
 });
-var engine_seidh_entity_impl_SeidhSkeletonWarriorEntity = function(characterEntity) {
-	engine_seidh_entity_base_SeidhBaseEntity.call(this,characterEntity);
-};
+class engine_seidh_entity_impl_SeidhSkeletonWarriorEntity extends engine_seidh_entity_base_SeidhBaseEntity {
+	constructor(characterEntity) {
+		super(characterEntity);
+	}
+	static GenerateObjectEntity(id,ownerId,x,y) {
+		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId, rotation : 0}, health : 10, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : new engine_base_EntityShape(140,100,80,100)}}});
+	}
+}
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__name__ = true;
-engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
-	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId}, health : 10, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : { actionType : 2, damage : 10, shape : new engine_base_EntityShape(140,100,80,100), inputDelay : 1}});
-};
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
-engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{
+Object.assign(engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.prototype, {
 	__class__: engine_seidh_entity_impl_SeidhSkeletonWarriorEntity
 });
-var haxe_IMap = function() { };
+class haxe_IMap {
+}
 haxe_IMap.__name__ = true;
 haxe_IMap.__isInterface__ = true;
-var haxe_Exception = function(message,previous,native) {
-	Error.call(this,message);
-	this.message = message;
-	this.__previousException = previous;
-	this.__nativeException = native != null ? native : this;
-};
-haxe_Exception.__name__ = true;
-haxe_Exception.thrown = function(value) {
-	if(((value) instanceof haxe_Exception)) {
-		return value.get_native();
-	} else if(((value) instanceof Error)) {
-		return value;
-	} else {
-		var e = new haxe_ValueException(value);
-		return e;
+class haxe_Exception extends Error {
+	constructor(message,previous,native) {
+		super(message);
+		this.message = message;
+		this.__previousException = previous;
+		this.__nativeException = native != null ? native : this;
 	}
-};
-haxe_Exception.__super__ = Error;
-haxe_Exception.prototype = $extend(Error.prototype,{
-	get_native: function() {
+	get_native() {
 		return this.__nativeException;
 	}
-	,__class__: haxe_Exception
-});
-var haxe_Int32 = {};
-haxe_Int32.ucompare = function(a,b) {
-	if(a < 0) {
-		if(b < 0) {
-			return ~b - ~a | 0;
+	static thrown(value) {
+		if(((value) instanceof haxe_Exception)) {
+			return value.get_native();
+		} else if(((value) instanceof Error)) {
+			return value;
 		} else {
-			return 1;
+			let e = new haxe_ValueException(value);
+			return e;
 		}
 	}
-	if(b < 0) {
-		return -1;
-	} else {
-		return a - b | 0;
-	}
-};
-var haxe_Int64 = {};
-haxe_Int64.divMod = function(dividend,divisor) {
-	if(divisor.high == 0) {
-		switch(divisor.low) {
-		case 0:
-			throw haxe_Exception.thrown("divide by zero");
-		case 1:
-			return { quotient : new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low), modulus : new haxe__$Int64__$_$_$Int64(0,0)};
+}
+haxe_Exception.__name__ = true;
+haxe_Exception.__super__ = Error;
+Object.assign(haxe_Exception.prototype, {
+	__class__: haxe_Exception
+});
+class haxe_Int32 {
+	static ucompare(a,b) {
+		if(a < 0) {
+			if(b < 0) {
+				return ~b - ~a | 0;
+			} else {
+				return 1;
+			}
+		}
+		if(b < 0) {
+			return -1;
+		} else {
+			return a - b | 0;
 		}
 	}
-	var divSign = dividend.high < 0 != divisor.high < 0;
-	var modulus;
-	if(dividend.high < 0) {
-		var high = ~dividend.high;
-		var low = ~dividend.low + 1 | 0;
-		if(low == 0) {
-			var ret = high++;
-			high = high | 0;
+}
+class haxe_Int64 {
+	static divMod(dividend,divisor) {
+		if(divisor.high == 0) {
+			switch(divisor.low) {
+			case 0:
+				throw haxe_Exception.thrown("divide by zero");
+			case 1:
+				return { quotient : new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low), modulus : new haxe__$Int64__$_$_$Int64(0,0)};
+			}
 		}
-		modulus = new haxe__$Int64__$_$_$Int64(high,low);
-	} else {
-		modulus = new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low);
-	}
-	if(divisor.high < 0) {
-		var high = ~divisor.high;
-		var low = ~divisor.low + 1 | 0;
-		if(low == 0) {
-			var ret = high++;
-			high = high | 0;
+		let divSign = dividend.high < 0 != divisor.high < 0;
+		let modulus;
+		if(dividend.high < 0) {
+			let high = ~dividend.high;
+			let low = ~dividend.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
+				high = high | 0;
+			}
+			modulus = new haxe__$Int64__$_$_$Int64(high,low);
+		} else {
+			modulus = new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low);
 		}
-		divisor = new haxe__$Int64__$_$_$Int64(high,low);
-	}
-	var quotient = new haxe__$Int64__$_$_$Int64(0,0);
-	var mask = new haxe__$Int64__$_$_$Int64(0,1);
-	while(!(divisor.high < 0)) {
-		var v = haxe_Int32.ucompare(divisor.high,modulus.high);
-		var cmp = v != 0 ? v : haxe_Int32.ucompare(divisor.low,modulus.low);
-		var b = 1;
-		b &= 63;
-		divisor = b == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high << b | divisor.low >>> 32 - b,divisor.low << b) : new haxe__$Int64__$_$_$Int64(divisor.low << b - 32,0);
-		var b1 = 1;
-		b1 &= 63;
-		mask = b1 == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(mask.high << b1 | mask.low >>> 32 - b1,mask.low << b1) : new haxe__$Int64__$_$_$Int64(mask.low << b1 - 32,0);
-		if(cmp >= 0) {
-			break;
+		if(divisor.high < 0) {
+			let high = ~divisor.high;
+			let low = ~divisor.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
+				high = high | 0;
+			}
+			divisor = new haxe__$Int64__$_$_$Int64(high,low);
 		}
-	}
-	while(true) {
-		var b_high = 0;
-		var b_low = 0;
-		if(!(mask.high != b_high || mask.low != b_low)) {
-			break;
+		let quotient = new haxe__$Int64__$_$_$Int64(0,0);
+		let mask = new haxe__$Int64__$_$_$Int64(0,1);
+		while(!(divisor.high < 0)) {
+			let v = haxe_Int32.ucompare(divisor.high,modulus.high);
+			let cmp = v != 0 ? v : haxe_Int32.ucompare(divisor.low,modulus.low);
+			let b = 1;
+			b &= 63;
+			divisor = b == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high << b | divisor.low >>> 32 - b,divisor.low << b) : new haxe__$Int64__$_$_$Int64(divisor.low << b - 32,0);
+			let b1 = 1;
+			b1 &= 63;
+			mask = b1 == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(mask.high << b1 | mask.low >>> 32 - b1,mask.low << b1) : new haxe__$Int64__$_$_$Int64(mask.low << b1 - 32,0);
+			if(cmp >= 0) {
+				break;
+			}
 		}
-		var v = haxe_Int32.ucompare(modulus.high,divisor.high);
-		if((v != 0 ? v : haxe_Int32.ucompare(modulus.low,divisor.low)) >= 0) {
-			quotient = new haxe__$Int64__$_$_$Int64(quotient.high | mask.high,quotient.low | mask.low);
-			var high = modulus.high - divisor.high | 0;
-			var low = modulus.low - divisor.low | 0;
-			if(haxe_Int32.ucompare(modulus.low,divisor.low) < 0) {
-				var ret = high--;
+		while(true) {
+			let b_high = 0;
+			let b_low = 0;
+			if(!(mask.high != b_high || mask.low != b_low)) {
+				break;
+			}
+			let v = haxe_Int32.ucompare(modulus.high,divisor.high);
+			if((v != 0 ? v : haxe_Int32.ucompare(modulus.low,divisor.low)) >= 0) {
+				quotient = new haxe__$Int64__$_$_$Int64(quotient.high | mask.high,quotient.low | mask.low);
+				let high = modulus.high - divisor.high | 0;
+				let low = modulus.low - divisor.low | 0;
+				if(haxe_Int32.ucompare(modulus.low,divisor.low) < 0) {
+					let ret = high--;
+					high = high | 0;
+				}
+				modulus = new haxe__$Int64__$_$_$Int64(high,low);
+			}
+			let b = 1;
+			b &= 63;
+			mask = b == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(mask.high >>> b,mask.high << 32 - b | mask.low >>> b) : new haxe__$Int64__$_$_$Int64(0,mask.high >>> b - 32);
+			let b1 = 1;
+			b1 &= 63;
+			divisor = b1 == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high >>> b1,divisor.high << 32 - b1 | divisor.low >>> b1) : new haxe__$Int64__$_$_$Int64(0,divisor.high >>> b1 - 32);
+		}
+		if(divSign) {
+			let high = ~quotient.high;
+			let low = ~quotient.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
+				high = high | 0;
+			}
+			quotient = new haxe__$Int64__$_$_$Int64(high,low);
+		}
+		if(dividend.high < 0) {
+			let high = ~modulus.high;
+			let low = ~modulus.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
 				high = high | 0;
 			}
 			modulus = new haxe__$Int64__$_$_$Int64(high,low);
 		}
-		var b = 1;
-		b &= 63;
-		mask = b == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(mask.high >>> b,mask.high << 32 - b | mask.low >>> b) : new haxe__$Int64__$_$_$Int64(0,mask.high >>> b - 32);
-		var b1 = 1;
-		b1 &= 63;
-		divisor = b1 == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high >>> b1,divisor.high << 32 - b1 | divisor.low >>> b1) : new haxe__$Int64__$_$_$Int64(0,divisor.high >>> b1 - 32);
+		return { quotient : quotient, modulus : modulus};
 	}
-	if(divSign) {
-		var high = ~quotient.high;
-		var low = ~quotient.low + 1 | 0;
-		if(low == 0) {
-			var ret = high++;
-			high = high | 0;
-		}
-		quotient = new haxe__$Int64__$_$_$Int64(high,low);
+}
+class haxe__$Int64__$_$_$Int64 {
+	constructor(high,low) {
+		this.high = high;
+		this.low = low;
 	}
-	if(dividend.high < 0) {
-		var high = ~modulus.high;
-		var low = ~modulus.low + 1 | 0;
-		if(low == 0) {
-			var ret = high++;
-			high = high | 0;
-		}
-		modulus = new haxe__$Int64__$_$_$Int64(high,low);
-	}
-	return { quotient : quotient, modulus : modulus};
-};
-var haxe__$Int64__$_$_$Int64 = function(high,low) {
-	this.high = high;
-	this.low = low;
-};
+}
 haxe__$Int64__$_$_$Int64.__name__ = true;
-haxe__$Int64__$_$_$Int64.prototype = {
+Object.assign(haxe__$Int64__$_$_$Int64.prototype, {
 	__class__: haxe__$Int64__$_$_$Int64
-};
-var haxe_Int64Helper = function() { };
-haxe_Int64Helper.__name__ = true;
-haxe_Int64Helper.fromFloat = function(f) {
-	if(isNaN(f) || !isFinite(f)) {
-		throw haxe_Exception.thrown("Number is NaN or Infinite");
-	}
-	var noFractions = f - f % 1;
-	if(noFractions > 9007199254740991) {
-		throw haxe_Exception.thrown("Conversion overflow");
-	}
-	if(noFractions < -9007199254740991) {
-		throw haxe_Exception.thrown("Conversion underflow");
-	}
-	var result = new haxe__$Int64__$_$_$Int64(0,0);
-	var neg = noFractions < 0;
-	var rest = neg ? -noFractions : noFractions;
-	var i = 0;
-	while(rest >= 1) {
-		var curr = rest % 2;
-		rest /= 2;
-		if(curr >= 1) {
-			var a_high = 0;
-			var a_low = 1;
-			var b = i;
-			b &= 63;
-			var b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(a_high,a_low) : b < 32 ? new haxe__$Int64__$_$_$Int64(a_high << b | a_low >>> 32 - b,a_low << b) : new haxe__$Int64__$_$_$Int64(a_low << b - 32,0);
-			var high = result.high + b1.high | 0;
-			var low = result.low + b1.low | 0;
-			if(haxe_Int32.ucompare(low,result.low) < 0) {
-				var ret = high++;
+});
+class haxe_Int64Helper {
+	static fromFloat(f) {
+		if(isNaN(f) || !isFinite(f)) {
+			throw haxe_Exception.thrown("Number is NaN or Infinite");
+		}
+		let noFractions = f - f % 1;
+		if(noFractions > 9007199254740991) {
+			throw haxe_Exception.thrown("Conversion overflow");
+		}
+		if(noFractions < -9007199254740991) {
+			throw haxe_Exception.thrown("Conversion underflow");
+		}
+		let result = new haxe__$Int64__$_$_$Int64(0,0);
+		let neg = noFractions < 0;
+		let rest = neg ? -noFractions : noFractions;
+		let i = 0;
+		while(rest >= 1) {
+			let curr = rest % 2;
+			rest /= 2;
+			if(curr >= 1) {
+				let a_high = 0;
+				let a_low = 1;
+				let b = i;
+				b &= 63;
+				let b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(a_high,a_low) : b < 32 ? new haxe__$Int64__$_$_$Int64(a_high << b | a_low >>> 32 - b,a_low << b) : new haxe__$Int64__$_$_$Int64(a_low << b - 32,0);
+				let high = result.high + b1.high | 0;
+				let low = result.low + b1.low | 0;
+				if(haxe_Int32.ucompare(low,result.low) < 0) {
+					let ret = high++;
+					high = high | 0;
+				}
+				result = new haxe__$Int64__$_$_$Int64(high,low);
+			}
+			++i;
+		}
+		if(neg) {
+			let high = ~result.high;
+			let low = ~result.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
 				high = high | 0;
 			}
 			result = new haxe__$Int64__$_$_$Int64(high,low);
 		}
-		++i;
+		return result;
 	}
-	if(neg) {
-		var high = ~result.high;
-		var low = ~result.low + 1 | 0;
-		if(low == 0) {
-			var ret = high++;
-			high = high | 0;
-		}
-		result = new haxe__$Int64__$_$_$Int64(high,low);
+}
+haxe_Int64Helper.__name__ = true;
+class haxe_Timer {
+	constructor(time_ms) {
+		let me = this;
+		this.id = setInterval(function() {
+			me.run();
+		},time_ms);
 	}
-	return result;
-};
-var haxe_Timer = function(time_ms) {
-	var me = this;
-	this.id = setInterval(function() {
-		me.run();
-	},time_ms);
-};
-haxe_Timer.__name__ = true;
-haxe_Timer.delay = function(f,time_ms) {
-	var t = new haxe_Timer(time_ms);
-	t.run = function() {
-		t.stop();
-		f();
-	};
-	return t;
-};
-haxe_Timer.prototype = {
-	stop: function() {
+	stop() {
 		if(this.id == null) {
 			return;
 		}
 		clearInterval(this.id);
 		this.id = null;
 	}
-	,run: function() {
+	run() {
 	}
-	,__class__: haxe_Timer
-};
-var haxe_ValueException = function(value,previous,native) {
-	haxe_Exception.call(this,String(value),previous,native);
-	this.value = value;
-};
+	static delay(f,time_ms) {
+		let t = new haxe_Timer(time_ms);
+		t.run = function() {
+			t.stop();
+			f();
+		};
+		return t;
+	}
+}
+haxe_Timer.__name__ = true;
+Object.assign(haxe_Timer.prototype, {
+	__class__: haxe_Timer
+});
+class haxe_ValueException extends haxe_Exception {
+	constructor(value,previous,native) {
+		super(String(value),previous,native);
+		this.value = value;
+	}
+}
 haxe_ValueException.__name__ = true;
 haxe_ValueException.__super__ = haxe_Exception;
-haxe_ValueException.prototype = $extend(haxe_Exception.prototype,{
+Object.assign(haxe_ValueException.prototype, {
 	__class__: haxe_ValueException
 });
-var haxe_crypto_Md5 = function() {
-};
-haxe_crypto_Md5.__name__ = true;
-haxe_crypto_Md5.make = function(b) {
-	var h = new haxe_crypto_Md5().doEncode(haxe_crypto_Md5.bytes2blks(b));
-	var out = new haxe_io_Bytes(new ArrayBuffer(16));
-	var p = 0;
-	out.b[p++] = h[0] & 255;
-	out.b[p++] = h[0] >> 8 & 255;
-	out.b[p++] = h[0] >> 16 & 255;
-	out.b[p++] = h[0] >>> 24;
-	out.b[p++] = h[1] & 255;
-	out.b[p++] = h[1] >> 8 & 255;
-	out.b[p++] = h[1] >> 16 & 255;
-	out.b[p++] = h[1] >>> 24;
-	out.b[p++] = h[2] & 255;
-	out.b[p++] = h[2] >> 8 & 255;
-	out.b[p++] = h[2] >> 16 & 255;
-	out.b[p++] = h[2] >>> 24;
-	out.b[p++] = h[3] & 255;
-	out.b[p++] = h[3] >> 8 & 255;
-	out.b[p++] = h[3] >> 16 & 255;
-	out.b[p++] = h[3] >>> 24;
-	return out;
-};
-haxe_crypto_Md5.bytes2blks = function(b) {
-	var nblk = (b.length + 8 >> 6) + 1;
-	var blks = [];
-	var blksSize = nblk * 16;
-	var _g = 0;
-	var _g1 = blksSize;
-	while(_g < _g1) {
-		var i = _g++;
-		blks[i] = 0;
+class haxe_crypto_Md5 {
+	constructor() {
 	}
-	var i = 0;
-	while(i < b.length) {
-		blks[i >> 2] |= b.b[i] << (((b.length << 3) + i & 3) << 3);
-		++i;
-	}
-	blks[i >> 2] |= 128 << (b.length * 8 + i) % 4 * 8;
-	var l = b.length * 8;
-	var k = nblk * 16 - 2;
-	blks[k] = l & 255;
-	blks[k] |= (l >>> 8 & 255) << 8;
-	blks[k] |= (l >>> 16 & 255) << 16;
-	blks[k] |= (l >>> 24 & 255) << 24;
-	return blks;
-};
-haxe_crypto_Md5.prototype = {
-	bitOR: function(a,b) {
-		var lsb = a & 1 | b & 1;
-		var msb31 = a >>> 1 | b >>> 1;
+	bitOR(a,b) {
+		let lsb = a & 1 | b & 1;
+		let msb31 = a >>> 1 | b >>> 1;
 		return msb31 << 1 | lsb;
 	}
-	,bitXOR: function(a,b) {
-		var lsb = a & 1 ^ b & 1;
-		var msb31 = a >>> 1 ^ b >>> 1;
+	bitXOR(a,b) {
+		let lsb = a & 1 ^ b & 1;
+		let msb31 = a >>> 1 ^ b >>> 1;
 		return msb31 << 1 | lsb;
 	}
-	,bitAND: function(a,b) {
-		var lsb = a & 1 & (b & 1);
-		var msb31 = a >>> 1 & b >>> 1;
+	bitAND(a,b) {
+		let lsb = a & 1 & (b & 1);
+		let msb31 = a >>> 1 & b >>> 1;
 		return msb31 << 1 | lsb;
 	}
-	,addme: function(x,y) {
-		var lsw = (x & 65535) + (y & 65535);
-		var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+	addme(x,y) {
+		let lsw = (x & 65535) + (y & 65535);
+		let msw = (x >> 16) + (y >> 16) + (lsw >> 16);
 		return msw << 16 | lsw & 65535;
 	}
-	,rol: function(num,cnt) {
+	rol(num,cnt) {
 		return num << cnt | num >>> 32 - cnt;
 	}
-	,cmn: function(q,a,b,x,s,t) {
+	cmn(q,a,b,x,s,t) {
 		return this.addme(this.rol(this.addme(this.addme(a,q),this.addme(x,t)),s),b);
 	}
-	,ff: function(a,b,c,d,x,s,t) {
+	ff(a,b,c,d,x,s,t) {
 		return this.cmn(this.bitOR(this.bitAND(b,c),this.bitAND(~b,d)),a,b,x,s,t);
 	}
-	,gg: function(a,b,c,d,x,s,t) {
+	gg(a,b,c,d,x,s,t) {
 		return this.cmn(this.bitOR(this.bitAND(b,d),this.bitAND(c,~d)),a,b,x,s,t);
 	}
-	,hh: function(a,b,c,d,x,s,t) {
+	hh(a,b,c,d,x,s,t) {
 		return this.cmn(this.bitXOR(this.bitXOR(b,c),d),a,b,x,s,t);
 	}
-	,ii: function(a,b,c,d,x,s,t) {
+	ii(a,b,c,d,x,s,t) {
 		return this.cmn(this.bitXOR(c,this.bitOR(b,~d)),a,b,x,s,t);
 	}
-	,doEncode: function(x) {
-		var a = 1732584193;
-		var b = -271733879;
-		var c = -1732584194;
-		var d = 271733878;
-		var step;
-		var i = 0;
+	doEncode(x) {
+		let a = 1732584193;
+		let b = -271733879;
+		let c = -1732584194;
+		let d = 271733878;
+		let step;
+		let i = 0;
 		while(i < x.length) {
-			var olda = a;
-			var oldb = b;
-			var oldc = c;
-			var oldd = d;
+			let olda = a;
+			let oldb = b;
+			let oldc = c;
+			let oldd = d;
 			step = 0;
 			a = this.ff(a,b,c,d,x[i],7,-680876936);
 			d = this.ff(d,a,b,c,x[i + 1],12,-389564586);
@@ -1589,83 +1787,83 @@ haxe_crypto_Md5.prototype = {
 		}
 		return [a,b,c,d];
 	}
-	,__class__: haxe_crypto_Md5
-};
-var haxe_crypto_Sha1 = function() {
-};
-haxe_crypto_Sha1.__name__ = true;
-haxe_crypto_Sha1.make = function(b) {
-	var h = new haxe_crypto_Sha1().doEncode(haxe_crypto_Sha1.bytes2blks(b));
-	var out = new haxe_io_Bytes(new ArrayBuffer(20));
-	var p = 0;
-	out.b[p++] = h[0] >>> 24;
-	out.b[p++] = h[0] >> 16 & 255;
-	out.b[p++] = h[0] >> 8 & 255;
-	out.b[p++] = h[0] & 255;
-	out.b[p++] = h[1] >>> 24;
-	out.b[p++] = h[1] >> 16 & 255;
-	out.b[p++] = h[1] >> 8 & 255;
-	out.b[p++] = h[1] & 255;
-	out.b[p++] = h[2] >>> 24;
-	out.b[p++] = h[2] >> 16 & 255;
-	out.b[p++] = h[2] >> 8 & 255;
-	out.b[p++] = h[2] & 255;
-	out.b[p++] = h[3] >>> 24;
-	out.b[p++] = h[3] >> 16 & 255;
-	out.b[p++] = h[3] >> 8 & 255;
-	out.b[p++] = h[3] & 255;
-	out.b[p++] = h[4] >>> 24;
-	out.b[p++] = h[4] >> 16 & 255;
-	out.b[p++] = h[4] >> 8 & 255;
-	out.b[p++] = h[4] & 255;
-	return out;
-};
-haxe_crypto_Sha1.bytes2blks = function(b) {
-	var nblk = (b.length + 8 >> 6) + 1;
-	var blks = [];
-	var _g = 0;
-	var _g1 = nblk * 16;
-	while(_g < _g1) {
-		var i = _g++;
-		blks[i] = 0;
+	static make(b) {
+		let h = new haxe_crypto_Md5().doEncode(haxe_crypto_Md5.bytes2blks(b));
+		let out = new haxe_io_Bytes(new ArrayBuffer(16));
+		let p = 0;
+		out.b[p++] = h[0] & 255;
+		out.b[p++] = h[0] >> 8 & 255;
+		out.b[p++] = h[0] >> 16 & 255;
+		out.b[p++] = h[0] >>> 24;
+		out.b[p++] = h[1] & 255;
+		out.b[p++] = h[1] >> 8 & 255;
+		out.b[p++] = h[1] >> 16 & 255;
+		out.b[p++] = h[1] >>> 24;
+		out.b[p++] = h[2] & 255;
+		out.b[p++] = h[2] >> 8 & 255;
+		out.b[p++] = h[2] >> 16 & 255;
+		out.b[p++] = h[2] >>> 24;
+		out.b[p++] = h[3] & 255;
+		out.b[p++] = h[3] >> 8 & 255;
+		out.b[p++] = h[3] >> 16 & 255;
+		out.b[p++] = h[3] >>> 24;
+		return out;
 	}
-	var _g = 0;
-	var _g1 = b.length;
-	while(_g < _g1) {
-		var i = _g++;
-		var p = i >> 2;
-		blks[p] |= b.b[i] << 24 - ((i & 3) << 3);
+	static bytes2blks(b) {
+		let nblk = (b.length + 8 >> 6) + 1;
+		let blks = [];
+		let blksSize = nblk * 16;
+		let _g = 0;
+		let _g1 = blksSize;
+		while(_g < _g1) {
+			let i = _g++;
+			blks[i] = 0;
+		}
+		let i = 0;
+		while(i < b.length) {
+			blks[i >> 2] |= b.b[i] << (((b.length << 3) + i & 3) << 3);
+			++i;
+		}
+		blks[i >> 2] |= 128 << (b.length * 8 + i) % 4 * 8;
+		let l = b.length * 8;
+		let k = nblk * 16 - 2;
+		blks[k] = l & 255;
+		blks[k] |= (l >>> 8 & 255) << 8;
+		blks[k] |= (l >>> 16 & 255) << 16;
+		blks[k] |= (l >>> 24 & 255) << 24;
+		return blks;
 	}
-	var i = b.length;
-	var p = i >> 2;
-	blks[p] |= 128 << 24 - ((i & 3) << 3);
-	blks[nblk * 16 - 1] = b.length * 8;
-	return blks;
-};
-haxe_crypto_Sha1.prototype = {
-	doEncode: function(x) {
-		var w = [];
-		var a = 1732584193;
-		var b = -271733879;
-		var c = -1732584194;
-		var d = 271733878;
-		var e = -1009589776;
-		var i = 0;
+}
+haxe_crypto_Md5.__name__ = true;
+Object.assign(haxe_crypto_Md5.prototype, {
+	__class__: haxe_crypto_Md5
+});
+class haxe_crypto_Sha1 {
+	constructor() {
+	}
+	doEncode(x) {
+		let w = [];
+		let a = 1732584193;
+		let b = -271733879;
+		let c = -1732584194;
+		let d = 271733878;
+		let e = -1009589776;
+		let i = 0;
 		while(i < x.length) {
-			var olda = a;
-			var oldb = b;
-			var oldc = c;
-			var oldd = d;
-			var olde = e;
-			var j = 0;
+			let olda = a;
+			let oldb = b;
+			let oldc = c;
+			let oldd = d;
+			let olde = e;
+			let j = 0;
 			while(j < 80) {
 				if(j < 16) {
 					w[j] = x[i + j];
 				} else {
-					var num = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
+					let num = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
 					w[j] = num << 1 | num >>> 31;
 				}
-				var t = (a << 5 | a >>> 27) + this.ft(j,b,c,d) + e + w[j] + this.kt(j);
+				let t = (a << 5 | a >>> 27) + this.ft(j,b,c,d) + e + w[j] + this.kt(j);
 				e = d;
 				d = c;
 				c = b << 30 | b >>> 2;
@@ -1682,7 +1880,7 @@ haxe_crypto_Sha1.prototype = {
 		}
 		return [a,b,c,d,e];
 	}
-	,ft: function(t,b,c,d) {
+	ft(t,b,c,d) {
 		if(t < 20) {
 			return b & c | ~b & d;
 		}
@@ -1694,7 +1892,7 @@ haxe_crypto_Sha1.prototype = {
 		}
 		return b ^ c ^ d;
 	}
-	,kt: function(t) {
+	kt(t) {
 		if(t < 20) {
 			return 1518500249;
 		}
@@ -1706,884 +1904,949 @@ haxe_crypto_Sha1.prototype = {
 		}
 		return -899497514;
 	}
-	,__class__: haxe_crypto_Sha1
-};
-var haxe_ds_StringMap = function() {
-	this.h = Object.create(null);
-};
+	static make(b) {
+		let h = new haxe_crypto_Sha1().doEncode(haxe_crypto_Sha1.bytes2blks(b));
+		let out = new haxe_io_Bytes(new ArrayBuffer(20));
+		let p = 0;
+		out.b[p++] = h[0] >>> 24;
+		out.b[p++] = h[0] >> 16 & 255;
+		out.b[p++] = h[0] >> 8 & 255;
+		out.b[p++] = h[0] & 255;
+		out.b[p++] = h[1] >>> 24;
+		out.b[p++] = h[1] >> 16 & 255;
+		out.b[p++] = h[1] >> 8 & 255;
+		out.b[p++] = h[1] & 255;
+		out.b[p++] = h[2] >>> 24;
+		out.b[p++] = h[2] >> 16 & 255;
+		out.b[p++] = h[2] >> 8 & 255;
+		out.b[p++] = h[2] & 255;
+		out.b[p++] = h[3] >>> 24;
+		out.b[p++] = h[3] >> 16 & 255;
+		out.b[p++] = h[3] >> 8 & 255;
+		out.b[p++] = h[3] & 255;
+		out.b[p++] = h[4] >>> 24;
+		out.b[p++] = h[4] >> 16 & 255;
+		out.b[p++] = h[4] >> 8 & 255;
+		out.b[p++] = h[4] & 255;
+		return out;
+	}
+	static bytes2blks(b) {
+		let nblk = (b.length + 8 >> 6) + 1;
+		let blks = [];
+		let _g = 0;
+		let _g1 = nblk * 16;
+		while(_g < _g1) {
+			let i = _g++;
+			blks[i] = 0;
+		}
+		let _g2 = 0;
+		let _g3 = b.length;
+		while(_g2 < _g3) {
+			let i = _g2++;
+			let p = i >> 2;
+			blks[p] |= b.b[i] << 24 - ((i & 3) << 3);
+		}
+		let i = b.length;
+		let p = i >> 2;
+		blks[p] |= 128 << 24 - ((i & 3) << 3);
+		blks[nblk * 16 - 1] = b.length * 8;
+		return blks;
+	}
+}
+haxe_crypto_Sha1.__name__ = true;
+Object.assign(haxe_crypto_Sha1.prototype, {
+	__class__: haxe_crypto_Sha1
+});
+class haxe_ds_StringMap {
+	constructor() {
+		this.h = Object.create(null);
+	}
+}
 haxe_ds_StringMap.__name__ = true;
 haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
-haxe_ds_StringMap.prototype = {
+Object.assign(haxe_ds_StringMap.prototype, {
 	__class__: haxe_ds_StringMap
-};
-var haxe_io_Bytes = function(data) {
-	this.length = data.byteLength;
-	this.b = new Uint8Array(data);
-	this.b.bufferValue = data;
-	data.hxBytes = this;
-	data.bytes = this.b;
-};
-haxe_io_Bytes.__name__ = true;
-haxe_io_Bytes.ofString = function(s,encoding) {
-	if(encoding == haxe_io_Encoding.RawNative) {
-		var buf = new Uint8Array(s.length << 1);
-		var _g = 0;
-		var _g1 = s.length;
+});
+class haxe_io_Bytes {
+	constructor(data) {
+		this.length = data.byteLength;
+		this.b = new Uint8Array(data);
+		this.b.bufferValue = data;
+		data.hxBytes = this;
+		data.bytes = this.b;
+	}
+	toHex() {
+		let s_b = "";
+		let chars = [];
+		let str = "0123456789abcdef";
+		let _g = 0;
+		let _g1 = str.length;
 		while(_g < _g1) {
-			var i = _g++;
-			var c = s.charCodeAt(i);
-			buf[i << 1] = c & 255;
-			buf[i << 1 | 1] = c >> 8;
-		}
-		return new haxe_io_Bytes(buf.buffer);
-	}
-	var a = [];
-	var i = 0;
-	while(i < s.length) {
-		var c = s.charCodeAt(i++);
-		if(55296 <= c && c <= 56319) {
-			c = c - 55232 << 10 | s.charCodeAt(i++) & 1023;
-		}
-		if(c <= 127) {
-			a.push(c);
-		} else if(c <= 2047) {
-			a.push(192 | c >> 6);
-			a.push(128 | c & 63);
-		} else if(c <= 65535) {
-			a.push(224 | c >> 12);
-			a.push(128 | c >> 6 & 63);
-			a.push(128 | c & 63);
-		} else {
-			a.push(240 | c >> 18);
-			a.push(128 | c >> 12 & 63);
-			a.push(128 | c >> 6 & 63);
-			a.push(128 | c & 63);
-		}
-	}
-	return new haxe_io_Bytes(new Uint8Array(a).buffer);
-};
-haxe_io_Bytes.ofHex = function(s) {
-	if((s.length & 1) != 0) {
-		throw haxe_Exception.thrown("Not a hex string (odd number of digits)");
-	}
-	var a = [];
-	var i = 0;
-	var len = s.length >> 1;
-	while(i < len) {
-		var high = s.charCodeAt(i * 2);
-		var low = s.charCodeAt(i * 2 + 1);
-		high = (high & 15) + ((high & 64) >> 6) * 9;
-		low = (low & 15) + ((low & 64) >> 6) * 9;
-		a.push((high << 4 | low) & 255);
-		++i;
-	}
-	return new haxe_io_Bytes(new Uint8Array(a).buffer);
-};
-haxe_io_Bytes.prototype = {
-	toHex: function() {
-		var s_b = "";
-		var chars = [];
-		var str = "0123456789abcdef";
-		var _g = 0;
-		var _g1 = str.length;
-		while(_g < _g1) {
-			var i = _g++;
+			let i = _g++;
 			chars.push(HxOverrides.cca(str,i));
 		}
-		var _g = 0;
-		var _g1 = this.length;
-		while(_g < _g1) {
-			var i = _g++;
-			var c = this.b[i];
+		let _g2 = 0;
+		let _g3 = this.length;
+		while(_g2 < _g3) {
+			let i = _g2++;
+			let c = this.b[i];
 			s_b += String.fromCodePoint(chars[c >> 4]);
 			s_b += String.fromCodePoint(chars[c & 15]);
 		}
 		return s_b;
 	}
-	,__class__: haxe_io_Bytes
-};
+	static ofString(s,encoding) {
+		if(encoding == haxe_io_Encoding.RawNative) {
+			let buf = new Uint8Array(s.length << 1);
+			let _g = 0;
+			let _g1 = s.length;
+			while(_g < _g1) {
+				let i = _g++;
+				let c = s.charCodeAt(i);
+				buf[i << 1] = c & 255;
+				buf[i << 1 | 1] = c >> 8;
+			}
+			return new haxe_io_Bytes(buf.buffer);
+		}
+		let a = [];
+		let i = 0;
+		while(i < s.length) {
+			let c = s.charCodeAt(i++);
+			if(55296 <= c && c <= 56319) {
+				c = c - 55232 << 10 | s.charCodeAt(i++) & 1023;
+			}
+			if(c <= 127) {
+				a.push(c);
+			} else if(c <= 2047) {
+				a.push(192 | c >> 6);
+				a.push(128 | c & 63);
+			} else if(c <= 65535) {
+				a.push(224 | c >> 12);
+				a.push(128 | c >> 6 & 63);
+				a.push(128 | c & 63);
+			} else {
+				a.push(240 | c >> 18);
+				a.push(128 | c >> 12 & 63);
+				a.push(128 | c >> 6 & 63);
+				a.push(128 | c & 63);
+			}
+		}
+		return new haxe_io_Bytes(new Uint8Array(a).buffer);
+	}
+	static ofHex(s) {
+		if((s.length & 1) != 0) {
+			throw haxe_Exception.thrown("Not a hex string (odd number of digits)");
+		}
+		let a = [];
+		let i = 0;
+		let len = s.length >> 1;
+		while(i < len) {
+			let high = s.charCodeAt(i * 2);
+			let low = s.charCodeAt(i * 2 + 1);
+			high = (high & 15) + ((high & 64) >> 6) * 9;
+			low = (low & 15) + ((low & 64) >> 6) * 9;
+			a.push((high << 4 | low) & 255);
+			++i;
+		}
+		return new haxe_io_Bytes(new Uint8Array(a).buffer);
+	}
+}
+haxe_io_Bytes.__name__ = true;
+Object.assign(haxe_io_Bytes.prototype, {
+	__class__: haxe_io_Bytes
+});
 var haxe_io_Encoding = $hxEnums["haxe.io.Encoding"] = { __ename__:true,__constructs__:null
 	,UTF8: {_hx_name:"UTF8",_hx_index:0,__enum__:"haxe.io.Encoding",toString:$estr}
 	,RawNative: {_hx_name:"RawNative",_hx_index:1,__enum__:"haxe.io.Encoding",toString:$estr}
 };
 haxe_io_Encoding.__constructs__ = [haxe_io_Encoding.UTF8,haxe_io_Encoding.RawNative];
-var haxe_iterators_ArrayIterator = function(array) {
-	this.current = 0;
-	this.array = array;
-};
-haxe_iterators_ArrayIterator.__name__ = true;
-haxe_iterators_ArrayIterator.prototype = {
-	hasNext: function() {
+class haxe_iterators_ArrayIterator {
+	constructor(array) {
+		this.current = 0;
+		this.array = array;
+	}
+	hasNext() {
 		return this.current < this.array.length;
 	}
-	,next: function() {
+	next() {
 		return this.array[this.current++];
 	}
-	,__class__: haxe_iterators_ArrayIterator
-};
-var js_Boot = function() { };
-js_Boot.__name__ = true;
-js_Boot.getClass = function(o) {
-	if(o == null) {
-		return null;
-	} else if(((o) instanceof Array)) {
-		return Array;
-	} else {
-		var cl = o.__class__;
-		if(cl != null) {
-			return cl;
+}
+haxe_iterators_ArrayIterator.__name__ = true;
+Object.assign(haxe_iterators_ArrayIterator.prototype, {
+	__class__: haxe_iterators_ArrayIterator
+});
+class js_Boot {
+	static getClass(o) {
+		if(o == null) {
+			return null;
+		} else if(((o) instanceof Array)) {
+			return Array;
+		} else {
+			let cl = o.__class__;
+			if(cl != null) {
+				return cl;
+			}
+			let name = js_Boot.__nativeClassName(o);
+			if(name != null) {
+				return js_Boot.__resolveNativeClass(name);
+			}
+			return null;
 		}
-		var name = js_Boot.__nativeClassName(o);
-		if(name != null) {
-			return js_Boot.__resolveNativeClass(name);
+	}
+	static __string_rec(o,s) {
+		if(o == null) {
+			return "null";
 		}
-		return null;
-	}
-};
-js_Boot.__string_rec = function(o,s) {
-	if(o == null) {
-		return "null";
-	}
-	if(s.length >= 5) {
-		return "<...>";
-	}
-	var t = typeof(o);
-	if(t == "function" && (o.__name__ || o.__ename__)) {
-		t = "object";
-	}
-	switch(t) {
-	case "function":
-		return "<function>";
-	case "object":
-		if(o.__enum__) {
-			var e = $hxEnums[o.__enum__];
-			var con = e.__constructs__[o._hx_index];
-			var n = con._hx_name;
-			if(con.__params__) {
-				s = s + "\t";
-				return n + "(" + ((function($this) {
-					var $r;
-					var _g = [];
-					{
-						var _g1 = 0;
-						var _g2 = con.__params__;
-						while(true) {
-							if(!(_g1 < _g2.length)) {
-								break;
+		if(s.length >= 5) {
+			return "<...>";
+		}
+		let t = typeof(o);
+		if(t == "function" && (o.__name__ || o.__ename__)) {
+			t = "object";
+		}
+		switch(t) {
+		case "function":
+			return "<function>";
+		case "object":
+			if(o.__enum__) {
+				let e = $hxEnums[o.__enum__];
+				let con = e.__constructs__[o._hx_index];
+				let n = con._hx_name;
+				if(con.__params__) {
+					s = s + "\t";
+					return n + "(" + ((function($this) {
+						var $r;
+						let _g = [];
+						{
+							let _g1 = 0;
+							let _g2 = con.__params__;
+							while(true) {
+								if(!(_g1 < _g2.length)) {
+									break;
+								}
+								let p = _g2[_g1];
+								_g1 = _g1 + 1;
+								_g.push(js_Boot.__string_rec(o[p],s));
 							}
-							var p = _g2[_g1];
-							_g1 = _g1 + 1;
-							_g.push(js_Boot.__string_rec(o[p],s));
 						}
-					}
-					$r = _g;
-					return $r;
-				}(this))).join(",") + ")";
-			} else {
-				return n;
+						$r = _g;
+						return $r;
+					}(this))).join(",") + ")";
+				} else {
+					return n;
+				}
 			}
-		}
-		if(((o) instanceof Array)) {
-			var str = "[";
+			if(((o) instanceof Array)) {
+				let str = "[";
+				s += "\t";
+				let _g = 0;
+				let _g1 = o.length;
+				while(_g < _g1) {
+					let i = _g++;
+					str += (i > 0 ? "," : "") + js_Boot.__string_rec(o[i],s);
+				}
+				str += "]";
+				return str;
+			}
+			let tostr;
+			try {
+				tostr = o.toString;
+			} catch( _g ) {
+				return "???";
+			}
+			if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
+				let s2 = o.toString();
+				if(s2 != "[object Object]") {
+					return s2;
+				}
+			}
+			let str = "{\n";
 			s += "\t";
-			var _g = 0;
-			var _g1 = o.length;
-			while(_g < _g1) {
-				var i = _g++;
-				str += (i > 0 ? "," : "") + js_Boot.__string_rec(o[i],s);
+			let hasp = o.hasOwnProperty != null;
+			let k = null;
+			for( k in o ) {
+			if(hasp && !o.hasOwnProperty(k)) {
+				continue;
 			}
-			str += "]";
+			if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+				continue;
+			}
+			if(str.length != 2) {
+				str += ", \n";
+			}
+			str += s + k + " : " + js_Boot.__string_rec(o[k],s);
+			}
+			s = s.substring(1);
+			str += "\n" + s + "}";
 			return str;
+		case "string":
+			return o;
+		default:
+			return String(o);
 		}
-		var tostr;
-		try {
-			tostr = o.toString;
-		} catch( _g ) {
-			return "???";
+	}
+	static __interfLoop(cc,cl) {
+		if(cc == null) {
+			return false;
 		}
-		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
-			var s2 = o.toString();
-			if(s2 != "[object Object]") {
-				return s2;
+		if(cc == cl) {
+			return true;
+		}
+		let intf = cc.__interfaces__;
+		if(intf != null && (cc.__super__ == null || cc.__super__.__interfaces__ != intf)) {
+			let _g = 0;
+			let _g1 = intf.length;
+			while(_g < _g1) {
+				let i = _g++;
+				let i1 = intf[i];
+				if(i1 == cl || js_Boot.__interfLoop(i1,cl)) {
+					return true;
+				}
 			}
 		}
-		var str = "{\n";
-		s += "\t";
-		var hasp = o.hasOwnProperty != null;
-		var k = null;
-		for( k in o ) {
-		if(hasp && !o.hasOwnProperty(k)) {
-			continue;
-		}
-		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
-			continue;
-		}
-		if(str.length != 2) {
-			str += ", \n";
-		}
-		str += s + k + " : " + js_Boot.__string_rec(o[k],s);
-		}
-		s = s.substring(1);
-		str += "\n" + s + "}";
-		return str;
-	case "string":
-		return o;
-	default:
-		return String(o);
+		return js_Boot.__interfLoop(cc.__super__,cl);
 	}
-};
-js_Boot.__interfLoop = function(cc,cl) {
-	if(cc == null) {
-		return false;
-	}
-	if(cc == cl) {
-		return true;
-	}
-	var intf = cc.__interfaces__;
-	if(intf != null) {
-		var _g = 0;
-		var _g1 = intf.length;
-		while(_g < _g1) {
-			var i = _g++;
-			var i1 = intf[i];
-			if(i1 == cl || js_Boot.__interfLoop(i1,cl)) {
+	static __instanceof(o,cl) {
+		if(cl == null) {
+			return false;
+		}
+		switch(cl) {
+		case Array:
+			return ((o) instanceof Array);
+		case Bool:
+			return typeof(o) == "boolean";
+		case Dynamic:
+			return o != null;
+		case Float:
+			return typeof(o) == "number";
+		case Int:
+			if(typeof(o) == "number") {
+				return ((o | 0) === o);
+			} else {
+				return false;
+			}
+			break;
+		case String:
+			return typeof(o) == "string";
+		default:
+			if(o != null) {
+				if(typeof(cl) == "function") {
+					if(js_Boot.__downcastCheck(o,cl)) {
+						return true;
+					}
+				} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
+					if(((o) instanceof cl)) {
+						return true;
+					}
+				}
+			} else {
+				return false;
+			}
+			if(cl == Class ? o.__name__ != null : false) {
 				return true;
 			}
+			if(cl == Enum ? o.__ename__ != null : false) {
+				return true;
+			}
+			return o.__enum__ != null ? $hxEnums[o.__enum__] == cl : false;
 		}
 	}
-	return js_Boot.__interfLoop(cc.__super__,cl);
-};
-js_Boot.__instanceof = function(o,cl) {
-	if(cl == null) {
-		return false;
-	}
-	switch(cl) {
-	case Array:
-		return ((o) instanceof Array);
-	case Bool:
-		return typeof(o) == "boolean";
-	case Dynamic:
-		return o != null;
-	case Float:
-		return typeof(o) == "number";
-	case Int:
-		if(typeof(o) == "number") {
-			return ((o | 0) === o);
-		} else {
-			return false;
-		}
-		break;
-	case String:
-		return typeof(o) == "string";
-	default:
-		if(o != null) {
-			if(typeof(cl) == "function") {
-				if(js_Boot.__downcastCheck(o,cl)) {
-					return true;
-				}
-			} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
-				if(((o) instanceof cl)) {
-					return true;
-				}
+	static __downcastCheck(o,cl) {
+		if(!((o) instanceof cl)) {
+			if(cl.__isInterface__) {
+				return js_Boot.__interfLoop(js_Boot.getClass(o),cl);
+			} else {
+				return false;
 			}
 		} else {
-			return false;
-		}
-		if(cl == Class ? o.__name__ != null : false) {
 			return true;
 		}
-		if(cl == Enum ? o.__ename__ != null : false) {
-			return true;
-		}
-		return o.__enum__ != null ? $hxEnums[o.__enum__] == cl : false;
 	}
-};
-js_Boot.__downcastCheck = function(o,cl) {
-	if(!((o) instanceof cl)) {
-		if(cl.__isInterface__) {
-			return js_Boot.__interfLoop(js_Boot.getClass(o),cl);
+	static __cast(o,t) {
+		if(o == null || js_Boot.__instanceof(o,t)) {
+			return o;
 		} else {
-			return false;
+			throw haxe_Exception.thrown("Cannot cast " + Std.string(o) + " to " + Std.string(t));
 		}
-	} else {
-		return true;
 	}
-};
-js_Boot.__cast = function(o,t) {
-	if(o == null || js_Boot.__instanceof(o,t)) {
-		return o;
-	} else {
-		throw haxe_Exception.thrown("Cannot cast " + Std.string(o) + " to " + Std.string(t));
+	static __nativeClassName(o) {
+		let name = js_Boot.__toStr.call(o).slice(8,-1);
+		if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
+			return null;
+		}
+		return name;
 	}
-};
-js_Boot.__nativeClassName = function(o) {
-	var name = js_Boot.__toStr.call(o).slice(8,-1);
-	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
-		return null;
+	static __isNativeObj(o) {
+		return js_Boot.__nativeClassName(o) != null;
 	}
-	return name;
-};
-js_Boot.__isNativeObj = function(o) {
-	return js_Boot.__nativeClassName(o) != null;
-};
-js_Boot.__resolveNativeClass = function(name) {
-	return $global[name];
-};
-var uuid_Uuid = function() { };
+	static __resolveNativeClass(name) {
+		return $global[name];
+	}
+}
+js_Boot.__name__ = true;
+class uuid_Uuid {
+	static splitmix64_seed(index) {
+		let b_high = -1640531527;
+		let b_low = 2135587861;
+		let high = index.high + b_high | 0;
+		let low = index.low + b_low | 0;
+		if(haxe_Int32.ucompare(low,index.low) < 0) {
+			let ret = high++;
+			high = high | 0;
+		}
+		let result = new haxe__$Int64__$_$_$Int64(high,low);
+		let b = 30;
+		b &= 63;
+		let b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(result.high,result.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(result.high >> b,result.high << 32 - b | result.low >>> b) : new haxe__$Int64__$_$_$Int64(result.high >> 31,result.high >> b - 32);
+		let a_high = result.high ^ b1.high;
+		let a_low = result.low ^ b1.low;
+		let b_high1 = -1084733587;
+		let b_low1 = 484763065;
+		let mask = 65535;
+		let al = a_low & mask;
+		let ah = a_low >>> 16;
+		let bl = b_low1 & mask;
+		let bh = b_low1 >>> 16;
+		let p00 = haxe_Int32._mul(al,bl);
+		let p10 = haxe_Int32._mul(ah,bl);
+		let p01 = haxe_Int32._mul(al,bh);
+		let p11 = haxe_Int32._mul(ah,bh);
+		let low1 = p00;
+		let high1 = (p11 + (p01 >>> 16) | 0) + (p10 >>> 16) | 0;
+		p01 <<= 16;
+		low1 = low1 + p01 | 0;
+		if(haxe_Int32.ucompare(low1,p01) < 0) {
+			let ret = high1++;
+			high1 = high1 | 0;
+		}
+		p10 <<= 16;
+		low1 = low1 + p10 | 0;
+		if(haxe_Int32.ucompare(low1,p10) < 0) {
+			let ret = high1++;
+			high1 = high1 | 0;
+		}
+		high1 = high1 + (haxe_Int32._mul(a_low,b_high1) + haxe_Int32._mul(a_high,b_low1) | 0) | 0;
+		result = new haxe__$Int64__$_$_$Int64(high1,low1);
+		let b2 = 27;
+		b2 &= 63;
+		let b3 = b2 == 0 ? new haxe__$Int64__$_$_$Int64(result.high,result.low) : b2 < 32 ? new haxe__$Int64__$_$_$Int64(result.high >> b2,result.high << 32 - b2 | result.low >>> b2) : new haxe__$Int64__$_$_$Int64(result.high >> 31,result.high >> b2 - 32);
+		let a_high1 = result.high ^ b3.high;
+		let a_low1 = result.low ^ b3.low;
+		let b_high2 = -1798288965;
+		let b_low2 = 321982955;
+		let mask1 = 65535;
+		let al1 = a_low1 & mask1;
+		let ah1 = a_low1 >>> 16;
+		let bl1 = b_low2 & mask1;
+		let bh1 = b_low2 >>> 16;
+		let p001 = haxe_Int32._mul(al1,bl1);
+		let p101 = haxe_Int32._mul(ah1,bl1);
+		let p011 = haxe_Int32._mul(al1,bh1);
+		let p111 = haxe_Int32._mul(ah1,bh1);
+		let low2 = p001;
+		let high2 = (p111 + (p011 >>> 16) | 0) + (p101 >>> 16) | 0;
+		p011 <<= 16;
+		low2 = low2 + p011 | 0;
+		if(haxe_Int32.ucompare(low2,p011) < 0) {
+			let ret = high2++;
+			high2 = high2 | 0;
+		}
+		p101 <<= 16;
+		low2 = low2 + p101 | 0;
+		if(haxe_Int32.ucompare(low2,p101) < 0) {
+			let ret = high2++;
+			high2 = high2 | 0;
+		}
+		high2 = high2 + (haxe_Int32._mul(a_low1,b_high2) + haxe_Int32._mul(a_high1,b_low2) | 0) | 0;
+		result = new haxe__$Int64__$_$_$Int64(high2,low2);
+		let b4 = 31;
+		b4 &= 63;
+		let b5 = b4 == 0 ? new haxe__$Int64__$_$_$Int64(result.high,result.low) : b4 < 32 ? new haxe__$Int64__$_$_$Int64(result.high >> b4,result.high << 32 - b4 | result.low >>> b4) : new haxe__$Int64__$_$_$Int64(result.high >> 31,result.high >> b4 - 32);
+		return new haxe__$Int64__$_$_$Int64(result.high ^ b5.high,result.low ^ b5.low);
+	}
+	static randomFromRange(min,max) {
+		let s1 = uuid_Uuid.state0;
+		let s0 = uuid_Uuid.state1;
+		uuid_Uuid.state0 = s0;
+		let b = 23;
+		b &= 63;
+		let b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(s1.high,s1.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(s1.high << b | s1.low >>> 32 - b,s1.low << b) : new haxe__$Int64__$_$_$Int64(s1.low << b - 32,0);
+		s1 = new haxe__$Int64__$_$_$Int64(s1.high ^ b1.high,s1.low ^ b1.low);
+		let a_high = s1.high ^ s0.high;
+		let a_low = s1.low ^ s0.low;
+		let b2 = 18;
+		b2 &= 63;
+		let b3 = b2 == 0 ? new haxe__$Int64__$_$_$Int64(s1.high,s1.low) : b2 < 32 ? new haxe__$Int64__$_$_$Int64(s1.high >>> b2,s1.high << 32 - b2 | s1.low >>> b2) : new haxe__$Int64__$_$_$Int64(0,s1.high >>> b2 - 32);
+		let a_high1 = a_high ^ b3.high;
+		let a_low1 = a_low ^ b3.low;
+		let b4 = 5;
+		b4 &= 63;
+		let b5 = b4 == 0 ? new haxe__$Int64__$_$_$Int64(s0.high,s0.low) : b4 < 32 ? new haxe__$Int64__$_$_$Int64(s0.high >>> b4,s0.high << 32 - b4 | s0.low >>> b4) : new haxe__$Int64__$_$_$Int64(0,s0.high >>> b4 - 32);
+		uuid_Uuid.state1 = new haxe__$Int64__$_$_$Int64(a_high1 ^ b5.high,a_low1 ^ b5.low);
+		let a = uuid_Uuid.state1;
+		let high = a.high + s0.high | 0;
+		let low = a.low + s0.low | 0;
+		if(haxe_Int32.ucompare(low,a.low) < 0) {
+			let ret = high++;
+			high = high | 0;
+		}
+		let x = max - min + 1;
+		let result = haxe_Int64.divMod(new haxe__$Int64__$_$_$Int64(high,low),new haxe__$Int64__$_$_$Int64(x >> 31,x)).modulus.low;
+		if(result < 0) {
+			result = -result;
+		}
+		return result + min;
+	}
+	static randomByte() {
+		return uuid_Uuid.randomFromRange(0,255);
+	}
+	static fromShort(shortUuid,separator,fromAlphabet) {
+		if(fromAlphabet == null) {
+			fromAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		let uuid = uuid_Uuid.convert(shortUuid,fromAlphabet,"0123456789abcdef");
+		return uuid_Uuid.hexToUuid(uuid,separator);
+	}
+	static toShort(uuid,separator,toAlphabet) {
+		if(toAlphabet == null) {
+			toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		uuid = StringTools.replace(uuid,separator,"").toLowerCase();
+		return uuid_Uuid.convert(uuid,"0123456789abcdef",toAlphabet);
+	}
+	static fromNano(nanoUuid,separator,fromAlphabet) {
+		if(fromAlphabet == null) {
+			fromAlphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		let uuid = uuid_Uuid.convert(nanoUuid,fromAlphabet,"0123456789abcdef");
+		return uuid_Uuid.hexToUuid(uuid,separator);
+	}
+	static toNano(uuid,separator,toAlphabet) {
+		if(toAlphabet == null) {
+			toAlphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		uuid = StringTools.replace(uuid,separator,"").toLowerCase();
+		return uuid_Uuid.convert(uuid,"0123456789abcdef",toAlphabet);
+	}
+	static v1(node,optClockSequence,msecs,optNsecs,randomFunc,separator,shortUuid,toAlphabet) {
+		if(toAlphabet == null) {
+			toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		}
+		if(shortUuid == null) {
+			shortUuid = false;
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		if(optNsecs == null) {
+			optNsecs = -1;
+		}
+		if(msecs == null) {
+			msecs = -1;
+		}
+		if(optClockSequence == null) {
+			optClockSequence = -1;
+		}
+		if(randomFunc == null) {
+			randomFunc = uuid_Uuid.randomByte;
+		}
+		let buffer = new haxe_io_Bytes(new ArrayBuffer(16));
+		if(node == null) {
+			node = new haxe_io_Bytes(new ArrayBuffer(6));
+			let v = randomFunc();
+			node.b[0] = v;
+			let v1 = randomFunc();
+			node.b[1] = v1;
+			let v2 = randomFunc();
+			node.b[2] = v2;
+			let v3 = randomFunc();
+			node.b[3] = v3;
+			let v4 = randomFunc();
+			node.b[4] = v4;
+			let v5 = randomFunc();
+			node.b[5] = v5;
+			node.b[0] |= 1;
+		}
+		if(uuid_Uuid.clockSequenceBuffer == -1) {
+			uuid_Uuid.clockSequenceBuffer = (randomFunc() << 8 | randomFunc()) & 16383;
+		}
+		let clockSeq = optClockSequence;
+		if(optClockSequence == -1) {
+			clockSeq = uuid_Uuid.clockSequenceBuffer;
+		}
+		if(msecs == -1) {
+			msecs = Math.round(Date.now());
+		}
+		let nsecs = optNsecs;
+		if(optNsecs == -1) {
+			nsecs = uuid_Uuid.lastNSecs + 1;
+		}
+		let dt = msecs - uuid_Uuid.lastMSecs + (nsecs - uuid_Uuid.lastNSecs) / 10000;
+		if(dt < 0 && optClockSequence == -1) {
+			clockSeq = clockSeq + 1 & 16383;
+		}
+		if((dt < 0 || msecs > uuid_Uuid.lastMSecs) && optNsecs == -1) {
+			nsecs = 0;
+		}
+		if(nsecs >= 10000) {
+			throw haxe_Exception.thrown("Can't create more than 10M uuids/sec");
+		}
+		uuid_Uuid.lastMSecs = msecs;
+		uuid_Uuid.lastNSecs = nsecs;
+		uuid_Uuid.clockSequenceBuffer = clockSeq;
+		msecs += 12219292800000;
+		let imsecs = haxe_Int64Helper.fromFloat(msecs);
+		let b_high = 0;
+		let b_low = 268435455;
+		let a_high = imsecs.high & b_high;
+		let a_low = imsecs.low & b_low;
+		let b_high1 = 0;
+		let b_low1 = 10000;
+		let mask = 65535;
+		let al = a_low & mask;
+		let ah = a_low >>> 16;
+		let bl = b_low1 & mask;
+		let bh = b_low1 >>> 16;
+		let p00 = haxe_Int32._mul(al,bl);
+		let p10 = haxe_Int32._mul(ah,bl);
+		let p01 = haxe_Int32._mul(al,bh);
+		let p11 = haxe_Int32._mul(ah,bh);
+		let low = p00;
+		let high = (p11 + (p01 >>> 16) | 0) + (p10 >>> 16) | 0;
+		p01 <<= 16;
+		low = low + p01 | 0;
+		if(haxe_Int32.ucompare(low,p01) < 0) {
+			let ret = high++;
+			high = high | 0;
+		}
+		p10 <<= 16;
+		low = low + p10 | 0;
+		if(haxe_Int32.ucompare(low,p10) < 0) {
+			let ret = high++;
+			high = high | 0;
+		}
+		high = high + (haxe_Int32._mul(a_low,b_high1) + haxe_Int32._mul(a_high,b_low1) | 0) | 0;
+		let a_high1 = high;
+		let a_low1 = low;
+		let b_high2 = nsecs >> 31;
+		let b_low2 = nsecs;
+		let high1 = a_high1 + b_high2 | 0;
+		let low1 = a_low1 + b_low2 | 0;
+		if(haxe_Int32.ucompare(low1,a_low1) < 0) {
+			let ret = high1++;
+			high1 = high1 | 0;
+		}
+		let tl = haxe_Int64.divMod(new haxe__$Int64__$_$_$Int64(high1,low1),uuid_Uuid.DVS).modulus.low;
+		buffer.b[0] = tl >>> 24 & 255;
+		buffer.b[1] = tl >>> 16 & 255;
+		buffer.b[2] = tl >>> 8 & 255;
+		buffer.b[3] = tl & 255;
+		let a = haxe_Int64.divMod(imsecs,uuid_Uuid.DVS).quotient;
+		let b_high3 = 0;
+		let b_low3 = 10000;
+		let mask1 = 65535;
+		let al1 = a.low & mask1;
+		let ah1 = a.low >>> 16;
+		let bl1 = b_low3 & mask1;
+		let bh1 = b_low3 >>> 16;
+		let p001 = haxe_Int32._mul(al1,bl1);
+		let p101 = haxe_Int32._mul(ah1,bl1);
+		let p011 = haxe_Int32._mul(al1,bh1);
+		let p111 = haxe_Int32._mul(ah1,bh1);
+		let low2 = p001;
+		let high2 = (p111 + (p011 >>> 16) | 0) + (p101 >>> 16) | 0;
+		p011 <<= 16;
+		low2 = low2 + p011 | 0;
+		if(haxe_Int32.ucompare(low2,p011) < 0) {
+			let ret = high2++;
+			high2 = high2 | 0;
+		}
+		p101 <<= 16;
+		low2 = low2 + p101 | 0;
+		if(haxe_Int32.ucompare(low2,p101) < 0) {
+			let ret = high2++;
+			high2 = high2 | 0;
+		}
+		high2 = high2 + (haxe_Int32._mul(a.low,b_high3) + haxe_Int32._mul(a.high,b_low3) | 0) | 0;
+		let a_high2 = high2;
+		let a_low2 = low2;
+		let b_high4 = 0;
+		let b_low4 = 268435455;
+		let this_high = a_high2 & b_high4;
+		let this_low = a_low2 & b_low4;
+		let tmh = this_low;
+		buffer.b[4] = tmh >>> 8 & 255;
+		buffer.b[5] = tmh & 255;
+		buffer.b[6] = tmh >>> 24 & 15 | 16;
+		buffer.b[7] = tmh >>> 16 & 255;
+		buffer.b[8] = clockSeq >>> 8 | 128;
+		buffer.b[9] = clockSeq & 255;
+		buffer.b[10] = node.b[0];
+		buffer.b[11] = node.b[1];
+		buffer.b[12] = node.b[2];
+		buffer.b[13] = node.b[3];
+		buffer.b[14] = node.b[4];
+		buffer.b[15] = node.b[5];
+		let uuid = uuid_Uuid.stringify(buffer,separator);
+		if(shortUuid) {
+			uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
+		}
+		return uuid;
+	}
+	static v3(name,namespace,separator,shortUuid,toAlphabet) {
+		if(toAlphabet == null) {
+			toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		}
+		if(shortUuid == null) {
+			shortUuid = false;
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		if(namespace == null) {
+			namespace = "";
+		}
+		namespace = StringTools.replace(namespace,"-","");
+		let buffer = haxe_crypto_Md5.make(haxe_io_Bytes.ofHex(namespace + haxe_io_Bytes.ofString(name).toHex()));
+		buffer.b[6] = buffer.b[6] & 15 | 48;
+		buffer.b[8] = buffer.b[8] & 63 | 128;
+		let uuid = uuid_Uuid.stringify(buffer,separator);
+		if(shortUuid) {
+			uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
+		}
+		return uuid;
+	}
+	static v4(randBytes,randomFunc,separator,shortUuid,toAlphabet) {
+		if(toAlphabet == null) {
+			toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		}
+		if(shortUuid == null) {
+			shortUuid = false;
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		if(randomFunc == null) {
+			randomFunc = uuid_Uuid.randomByte;
+		}
+		let buffer = randBytes;
+		if(buffer == null) {
+			buffer = new haxe_io_Bytes(new ArrayBuffer(16));
+			let v = randomFunc();
+			buffer.b[0] = v;
+			let v1 = randomFunc();
+			buffer.b[1] = v1;
+			let v2 = randomFunc();
+			buffer.b[2] = v2;
+			let v3 = randomFunc();
+			buffer.b[3] = v3;
+			let v4 = randomFunc();
+			buffer.b[4] = v4;
+			let v5 = randomFunc();
+			buffer.b[5] = v5;
+			let v6 = randomFunc();
+			buffer.b[6] = v6;
+			let v7 = randomFunc();
+			buffer.b[7] = v7;
+			let v8 = randomFunc();
+			buffer.b[8] = v8;
+			let v9 = randomFunc();
+			buffer.b[9] = v9;
+			let v10 = randomFunc();
+			buffer.b[10] = v10;
+			let v11 = randomFunc();
+			buffer.b[11] = v11;
+			let v12 = randomFunc();
+			buffer.b[12] = v12;
+			let v13 = randomFunc();
+			buffer.b[13] = v13;
+			let v14 = randomFunc();
+			buffer.b[14] = v14;
+			let v15 = randomFunc();
+			buffer.b[15] = v15;
+		} else if(buffer.length < 16) {
+			throw haxe_Exception.thrown("Random bytes should be at least 16 bytes");
+		}
+		buffer.b[6] = buffer.b[6] & 15 | 64;
+		buffer.b[8] = buffer.b[8] & 63 | 128;
+		let uuid = uuid_Uuid.stringify(buffer,separator);
+		if(shortUuid) {
+			uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
+		}
+		return uuid;
+	}
+	static v5(name,namespace,separator,shortUuid,toAlphabet) {
+		if(toAlphabet == null) {
+			toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		}
+		if(shortUuid == null) {
+			shortUuid = false;
+		}
+		if(separator == null) {
+			separator = "-";
+		}
+		if(namespace == null) {
+			namespace = "";
+		}
+		namespace = StringTools.replace(namespace,"-","");
+		let buffer = haxe_crypto_Sha1.make(haxe_io_Bytes.ofHex(namespace + haxe_io_Bytes.ofString(name).toHex()));
+		buffer.b[6] = buffer.b[6] & 15 | 80;
+		buffer.b[8] = buffer.b[8] & 63 | 128;
+		let uuid = uuid_Uuid.stringify(buffer,separator);
+		if(shortUuid) {
+			uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
+		}
+		return uuid;
+	}
+	static stringify(data,separator) {
+		if(separator == null) {
+			separator = "-";
+		}
+		return uuid_Uuid.hexToUuid(data.toHex(),separator);
+	}
+	static parse(uuid,separator) {
+		if(separator == null) {
+			separator = "-";
+		}
+		return haxe_io_Bytes.ofHex(StringTools.replace(uuid,separator,""));
+	}
+	static validate(uuid,separator) {
+		if(separator == null) {
+			separator = "-";
+		}
+		if(separator == "") {
+			uuid = HxOverrides.substr(uuid,0,8) + "-" + HxOverrides.substr(uuid,8,4) + "-" + HxOverrides.substr(uuid,12,4) + "-" + HxOverrides.substr(uuid,16,4) + "-" + HxOverrides.substr(uuid,20,12);
+		} else if(separator != "-") {
+			uuid = StringTools.replace(uuid,separator,"-");
+		}
+		return uuid_Uuid.regexp.match(uuid);
+	}
+	static version(uuid,separator) {
+		if(separator == null) {
+			separator = "-";
+		}
+		uuid = StringTools.replace(uuid,separator,"");
+		return Std.parseInt("0x" + HxOverrides.substr(uuid,12,1));
+	}
+	static hexToUuid(hex,separator) {
+		return HxOverrides.substr(hex,0,8) + separator + HxOverrides.substr(hex,8,4) + separator + HxOverrides.substr(hex,12,4) + separator + HxOverrides.substr(hex,16,4) + separator + HxOverrides.substr(hex,20,12);
+	}
+	static convert(number,fromAlphabet,toAlphabet) {
+		let fromBase = fromAlphabet.length;
+		let toBase = toAlphabet.length;
+		let len = number.length;
+		let buf = "";
+		let numberMap = new Array(len);
+		let divide = 0;
+		let newlen = 0;
+		let _g = 0;
+		let _g1 = len;
+		while(_g < _g1) {
+			let i = _g++;
+			numberMap[i] = fromAlphabet.indexOf(number.charAt(i));
+		}
+		do {
+			divide = 0;
+			newlen = 0;
+			let _g = 0;
+			let _g1 = len;
+			while(_g < _g1) {
+				let i = _g++;
+				divide = divide * fromBase + numberMap[i];
+				if(divide >= toBase) {
+					numberMap[newlen++] = Math.floor(divide / toBase);
+					divide %= toBase;
+				} else if(newlen > 0) {
+					numberMap[newlen++] = 0;
+				}
+			}
+			len = newlen;
+			buf = toAlphabet.charAt(divide) + buf;
+		} while(newlen != 0);
+		return buf;
+	}
+	static nanoId(len,alphabet,randomFunc) {
+		if(alphabet == null) {
+			alphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		}
+		if(len == null) {
+			len = 21;
+		}
+		if(randomFunc == null) {
+			randomFunc = uuid_Uuid.randomByte;
+		}
+		if(alphabet == null) {
+			throw haxe_Exception.thrown("Alphabet cannot be null");
+		}
+		if(alphabet.length == 0 || alphabet.length >= 256) {
+			throw haxe_Exception.thrown("Alphabet must contain between 1 and 255 symbols");
+		}
+		if(len <= 0) {
+			throw haxe_Exception.thrown("Length must be greater than zero");
+		}
+		let mask = (2 << Math.floor(Math.log(alphabet.length - 1) / Math.log(2))) - 1;
+		let step = Math.ceil(1.6 * mask * len / alphabet.length);
+		let sb_b = "";
+		while(sb_b.length != len) {
+			let _g = 0;
+			let _g1 = step;
+			while(_g < _g1) {
+				let i = _g++;
+				let rnd = randomFunc();
+				let aIndex = rnd & mask;
+				if(aIndex < alphabet.length) {
+					sb_b += Std.string(alphabet.charAt(aIndex));
+					if(sb_b.length == len) {
+						break;
+					}
+				}
+			}
+		}
+		return sb_b;
+	}
+	static short(toAlphabet,randomFunc) {
+		if(toAlphabet == null) {
+			toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		}
+		return uuid_Uuid.v4(null,randomFunc,null,true,toAlphabet);
+	}
+}
 uuid_Uuid.__name__ = true;
-uuid_Uuid.splitmix64_seed = function(index) {
-	var b_high = -1640531527;
-	var b_low = 2135587861;
-	var high = index.high + b_high | 0;
-	var low = index.low + b_low | 0;
-	if(haxe_Int32.ucompare(low,index.low) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	var result = new haxe__$Int64__$_$_$Int64(high,low);
-	var b = 30;
-	b &= 63;
-	var b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(result.high,result.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(result.high >> b,result.high << 32 - b | result.low >>> b) : new haxe__$Int64__$_$_$Int64(result.high >> 31,result.high >> b - 32);
-	var a_high = result.high ^ b1.high;
-	var a_low = result.low ^ b1.low;
-	var b_high = -1084733587;
-	var b_low = 484763065;
-	var mask = 65535;
-	var al = a_low & mask;
-	var ah = a_low >>> 16;
-	var bl = b_low & mask;
-	var bh = b_low >>> 16;
-	var p00 = haxe_Int32._mul(al,bl);
-	var p10 = haxe_Int32._mul(ah,bl);
-	var p01 = haxe_Int32._mul(al,bh);
-	var p11 = haxe_Int32._mul(ah,bh);
-	var low = p00;
-	var high = (p11 + (p01 >>> 16) | 0) + (p10 >>> 16) | 0;
-	p01 <<= 16;
-	low = low + p01 | 0;
-	if(haxe_Int32.ucompare(low,p01) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	p10 <<= 16;
-	low = low + p10 | 0;
-	if(haxe_Int32.ucompare(low,p10) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	high = high + (haxe_Int32._mul(a_low,b_high) + haxe_Int32._mul(a_high,b_low) | 0) | 0;
-	result = new haxe__$Int64__$_$_$Int64(high,low);
-	var b = 27;
-	b &= 63;
-	var b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(result.high,result.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(result.high >> b,result.high << 32 - b | result.low >>> b) : new haxe__$Int64__$_$_$Int64(result.high >> 31,result.high >> b - 32);
-	var a_high = result.high ^ b1.high;
-	var a_low = result.low ^ b1.low;
-	var b_high = -1798288965;
-	var b_low = 321982955;
-	var mask = 65535;
-	var al = a_low & mask;
-	var ah = a_low >>> 16;
-	var bl = b_low & mask;
-	var bh = b_low >>> 16;
-	var p00 = haxe_Int32._mul(al,bl);
-	var p10 = haxe_Int32._mul(ah,bl);
-	var p01 = haxe_Int32._mul(al,bh);
-	var p11 = haxe_Int32._mul(ah,bh);
-	var low = p00;
-	var high = (p11 + (p01 >>> 16) | 0) + (p10 >>> 16) | 0;
-	p01 <<= 16;
-	low = low + p01 | 0;
-	if(haxe_Int32.ucompare(low,p01) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	p10 <<= 16;
-	low = low + p10 | 0;
-	if(haxe_Int32.ucompare(low,p10) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	high = high + (haxe_Int32._mul(a_low,b_high) + haxe_Int32._mul(a_high,b_low) | 0) | 0;
-	result = new haxe__$Int64__$_$_$Int64(high,low);
-	var b = 31;
-	b &= 63;
-	var b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(result.high,result.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(result.high >> b,result.high << 32 - b | result.low >>> b) : new haxe__$Int64__$_$_$Int64(result.high >> 31,result.high >> b - 32);
-	return new haxe__$Int64__$_$_$Int64(result.high ^ b1.high,result.low ^ b1.low);
-};
-uuid_Uuid.randomFromRange = function(min,max) {
-	var s1 = uuid_Uuid.state0;
-	var s0 = uuid_Uuid.state1;
-	uuid_Uuid.state0 = s0;
-	var b = 23;
-	b &= 63;
-	var b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(s1.high,s1.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(s1.high << b | s1.low >>> 32 - b,s1.low << b) : new haxe__$Int64__$_$_$Int64(s1.low << b - 32,0);
-	s1 = new haxe__$Int64__$_$_$Int64(s1.high ^ b1.high,s1.low ^ b1.low);
-	var a_high = s1.high ^ s0.high;
-	var a_low = s1.low ^ s0.low;
-	var b = 18;
-	b &= 63;
-	var b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(s1.high,s1.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(s1.high >>> b,s1.high << 32 - b | s1.low >>> b) : new haxe__$Int64__$_$_$Int64(0,s1.high >>> b - 32);
-	var a_high1 = a_high ^ b1.high;
-	var a_low1 = a_low ^ b1.low;
-	var b = 5;
-	b &= 63;
-	var b1 = b == 0 ? new haxe__$Int64__$_$_$Int64(s0.high,s0.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(s0.high >>> b,s0.high << 32 - b | s0.low >>> b) : new haxe__$Int64__$_$_$Int64(0,s0.high >>> b - 32);
-	uuid_Uuid.state1 = new haxe__$Int64__$_$_$Int64(a_high1 ^ b1.high,a_low1 ^ b1.low);
-	var a = uuid_Uuid.state1;
-	var high = a.high + s0.high | 0;
-	var low = a.low + s0.low | 0;
-	if(haxe_Int32.ucompare(low,a.low) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	var x = max - min + 1;
-	var result = haxe_Int64.divMod(new haxe__$Int64__$_$_$Int64(high,low),new haxe__$Int64__$_$_$Int64(x >> 31,x)).modulus.low;
-	if(result < 0) {
-		result = -result;
-	}
-	return result + min;
-};
-uuid_Uuid.randomByte = function() {
-	return uuid_Uuid.randomFromRange(0,255);
-};
-uuid_Uuid.fromShort = function(shortUuid,separator,fromAlphabet) {
-	if(fromAlphabet == null) {
-		fromAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	var uuid = uuid_Uuid.convert(shortUuid,fromAlphabet,"0123456789abcdef");
-	return uuid_Uuid.hexToUuid(uuid,separator);
-};
-uuid_Uuid.toShort = function(uuid,separator,toAlphabet) {
-	if(toAlphabet == null) {
-		toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	uuid = StringTools.replace(uuid,separator,"").toLowerCase();
-	return uuid_Uuid.convert(uuid,"0123456789abcdef",toAlphabet);
-};
-uuid_Uuid.fromNano = function(nanoUuid,separator,fromAlphabet) {
-	if(fromAlphabet == null) {
-		fromAlphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	var uuid = uuid_Uuid.convert(nanoUuid,fromAlphabet,"0123456789abcdef");
-	return uuid_Uuid.hexToUuid(uuid,separator);
-};
-uuid_Uuid.toNano = function(uuid,separator,toAlphabet) {
-	if(toAlphabet == null) {
-		toAlphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	uuid = StringTools.replace(uuid,separator,"").toLowerCase();
-	return uuid_Uuid.convert(uuid,"0123456789abcdef",toAlphabet);
-};
-uuid_Uuid.v1 = function(node,optClockSequence,msecs,optNsecs,randomFunc,separator,shortUuid,toAlphabet) {
-	if(toAlphabet == null) {
-		toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	}
-	if(shortUuid == null) {
-		shortUuid = false;
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	if(optNsecs == null) {
-		optNsecs = -1;
-	}
-	if(msecs == null) {
-		msecs = -1;
-	}
-	if(optClockSequence == null) {
-		optClockSequence = -1;
-	}
-	if(randomFunc == null) {
-		randomFunc = uuid_Uuid.randomByte;
-	}
-	var buffer = new haxe_io_Bytes(new ArrayBuffer(16));
-	if(node == null) {
-		node = new haxe_io_Bytes(new ArrayBuffer(6));
-		var v = randomFunc();
-		node.b[0] = v;
-		var v = randomFunc();
-		node.b[1] = v;
-		var v = randomFunc();
-		node.b[2] = v;
-		var v = randomFunc();
-		node.b[3] = v;
-		var v = randomFunc();
-		node.b[4] = v;
-		var v = randomFunc();
-		node.b[5] = v;
-		node.b[0] |= 1;
-	}
-	if(uuid_Uuid.clockSequenceBuffer == -1) {
-		uuid_Uuid.clockSequenceBuffer = (randomFunc() << 8 | randomFunc()) & 16383;
-	}
-	var clockSeq = optClockSequence;
-	if(optClockSequence == -1) {
-		clockSeq = uuid_Uuid.clockSequenceBuffer;
-	}
-	if(msecs == -1) {
-		msecs = Math.round(Date.now());
-	}
-	var nsecs = optNsecs;
-	if(optNsecs == -1) {
-		nsecs = uuid_Uuid.lastNSecs + 1;
-	}
-	var dt = msecs - uuid_Uuid.lastMSecs + (nsecs - uuid_Uuid.lastNSecs) / 10000;
-	if(dt < 0 && optClockSequence == -1) {
-		clockSeq = clockSeq + 1 & 16383;
-	}
-	if((dt < 0 || msecs > uuid_Uuid.lastMSecs) && optNsecs == -1) {
-		nsecs = 0;
-	}
-	if(nsecs >= 10000) {
-		throw haxe_Exception.thrown("Can't create more than 10M uuids/sec");
-	}
-	uuid_Uuid.lastMSecs = msecs;
-	uuid_Uuid.lastNSecs = nsecs;
-	uuid_Uuid.clockSequenceBuffer = clockSeq;
-	msecs += 12219292800000;
-	var imsecs = haxe_Int64Helper.fromFloat(msecs);
-	var b_high = 0;
-	var b_low = 268435455;
-	var a_high = imsecs.high & b_high;
-	var a_low = imsecs.low & b_low;
-	var b_high = 0;
-	var b_low = 10000;
-	var mask = 65535;
-	var al = a_low & mask;
-	var ah = a_low >>> 16;
-	var bl = b_low & mask;
-	var bh = b_low >>> 16;
-	var p00 = haxe_Int32._mul(al,bl);
-	var p10 = haxe_Int32._mul(ah,bl);
-	var p01 = haxe_Int32._mul(al,bh);
-	var p11 = haxe_Int32._mul(ah,bh);
-	var low = p00;
-	var high = (p11 + (p01 >>> 16) | 0) + (p10 >>> 16) | 0;
-	p01 <<= 16;
-	low = low + p01 | 0;
-	if(haxe_Int32.ucompare(low,p01) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	p10 <<= 16;
-	low = low + p10 | 0;
-	if(haxe_Int32.ucompare(low,p10) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	high = high + (haxe_Int32._mul(a_low,b_high) + haxe_Int32._mul(a_high,b_low) | 0) | 0;
-	var a_high = high;
-	var a_low = low;
-	var b_high = nsecs >> 31;
-	var b_low = nsecs;
-	var high = a_high + b_high | 0;
-	var low = a_low + b_low | 0;
-	if(haxe_Int32.ucompare(low,a_low) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	var tl = haxe_Int64.divMod(new haxe__$Int64__$_$_$Int64(high,low),uuid_Uuid.DVS).modulus.low;
-	buffer.b[0] = tl >>> 24 & 255;
-	buffer.b[1] = tl >>> 16 & 255;
-	buffer.b[2] = tl >>> 8 & 255;
-	buffer.b[3] = tl & 255;
-	var a = haxe_Int64.divMod(imsecs,uuid_Uuid.DVS).quotient;
-	var b_high = 0;
-	var b_low = 10000;
-	var mask = 65535;
-	var al = a.low & mask;
-	var ah = a.low >>> 16;
-	var bl = b_low & mask;
-	var bh = b_low >>> 16;
-	var p00 = haxe_Int32._mul(al,bl);
-	var p10 = haxe_Int32._mul(ah,bl);
-	var p01 = haxe_Int32._mul(al,bh);
-	var p11 = haxe_Int32._mul(ah,bh);
-	var low = p00;
-	var high = (p11 + (p01 >>> 16) | 0) + (p10 >>> 16) | 0;
-	p01 <<= 16;
-	low = low + p01 | 0;
-	if(haxe_Int32.ucompare(low,p01) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	p10 <<= 16;
-	low = low + p10 | 0;
-	if(haxe_Int32.ucompare(low,p10) < 0) {
-		var ret = high++;
-		high = high | 0;
-	}
-	high = high + (haxe_Int32._mul(a.low,b_high) + haxe_Int32._mul(a.high,b_low) | 0) | 0;
-	var a_high = high;
-	var a_low = low;
-	var b_high = 0;
-	var b_low = 268435455;
-	var this_high = a_high & b_high;
-	var this_low = a_low & b_low;
-	var tmh = this_low;
-	buffer.b[4] = tmh >>> 8 & 255;
-	buffer.b[5] = tmh & 255;
-	buffer.b[6] = tmh >>> 24 & 15 | 16;
-	buffer.b[7] = tmh >>> 16 & 255;
-	buffer.b[8] = clockSeq >>> 8 | 128;
-	buffer.b[9] = clockSeq & 255;
-	buffer.b[10] = node.b[0];
-	buffer.b[11] = node.b[1];
-	buffer.b[12] = node.b[2];
-	buffer.b[13] = node.b[3];
-	buffer.b[14] = node.b[4];
-	buffer.b[15] = node.b[5];
-	var uuid = uuid_Uuid.stringify(buffer,separator);
-	if(shortUuid) {
-		uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
-	}
-	return uuid;
-};
-uuid_Uuid.v3 = function(name,namespace,separator,shortUuid,toAlphabet) {
-	if(toAlphabet == null) {
-		toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	}
-	if(shortUuid == null) {
-		shortUuid = false;
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	if(namespace == null) {
-		namespace = "";
-	}
-	namespace = StringTools.replace(namespace,"-","");
-	var buffer = haxe_crypto_Md5.make(haxe_io_Bytes.ofHex(namespace + haxe_io_Bytes.ofString(name).toHex()));
-	buffer.b[6] = buffer.b[6] & 15 | 48;
-	buffer.b[8] = buffer.b[8] & 63 | 128;
-	var uuid = uuid_Uuid.stringify(buffer,separator);
-	if(shortUuid) {
-		uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
-	}
-	return uuid;
-};
-uuid_Uuid.v4 = function(randBytes,randomFunc,separator,shortUuid,toAlphabet) {
-	if(toAlphabet == null) {
-		toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	}
-	if(shortUuid == null) {
-		shortUuid = false;
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	if(randomFunc == null) {
-		randomFunc = uuid_Uuid.randomByte;
-	}
-	var buffer = randBytes;
-	if(buffer == null) {
-		buffer = new haxe_io_Bytes(new ArrayBuffer(16));
-		var v = randomFunc();
-		buffer.b[0] = v;
-		var v = randomFunc();
-		buffer.b[1] = v;
-		var v = randomFunc();
-		buffer.b[2] = v;
-		var v = randomFunc();
-		buffer.b[3] = v;
-		var v = randomFunc();
-		buffer.b[4] = v;
-		var v = randomFunc();
-		buffer.b[5] = v;
-		var v = randomFunc();
-		buffer.b[6] = v;
-		var v = randomFunc();
-		buffer.b[7] = v;
-		var v = randomFunc();
-		buffer.b[8] = v;
-		var v = randomFunc();
-		buffer.b[9] = v;
-		var v = randomFunc();
-		buffer.b[10] = v;
-		var v = randomFunc();
-		buffer.b[11] = v;
-		var v = randomFunc();
-		buffer.b[12] = v;
-		var v = randomFunc();
-		buffer.b[13] = v;
-		var v = randomFunc();
-		buffer.b[14] = v;
-		var v = randomFunc();
-		buffer.b[15] = v;
-	} else if(buffer.length < 16) {
-		throw haxe_Exception.thrown("Random bytes should be at least 16 bytes");
-	}
-	buffer.b[6] = buffer.b[6] & 15 | 64;
-	buffer.b[8] = buffer.b[8] & 63 | 128;
-	var uuid = uuid_Uuid.stringify(buffer,separator);
-	if(shortUuid) {
-		uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
-	}
-	return uuid;
-};
-uuid_Uuid.v5 = function(name,namespace,separator,shortUuid,toAlphabet) {
-	if(toAlphabet == null) {
-		toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	}
-	if(shortUuid == null) {
-		shortUuid = false;
-	}
-	if(separator == null) {
-		separator = "-";
-	}
-	if(namespace == null) {
-		namespace = "";
-	}
-	namespace = StringTools.replace(namespace,"-","");
-	var buffer = haxe_crypto_Sha1.make(haxe_io_Bytes.ofHex(namespace + haxe_io_Bytes.ofString(name).toHex()));
-	buffer.b[6] = buffer.b[6] & 15 | 80;
-	buffer.b[8] = buffer.b[8] & 63 | 128;
-	var uuid = uuid_Uuid.stringify(buffer,separator);
-	if(shortUuid) {
-		uuid = uuid_Uuid.toShort(uuid,separator,toAlphabet);
-	}
-	return uuid;
-};
-uuid_Uuid.stringify = function(data,separator) {
-	if(separator == null) {
-		separator = "-";
-	}
-	return uuid_Uuid.hexToUuid(data.toHex(),separator);
-};
-uuid_Uuid.parse = function(uuid,separator) {
-	if(separator == null) {
-		separator = "-";
-	}
-	return haxe_io_Bytes.ofHex(StringTools.replace(uuid,separator,""));
-};
-uuid_Uuid.validate = function(uuid,separator) {
-	if(separator == null) {
-		separator = "-";
-	}
-	if(separator == "") {
-		uuid = HxOverrides.substr(uuid,0,8) + "-" + HxOverrides.substr(uuid,8,4) + "-" + HxOverrides.substr(uuid,12,4) + "-" + HxOverrides.substr(uuid,16,4) + "-" + HxOverrides.substr(uuid,20,12);
-	} else if(separator != "-") {
-		uuid = StringTools.replace(uuid,separator,"-");
-	}
-	return uuid_Uuid.regexp.match(uuid);
-};
-uuid_Uuid.version = function(uuid,separator) {
-	if(separator == null) {
-		separator = "-";
-	}
-	uuid = StringTools.replace(uuid,separator,"");
-	return Std.parseInt("0x" + HxOverrides.substr(uuid,12,1));
-};
-uuid_Uuid.hexToUuid = function(hex,separator) {
-	return HxOverrides.substr(hex,0,8) + separator + HxOverrides.substr(hex,8,4) + separator + HxOverrides.substr(hex,12,4) + separator + HxOverrides.substr(hex,16,4) + separator + HxOverrides.substr(hex,20,12);
-};
-uuid_Uuid.convert = function(number,fromAlphabet,toAlphabet) {
-	var fromBase = fromAlphabet.length;
-	var toBase = toAlphabet.length;
-	var len = number.length;
-	var buf = "";
-	var numberMap = new Array(len);
-	var divide = 0;
-	var newlen = 0;
-	var _g = 0;
-	var _g1 = len;
-	while(_g < _g1) {
-		var i = _g++;
-		numberMap[i] = fromAlphabet.indexOf(number.charAt(i));
-	}
-	do {
-		divide = 0;
-		newlen = 0;
-		var _g = 0;
-		var _g1 = len;
-		while(_g < _g1) {
-			var i = _g++;
-			divide = divide * fromBase + numberMap[i];
-			if(divide >= toBase) {
-				numberMap[newlen++] = Math.floor(divide / toBase);
-				divide %= toBase;
-			} else if(newlen > 0) {
-				numberMap[newlen++] = 0;
-			}
-		}
-		len = newlen;
-		buf = toAlphabet.charAt(divide) + buf;
-	} while(newlen != 0);
-	return buf;
-};
-uuid_Uuid.nanoId = function(len,alphabet,randomFunc) {
-	if(alphabet == null) {
-		alphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	}
-	if(len == null) {
-		len = 21;
-	}
-	if(randomFunc == null) {
-		randomFunc = uuid_Uuid.randomByte;
-	}
-	if(alphabet == null) {
-		throw haxe_Exception.thrown("Alphabet cannot be null");
-	}
-	if(alphabet.length == 0 || alphabet.length >= 256) {
-		throw haxe_Exception.thrown("Alphabet must contain between 1 and 255 symbols");
-	}
-	if(len <= 0) {
-		throw haxe_Exception.thrown("Length must be greater than zero");
-	}
-	var mask = (2 << Math.floor(Math.log(alphabet.length - 1) / Math.log(2))) - 1;
-	var step = Math.ceil(1.6 * mask * len / alphabet.length);
-	var sb_b = "";
-	while(sb_b.length != len) {
-		var _g = 0;
-		var _g1 = step;
-		while(_g < _g1) {
-			var i = _g++;
-			var rnd = randomFunc();
-			var aIndex = rnd & mask;
-			if(aIndex < alphabet.length) {
-				sb_b += Std.string(alphabet.charAt(aIndex));
-				if(sb_b.length == len) {
-					break;
-				}
-			}
-		}
-	}
-	return sb_b;
-};
-uuid_Uuid.short = function(toAlphabet,randomFunc) {
-	if(toAlphabet == null) {
-		toAlphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	}
-	return uuid_Uuid.v4(null,randomFunc,null,true,toAlphabet);
-};
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $global.$haxeUID++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = m.bind(o); o.hx__closures__[m.__id__] = f; } return f; }
 $global.$haxeUID |= 0;
 if(typeof(performance) != "undefined" ? typeof(performance.now) == "function" : false) {
 	HxOverrides.now = performance.now.bind(performance);
 }
 if( String.fromCodePoint == null ) String.fromCodePoint = function(c) { return c < 0x10000 ? String.fromCharCode(c) : String.fromCharCode((c>>10)+0xD7C0)+String.fromCharCode((c&0x3FF)+0xDC00); }
-Object.defineProperty(String.prototype,"__class__",{ value : String, enumerable : false, writable : true});
-String.__name__ = true;
-Array.__name__ = true;
-var Int = { };
-var Dynamic = { };
-var Float = Number;
-var Bool = Boolean;
-var Class = { };
-var Enum = { };
+{
+	Object.defineProperty(String.prototype,"__class__",{ value : String, enumerable : false, writable : true});
+	String.__name__ = true;
+	Array.__name__ = true;
+	var Int = { };
+	var Dynamic = { };
+	var Float = Number;
+	var Bool = Boolean;
+	var Class = { };
+	var Enum = { };
+}
 js_Boot.__toStr = ({ }).toString;
+engine_base_EngineConfig.AI_ENABLED = true;
+engine_base_EngineConfig.TARGET_FPS = 15;
+engine_base_core_BaseEngine._hx_skip_constructor = false;
+engine_base_entity_base_EngineBaseEntity._hx_skip_constructor = false;
 haxe_Int32._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
 };
@@ -2612,27 +2875,27 @@ uuid_Uuid.rndSeed = haxe_Int64Helper.fromFloat(Date.now());
 uuid_Uuid.state0 = uuid_Uuid.splitmix64_seed(uuid_Uuid.rndSeed);
 uuid_Uuid.state1 = (function($this) {
 	var $r;
-	var a = uuid_Uuid.rndSeed;
-	var x = Std.random(10000);
-	var b_high = x >> 31;
-	var b_low = x;
-	var high = a.high + b_high | 0;
-	var low = a.low + b_low | 0;
+	let a = uuid_Uuid.rndSeed;
+	let x = Std.random(10000);
+	let b_high = x >> 31;
+	let b_low = x;
+	let high = a.high + b_high | 0;
+	let low = a.low + b_low | 0;
 	if(haxe_Int32.ucompare(low,a.low) < 0) {
-		var ret = high++;
+		let ret = high++;
 		high = high | 0;
 	}
-	var a_high = high;
-	var a_low = low;
-	var b_high = 0;
-	var b_low = 1;
-	var high = a_high + b_high | 0;
-	var low = a_low + b_low | 0;
-	if(haxe_Int32.ucompare(low,a_low) < 0) {
-		var ret = high++;
-		high = high | 0;
+	let a_high = high;
+	let a_low = low;
+	let b_high1 = 0;
+	let b_low1 = 1;
+	let high1 = a_high + b_high1 | 0;
+	let low1 = a_low + b_low1 | 0;
+	if(haxe_Int32.ucompare(low1,a_low) < 0) {
+		let ret = high1++;
+		high1 = high1 | 0;
 	}
-	$r = uuid_Uuid.splitmix64_seed(new haxe__$Int64__$_$_$Int64(high,low));
+	$r = uuid_Uuid.splitmix64_seed(new haxe__$Int64__$_$_$Int64(high1,low1));
 	return $r;
 }(this));
 uuid_Uuid.DVS = new haxe__$Int64__$_$_$Int64(1,0);

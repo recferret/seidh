@@ -249,24 +249,24 @@ abstract class BaseEngine {
 		}
 	}
 
-	public function addInputCommandServer(struct:Dynamic) {
-		final entityId = getMainEntityIdByOwnerId(struct.playerId);
+	public function addInputCommandServer(input:PlayerInputCommand) {
+		final entityId = getMainEntityIdByOwnerId(input.playerId);
 		var allow = false;
 
-		if (struct.actionType == CharacterActionType.MOVE) {
+		if (input.actionType == CharacterActionType.MOVE) {
 			allow = checkLocalMovementInputAllowance(entityId);
 		} else {
-			allow = checkLocalActionInputAllowance(entityId, struct.actionType);
+			allow = checkLocalActionInputAllowance(entityId, input.actionType);
 		}
 
 		if (allow) {
-			addInputCommandClient(new PlayerInputCommand(struct.actionType, struct.movAngle, struct.playerId));
+			addInputCommandClient(new PlayerInputCommand(input.actionType, input.movAngle, input.playerId));
 		}
 	}
 
-	public function addInputCommandClient(playerInputCommand:PlayerInputCommand) {
-		if (playerInputCommand.actionType != null && playerInputCommand.playerId != null) {
-			final wrappedCommand = new InputCommandEngineWrapped(playerInputCommand, tick);
+	public function addInputCommandClient(input:PlayerInputCommand) {
+		if (input.actionType != null && input.playerId != null) {
+			final wrappedCommand = new InputCommandEngineWrapped(input, tick);
 			hotInputCommands.push(wrappedCommand);
 			coldInputCommands.push(wrappedCommand);
 		}

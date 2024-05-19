@@ -128,7 +128,6 @@ typedef CharacterEntityStruct = {
 	?characterAction2Struct:CharacterActionStruct,
 	?characterAction3Struct:CharacterActionStruct,
 	?characterActionUltimate:CharacterActionStruct,
-	dodgeChance:Int,
 	health:Int,
 }
 
@@ -154,7 +153,6 @@ class BaseEntity {
 
 class CharacterEntity extends BaseEntity {
 	public var health:Int;
-	public var dodgeChance:Int;
 	public var movement:CharacterMovementStruct;
 	public var actionMain:CharacterActionStruct;
 	public var action1:CharacterActionStruct;
@@ -166,7 +164,6 @@ class CharacterEntity extends BaseEntity {
 		super(struct.base);
 
 		this.health = struct.health;
-		this.dodgeChance = struct.dodgeChance;
 		this.movement = struct.characterMovementStruct;
 		this.actionMain = struct.characterActionMainStruct;
 		this.action1 = struct.characterAction1Struct;
@@ -216,7 +213,7 @@ enum abstract CharacterActionType(Int) {
 class PlayerInputCommand {
 	public var index:Int;
 	public var actionType:CharacterActionType;
-	public var movAngle: Float;
+	public var movAngle:Float;
 	public var playerId:String;
 
 	public function new(actionType:CharacterActionType, movAngle:Float, playerId:String, ?index:Int) {

@@ -16,8 +16,16 @@ typedef CharacterActionCallbackParams = {
     actionType:CharacterActionType, 
     shape:EntityShape, 
     hurtEntities: Array<String>,
-    deadEntities: Array<String> 
+    deadEntities: Array<String>,
 };
+
+typedef CreateCharacterMinStruct = {
+    id:String,
+    ownerId:String,
+    x:Int,
+    y:Int,
+    entityType:EntityType,
+}
 
 @:expose
 class SeidhGameEngine extends BaseEngine {
@@ -33,7 +41,7 @@ class SeidhGameEngine extends BaseEngine {
 	    super(engineMode);
     }
 
-    public function createCharacterEntityFromMinimalStruct(struct:Dynamic) {
+    public function createCharacterEntityFromMinimalStruct(struct:CreateCharacterMinStruct) {
         createCharacterEntity(SeidhEntityFactory.InitiateEntity(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType), true);
     }
 
