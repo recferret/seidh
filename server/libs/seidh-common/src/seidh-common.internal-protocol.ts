@@ -6,10 +6,11 @@ export interface WsGameEvent {
 }
 
 export enum ServicePort {
-    Gameplay = 3000,
-    GameplayLobby = 3001,
-    Gateway = 3002,
-    WsGateway = 3003,
+    TG = 3000,
+    Gameplay = 3001,
+    GameplayLobby = 3002,
+    Gateway = 3003,
+    WsGateway = 3004,
 }
 
 export enum ServiceName {
