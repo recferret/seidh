@@ -12,7 +12,8 @@ extern class NativeWindowJS {
 	static function wsConnect(callback:String->Void):Void;
     static function wsSend(message:Dynamic):Void;
 
-    // HTTP
+    // Rest
+    static function restPostTelegramInitData(initData:String):Void;
 
     // Common
     static function getMobile():String;
@@ -21,6 +22,7 @@ extern class NativeWindowJS {
 
     // Telegram
     static function tgExpand():Void;
+    static function tgGetInitData():String;
 
     // YandexMetrics
     static function ymTrackGoal(goal:YandexMetricsGoals):Void;

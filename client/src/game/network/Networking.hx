@@ -25,19 +25,12 @@ typedef ActionsPayload = {
 class Networking {
 
     private var joined = false;
-    private var currentTransport = 0; // 0 - none, 1 - ws, 2 - wt
 
     public function new() {
     }
 
     public function wsConnect() {
         NativeWindowJS.wsConnect(callback);
-        currentTransport = 1;
-    }
-
-    public function wtConnect() {
-        NativeWindowJS.wtConnect(callback);
-        currentTransport = 2;
     }
 
     public function sendLogin() {
@@ -65,11 +58,7 @@ class Networking {
     }
 
     private function sendData(message:Dynamic) {
-        if (currentTransport == 1) {
-            NativeWindowJS.wsSend(Json.stringify(message));
-        } else if (currentTransport == 2) {
-            NativeWindowJS.wtSend(Json.stringify(message));
-        }
+        NativeWindowJS.wsSend(Json.stringify(message));
     }
 
     private function callback(data:String) {

@@ -1,14 +1,20 @@
 package game.scene.impl;
 
+import game.js.NativeWindowJS;
 import engine.seidh.SeidhGameEngine;
 import game.scene.base.BasicScene;
 
 class SceneInputTest extends BasicScene {
 
     public function new() {
-		super(new SeidhGameEngine());
+		super(null);
 
-		// camera.scale(2, 2);
+		camera.scale(1, 1);
+
+		final text = addText(NativeWindowJS.tgGetInitData());
+		text.setPosition(0, 0);
+
+		NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
 
 		// addButton('TG FULLSCREEN', function callback(button:h2d.Flow) {
 		// 	// hxd.Window.getInstance().displayMode = hxd.Window.DisplayMode.FullscreenResize;
@@ -22,10 +28,10 @@ class SceneInputTest extends BasicScene {
         // });
 
 
-		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 300, 100, KNIGHT);
+		// createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 300, 100, KNIGHT);
 
-		createCharacterEntityFromMinimalStruct("1", "1", 400, 200, SKELETON_WARRIOR);
-		createCharacterEntityFromMinimalStruct("2", "2", 470, 300, SKELETON_WARRIOR);
+		// createCharacterEntityFromMinimalStruct("1", "1", 400, 200, SKELETON_WARRIOR);
+		// createCharacterEntityFromMinimalStruct("2", "2", 470, 300, SKELETON_WARRIOR);
 
 		// createGameEntityFromMinimalStruct("2", "2", 50, 300, SKELETON_WARRIOR);
 		// createGameEntityFromMinimalStruct("3", "3", 850, 200, SKELETON_WARRIOR);

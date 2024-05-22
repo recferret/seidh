@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { GameplayController } from './gameplay.controller';
 import { GameplayService } from './gameplay.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
 import { ServiceName } from '@app/seidh-common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
 
 @Module({
   imports: [

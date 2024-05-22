@@ -1,5 +1,6 @@
 package game.scene;
 
+import game.scene.impl.UiSceneTest.SceneUiTest;
 import game.scene.impl.NetworkTestScene.SceneNetworkTest;
 import game.scene.impl.SpritesSceneTest.SceneSpritesTest;
 import game.scene.impl.InputSceneTest;
@@ -14,6 +15,7 @@ enum GameScene {
 	SceneAiTest;
 	SceneGeomTest;
 	SceneSpritesTest;
+	SceneUiTest;
 }
 
 class SceneManager {
@@ -48,6 +50,7 @@ class SceneManager {
 		// currentScene = new SceneSpritesTest();
 		// currentScene = new SceneGeomTest();
 		// currentScene = new SceneNetworkTest();
+		// currentScene = new SceneUiTest();
 		currentScene.start();
 
 		changeSceneCallback();

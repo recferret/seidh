@@ -1,6 +1,7 @@
 -cp src
 
 -lib heaps
+-lib domkit 
 -lib uuid
 # -lib haxeui-core
 # -lib haxeui-heaps

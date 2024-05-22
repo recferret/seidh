@@ -12,14 +12,18 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "start:tg": "nest start tg --debug --watch",
+    "start:tg:prod": "nest start tg",
     "start:ws-gateway": "nest start ws-gateway --debug --watch",
-    "start:gateway": "nest start gateway --debug --watch",
-    "start:gameplay": "nest start gameplay --debug --watch",
-    "start:gameplay-lobby": "nest start gameplay-lobby --debug --watch",
     "start:ws-gateway:prod": "nest start ws-gateway",
+    "start:gateway": "nest start gateway --debug --watch",
     "start:gateway:prod": "nest start gateway",
+    "start:gameplay": "nest start gameplay --debug --watch",
     "start:gameplay:prod": "nest start gameplay",
-    "start:gameplay-lobby:prod": "nest start gameplay-lobby"
+    "start:gameplay-lobby": "nest start gameplay-lobby --debug --watch",
+    "start:gameplay-lobby:prod": "nest start gameplay-lobby",
+    "start:auth": "nest start auth --debug --watch",
+    "start:auth:prod": "nest start auth"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

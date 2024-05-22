@@ -4,6 +4,7 @@ import { MessagePattern } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { WsGameEvent } from '@app/seidh-common';
 import { GameplayJoinGameMessage, GameplayJoinGamePattern } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
+import { GameplayInputPattern, GameplayInputMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
 import { Config } from './main';
 
 @Injectable()
@@ -30,11 +31,12 @@ class PlayerGuard implements CanActivate {
 export class GameplayController {
   constructor(private readonly gameplayService: GameplayService) {}
 
-  // @UseGuards(PlayerGuard)
-  // @MessagePattern('input')
-  // input(data: any) {
-  //   console.log('JUST got player input');
-  // }
+  @UseGuards(InstanceIdGuard, PlayerGuard)
+  @MessagePattern(GameplayInputPattern)
+  input(data: GameplayInputMessage) {
+    Logger.log(`Input for instance ${Config.GAMEPLAY_INSTANCE_ID}`);
+    Logger.log(data);
+  }
 
   @UseGuards(InstanceIdGuard)
   @MessagePattern(GameplayJoinGamePattern)

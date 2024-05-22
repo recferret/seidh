@@ -25,7 +25,6 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
                 rotation: 0
             },
             health: 10,
-            dodgeChance: 0,
             characterMovementStruct: {
                 canWalk: true,
                 canRun: true,

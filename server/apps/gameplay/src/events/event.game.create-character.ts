@@ -1,4 +1,4 @@
-import { CharacterEntityMinStruct } from "../game/game.types";
+import { CharacterEntityMinStruct } from "@app/seidh-common/seidh-common.game-types";
 import { EventGameBase } from "./event.game.base";
 
 export class EventGameCreateCharacter implements EventGameBase {

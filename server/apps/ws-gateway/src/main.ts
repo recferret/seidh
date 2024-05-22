@@ -4,6 +4,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ServiceName, ServicePort } from '@app/seidh-common';
 import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(WsGatewayModule);
@@ -18,5 +19,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(ServicePort.WsGateway);
+
+  Logger.log(`WsGateway listening on port ${ServicePort.WsGateway}`);
 }
 bootstrap();

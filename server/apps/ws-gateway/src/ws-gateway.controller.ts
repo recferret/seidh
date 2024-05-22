@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { WsGatewayWsController, WsProtocol } from './ws-gateway.ws.controller';
 import { WsGatewayGameInitPattern, WsGatewayGameInitMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.init.msg';
@@ -16,36 +16,50 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameInitPattern)
   gameInit(data: WsGatewayGameInitMessage) {
+    Logger.log('gameInit, data:');
+    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocol.GameInit, data);
   }
 
   @MessagePattern(WsGatewayGameCreateCharacterPattern)
   createCharacter(data: WsGatewayGameCreateCharacterMessage) {
+    Logger.log('createCharacter, data:');
+    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocol.CreateCharacter, data);
   }
 
   @MessagePattern(WsGatewayGameDeleteCharacterPattern)
   deleteCharacter(data: WsGatewayGameDeleteCharacterMessage) {
+    Logger.log('deleteCharacter, data:');
+    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocol.DeleteCharacter, data);
   }
 
   @MessagePattern(WsGatewayGameCreateProjectilePattern)
   createProjectile(data: WsGatewayGameCreateProjectileMessage) {
+    Logger.log('createProjectile, data:');
+    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocol.CreateProjectile, data);
   }
 
   @MessagePattern(WsGatewayGameDeleteProjectilePattern)
   deleteProjectile(data: WsGatewayGameDeleteProjectileMessage) {
+    Logger.log('deleteProjectile, data:');
+    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocol.DeleteProjectile, data);
   }
 
   @MessagePattern(WsGatewayGameCharacterActionsPattern)
   characterActions(data: WsGatewayGameCharacterActionsMessage) {
+    Logger.log('characterActions, data:');
+    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocol.CharacterActions, data);
   }
 
   @MessagePattern(WsGatewayGameStatePattern)
   gameState(data: WsGatewayGameStateMessage) {
+    Logger.log('gameState, data:');
+    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocol.GameState, data);
   }
 

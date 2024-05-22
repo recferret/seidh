@@ -123,7 +123,6 @@ class engine_base_CharacterEntity extends engine_base_BaseEntity {
 	constructor(struct) {
 		super(struct.base);
 		this.health = struct.health;
-		this.dodgeChance = struct.dodgeChance;
 		this.movement = struct.characterMovementStruct;
 		this.actionMain = struct.characterActionMainStruct;
 		this.action1 = struct.characterAction1Struct;
@@ -287,11 +286,8 @@ class engine_base_core_BaseEngine {
 		this.gameLoop = new engine_base_core_GameLoop(loop);
 		this.okLoopTime = 1000 / this.gameLoop.targetFps | 0;
 	}
-	createCharacterEntity(entity,fireCallback) {
-		if(fireCallback == null) {
-			fireCallback = false;
-		}
-		this.createCharacterEntityQueue.push({ entity : entity, fireCallback : fireCallback});
+	createCharacterEntity(entity) {
+		this.createCharacterEntityQueue.push({ entity : entity});
 	}
 	removeCharacterEntity(entityId) {
 		this.removeCharacterEntityQueue.push(entityId);
@@ -324,10 +320,23 @@ class engine_base_core_BaseEngine {
 			(js_Boot.__cast(entity , engine_base_entity_impl_EngineCharacterEntity)).setNextActionToPerform(characterActionType);
 		}
 	}
-	getCharacterEntities() {
+	getCharacterEntitiesMap() {
 		return this.characterEntityManager.entities;
 	}
-	getCharacterEntitiesChanged() {
+	getCharacterEntitiesArray() {
+		let result = [];
+		let jsIterator = this.characterEntityManager.entities.values();
+		let _g_jsIterator = jsIterator;
+		let _g_lastStep = jsIterator.next();
+		while(!_g_lastStep.done) {
+			let v = _g_lastStep.value;
+			_g_lastStep = _g_jsIterator.next();
+			let entity = v;
+			result.push(entity);
+		}
+		return result;
+	}
+	getCharacterEntitiesChangedArray() {
 		let result = [];
 		let jsIterator = this.characterEntityManager.entities.values();
 		let _g_jsIterator = jsIterator;
@@ -353,7 +362,7 @@ class engine_base_core_BaseEngine {
 			let key = queueTask.entity.getOwnerId();
 			let value = queueTask.entity.getId();
 			this1.h[key] = value;
-			if(queueTask.fireCallback && this.createCharacterCallback != null) {
+			if(this.createCharacterCallback != null) {
 				this.createCharacterCallback(queueTask.entity);
 			}
 		}
@@ -381,11 +390,8 @@ class engine_base_core_BaseEngine {
 		}
 		this.removeCharacterEntityQueue = [];
 	}
-	createProjectileEntity(entity,fireCallback) {
-		if(fireCallback == null) {
-			fireCallback = false;
-		}
-		this.createProjectileEntityQueue.push({ entity : entity, fireCallback : fireCallback});
+	createProjectileEntity(entity) {
+		this.createProjectileEntityQueue.push({ entity : entity});
 	}
 	removeProjectileEntity(entityId) {
 		this.removeProjectileEntityQueue.push(entityId);
@@ -397,7 +403,7 @@ class engine_base_core_BaseEngine {
 			let queueTask = _g1[_g];
 			++_g;
 			this.projectileEntityManager.add(queueTask.entity);
-			if(queueTask.fireCallback && this.createProjectileCallback != null) {
+			if(this.createProjectileCallback != null) {
 				this.createProjectileCallback(queueTask.entity);
 			}
 		}
@@ -439,21 +445,21 @@ class engine_base_core_BaseEngine {
 			return false;
 		}
 	}
-	addInputCommandServer(struct) {
-		let entityId = this.getMainEntityIdByOwnerId(struct.playerId);
+	addInputCommandServer(input) {
+		let entityId = this.getMainEntityIdByOwnerId(input.playerId);
 		let allow = false;
-		if(struct.actionType == 1) {
+		if(input.actionType == 1) {
 			allow = this.checkLocalMovementInputAllowance(entityId);
 		} else {
-			allow = this.checkLocalActionInputAllowance(entityId,struct.actionType);
+			allow = this.checkLocalActionInputAllowance(entityId,input.actionType);
 		}
 		if(allow) {
-			this.addInputCommandClient(new engine_base_PlayerInputCommand(struct.actionType,struct.movAngle,struct.playerId));
+			this.addInputCommandClient(new engine_base_PlayerInputCommand(input.actionType,input.movAngle,input.playerId));
 		}
 	}
-	addInputCommandClient(playerInputCommand) {
-		if(playerInputCommand.actionType != null && playerInputCommand.playerId != null) {
-			let wrappedCommand = new engine_base_InputCommandEngineWrapped(playerInputCommand,this.tick);
+	addInputCommandClient(input) {
+		if(input.actionType != null && input.playerId != null) {
+			let wrappedCommand = new engine_base_InputCommandEngineWrapped(input,this.tick);
 			this.hotInputCommands.push(wrappedCommand);
 			this.coldInputCommands.push(wrappedCommand);
 		}
@@ -1159,7 +1165,7 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 		super._hx_constructor(engineMode);
 	}
 	createCharacterEntityFromMinimalStruct(struct) {
-		this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateEntity(struct.id,struct.ownerId,struct.x,struct.y,struct.entityType),true);
+		this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateEntity(struct.id,struct.ownerId,struct.x,struct.y,struct.entityType));
 	}
 	processInputCommands(playerInputCommands) {
 		let _g = 0;
@@ -1272,7 +1278,7 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 					let deadEntities = [];
 					let actionShape = null;
 					if(character1.actionToPerform.projectileStruct != null) {
-						this.createProjectileEntity(this.createProjectileByCharacter(character1),true);
+						this.createProjectileEntity(this.createProjectileByCharacter(character1));
 						actionShape = character1.actionToPerform.projectileStruct.shape;
 					} else if(character1.actionToPerform.meleeStruct != null) {
 						actionShape = character1.actionToPerform.meleeStruct.shape;
@@ -1404,7 +1410,7 @@ class engine_seidh_entity_impl_SeidhKnightEntity extends engine_seidh_entity_bas
 		let tmp1 = { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(140,100,80,100)}};
 		let tmp2 = { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : new engine_base_EntityShape(30,10,0,0)}};
 		let tmp3 = { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : new engine_base_EntityShape(100,100,0,0), shape : new engine_base_EntityShape(25,25,0,0)}};
-		return new engine_base_CharacterEntity({ base : tmp, health : 100, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : tmp1, characterAction1Struct : tmp2, characterAction2Struct : tmp3, characterAction3Struct : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
+		return new engine_base_CharacterEntity({ base : tmp, health : 100, characterMovementStruct : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : tmp1, characterAction1Struct : tmp2, characterAction2Struct : tmp3, characterAction3Struct : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
 	}
 }
 engine_seidh_entity_impl_SeidhKnightEntity.__name__ = true;
@@ -1417,7 +1423,7 @@ class engine_seidh_entity_impl_SeidhSkeletonWarriorEntity extends engine_seidh_e
 		super(characterEntity);
 	}
 	static GenerateObjectEntity(id,ownerId,x,y) {
-		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId, rotation : 0}, health : 10, dodgeChance : 0, characterMovementStruct : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : new engine_base_EntityShape(140,100,80,100)}}});
+		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId, rotation : 0}, health : 10, characterMovementStruct : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : new engine_base_EntityShape(140,100,80,100)}}});
 	}
 }
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__name__ = true;

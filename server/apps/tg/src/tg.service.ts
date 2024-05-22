@@ -21,12 +21,12 @@ export class TgService {
 
     this.bot.on(message('text'), async (ctx) => {
       console.log(ctx.message.text);
-      ctx.reply(
-        'Добро пожаловать! Нажмите на кнопку ниже, чтобы запустить приложение',
-        Markup.keyboard([
-          Markup.button.webApp('Отправить сообщение', 'https://seidh-game.online/'),
-        ])
-      )
+      // ctx.reply(
+      //   'Добро пожаловать! Нажмите на кнопку ниже, чтобы запустить приложение',
+      //   Markup.keyboard([
+      //     Markup.button.webApp('Play', 'https://192.168.1.6:8080'),
+      //   ])
+      // )
     });
 
     this.bot.launch();

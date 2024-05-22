@@ -42,7 +42,7 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function createCharacterEntityFromMinimalStruct(struct:CreateCharacterMinStruct) {
-        createCharacterEntity(SeidhEntityFactory.InitiateEntity(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType), true);
+        createCharacterEntity(SeidhEntityFactory.InitiateEntity(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType));
     }
 
     // ---------------------------------------------------
@@ -149,7 +149,7 @@ class SeidhGameEngine extends BaseEngine {
 
                     var actionShape:EntityShape = null;
                     if (character1.actionToPerform.projectileStruct != null) {
-                        createProjectileEntity(createProjectileByCharacter(character1), true);
+                        createProjectileEntity(createProjectileByCharacter(character1));
                         actionShape = character1.actionToPerform.projectileStruct.shape;
                     } else if (character1.actionToPerform.meleeStruct != null) {
                         actionShape = character1.actionToPerform.meleeStruct.shape;

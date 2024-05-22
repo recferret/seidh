@@ -2,5 +2,3 @@
 -lib uuid
 -js SeidhGameEngine.js
 -main engine.seidh.SeidhGameEngine
-
-# haxe .\compileEngine.hxml -D js-es=6

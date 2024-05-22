@@ -4,6 +4,7 @@ import { ServiceName, ServicePort } from '@app/seidh-common';
 import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(GameplayLobbyModule);
@@ -18,5 +19,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(ServicePort.GameplayLobby);
+
+  Logger.log(`Gameplay lobby listening on port ${ServicePort.GameplayLobby}`);
 }
 bootstrap();

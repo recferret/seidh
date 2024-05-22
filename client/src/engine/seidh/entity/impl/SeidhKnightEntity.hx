@@ -25,7 +25,6 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                 rotation: 0
             },
             health: 100,
-            dodgeChance: 0,
             characterMovementStruct: {
                 canWalk: true,
                 canRun: false,

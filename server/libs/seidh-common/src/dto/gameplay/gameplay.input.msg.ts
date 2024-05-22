@@ -1,6 +1,6 @@
-import { CharacterActionType } from "apps/gameplay/src/game/game.types";
+import { CharacterActionType } from "@app/seidh-common/seidh-common.game-types";
 
-export const GameplayJoinGamePattern = 'gameplay.input';
+export const GameplayInputPattern = 'gameplay.input';
 
 export interface GameplayInputMessage {
     playerId: string;

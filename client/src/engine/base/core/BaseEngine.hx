@@ -13,12 +13,10 @@ enum EngineMode {
 }
 
 typedef CreateCharacterEntityTask = {
-	var fireCallback:Bool;
 	var entity:EngineCharacterEntity;
 }
 
 typedef CreateProjectileEntityTask = {
-	var fireCallback:Bool;
 	var entity:EngineProjectileEntity;
 }
 
@@ -110,10 +108,9 @@ abstract class BaseEngine {
 	// Character entity management
 	// -----------------------------------
 
-	function createCharacterEntity(entity:EngineCharacterEntity, fireCallback = false) {
+	function createCharacterEntity(entity:EngineCharacterEntity) {
 		createCharacterEntityQueue.push({
-			entity: entity,
-			fireCallback: fireCallback
+			entity: entity
 		});
 	}
 
@@ -151,11 +148,19 @@ abstract class BaseEngine {
 		}
 	}
 
-	public function getCharacterEntities() {
+	public function getCharacterEntitiesMap() {
 		return characterEntityManager.entities;
 	}
 
-	public function getCharacterEntitiesChanged() {
+	public function getCharacterEntitiesArray() {
+		final result = new Array<EngineBaseEntity>();
+		for (entity in characterEntityManager.entities) {
+			result.push(entity);
+		}
+		return result;
+	}
+
+	public function getCharacterEntitiesChangedArray() {
 		final result = new Array<EngineBaseEntity>();
 		for (entity in characterEntityManager.entities) {
 			if (entity.isChanged()) 
@@ -168,7 +173,7 @@ abstract class BaseEngine {
 		for (queueTask in createCharacterEntityQueue) {
 			characterEntityManager.add(queueTask.entity);
 			playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
-			if (queueTask.fireCallback && createCharacterCallback != null) {
+			if (createCharacterCallback != null) {
 				createCharacterCallback(queueTask.entity);
 			}
 		}
@@ -193,10 +198,9 @@ abstract class BaseEngine {
 	// Projectiles
 	// -----------------------------------
 
-	function createProjectileEntity(entity:EngineProjectileEntity, fireCallback = false) {
+	function createProjectileEntity(entity:EngineProjectileEntity) {
 		createProjectileEntityQueue.push({
-			entity: entity,
-			fireCallback: fireCallback
+			entity: entity
 		});
 	}
 
@@ -207,7 +211,7 @@ abstract class BaseEngine {
 	function processCreateProjectileQueue() {
 		for (queueTask in createProjectileEntityQueue) {
 			projectileEntityManager.add(queueTask.entity);
-			if (queueTask.fireCallback && createProjectileCallback != null) {
+			if (createProjectileCallback != null) {
 				createProjectileCallback(queueTask.entity);
 			}
 		}

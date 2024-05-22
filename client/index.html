@@ -6,9 +6,11 @@
     <style>
         body { margin:0;padding:0; }
     </style>
+
      <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
         integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
         crossorigin="anonymous"></script>
+        
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <!-- Yandex.Metrika counter -->
@@ -40,9 +42,45 @@
     <!-- <script type="text/javascript" src="network.js"></script> -->
     <script type="text/javascript" src="rest.js"></script>
     <script type="text/javascript" src="socket.io.js"></script>
-    <script type="text/javascript" src="game.js"></script>
     <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="telegram.js"></script>
     <script type="text/javascript" src="ym.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+
+    <script>
+
+        async function init() {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.MainButton.setParams({
+                text: 'Main Button'
+            });
+            Telegram.WebApp.MainButton.onClick(function () {
+                // Telegram.WebApp.showAlert(Telegram.WebApp.initData);
+                fetch('http://192.168.1.6:3005/validateTelegramInitData', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        initData: 'FFFF'
+                    })
+                }).then((r) => {
+                    Telegram.WebApp.showAlert(r);
+                }).catch((e) => {
+                    Telegram.WebApp.showAlert(e);
+                });
+            });	
+            Telegram.WebApp.MainButton.show();
+            // const tg = window.Telegram.WebApp;
+            // await tg.ready();
+            // alert(window.Telegram.WebApp.tgWebAppPlatform);
+//             let tg = window.Telegram.WebApp; //получаем объект webapp телеграма 
+
+// tg.expand(); 
+        }
+
+        init();
+    </script>
+
 </body>
 </html>

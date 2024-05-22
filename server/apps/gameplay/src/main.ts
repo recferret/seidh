@@ -6,6 +6,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ServiceName, ServicePort } from '@app/seidh-common';
 import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
+import { Logger } from '@nestjs/common';
 
 export class Config {
   public static readonly GAMEPLAY_INSTANCE_ID = uuidv4();
@@ -24,5 +25,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(ServicePort.Gameplay);
+
+  Logger.log(`Gameplay ${Config.GAMEPLAY_INSTANCE_ID} listening on port ${ServicePort.GameplayLobby}`);
 }
 bootstrap();

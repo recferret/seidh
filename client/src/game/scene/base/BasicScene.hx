@@ -182,7 +182,7 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.baseEngine.postLoopCallback = function callback() {
-				for (mainEntity in baseEngine.getCharacterEntities()) {
+				for (mainEntity in baseEngine.getCharacterEntitiesMap()) {
 					if (clientCharacterEntities.exists(mainEntity.getId())) {
 						final clientEntity = clientCharacterEntities.get(mainEntity.getId());
 						clientEntity.setTragetServerPosition(mainEntity.getX(), mainEntity.getY());
@@ -455,5 +455,11 @@ abstract class BasicScene extends h2d.Scene {
 		f.interactive.onOver = function(_) f.backgroundTile = h2d.Tile.fromColor(0x606060);
 		f.interactive.onOut = function(_) f.backgroundTile = h2d.Tile.fromColor(0x404040);
 		return f;
+	}
+
+	public function addText(label:String) {
+		final text = new h2d.Text(hxd.res.DefaultFont.get(), fui);
+		text.text = label;
+		return text;
 	}
 }

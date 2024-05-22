@@ -39,6 +39,7 @@ export class GameplayService {
 
   private readonly gameInstances = new Map<string, GameInstance>();
   private readonly playerGameInstance = new Map<string, string>();
+  private readonly playersToInit = new Set<string>();
 
   constructor(
     private eventEmitter: EventEmitter2,
@@ -84,31 +85,28 @@ export class GameplayService {
     this.playerLastRequestTime.set(message.playerId, Date.now());
     
     let gameInstance: GameInstance = undefined;
-    let response: WsGatewayGameInitMessage = undefined;
 
     if (message.gameId) {
       // TODO impl join game
       gameInstance = this.gameInstances.get(message.gameId);
       if (!gameInstance) {
+        Logger.log('Join a game');
         this.playerGameInstance.set(message.playerId, gameInstance.gameId);
+        this.playersToInit.add(message.playerId);
         gameInstance.addPlayer(message.playerId);
       } else {
+        Logger.error('Error while joining the game');
         // TODO impl error while join game
       }
     } else {
-      // Create a new game 
+      // Create a new game
+      Logger.log('Create a new game');
       gameInstance = new GameInstance(this.eventEmitter, uuidv4(), GameType.PublicGame);
       gameInstance.addPlayer(message.playerId);
       this.gameInstances.set(gameInstance.gameId, gameInstance);
       this.playerGameInstance.set(message.playerId, gameInstance.gameId);
+      this.playersToInit.add(message.playerId);
     }
-
-    response = {
-      targetPlayerId : message.playerId,
-      gameId: gameInstance.gameId
-    };
-
-    this.wsGatewayService.emit(WsGatewayGameInitPattern, response);
   }
 
   public input(message: GameplayInputMessage) {
@@ -142,6 +140,24 @@ export class GameplayService {
 
   @OnEvent(EventGameGameState.EventName)
   handleEventGameGameState(payload: EventGameGameState) {
+    // Notify new players about full game state
+    try {
+      this.playersToInit.forEach(playerId => {
+        const gameInstance = this.checkAndGetGameInstance(payload.gameId);
+        const initMessage: WsGatewayGameInitMessage = {
+          targetPlayerId : playerId,
+          gameId: payload.gameId,
+          characters: gameInstance.getCharacters()
+        };
+        this.wsGatewayService.emit(WsGatewayGameInitPattern, initMessage);
+        Logger.log(`Player ${playerId} notified about full game state`);
+      });
+      this.playersToInit.clear();
+    } catch (err) {
+      Logger.error('Unable to notify new players about full game state', err);
+    }
+
+    // Notify all players about changed game state
     const message: WsGatewayGameStateMessage = {
       gameId: payload.gameId,
     }

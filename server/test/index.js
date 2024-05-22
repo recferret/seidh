@@ -1,7 +1,7 @@
 const playerId = 'player_1';
 
 async function init() {
-    const findGameResult = await fetch('http://localhost:3002/findGame', {
+    const findGameResult = await fetch('http://localhost:3003/findGame', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
@@ -13,7 +13,7 @@ async function init() {
 
     const findGameData = await findGameResult.json();
 
-    const socket = io('ws://localhost:3003', {
+    const socket = io('ws://localhost:3004', {
         transport: [ "websocket" ],
         auth: {    
             playerId: "player_1"
