@@ -52,13 +52,8 @@
         async function init() {
             Telegram.WebApp.ready();
 
-            alert(Telegram.WebApp.viewportHeight);
-
             const tg = Telegram.WebApp;
-            alert(tg.isExpanded);
             tg.expand();
-
-
 
             // Telegram.WebApp.MainButton.setParams({
             //     text: 'Main Button'
