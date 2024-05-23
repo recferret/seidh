@@ -12,7 +12,8 @@ async function bootstrap() {
   // };
   // console.log(httpsOptions);
 
-  const app = await NestFactory.create(AuthModule);//, {httpsOptions});
+  const app = await NestFactory.create(AuthModule);
+  app.enableCors();
 
   await app.listen(ServicePort.Auth);
 
