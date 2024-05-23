@@ -45,6 +45,8 @@ function alertScreenParams() {
     );
 }
 
+alertScreenParams();
+
 function getScreenParams() {
     const screenWidth = window.screen.width;
     const screenHeight = window.screen.height;

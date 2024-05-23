@@ -51,32 +51,40 @@
 
         async function init() {
             Telegram.WebApp.ready();
-            Telegram.WebApp.MainButton.setParams({
-                text: 'Main Button'
-            });
-            Telegram.WebApp.MainButton.onClick(function () {
-                // Telegram.WebApp.showAlert(Telegram.WebApp.initData);
-                fetch('http://192.168.1.6:3005/validateTelegramInitData', {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify({
-                        initData: 'FFFF'
-                    })
-                }).then((r) => {
-                    Telegram.WebApp.showAlert(r);
-                }).catch((e) => {
-                    Telegram.WebApp.showAlert(e);
-                });
-            });	
-            Telegram.WebApp.MainButton.show();
+
+            alert(Telegram.WebApp.viewportHeight);
+
+            const tg = Telegram.WebApp;
+            tg.isExpanded;
+            tg.expand();
+
+
+
+            // Telegram.WebApp.MainButton.setParams({
+            //     text: 'Main Button'
+            // });
+            // Telegram.WebApp.MainButton.onClick(function () {
+            //     // Telegram.WebApp.showAlert(Telegram.WebApp.initData);
+            //     fetch('https://seidh-game.online/validateTelegramInitData', {
+            //         method: 'POST',
+            //         headers: {
+            //         'Content-Type': 'application/json;charset=utf-8'
+            //         },
+            //         body: JSON.stringify({
+            //             initData: 'FFFF'
+            //         })
+            //     }).then((r) => {
+            //         Telegram.WebApp.showAlert(r);
+            //     }).catch((e) => {
+            //         Telegram.WebApp.showAlert(e);
+            //     });
+            // });	
+            // Telegram.WebApp.MainButton.show();
             // const tg = window.Telegram.WebApp;
             // await tg.ready();
             // alert(window.Telegram.WebApp.tgWebAppPlatform);
-//             let tg = window.Telegram.WebApp; //получаем объект webapp телеграма 
-
-// tg.expand(); 
+            // let tg = window.Telegram.WebApp; //получаем объект webapp телеграма 
+            // tg.expand(); 
         }
 
         init();
