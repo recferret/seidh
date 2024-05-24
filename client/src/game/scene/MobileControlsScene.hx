@@ -1,11 +1,9 @@
 package game.scene;
 
 import game.utils.Utils;
-import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
 import engine.base.geometry.Point;
 import engine.base.geometry.Rectangle;
-import engine.seidh.SeidhGameEngine;
 
 class MovementController extends h2d.Object {
 
@@ -107,54 +105,46 @@ enum abstract ButtonPressed(Int) {
 	var Y = 4;
 }
 
-class ControlsScene extends h2d.Scene {
+class MobileControlsScene extends h2d.Scene {
 
 	private final movementController:MovementController;
-	
 	private final text:h2d.Text;
+	private final isMobileDevice:Bool;
+	private var screenWidth:Int = 0;
+	private var screenHeight:Int = 0;
+
+	final buttonA:h2d.Bitmap;
+	final buttonB:h2d.Bitmap;
     
-    public function new(baseEngine:SeidhGameEngine, buttonPressedCallback:ButtonPressed->Void) {
+    public function new(
+		isMobileDevice:Bool, 
+		buttonPressedCallback:ButtonPressed->Void,
+		joystickMovedCallback:Float->Void,
+	) {
         super();
 
-        scaleMode = ScaleMode.Zoom(2);
+		this.isMobileDevice = isMobileDevice;
 
         movementController = new MovementController(this, function callback(angle:Float) {
-            final playerId = Player.instance.playerId;
-            final playerEntityId = Player.instance.playerEntityId;
-            final playerMovementInputType = CharacterActionType.MOVE;
-
-            if (playerMovementInputType != null) {
-                final movementAllowance = baseEngine.checkLocalMovementInputAllowance(playerEntityId);
-                if (movementAllowance) {
-                    baseEngine.addInputCommandClient(new PlayerInputCommand(playerMovementInputType, angle, playerId, Player.instance.incrementAndGetInputIndex()));
-                }
-            }
+			if (joystickMovedCallback != null) {
+				joystickMovedCallback(angle);
+			}
         });
-        movementController.initiate(250, 250, 400);
 
-		// Buttons
+		buttonA = new h2d.Bitmap(hxd.Res.input.button_a.toTile(), this);
+		buttonB = new h2d.Bitmap(hxd.Res.input.button_b.toTile(), this);
 
-		final buttonScale = 2;
-		final buttonSize = 80;
-		final buttonScaledSize = buttonScale * buttonSize;
+		buttonA.scale(2);
+		buttonB.scale(2);
 
-		final buttonA = new h2d.Bitmap(hxd.Res.input.button_a.toTile(), this);
-		final buttonB = new h2d.Bitmap(hxd.Res.input.button_b.toTile(), this);
-
-		buttonA.scale(buttonScale);
-		buttonB.scale(buttonScale);
-
-		buttonA.setPosition(width - (buttonScaledSize * 2), buttonScaledSize / 2);
-		buttonB.setPosition(width - (buttonScaledSize * 2), buttonScaledSize * 2);
-
-		final interactionButtonA = new h2d.Interactive(buttonSize, buttonSize, buttonA);
+		final interactionButtonA = new h2d.Interactive(buttonA.tile.width, buttonA.tile.height, buttonA);
 		interactionButtonA.onClick = function(event : hxd.Event) {
 			if (buttonPressedCallback != null) {
 				buttonPressedCallback(ButtonPressed.A);
 			}
 		}
 
-		final interactionButtonB = new h2d.Interactive(buttonSize, buttonSize, buttonB);
+		final interactionButtonB = new h2d.Interactive(buttonB.tile.width, buttonB.tile.height, buttonB);
 		interactionButtonB.onClick = function(event : hxd.Event) {
 			if (buttonPressedCallback != null) {
 				buttonPressedCallback(ButtonPressed.B);
@@ -170,6 +160,17 @@ class ControlsScene extends h2d.Scene {
 
 		text = new h2d.Text(hxd.res.DefaultFont.get(), fui);
     }
+
+
+	public function resize(orientation:String, w:Int, h:Int) {
+		scaleMode = ScaleMode.Stretch(w, h);
+		final rectSize = 400;
+
+		movementController.initiate(rectSize / 2, h - rectSize / 2, rectSize);
+
+		buttonA.setPosition(w - (buttonA.tile.width * 2.5), h - (buttonB.tile.height * 5.5));
+		buttonB.setPosition(w - (buttonB.tile.width * 2.5), h - (buttonB.tile.height * 2.5));
+	}
 
     public function update() {
 		movementController.update();
