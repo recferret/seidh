@@ -263,8 +263,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 			currentDirectionSide = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
 
-			baseEntity.x += dx;
-			baseEntity.y += dy;
+			baseEntity.x += Std.int(dx);
+			baseEntity.y += Std.int(dy);
 		}
 	}
 
@@ -353,18 +353,12 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// Getters
 	// ------------------------------------------------
 
-	public function getFullEntity() {
-		return characterEntity;
+	public function getEntityFullStruct() {
+		return characterEntity.toFullStruct();
 	}
 
-	public function getMinEntity() {
-		final minEntity:CharacterEntityMinStruct = {
-			id: baseEntity.id,
-			x: baseEntity.x,
-			y: baseEntity.y,
-			side: currentDirectionSide
-		};
-		return minEntity;
+	public function getEntityMinStruct() {
+		return characterEntity.toMinStruct();
 	}
 	
 	public function getCurrentActionRect() {

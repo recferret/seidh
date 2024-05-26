@@ -1,5 +1,7 @@
 package game.js;
 
+import engine.base.BaseTypesAndClasses.CharacterActionType;
+
 enum abstract YandexMetricsGoals(String) {
 	var JoinSinglePlayerGame = 'JoinSinglePlayerGame';
 	var JoinMultiplayerPlayerGame = 'JoinMultiplayerPlayerGame';
@@ -8,12 +10,13 @@ enum abstract YandexMetricsGoals(String) {
 @:native("window")
 extern class NativeWindowJS {
 
-    // WS
-	static function wsConnect(callback:String->Void):Void;
-    static function wsSend(message:Dynamic):Void;
+    // Networking
+    static function networkInit(playerId:String, wsCallback:Dynamic->Void):Void;
+    static function networkFindAndJoinGame(playerId:String):Void;
+    static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;
 
     // Rest
-    static function restPostTelegramInitData(initData:String):Void;
+    // static function restPostTelegramInitData(initData:String):Void;
 
     // Common
     static function getMobile():String;

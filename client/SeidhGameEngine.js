@@ -114,6 +114,10 @@ class engine_base_BaseEntity {
 		this.ownerId = struct.ownerId;
 		this.rotation = struct.rotation;
 	}
+	getBaseStruct() {
+		let struct = { x : this.x, y : this.y, entityType : this.entityType, entityShape : this.entityShape, id : this.id, ownerId : this.ownerId, rotation : this.rotation};
+		return struct;
+	}
 }
 engine_base_BaseEntity.__name__ = true;
 Object.assign(engine_base_BaseEntity.prototype, {
@@ -123,12 +127,23 @@ class engine_base_CharacterEntity extends engine_base_BaseEntity {
 	constructor(struct) {
 		super(struct.base);
 		this.health = struct.health;
-		this.movement = struct.characterMovementStruct;
-		this.actionMain = struct.characterActionMainStruct;
-		this.action1 = struct.characterAction1Struct;
-		this.action2 = struct.characterAction2Struct;
-		this.action3 = struct.characterAction3Struct;
-		this.actionUltimate = struct.characterActionUltimate;
+		this.movement = struct.movement;
+		this.actionMain = struct.actionMain;
+		this.action1 = struct.action1;
+		this.action2 = struct.action2;
+		this.action3 = struct.action3;
+		this.actionUltimate = struct.actionUltimate;
+	}
+	toFullStruct() {
+		let fullEntity = { base : this.getBaseStruct(), movement : this.movement, health : this.health, actionMain : this.actionMain, action1 : this.action1, action2 : this.action2, action3 : this.action3, actionUltimate : this.actionUltimate};
+		return fullEntity;
+	}
+	toMinStruct() {
+		let minEntity = { id : this.id, x : this.x, y : this.y};
+		return minEntity;
+	}
+	static CreateFromDynamic(struct) {
+		return new engine_base_CharacterEntity(struct);
 	}
 }
 engine_base_CharacterEntity.__name__ = true;
@@ -252,9 +267,9 @@ class engine_base_core_BaseEngine {
 		this.coldInputCommandsTreshhold = 10;
 		this.ticksSinceLastPop = 0;
 		this.hotInputCommands = [];
-		this.removeProjectileEntityQueue = [];
+		this.deleteProjectileEntityQueue = [];
 		this.createProjectileEntityQueue = [];
-		this.removeCharacterEntityQueue = [];
+		this.deleteCharacterEntityQueue = [];
 		this.createCharacterEntityQueue = [];
 		this.validatedInputCommands = [];
 		this.playerToEntityMap = new haxe_ds_StringMap();
@@ -270,9 +285,9 @@ class engine_base_core_BaseEngine {
 			}
 			_gthis.ticksSinceLastPop++;
 			_gthis.processCreateCharacterQueue();
-			_gthis.processRemoveCharacterQueue();
+			_gthis.processDeleteCharacterQueue();
 			_gthis.processCreateProjectileQueue();
-			_gthis.processRemoveProjectileQueue();
+			_gthis.processDeleteProjectileQueue();
 			_gthis.engineLoopUpdate(dt);
 			if(_gthis.hotInputCommands.length > 0) {
 				_gthis.processInputCommands(_gthis.hotInputCommands);
@@ -289,16 +304,19 @@ class engine_base_core_BaseEngine {
 	createCharacterEntity(entity) {
 		this.createCharacterEntityQueue.push({ entity : entity});
 	}
-	removeCharacterEntity(entityId) {
-		this.removeCharacterEntityQueue.push(entityId);
+	deleteCharacterEntityByOwnerId(ownerId) {
+		this.deleteCharacterEntityQueue.push(this.getCharacterEntityIdByOwnerId(ownerId));
+	}
+	deleteCharacterEntity(entityId) {
+		this.deleteCharacterEntityQueue.push(entityId);
 	}
 	getCharacterEntityById(id) {
 		return this.characterEntityManager.getEntityById(id);
 	}
-	getMainEntityIdByOwnerId(id) {
+	getCharacterEntityIdByOwnerId(id) {
 		return this.playerToEntityMap.h[id];
 	}
-	getMainEntityByOwnerId(id) {
+	getCharacterEntityByOwnerId(id) {
 		return this.characterEntityManager.getEntityById(this.playerToEntityMap.h[id]);
 	}
 	updateCharacterEntitiesByServer(minEntities) {
@@ -310,7 +328,6 @@ class engine_base_core_BaseEngine {
 			if(entity != null) {
 				entity.setX(minEntity.x);
 				entity.setY(minEntity.y);
-				(js_Boot.__cast(entity , engine_base_entity_impl_EngineCharacterEntity)).currentDirectionSide = minEntity.side;
 			}
 		}
 	}
@@ -323,7 +340,7 @@ class engine_base_core_BaseEngine {
 	getCharacterEntitiesMap() {
 		return this.characterEntityManager.entities;
 	}
-	getCharacterEntitiesArray() {
+	getCharactersStruct(params) {
 		let result = [];
 		let jsIterator = this.characterEntityManager.entities.values();
 		let _g_jsIterator = jsIterator;
@@ -332,22 +349,16 @@ class engine_base_core_BaseEngine {
 			let v = _g_lastStep.value;
 			_g_lastStep = _g_jsIterator.next();
 			let entity = v;
-			result.push(entity);
-		}
-		return result;
-	}
-	getCharacterEntitiesChangedArray() {
-		let result = [];
-		let jsIterator = this.characterEntityManager.entities.values();
-		let _g_jsIterator = jsIterator;
-		let _g_lastStep = jsIterator.next();
-		while(!_g_lastStep.done) {
-			let v = _g_lastStep.value;
-			_g_lastStep = _g_jsIterator.next();
-			let entity = v;
-			if(entity.isChanged()) {
-				result.push(entity);
+			if(params.changed == true && !entity.isChanged()) {
+				continue;
 			}
+			let entityStruct;
+			if(params.full == true) {
+				entityStruct = (js_Boot.__cast(entity , engine_base_entity_impl_EngineCharacterEntity)).getEntityFullStruct();
+			} else {
+				entityStruct = (js_Boot.__cast(entity , engine_base_entity_impl_EngineCharacterEntity)).getEntityMinStruct();
+			}
+			result.push(entityStruct);
 		}
 		return result;
 	}
@@ -368,9 +379,9 @@ class engine_base_core_BaseEngine {
 		}
 		this.createCharacterEntityQueue = [];
 	}
-	processRemoveCharacterQueue() {
+	processDeleteCharacterQueue() {
 		let _g = 0;
-		let _g1 = this.removeCharacterEntityQueue;
+		let _g1 = this.deleteCharacterEntityQueue;
 		while(_g < _g1.length) {
 			let entityId = _g1[_g];
 			++_g;
@@ -385,16 +396,16 @@ class engine_base_core_BaseEngine {
 				if(Object.prototype.hasOwnProperty.call(_this.h,key)) {
 					delete(_this.h[key]);
 				}
-				this.characterEntityManager.remove(entity.getId());
+				this.characterEntityManager.delete(entity.getId());
 			}
 		}
-		this.removeCharacterEntityQueue = [];
+		this.deleteCharacterEntityQueue = [];
 	}
 	createProjectileEntity(entity) {
 		this.createProjectileEntityQueue.push({ entity : entity});
 	}
-	removeProjectileEntity(entityId) {
-		this.removeProjectileEntityQueue.push(entityId);
+	deleteProjectileEntity(entityId) {
+		this.deleteProjectileEntityQueue.push(entityId);
 	}
 	processCreateProjectileQueue() {
 		let _g = 0;
@@ -409,9 +420,9 @@ class engine_base_core_BaseEngine {
 		}
 		this.createProjectileEntityQueue = [];
 	}
-	processRemoveProjectileQueue() {
+	processDeleteProjectileQueue() {
 		let _g = 0;
-		let _g1 = this.removeProjectileEntityQueue;
+		let _g1 = this.deleteProjectileEntityQueue;
 		while(_g < _g1.length) {
 			let entityId = _g1[_g];
 			++_g;
@@ -420,10 +431,10 @@ class engine_base_core_BaseEngine {
 				if(this.deleteProjectileCallback != null) {
 					this.deleteProjectileCallback(entity);
 				}
-				this.projectileEntityManager.remove(entity.getId());
+				this.projectileEntityManager.delete(entity.getId());
 			}
 		}
-		this.removeProjectileEntityQueue = [];
+		this.deleteProjectileEntityQueue = [];
 	}
 	checkLocalMovementInputAllowance(entityId) {
 		let entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
@@ -446,7 +457,7 @@ class engine_base_core_BaseEngine {
 		}
 	}
 	addInputCommandServer(input) {
-		let entityId = this.getMainEntityIdByOwnerId(input.playerId);
+		let entityId = this.getCharacterEntityIdByOwnerId(input.playerId);
 		let allow = false;
 		if(input.actionType == 1) {
 			allow = this.checkLocalMovementInputAllowance(entityId);
@@ -545,8 +556,8 @@ class engine_base_entity_base_EngineBaseEntity {
 		return this.previousTickHash != this.currentTickHash;
 	}
 	moveBy(x,y) {
-		this.baseEntity.x += x;
-		this.baseEntity.y += y;
+		this.baseEntity.x += x | 0;
+		this.baseEntity.y += y | 0;
 	}
 	getBodyRectangle(rotated) {
 		if(rotated == null) {
@@ -614,7 +625,7 @@ class engine_base_entity_base_EngineBaseEntityManager {
 	add(entity) {
 		this.entities.set(entity.getId(),entity);
 	}
-	remove(id) {
+	delete(id) {
 		this.entities.delete(id);
 	}
 	getEntityById(id) {
@@ -803,8 +814,8 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 			this.dx = speed * Math.cos(this.baseEntity.rotation) * this.lastDeltaTime;
 			this.dy = speed * Math.sin(this.baseEntity.rotation) * this.lastDeltaTime;
 			this.currentDirectionSide = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
-			this.baseEntity.x += this.dx;
-			this.baseEntity.y += this.dy;
+			this.baseEntity.x += this.dx | 0;
+			this.baseEntity.y += this.dy | 0;
 		}
 	}
 	checkLocalMovementInput() {
@@ -890,12 +901,11 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 		}
 		return this.characterEntity.health;
 	}
-	getFullEntity() {
-		return this.characterEntity;
+	getEntityFullStruct() {
+		return this.characterEntity.toFullStruct();
 	}
-	getMinEntity() {
-		let minEntity = { id : this.baseEntity.id, x : this.baseEntity.x, y : this.baseEntity.y, side : this.currentDirectionSide};
-		return minEntity;
+	getEntityMinStruct() {
+		return this.characterEntity.toMinStruct();
 	}
 	getCurrentActionRect() {
 		if(this.actionToPerform.meleeStruct != null) {
@@ -1167,6 +1177,9 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 	createCharacterEntityFromMinimalStruct(struct) {
 		this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateEntity(struct.id,struct.ownerId,struct.x,struct.y,struct.entityType));
 	}
+	createCharacterEntityFromFullStruct(struct) {
+		this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCharacterFromFullStruct(struct));
+	}
 	processInputCommands(playerInputCommands) {
 		let _g = 0;
 		while(_g < playerInputCommands.length) {
@@ -1203,7 +1216,7 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 			if(projectile.allowMovement) {
 				projectile.update(dt);
 			} else {
-				this.removeProjectileEntity(projectile.getId());
+				this.deleteProjectileEntity(projectile.getId());
 			}
 		}
 		let jsIterator1 = this.characterEntityManager.entities.values();
@@ -1297,7 +1310,7 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 								if(health == 0) {
 									character2.isAlive = false;
 									deadEntities.push(character2.getId());
-									this.removeCharacterEntity(character2.getId());
+									this.deleteCharacterEntity(character2.getId());
 								} else {
 									hurtEntities.push(character2.getId());
 								}
@@ -1318,7 +1331,7 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 	}
 	createProjectileByCharacter(character) {
 		let ownerRect = character.getBodyRectangle();
-		let projectileEntity = new engine_base_entity_impl_EngineProjectileEntity(new engine_base_ProjectileEntity({ base : { x : ownerRect.getCenter().x, y : ownerRect.getCenter().y, entityType : 6, entityShape : character.actionToPerform.projectileStruct.shape, ownerId : character.getOwnerId(), rotation : character.getRotation()}, projectile : character.actionToPerform.projectileStruct}));
+		let projectileEntity = new engine_base_entity_impl_EngineProjectileEntity(new engine_base_ProjectileEntity({ base : { x : ownerRect.getCenter().x | 0, y : ownerRect.getCenter().y | 0, entityType : 6, entityShape : character.actionToPerform.projectileStruct.shape, ownerId : character.getOwnerId(), rotation : character.getRotation()}, projectile : character.actionToPerform.projectileStruct}));
 		return projectileEntity;
 	}
 	getNearestPlayer(entity) {
@@ -1397,6 +1410,22 @@ class engine_seidh_entity_factory_SeidhEntityFactory {
 		}
 		return entity;
 	}
+	static InitiateCharacterFromFullStruct(struct) {
+		let entity = null;
+		let _g = struct.base.entityType;
+		if(_g != null) {
+			switch(_g) {
+			case 1:
+				entity = new engine_seidh_entity_impl_SeidhKnightEntity(new engine_base_CharacterEntity(struct));
+				break;
+			case 4:
+				entity = new engine_seidh_entity_impl_SeidhSkeletonWarriorEntity(new engine_base_CharacterEntity(struct));
+				break;
+			default:
+			}
+		}
+		return entity;
+	}
 	static InitiateProjectile() {
 	}
 }
@@ -1410,7 +1439,7 @@ class engine_seidh_entity_impl_SeidhKnightEntity extends engine_seidh_entity_bas
 		let tmp1 = { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(140,100,80,100)}};
 		let tmp2 = { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : new engine_base_EntityShape(30,10,0,0)}};
 		let tmp3 = { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : new engine_base_EntityShape(100,100,0,0), shape : new engine_base_EntityShape(25,25,0,0)}};
-		return new engine_base_CharacterEntity({ base : tmp, health : 100, characterMovementStruct : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : tmp1, characterAction1Struct : tmp2, characterAction2Struct : tmp3, characterAction3Struct : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
+		return new engine_base_CharacterEntity({ base : tmp, health : 100, movement : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : tmp1, action1 : tmp2, action2 : tmp3, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
 	}
 }
 engine_seidh_entity_impl_SeidhKnightEntity.__name__ = true;
@@ -1423,7 +1452,7 @@ class engine_seidh_entity_impl_SeidhSkeletonWarriorEntity extends engine_seidh_e
 		super(characterEntity);
 	}
 	static GenerateObjectEntity(id,ownerId,x,y) {
-		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId, rotation : 0}, health : 10, characterMovementStruct : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, characterActionMainStruct : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : new engine_base_EntityShape(140,100,80,100)}}});
+		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId, rotation : 0}, health : 10, movement : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : new engine_base_EntityShape(140,100,80,100)}}});
 	}
 }
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__name__ = true;

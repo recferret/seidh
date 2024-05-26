@@ -25,7 +25,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
                 rotation: 0
             },
             health: 10,
-            characterMovementStruct: {
+            movement: {
                 canWalk: true,
                 canRun: true,
                 walkSpeed: 20,
@@ -35,7 +35,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
                 vitalityConsumptionPerSec: 20,
                 vitalityRegenPerSec: 10,
             },
-            characterActionMainStruct: {
+            actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,
                 damage: 10,
                 inputDelay: 1,

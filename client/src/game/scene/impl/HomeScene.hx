@@ -11,17 +11,15 @@ class HomeScene extends BasicScene {
 
 		this.selectSceneCallback = selectSceneCallback;
 
-		addButton('Input scene', (button:h2d.Flow) -> {
-			selectScene(GameScene.SceneInputTest);
+		final createGameButton = addButton('Create game', (button:h2d.Flow) -> {
+			// selectScene(GameScene.SceneInputTest);
 		});
 
-		addButton('AI scene', (button:h2d.Flow) -> {
-			selectScene(GameScene.SceneAiTest);
+		final joinGameButton = addButton('Join game 2', (button:h2d.Flow) -> {
+			// selectScene(GameScene.SceneAiTest);
 		});
 
-		addButton('Geom test', (button:h2d.Flow) -> {
-			selectScene(GameScene.SceneGeomTest);
-		});
+		joinGameButton.minWidth = createGameButton.outerWidth;
 	}
 
 	// --------------------------------------

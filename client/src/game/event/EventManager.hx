@@ -6,9 +6,9 @@ interface EventListener {
 
 class EventManager {
 
-	public static final EVENT_JOIN_GAME = 'EVENT_JOIN_GAME';
-	public static final EVENT_CREATE_ENTITY = 'EVENT_CREATE_ENTITY';
-	public static final EVENT_DELETE_ENTITY = 'EVENT_DELETE_ENTITY';
+	public static final EVENT_GAME_INIT = 'EVENT_GAME_INIT';
+	public static final EVENT_CREATE_CHARACTER = 'EVENT_CREATE_CHARACTER';
+	public static final EVENT_DELETE_CHARACTER = 'EVENT_DELETE_CHARACTER';
 	public static final EVENT_GAME_STATE = 'EVENT_GAME_STATE';
 	public static final EVENT_PERFORM_ACTION = 'EVENT_PERFORM_ACTION';
 

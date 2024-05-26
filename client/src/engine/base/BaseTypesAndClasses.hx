@@ -111,8 +111,8 @@ typedef CharacterActionStruct = {
 }
 
 typedef BaseEntityStruct = {
-	x:Float,
-	y:Float,
+	x:Int,
+	y:Int,
 	?entityType:EntityType,
 	?entityShape:EntityShape,
 	?id:String,
@@ -120,20 +120,28 @@ typedef BaseEntityStruct = {
 	?rotation:Float,
 }
 
-typedef CharacterEntityStruct = {
+typedef CharacterEntityMinStruct = {
+    id:String,
+    ?ownerId:String,
+    x:Int,
+    y:Int,
+    ?entityType:EntityType,
+}
+
+typedef CharacterEntityFullStruct = {
 	base:BaseEntityStruct,
-	characterMovementStruct:CharacterMovementStruct,
-	characterActionMainStruct:CharacterActionStruct,
-	?characterAction1Struct:CharacterActionStruct,
-	?characterAction2Struct:CharacterActionStruct,
-	?characterAction3Struct:CharacterActionStruct,
-	?characterActionUltimate:CharacterActionStruct,
+	movement:CharacterMovementStruct,
+	actionMain:CharacterActionStruct,
+	?action1:CharacterActionStruct,
+	?action2:CharacterActionStruct,
+	?action3:CharacterActionStruct,
+	?actionUltimate:CharacterActionStruct,
 	health:Int,
 }
 
 class BaseEntity {
-	public var x:Float;
-	public var y:Float;
+	public var x:Int;
+	public var y:Int;
 	public var entityType:EntityType;
 	public var entityShape:EntityShape;
 	public var id:String;
@@ -149,9 +157,22 @@ class BaseEntity {
 		this.ownerId = struct.ownerId;
 		this.rotation = struct.rotation;
 	}
+
+	public function getBaseStruct() {
+		final struct:BaseEntityStruct = {
+			x: this.x,
+			y: this.y,
+			entityType: this.entityType,
+			entityShape: this.entityShape,
+			id: this.id,
+			ownerId: this.ownerId,
+			rotation: this.rotation
+		};
+		return struct;
+	}
 }
 
-class CharacterEntity extends BaseEntity {
+class CharacterEntity extends BaseEntity { 
 	public var health:Int;
 	public var movement:CharacterMovementStruct;
 	public var actionMain:CharacterActionStruct;
@@ -160,16 +181,43 @@ class CharacterEntity extends BaseEntity {
 	public var action3:CharacterActionStruct;
 	public var actionUltimate:CharacterActionStruct;
 
-	public function new(struct:CharacterEntityStruct) {
+	public function new(struct:CharacterEntityFullStruct) {
 		super(struct.base);
 
 		this.health = struct.health;
-		this.movement = struct.characterMovementStruct;
-		this.actionMain = struct.characterActionMainStruct;
-		this.action1 = struct.characterAction1Struct;
-		this.action2 = struct.characterAction2Struct;
-		this.action3 = struct.characterAction3Struct;
-		this.actionUltimate = struct.characterActionUltimate;
+		this.movement = struct.movement;
+		this.actionMain = struct.actionMain;
+		this.action1 = struct.action1;
+		this.action2 = struct.action2;
+		this.action3 = struct.action3;
+		this.actionUltimate = struct.actionUltimate;
+	}
+
+	public function toFullStruct() {
+		final fullEntity:CharacterEntityFullStruct = {
+			base: getBaseStruct(),
+			movement: this.movement,
+			health: this.health,
+			actionMain: this.actionMain,
+			action1: this.action1,
+			action2: this.action2,
+			action3: this.action3,
+			actionUltimate: this.actionUltimate,
+		};
+		return fullEntity;
+	}
+
+	public function toMinStruct() {
+		final minEntity:CharacterEntityMinStruct = {
+			id: this.id,
+			x: this.x,
+			y: this.y,
+		};
+		return minEntity;
+	}
+
+	public static function CreateFromDynamic(struct:CharacterEntityFullStruct) {
+		return new CharacterEntity(struct);
 	}
 }
 
@@ -191,15 +239,6 @@ class ProjectileEntity extends BaseEntity {
 // -------------------------------
 // Multiplayer
 // -------------------------------
-
-// NEED SIDE ?
-
-typedef CharacterEntityMinStruct = {
-	id:String,
-	x:Float,
-	y:Float,
-	side:Side
-}
 
 enum abstract CharacterActionType(Int) {
 	var MOVE = 1;

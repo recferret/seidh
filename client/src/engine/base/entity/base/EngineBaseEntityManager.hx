@@ -26,7 +26,7 @@ class EngineBaseEntityManager {
 		entities.set(entity.getId(), entity);
 	}
 
-	public function remove(id:String) {
+	public function delete(id:String) {
 		entities.delete(id);
 	}
 

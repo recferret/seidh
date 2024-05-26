@@ -19,14 +19,6 @@ typedef CharacterActionCallbackParams = {
     deadEntities: Array<String>,
 };
 
-typedef CreateCharacterMinStruct = {
-    id:String,
-    ownerId:String,
-    x:Int,
-    y:Int,
-    entityType:EntityType,
-}
-
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
@@ -41,8 +33,12 @@ class SeidhGameEngine extends BaseEngine {
 	    super(engineMode);
     }
 
-    public function createCharacterEntityFromMinimalStruct(struct:CreateCharacterMinStruct) {
+    public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
         createCharacterEntity(SeidhEntityFactory.InitiateEntity(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType));
+    }
+
+    public function createCharacterEntityFromFullStruct(struct:CharacterEntityFullStruct) {
+        createCharacterEntity(SeidhEntityFactory.InitiateCharacterFromFullStruct(struct));
     }
 
     // ---------------------------------------------------
@@ -85,7 +81,7 @@ class SeidhGameEngine extends BaseEngine {
             if (projectile.allowMovement) {
                 projectile.update(dt);
             } else {
-                removeProjectileEntity(projectile.getId());
+                deleteProjectileEntity(projectile.getId());
             }
         }
 
@@ -164,7 +160,7 @@ class SeidhGameEngine extends BaseEngine {
                                 if (health == 0) {
                                     character2.isAlive = false;
                                     deadEntities.push(character2.getId());
-                                    removeCharacterEntity(character2.getId());
+                                    deleteCharacterEntity(character2.getId());
                                 } else {
                                     hurtEntities.push(character2.getId());
                                 }
@@ -199,8 +195,8 @@ class SeidhGameEngine extends BaseEngine {
         final ownerRect = character.getBodyRectangle();
         final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
             base: {
-                x: ownerRect.getCenter().x,
-                y: ownerRect.getCenter().y,
+                x: Std.int(ownerRect.getCenter().x),
+                y: Std.int(ownerRect.getCenter().y),
                 entityType: EntityType.PROJECTILE_MAGIC_ARROW,
                 entityShape: character.actionToPerform.projectileStruct.shape,
                 ownerId: character.getOwnerId(),

@@ -1,8 +1,19 @@
 // const url = 'http://localhost:4005/';
 // const url = 'https://192.168.1.6:3005/';
 
-function restJoinGame(playerId, gameType) {
-    fetch('/rest/joinGame');
+async function restFindGame(playerId) {
+    const findGameResult = await fetch('http://localhost:3003/findGame', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({
+            playerId
+        })
+    });
+
+    const findGameData = await findGameResult.json();
+    return findGameData;
 }
 
 

@@ -9,6 +9,15 @@ class SceneUiTest extends BasicScene {
 		super(null);
 
         trace('SceneUiTest');
+
+		// TODO impl
+
+		addButton('Create game', (button:h2d.Flow) -> {
+			
+		});
+		addButton('Join game', (button:h2d.Flow) -> {
+			
+		});
     }
 
     // --------------------------------------

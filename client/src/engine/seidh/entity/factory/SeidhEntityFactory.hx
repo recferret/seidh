@@ -1,10 +1,8 @@
 package engine.seidh.entity.factory;
 
-import engine.base.BaseTypesAndClasses.EntityType;
+import engine.base.BaseTypesAndClasses;
 import engine.seidh.entity.impl.SeidhKnightEntity;
-// import engine.seidh.entity.impl.SeidhSamuraiEntity;
 import engine.seidh.entity.impl.SeidhSkeletonWarriorEntity;
-// import engine.seidh.entity.impl.SeidhSkeletonArcherEntity;
 import engine.seidh.entity.base.SeidhBaseEntity;
 
 class SeidhEntityFactory {
@@ -20,6 +18,18 @@ class SeidhEntityFactory {
                 entity = new SeidhSkeletonWarriorEntity(SeidhSkeletonWarriorEntity.GenerateObjectEntity(id, ownerId, x, y));
             // case SKELETON_ARCHER:
                 // entity = new SeidhSkeletonArcherEntity(SeidhSkeletonArcherEntity.GenerateObjectEntity(id, ownerId, x, y));
+            default:
+        }
+        return entity;
+    }
+
+    public static function InitiateCharacterFromFullStruct(struct:CharacterEntityFullStruct) {
+        var entity:SeidhBaseEntity = null;
+        switch (struct.base.entityType) {
+            case KNIGHT:
+                entity = new SeidhKnightEntity(new CharacterEntity(struct));
+            case SKELETON_WARRIOR:
+                entity = new SeidhSkeletonWarriorEntity(new CharacterEntity(struct));
             default:
         }
         return entity;

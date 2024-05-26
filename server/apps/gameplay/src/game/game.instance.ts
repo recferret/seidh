@@ -7,8 +7,8 @@ import {
     CharacterActionCallbackParams,
     PlayerInputCommand,
     CreateCharacterMinStruct,
-    EntityType, 
-    CharacterEntity
+    EntityType,
+    CharacterEntityFullStruct, 
 } from "@app/seidh-common/seidh-common.game-types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EventGameGameState } from "../events/event.game.state";
@@ -17,10 +17,12 @@ import { EventGameCreateCharacter } from "../events/event.game.create-character"
 import { EventGameCreateProjectile } from "../events/event.game.create-projectile";
 import { EventGameDeleteCharacter } from "../events/event.game.delete-character";
 import { EventGameDeleteProjectile } from "../events/event.game.delete-projectile";
+import { Logger } from "@nestjs/common";
 
 export class GameInstance {
 
     private readonly engine: Engine.SeidhGameEngine;
+    private dummyCounter = 1;
 
     constructor(private eventEmitter: EventEmitter2, public gameId: string, public gameType: GameType) {
         this.engine = new Engine.engine.seidh.SeidhGameEngine();
@@ -32,17 +34,14 @@ export class GameInstance {
         this.engine.createCharacterCallback = (characterEntity: EngineCharacterEntity) => {
             this.eventEmitter.emit(
                 EventGameCreateCharacter.EventName, 
-                characterEntity
+                new EventGameCreateCharacter(gameId, characterEntity.getEntityFullStruct())
             );
         };
 
         this.engine.deleteCharacterCallback = (characterEntity: EngineCharacterEntity) => {
             this.eventEmitter.emit(
                 EventGameDeleteCharacter.EventName,
-                new EventGameDeleteCharacter(
-                    gameId,
-                    characterEntity.getMinEntity().id
-                )
+                new EventGameDeleteCharacter(gameId, characterEntity.getEntityMinStruct().id)
             );
         };
 
@@ -55,27 +54,26 @@ export class GameInstance {
         };
 
         this.engine.postLoopCallback = () => {
-            const charactersMin: CharacterEntityMinStruct[] = [];
-            for (const entity of this.engine.getCharacterEntitiesChangedArray()) {
-                charactersMin.push(entity.getMinEntity());
+            const charactersMinStruct: CharacterEntityMinStruct[] = [];
+            for (const entity of this.engine.getCharactersStruct({ changed: true, full: false })) {
+                charactersMinStruct.push(entity);
             }
 
-            const charactersFull: CharacterEntity[] = [];
-            // for (const entity of entitiesMap.values())
-            // TODO rmk to array ? or just rename this function?
-            for (const entity of this.engine.getCharacterEntitiesArray()) {
-                console.log(entity);
-                charactersFull.push(entity);
+            const charactersFullStruct: CharacterEntityFullStruct[] = [];
+            for (const entity of this.engine.getCharactersStruct({ changed: false, full: true })) {
+                charactersFullStruct.push(entity);
             }
 
-            this.eventEmitter.emit(
-                EventGameGameState.EventName, 
-                new EventGameGameState(
-                    gameId,
-                    charactersMin,
-                    charactersFull
-                )
-            );
+            if (charactersMinStruct.length > 0 || charactersFullStruct.length > 0) {
+                this.eventEmitter.emit(
+                    EventGameGameState.EventName, 
+                    new EventGameGameState(
+                        gameId,
+                        charactersMinStruct,
+                        charactersFullStruct
+                    )
+                );
+            }
         };
 
         this.engine.characterActionCallbacks = (actions: CharacterActionCallbackParams[]) => {
@@ -101,28 +99,25 @@ export class GameInstance {
         const struct: CreateCharacterMinStruct = {
             id: 'entity_' + playerId,
             ownerId: playerId,
-            x: 200,
+            x: 200 * this.dummyCounter++,
             y: 200,
             entityType: EntityType.KNIGHT,
         };
         this.engine.createCharacterEntityFromMinimalStruct(struct);
     }
 
-    removePlayer(playerId: string) {
-        this.engine.removeCharacterEntity(playerId);
+    deletePlayer(playerId: string) {
+        this.engine.deleteCharacterEntityByOwnerId(playerId);
     }
 
     // getters
     
-
-    // WTF ?
-    getCharacters() {
-        const characters: CharacterEntity[] = [];
-        console.log(this.engine);
-        for (const entity of this.engine.getCharacterEntitiesArray()) {
-            console.log(entity);
-            characters.push(entity.getFullEntity());
-        }
-        return characters;
-    }
+    // getCharactersFullStruct() {
+    //     const characters: CharacterEntityFullStruct[] = [];
+    //     for (const entity of this.engine.getCharactersStruct({ changed: false, full: true })) {
+    //         characters.push(entity);
+    //     }
+    //     return characters;
+    // }
+    
 }

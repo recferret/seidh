@@ -27,9 +27,19 @@ async function init() {
             gameplayServiceId: findGameData.gameplayServiceId
         });
     });
+
+    socket.on('GameInit', function(data) {
+        console.log('GameInit', data);
+    });
+
+    socket.on('GameState', function(data) {
+        console.log('GameState', data);
+    });
+
     socket.on('exception', function(data) {
         console.log('Exception', data);
     });
+    
     socket.on('disconnect', function() {
         console.log('Disconnected');
     });

@@ -25,33 +25,33 @@ class SceneManager {
 	public function new(sceneChangedCallback:BasicScene->Void, scene:GameScene = GameScene.SceneHome) {
 		this.sceneChangedCallback = sceneChangedCallback;
 
-		// switch (scene) {
-		// 	case SceneHome:
-		// 		currentScene = new HomeScene(function callback(gameScene:GameScene) {
-		// 			switch (gameScene) {
-		// 				case SceneInputTest:
-		// 					currentScene = new SceneInputTest();
-		// 					currentScene.start();
-		// 				case SceneAiTest:
-		// 					currentScene = new SceneAiTest();
-		// 					currentScene.start();
-		// 				case SceneGeomTest:
-							// currentScene = new SceneGeomTest();
-		// 					currentScene.start();
-		// 				default:
-		// 			}
-		// 			changeSceneCallback();
-		// 		});
-		// 	default:
-		// }
+		switch (scene) {
+			case SceneHome:
+				currentScene = new HomeScene(function callback(gameScene:GameScene) {
+					// switch (gameScene) {
+					// 	case SceneInputTest:
+					// 		currentScene = new SceneInputTest();
+					// 		currentScene.start();
+					// 	case SceneAiTest:
+					// 		currentScene = new SceneAiTest();
+					// 		currentScene.start();
+					// 	case SceneGeomTest:
+					// 		currentScene = new SceneGeomTest();
+					// 		currentScene.start();
+					// 	default:
+					// }
+					// changeSceneCallback();
+				});
+			default:
+		}
 
 		// currentScene = new SceneAiTest();
-		currentScene = new SceneInputTest();
+		// currentScene = new SceneInputTest();
 		// currentScene = new SceneSpritesTest();
 		// currentScene = new SceneGeomTest();
-		// currentScene = new SceneNetworkTest();
+		currentScene = new SceneNetworkTest();
 		// currentScene = new SceneUiTest();
-		currentScene.start();
+		// currentScene.start();
 
 		changeSceneCallback();
 	}

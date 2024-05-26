@@ -6,10 +6,14 @@ import { ServiceName } from '@app/seidh-common';
 import { FindGameDto } from './dto/find.game.dto';
 import { GameplayJoinGameMessage, GameplayJoinGamePattern } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
 import { WsGatewayGameBaseMsg } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.base.msg';
+import { GameplayDisconnectedMessage, GameplayDisconnectedPattern } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+import { InputDto } from './dto/input.dto';
+import { GameplayInputMessage, GameplayInputPattern } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
 
-export enum WsProtocol {
+export enum WsProtocolMessage {
   // Client -> Server
   FindGame = 'FindGame',
+  Input = 'Input',
 
   // Server -> Client
   GameInit = 'GameInit',
@@ -32,7 +36,10 @@ export class WsGatewayWsController implements OnModuleInit {
   @WebSocketServer()
   server: Server;
 
+  // TODO single entity for each player socket
   private readonly playerSockets = new Map<string, Socket>();
+  private readonly playerIdToGameId = new Map<string, string>();
+  private readonly playerIdToGameplayService = new Map<string, string>();
   private readonly socketIdToPlayerId = new Map<string, string>();
 
   constructor(@Inject(ServiceName.Gameplay) private gameplayService: ClientProxy) {
@@ -51,8 +58,19 @@ export class WsGatewayWsController implements OnModuleInit {
         socket.on('disconnect', () => {
           Logger.log('Socket disconnected, playerId:', this.socketIdToPlayerId.get(socket.id));
 
-          this.playerSockets.delete(this.socketIdToPlayerId.get(socket.id));
-          this.socketIdToPlayerId.delete(socket.id);
+          const playerId = this.socketIdToPlayerId.get(socket.id);
+
+          if (playerId) {
+            const request: GameplayDisconnectedMessage = {
+              playerId
+            };
+            this.gameplayService.emit(GameplayDisconnectedPattern, request);
+
+            this.playerSockets.delete(this.socketIdToPlayerId.get(socket.id));
+            this.socketIdToPlayerId.delete(socket.id);
+            this.playerIdToGameId.delete(playerId);
+            this.playerIdToGameplayService.delete(playerId);
+          }
         });
       } else {
         Logger.error('Bad handshake', socket.handshake.auth);
@@ -65,39 +83,63 @@ export class WsGatewayWsController implements OnModuleInit {
   // Client -> Server
   // ----------------------------------------------
 
-  @SubscribeMessage(WsProtocol.FindGame)
+  @SubscribeMessage(WsProtocolMessage.FindGame)
   async handleFindGame(@MessageBody() data: FindGameDto) {
-    Logger.log('handleFindGame', data);
     const request: GameplayJoinGameMessage = {
       playerId: data.playerId,
       gameplayServiceId: data.gameplayServiceId,
     };
     this.gameplayService.emit(GameplayJoinGamePattern, request);
+    this.playerIdToGameplayService.set(data.playerId, data.gameplayServiceId);
+  }
+
+  @SubscribeMessage(WsProtocolMessage.Input)
+  async handleInput(@MessageBody() data: InputDto) {
+    const request: GameplayInputMessage = {
+      playerId: data.playerId,
+      gameId: this.playerIdToGameId.get(data.playerId),
+      gameplayServiceId: this.playerIdToGameplayService.get(data.playerId),
+      actionType: data.actionType,
+      movAngle: data.movAngle,
+    };
+    this.gameplayService.emit(GameplayInputPattern, request);
   }
 
   // ----------------------------------------------
   // Server -> Client
   // ----------------------------------------------
 
-  broadcast(wsProtocol: WsProtocol, data: WsGatewayGameBaseMsg) {
-    Logger.log('broadcast', wsProtocol, data);
+  broadcast(wsProtocolMessage: WsProtocolMessage, data: WsGatewayGameBaseMsg) {
     if (data.targetPlayerId) {
       const socket = this.playerSockets.get(data.targetPlayerId);
       if (socket && socket.connected) {
-        data.targetPlayerId = null;
-        socket.emit(wsProtocol, data);
+        // Connect player and game for the first time
+        if (wsProtocolMessage == WsProtocolMessage.GameInit) {
+          this.playerIdToGameId.set(data.targetPlayerId, data.gameId);
+        }
+
+        // Drop extra fields
+        delete data.targetPlayerId;
+        delete data.gameId;
+
+        socket.emit(wsProtocolMessage, data);
       } else {
-        Logger.error('Socket is not connected', wsProtocol, data);
+        Logger.error('Socket is not connected', wsProtocolMessage, data);
       }
     } else {
       for (const [playerId, socket] of this.playerSockets) {
         if (socket && socket.connected) {
-          if (data.excludePlayerId && data.excludePlayerId == playerId) {
+          // Skip excluded players and players that are not in the game
+          if (data.excludePlayerId && data.excludePlayerId == playerId || !this.playerIdToGameId.has(playerId)) {
             continue;
           }
-          socket.emit(wsProtocol, data);
+
+          // Drop extra fields
+          delete data.excludePlayerId;
+          delete data.gameId;
+          socket.emit(wsProtocolMessage, data);
         } else {
-         Logger.error('Socket is not connected', wsProtocol, data);
+         Logger.error('Socket is not connected', wsProtocolMessage, data);
         }
       }
     }

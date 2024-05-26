@@ -11,34 +11,29 @@ class SceneNetworkTest extends BasicScene implements EventListener {
     public function new() {
 		super(new SeidhGameEngine());
 
-		camera.scale(2, 2);
-
-		initNetwork();
-
 		// var wsConnectButton:h2d.Flow;
-		var wsConnectButton:h2d.Flow; 
+		// var wsConnectButton:h2d.Flow; 
 
         // wsConnectButton = addButton('WS CONNECT', function callback(button:h2d.Flow) {
             // networking.wsConnect();
         // });
 
-		wsConnectButton = addButton('CONNECT', function callback(button:h2d.Flow) {
-            networking.wsConnect();
-        });
+		// wsConnectButton = addButton('CONNECT', function callback(button:h2d.Flow) {
+        //     networking.wsConnect();
+        // });
 
         addButton('LOGIN', function callback(button:h2d.Flow) {
-            networking.sendLogin();
-			// fui.removeChild(wsConnectButton);
-			fui.removeChild(wsConnectButton);
+            networking.findAndJoinGame();
 			fui.removeChild(button);
-
         });
 
-		EventManager.instance.subscribe(EventManager.EVENT_JOIN_GAME, this);
+		EventManager.instance.subscribe(EventManager.EVENT_GAME_INIT, this);
 		EventManager.instance.subscribe(EventManager.EVENT_GAME_STATE, this);
-		EventManager.instance.subscribe(EventManager.EVENT_CREATE_ENTITY, this);
-		EventManager.instance.subscribe(EventManager.EVENT_DELETE_ENTITY, this);
+		EventManager.instance.subscribe(EventManager.EVENT_CREATE_CHARACTER, this);
+		EventManager.instance.subscribe(EventManager.EVENT_DELETE_CHARACTER, this);
 		EventManager.instance.subscribe(EventManager.EVENT_PERFORM_ACTION, this);
+
+		initNetwork();
     }
 
     // --------------------------------------
@@ -47,14 +42,14 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 
 	public function notify(event:String, message:Dynamic) {
 		switch (event) {
-			case EventManager.EVENT_JOIN_GAME:
-				processJoinGameEvent(message);
+			case EventManager.EVENT_GAME_INIT:
+				processGameInitEvent(message);
 			case EventManager.EVENT_GAME_STATE:
 				processGameStateEvent(message);
-			case EventManager.EVENT_CREATE_ENTITY:
+			case EventManager.EVENT_CREATE_CHARACTER:
 				processCreateCharacterEntityEvent(message);
-			case EventManager.EVENT_DELETE_ENTITY:
-				processRemoveCharacterEntityEvent(message);
+			case EventManager.EVENT_DELETE_CHARACTER:
+				processDeleteCharacterEntityEvent(message);
 			case EventManager.EVENT_PERFORM_ACTION:
 				processPerformActionEvent(message);
 		}
@@ -74,24 +69,26 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 		}
 	}
 
-	//
+	// ---------------------------------------
+	// Server -> Client socket events
+	// ---------------------------------------
 
-	private function processJoinGameEvent(payload:JoinGamePayload) {
-		for (entityStruct in payload.entities) {
-			baseEngine.createCharacterEntityFromMinimalStruct(entityStruct);
+	private function processGameInitEvent(payload:GameInitPayload) {
+		for (characterStruct in payload.charactersFullStruct ) {
+			baseEngine.createCharacterEntityFromFullStruct(characterStruct);
 		}
 	}
 
 	private function processGameStateEvent(payload:GameStatePayload) {
-		baseEngine.updateCharacterEntitiesByServer(payload.entities);
+		baseEngine.updateCharacterEntitiesByServer(payload.charactersMinStruct);
 	}
 
-	private function processCreateCharacterEntityEvent(payload:Dynamic) {
-		baseEngine.createCharacterEntityFromMinimalStruct(payload.entity);
+	private function processCreateCharacterEntityEvent(payload:CreateCharacterPayload) {
+		baseEngine.createCharacterEntityFromFullStruct(payload.characterEntityFullStruct);
 	}
 
-	private function processRemoveCharacterEntityEvent(payload:DeleteEntityPayload) {
-		baseEngine.removeCharacterEntity(payload.entityId);
+	private function processDeleteCharacterEntityEvent(payload:DeleteCharacterPayload) {
+		baseEngine.deleteCharacterEntity(payload.characterId);
 	}
 
 	private function processPerformActionEvent(payload:ActionsPayload) {

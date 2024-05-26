@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Telegraf, Markup  } from 'telegraf';
 import { message } from 'telegraf/filters'
+import { link } from 'telegraf/format';
 
 @Injectable()
 export class TgService {
@@ -21,13 +22,27 @@ export class TgService {
 
     this.bot.on(message('text'), async (ctx) => {
       console.log(ctx.message.text);
-      // ctx.reply(
-      //   'Добро пожаловать! Нажмите на кнопку ниже, чтобы запустить приложение',
-      //   Markup.keyboard([
-      //     Markup.button.webApp('Play', 'https://192.168.1.6:8080'),
-      //   ])
-      // )
+      ctx.reply(
+        'Добро пожаловать! Нажмите на кнопку ниже, чтобы запустить приложение',
+        Markup.keyboard([
+          Markup.button.webApp('Отправить сообщение', 'https://192.168.1.6:8080'),
+        ])
+      )
     });
+
+
+    // this.bot.command("link", ctx =>
+    //   /*
+    //     Go to @Botfather and create a new app for your bot first, using /newapp
+    //     Then modify this link appropriately.
+      
+    //     startapp is optional.
+    //     If provided, it will be passed as start_param in initData
+    //     and as ?tgWebAppStartParam=$command in the Web App URL
+    //   */
+    //   ctx.reply(link("Launch", "https://seidh-game.online")),
+    // );
+
 
     this.bot.launch();
   }

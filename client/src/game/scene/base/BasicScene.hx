@@ -192,7 +192,7 @@ abstract class BasicScene extends h2d.Scene {
 				if (networking != null) {
 					for (input in baseEngine.validatedInputCommands) {
 						if (input.playerId == Player.instance.playerId) {
-							networking.sendInput(input);
+							networking.input(input);
 						}
 					}
 				}
@@ -276,10 +276,6 @@ abstract class BasicScene extends h2d.Scene {
 
 		hxd.Window.getInstance().addEventTarget(onEvent);
 
-		debugText = addText('Test');
-		debugText.setScale(2);
-		debugText.setPosition(50, 50);
-
 		onResize();
 	}
 
@@ -288,8 +284,9 @@ abstract class BasicScene extends h2d.Scene {
 	public abstract function customUpdate(dt:Float, fps:Float):Void;
 
 	public function initNetwork() {
-		if (networking == null) 
+		if (networking == null) {
 			networking = new Networking();
+		}
 	}
 
 	public function onResize() {
@@ -298,8 +295,6 @@ abstract class BasicScene extends h2d.Scene {
 		var w = 0;
 		var h = 0;
 		var orientation = 'landscape';
-
-		trace(jsScreenParams);
 
 		if (isMobileDevice) {
 			if (baseEngine != null && mobileControlsScene == null) {
@@ -485,9 +480,8 @@ abstract class BasicScene extends h2d.Scene {
 	// ----------------------------------
 
 	public function addButton(label: String, onClick: h2d.Flow -> Void) {
-		var f = new h2d.Flow(fui);
+		final f = new h2d.Flow(fui);
 		f.padding = 25;
-		f.paddingBottom = 7;
 		f.backgroundTile = h2d.Tile.fromColor(0x404040);
 		var tf = new h2d.Text(hxd.res.DefaultFont.get(), f);
 		tf.text = label;

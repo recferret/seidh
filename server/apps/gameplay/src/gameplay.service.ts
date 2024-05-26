@@ -28,6 +28,7 @@ import { WsGatewayGameCreateProjectileMessage, WsGatewayGameCreateProjectilePatt
 import { WsGatewayGameDeleteCharacterMessage, WsGatewayGameDeleteCharacterPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.character.msg';
 import { WsGatewayGameDeleteProjectileMessage, WsGatewayGameDeleteProjectilePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.projectile.msg';
 import { GameplayInputMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
+import { GameplayDisconnectedMessage } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
 
 @Injectable()
 export class GameplayService {
@@ -40,6 +41,8 @@ export class GameplayService {
   private readonly gameInstances = new Map<string, GameInstance>();
   private readonly playerGameInstance = new Map<string, string>();
   private readonly playersToInit = new Set<string>();
+
+  private readonly gameInstance: GameInstance;
 
   constructor(
     private eventEmitter: EventEmitter2,
@@ -65,6 +68,10 @@ export class GameplayService {
       this.gameplayLobbyService.emit(GameplayLobbyUpdateGamesPattern, message);
     }, 1000);
 
+    // Dummy game for testing
+    this.gameInstance = new GameInstance(this.eventEmitter, uuidv4(), GameType.PublicGame);
+    this.gameInstances.set(this.gameInstance.gameId, this.gameInstance);
+
     Logger.log('GameplayService initialized', Config.GAMEPLAY_INSTANCE_ID);
   }
 
@@ -72,50 +79,53 @@ export class GameplayService {
   // Client -> Server
   // ---------------------------------------------- 
 
-  public disconnectPlayer(playerId: string) {
-    GameplayService.ConnectedPlayers.delete(playerId);
-    const gameInstance = this.checkAndGetGameInstance(this.playerGameInstance.get(playerId), `Disconnected player ${playerId}`);
-    if (gameInstance) {
-      gameInstance.removePlayer(playerId);
-    }
-    this.playerGameInstance.delete(playerId);
+  public disconnected(message: GameplayDisconnectedMessage) {
+    this.deletePlayer(message.playerId, 'disconnected');
   }
 
   public joinGame(message: GameplayJoinGameMessage) {
     this.playerLastRequestTime.set(message.playerId, Date.now());
     
-    let gameInstance: GameInstance = undefined;
+    // let gameInstance: GameInstance = undefined;
 
-    if (message.gameId) {
-      // TODO impl join game
-      gameInstance = this.gameInstances.get(message.gameId);
-      if (!gameInstance) {
-        Logger.log('Join a game');
-        this.playerGameInstance.set(message.playerId, gameInstance.gameId);
-        this.playersToInit.add(message.playerId);
-        gameInstance.addPlayer(message.playerId);
-      } else {
-        Logger.error('Error while joining the game');
-        // TODO impl error while join game
-      }
-    } else {
-      // Create a new game
-      Logger.log('Create a new game');
-      gameInstance = new GameInstance(this.eventEmitter, uuidv4(), GameType.PublicGame);
-      gameInstance.addPlayer(message.playerId);
-      this.gameInstances.set(gameInstance.gameId, gameInstance);
-      this.playerGameInstance.set(message.playerId, gameInstance.gameId);
-      this.playersToInit.add(message.playerId);
-    }
+    this.gameInstance.addPlayer(message.playerId);
+
+    this.playerGameInstance.set(message.playerId, this.gameInstance.gameId);
+    this.playersToInit.add(message.playerId);
+
+    GameplayService.ConnectedPlayers.add(message.playerId);
+
+    // if (message.gameId) {
+    //   // TODO impl join game
+    //   gameInstance = this.gameInstances.get(message.gameId);
+    //   if (!gameInstance) {
+    //     Logger.log('Join a game');
+    //     this.playerGameInstance.set(message.playerId, gameInstance.gameId);
+    //     this.playersToInit.add(message.playerId);
+    //     gameInstance.addPlayer(message.playerId);
+    //   } else {
+    //     Logger.error('Error while joining the game');
+    //     // TODO impl error while join game
+    //   }
+    // } else {
+    //   // Create a new game
+    //   Logger.log('Create a new game');
+    //   gameInstance = new GameInstance(this.eventEmitter, uuidv4(), GameType.PublicGame);
+    //   gameInstance.addPlayer(message.playerId);
+    //   this.gameInstances.set(gameInstance.gameId, gameInstance);
+    //   this.playerGameInstance.set(message.playerId, gameInstance.gameId);
+    //   this.playersToInit.add(message.playerId);
+    // }
   }
 
   public input(message: GameplayInputMessage) {
+    this.playerLastRequestTime.set(message.playerId, Date.now());
     this.checkPlayerConnected(message.playerId);
     const gameInstance = this.checkAndGetGameInstance(message.gameId);
     gameInstance.input({
       playerId: message.playerId,
       index: message.index,
-      actionType: message.index,
+      actionType: message.actionType,
       movAngle: message.movAngle
     });
   }
@@ -141,33 +151,34 @@ export class GameplayService {
   @OnEvent(EventGameGameState.EventName)
   handleEventGameGameState(payload: EventGameGameState) {
     // Notify new players about full game state
-    try {
+    if (payload.charactersFullStruct.length > 0) {
       this.playersToInit.forEach(playerId => {
-        const gameInstance = this.checkAndGetGameInstance(payload.gameId);
         const initMessage: WsGatewayGameInitMessage = {
           targetPlayerId : playerId,
           gameId: payload.gameId,
-          characters: gameInstance.getCharacters()
+          charactersFullStruct: payload.charactersFullStruct
         };
         this.wsGatewayService.emit(WsGatewayGameInitPattern, initMessage);
-        Logger.log(`Player ${playerId} notified about full game state`);
       });
       this.playersToInit.clear();
-    } catch (err) {
-      Logger.error('Unable to notify new players about full game state', err);
     }
 
     // Notify all players about changed game state
-    const message: WsGatewayGameStateMessage = {
-      gameId: payload.gameId,
+    if (payload.charactersMinStruct.length > 0) {
+      const message: WsGatewayGameStateMessage = {
+        gameId: payload.gameId,
+        charactersMinStruct: payload.charactersMinStruct
+      }
+      this.wsGatewayService.emit(WsGatewayGameStatePattern, message);
     }
-    this.wsGatewayService.emit(WsGatewayGameStatePattern, message);
   }
 
   @OnEvent(EventGameCreateCharacter.EventName)
   handleEventGameCreateCharacter(payload: EventGameCreateCharacter) {
     const message: WsGatewayGameCreateCharacterMessage = {
       gameId: payload.gameId,
+      characterEntityFullStruct: payload.characterEntityFullStruct,
+      excludePlayerId: payload.characterEntityFullStruct.base.ownerId,
     }
     this.wsGatewayService.emit(WsGatewayGameCreateCharacterPattern, message);
   }
@@ -176,6 +187,7 @@ export class GameplayService {
   handleEventGameDeleteCharacter(payload: EventGameDeleteCharacter) {
     const message: WsGatewayGameDeleteCharacterMessage = {
       gameId: payload.gameId,
+      characterId: payload.characterId,
     }
     this.wsGatewayService.emit(WsGatewayGameDeleteCharacterPattern, message);
   }
@@ -208,7 +220,7 @@ export class GameplayService {
   // Common
   // ----------------------------------------------
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  // @Cron(CronExpression.EVERY_5_SECONDS)
   dropDisconnectedPlayers() {
     const now = Date.now();
     const playersToDrop = [];
@@ -221,7 +233,23 @@ export class GameplayService {
   
     playersToDrop.forEach(key => {
       this.playerLastRequestTime.delete(key);
+      this.deletePlayer(key, 'drop');
     });
+  }
+
+  private deletePlayer(playerId: string, deleteType: string) {
+    if (GameplayService.ConnectedPlayers.has(playerId)) {
+      GameplayService.ConnectedPlayers.delete(playerId);
+      const gameInstance = this.checkAndGetGameInstance(this.playerGameInstance.get(playerId), `${deleteType} ${playerId}`);
+      if (gameInstance) {
+        gameInstance.deletePlayer(playerId);
+        this.playerGameInstance.delete(playerId);
+      } else {
+        Logger.error('Player '+ playerId +' is not in the game, unable to drop');
+      }
+    } else {
+      Logger.error('Player '+ playerId +' is not connected, unable to drop');
+    }
   }
 
 }

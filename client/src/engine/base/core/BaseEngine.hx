@@ -44,10 +44,10 @@ abstract class BaseEngine {
 	public var validatedInputCommands = new Array<PlayerInputCommand>();
 
 	private var createCharacterEntityQueue = new Array<CreateCharacterEntityTask>();
-	private var removeCharacterEntityQueue = new Array<String>();
+	private var deleteCharacterEntityQueue = new Array<String>();
 
 	private var createProjectileEntityQueue = new Array<CreateProjectileEntityTask>();
-	private var removeProjectileEntityQueue = new Array<String>();
+	private var deleteProjectileEntityQueue = new Array<String>();
 
 	// Команды от пользователей, которые будут применены в начале каждого тика
 	private var hotInputCommands = new Array<InputCommandEngineWrapped>();
@@ -71,10 +71,10 @@ abstract class BaseEngine {
 			ticksSinceLastPop++;
 
 			processCreateCharacterQueue();
-			processRemoveCharacterQueue();
+			processDeleteCharacterQueue();
 
 			processCreateProjectileQueue();
-			processRemoveProjectileQueue();
+			processDeleteProjectileQueue();
 
 			// Update all entities
 			engineLoopUpdate(dt);
@@ -114,19 +114,23 @@ abstract class BaseEngine {
 		});
 	}
 
-	public function removeCharacterEntity(entityId:String) {
-		removeCharacterEntityQueue.push(entityId);
+	public function deleteCharacterEntityByOwnerId(ownerId:String) {
+		deleteCharacterEntityQueue.push(getCharacterEntityIdByOwnerId(ownerId));
+	}
+
+	public function deleteCharacterEntity(entityId:String) {
+		deleteCharacterEntityQueue.push(entityId);
 	}
 
 	public function getCharacterEntityById(id:String) {
 		return characterEntityManager.getEntityById(id);
 	}
 
-	public function getMainEntityIdByOwnerId(id:String) {
+	public function getCharacterEntityIdByOwnerId(id:String) {
 		return playerToEntityMap.get(id);
 	}
 
-	public function getMainEntityByOwnerId(id:String) {
+	public function getCharacterEntityByOwnerId(id:String) {
 		return characterEntityManager.getEntityById(playerToEntityMap.get(id));
 	}
 
@@ -136,7 +140,6 @@ abstract class BaseEngine {
 			if (entity != null) {
 				entity.setX(minEntity.x);
 				entity.setY(minEntity.y);
-				cast (entity, EngineCharacterEntity).currentDirectionSide = minEntity.side;
 			}
 		}
 	}
@@ -152,19 +155,19 @@ abstract class BaseEngine {
 		return characterEntityManager.entities;
 	}
 
-	public function getCharacterEntitiesArray() {
-		final result = new Array<EngineBaseEntity>();
+	public function getCharactersStruct(params:Dynamic) {
+		final result = new Array<Dynamic>();
 		for (entity in characterEntityManager.entities) {
-			result.push(entity);
-		}
-		return result;
-	}
-
-	public function getCharacterEntitiesChangedArray() {
-		final result = new Array<EngineBaseEntity>();
-		for (entity in characterEntityManager.entities) {
-			if (entity.isChanged()) 
-				result.push(entity);
+			if (params.changed == true && !entity.isChanged()) {
+				continue;
+			}
+			var entityStruct:Dynamic;
+			if (params.full == true) {
+				entityStruct = cast(entity, EngineCharacterEntity).getEntityFullStruct();
+			} else {
+				entityStruct = cast(entity, EngineCharacterEntity).getEntityMinStruct();
+			}
+			result.push(entityStruct);
 		}
 		return result;
 	}
@@ -180,18 +183,18 @@ abstract class BaseEngine {
 		createCharacterEntityQueue = [];
 	}
 
-	function processRemoveCharacterQueue() {
-		for (entityId in removeCharacterEntityQueue) {
+	function processDeleteCharacterQueue() {
+		for (entityId in deleteCharacterEntityQueue) {
 			final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 			if (entity != null) {
 				if (deleteCharacterCallback != null) {
 					deleteCharacterCallback(cast (entity, EngineCharacterEntity));
 				}
 				playerToEntityMap.remove(entity.getOwnerId());
-				characterEntityManager.remove(entity.getId());
+				characterEntityManager.delete(entity.getId());
 			}
 		}
-		removeCharacterEntityQueue = [];
+		deleteCharacterEntityQueue = [];
 	}
 
 	// -----------------------------------
@@ -204,8 +207,8 @@ abstract class BaseEngine {
 		});
 	}
 
-	function removeProjectileEntity(entityId:String) {
-		removeProjectileEntityQueue.push(entityId);
+	function deleteProjectileEntity(entityId:String) {
+		deleteProjectileEntityQueue.push(entityId);
 	}
 
 	function processCreateProjectileQueue() {
@@ -218,17 +221,17 @@ abstract class BaseEngine {
 		createProjectileEntityQueue = [];
 	}
 
-	function processRemoveProjectileQueue() {
-		for (entityId in removeProjectileEntityQueue) {
+	function processDeleteProjectileQueue() {
+		for (entityId in deleteProjectileEntityQueue) {
 			final entity = cast (projectileEntityManager.getEntityById(entityId), EngineProjectileEntity);
 			if (entity != null) {
 				if (deleteProjectileCallback != null) {
 					deleteProjectileCallback(entity);
 				}
-				projectileEntityManager.remove(entity.getId());
+				projectileEntityManager.delete(entity.getId());
 			}
 		}
-		removeProjectileEntityQueue = [];
+		deleteProjectileEntityQueue = [];
 	}
 
 	// -----------------------------------
@@ -254,7 +257,7 @@ abstract class BaseEngine {
 	}
 
 	public function addInputCommandServer(input:PlayerInputCommand) {
-		final entityId = getMainEntityIdByOwnerId(input.playerId);
+		final entityId = getCharacterEntityIdByOwnerId(input.playerId);
 		var allow = false;
 
 		if (input.actionType == CharacterActionType.MOVE) {

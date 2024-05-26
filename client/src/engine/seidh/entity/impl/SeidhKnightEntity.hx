@@ -25,7 +25,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                 rotation: 0
             },
             health: 100,
-            characterMovementStruct: {
+            movement: {
                 canWalk: true,
                 canRun: false,
                 walkSpeed: 10,
@@ -35,7 +35,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                 vitalityConsumptionPerSec: 20,
                 vitalityRegenPerSec: 10,
             },
-            characterActionMainStruct: {
+            actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,
                 damage: 5,
                 inputDelay: 1,
@@ -44,7 +44,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     shape: new EntityShape(140, 100, 80, 100),
                 }
             },
-            characterAction1Struct: {
+            action1: {
                 actionType: CharacterActionType.ACTION_1,
                 damage: 5,
                 inputDelay: 1,
@@ -57,7 +57,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     shape: new EntityShape(30, 10, 0, 0),
                 },
             },
-            characterAction2Struct: {
+            action2: {
                 actionType: CharacterActionType.ACTION_2,
                 damage: 5,
                 inputDelay: 1,
@@ -71,7 +71,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     shape: new EntityShape(25, 25, 0, 0),
                 },
             },
-            characterAction3Struct: {
+            action3: {
                 actionType: CharacterActionType.ACTION_3,
                 damage: 0,
                 inputDelay: 3,

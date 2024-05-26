@@ -2,7 +2,7 @@ export interface WsGameEvent {
     broadcast: boolean;
     gameplayServiceId: string;
     gameId?: string;
-    userId?: string;
+    playerId?: string;
 }
 
 export enum ServicePort {

@@ -5,8 +5,8 @@ export const GameplayInputPattern = 'gameplay.input';
 export interface GameplayInputMessage {
     playerId: string;
     gameId: string;
-
-    index?: number;
+    gameplayServiceId: string;
 	actionType: CharacterActionType;
-	movAngle: number;
+	movAngle?: number;
+    index?: number;
 }

@@ -14,5 +14,5 @@ export interface GameplayLobbyGameplayInstanceInfo {
     lastUpdateTime?: number;
 }
 
-export interface GameplayLobbyUpdateGamesMessage extends GameplayLobbyGameplayInstanceInfo{
+export interface GameplayLobbyUpdateGamesMessage extends GameplayLobbyGameplayInstanceInfo {
 }

@@ -29,7 +29,7 @@ export interface EntityShape {
 	rectOffsetY: number;
 }
 
-export interface BaseEntity {
+export interface BaseEntityStruct {
 	x: number;
 	y: number;
 	entityType:EntityType;
@@ -73,7 +73,8 @@ export interface CharacterActionStruct {
 	projectileStruct?:ProjectileStruct,
 }
 
-export interface CharacterEntity extends BaseEntity {
+export interface CharacterEntityFullStruct {
+	base: BaseEntityStruct;
 	health: number;
 	movement: CharacterMovementStruct;
 	actionMain: CharacterActionStruct;
@@ -91,8 +92,8 @@ export interface CharacterEntityMinStruct {
 }
 
 export interface EngineCharacterEntity {
-	getFullEntity(): CharacterEntity;
-	getMinEntity(): CharacterEntityMinStruct;
+	getEntityFullStruct(): CharacterEntityFullStruct;
+	getEntityMinStruct(): CharacterEntityMinStruct;
 }
 
 export interface EngineProjectileEntity {
