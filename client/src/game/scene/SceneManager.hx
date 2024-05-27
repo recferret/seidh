@@ -46,10 +46,10 @@ class SceneManager {
 		}
 
 		// currentScene = new SceneAiTest();
-		// currentScene = new SceneInputTest();
+		currentScene = new SceneInputTest();
 		// currentScene = new SceneSpritesTest();
 		// currentScene = new SceneGeomTest();
-		currentScene = new SceneNetworkTest();
+		// currentScene = new SceneNetworkTest();
 		// currentScene = new SceneUiTest();
 		// currentScene.start();
 

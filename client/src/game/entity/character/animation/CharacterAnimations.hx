@@ -199,6 +199,103 @@ class CharacterAnimation {
 
 class CharacterAnimations {
 
+    public static function LoadRagnarAnimation(parent:h2d.Object) {
+        final animation = new CharacterAnimation(parent);
+        final leftOffsetX = 180;
+
+        animation.loadIdle(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadRun(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadWalk(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadDead(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadHurt(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadAttack1(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadAttack2(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadAttack3(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadAttackRun(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        animation.loadDefend(
+            [
+                hxd.Res.ragnar.ragnar.toTile(),
+            ],
+            flipTilesLeft([
+                hxd.Res.ragnar.ragnar.toTile(),
+            ], leftOffsetX)
+        );
+
+        return animation;
+    }
+
     public static function LoadKnightAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
         final leftOffsetX = 62;

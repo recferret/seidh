@@ -41,7 +41,7 @@ class ClientCharacterEntity extends h2d.Object {
         }
 
         if (debugActionShape != null) {
-            Utils.DrawRect(graphics, debugActionShape.toRect(x, y, 0, engineEntity.currentDirectionSide), GameConfig.GreenColor);
+            Utils.DrawRect(graphics, debugActionShape.toRect(x, y, 0, engineEntity.getSide()), GameConfig.GreenColor);
         }
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
@@ -52,6 +52,8 @@ class ClientCharacterEntity extends h2d.Object {
 		setPosition(engineEntity.getX(), engineEntity.getY());
 
         switch (engineEntity.getEntityType()) {
+            case EntityType.RAGNAR:
+                animation = CharacterAnimations.LoadRagnarAnimation(this);
             case EntityType.KNIGHT:
                 animation = CharacterAnimations.LoadKnightAnimation(this);
             case EntityType.SAMURAI:
@@ -79,7 +81,7 @@ class ClientCharacterEntity extends h2d.Object {
             //     animation.setSide(isRightSide() ? RIGHT : LEFT);
             // }
 
-            animation.setSide(engineEntity.currentDirectionSide);
+            animation.setSide(engineEntity.getSide());
 
             final distance = targetServerPosition.distance(new Point(x, y));
             if (distance > 1) {
@@ -90,8 +92,8 @@ class ClientCharacterEntity extends h2d.Object {
                 //     animation.setAnimationState(WALK);
                 // }
                 
-                x = Math.lerp(x, targetServerPosition.x, 0.08);
-                y = Math.lerp(y, targetServerPosition.y, 0.08);
+                x = Math.lerp(x, targetServerPosition.x, 0.1);
+                y = Math.lerp(y, targetServerPosition.y, 0.1);
             } else {
                 animation.setAnimationState(IDLE);
             }

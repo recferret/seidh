@@ -1,5 +1,6 @@
 package game.scene.base;
 
+import game.terrain.TerrainManager;
 import h2d.Text;
 import h3d.Engine;
 import hxd.Key in K;
@@ -135,6 +136,8 @@ abstract class BasicScene extends h2d.Scene {
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
 	final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
 	
+	var inputsSent = 0;
+
 	public function new(baseEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneCallback->Void) {
 		super();
 
@@ -146,6 +149,8 @@ abstract class BasicScene extends h2d.Scene {
 		}
 
 		if (baseEngine != null) {
+			new TerrainManager(this);
+
 			this.baseEngine = baseEngine;
 
 			this.baseEngine.createCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
@@ -155,7 +160,7 @@ abstract class BasicScene extends h2d.Scene {
 
 				if (character.getOwnerId() == Player.instance.playerId) {
 					playerEntity = character;
-					targetCursor = new h2d.Bitmap(hxd.Res.input.target.toTile().center(), this);
+					// targetCursor = new h2d.Bitmap(hxd.Res.input.target.toTile().center(), this);
 				}
 			};
 
@@ -192,6 +197,7 @@ abstract class BasicScene extends h2d.Scene {
 				if (networking != null) {
 					for (input in baseEngine.validatedInputCommands) {
 						if (input.playerId == Player.instance.playerId) {
+							inputsSent++;
 							networking.input(input);
 						}
 					}
@@ -290,79 +296,89 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public function onResize() {
-		final jsScreenParams = NativeWindowJS.getScreenParams();
+		if (baseEngine != null) {
+			final jsScreenParams = NativeWindowJS.getScreenParams();
 
-		var w = 0;
-		var h = 0;
-		var orientation = 'landscape';
+			var w = 0;
+			var h = 0;
+			var orientation = 'landscape';
 
-		if (isMobileDevice) {
-			if (baseEngine != null && mobileControlsScene == null) {
-				mobileControlsScene = new MobileControlsScene(
-					isMobileDevice,
-					function callback(buttonPressed:ButtonPressed) {
-						switch (buttonPressed) {
-							case ButtonPressed.A:
-								addInputCommand(CharacterActionType.ACTION_MAIN);
-							case ButtonPressed.B:
-								addInputCommand(CharacterActionType.ACTION_1);
-							default:
-						}
-					},
-					function callback(angle:Float) {
-						addInputCommand(CharacterActionType.MOVE, angle);
-					});
-			} 
+			if (isMobileDevice) {
+				if (mobileControlsScene == null) {
+					mobileControlsScene = new MobileControlsScene(
+						isMobileDevice,
+						function callback(buttonPressed:ButtonPressed) {
+							switch (buttonPressed) {
+								case ButtonPressed.A:
+									addInputCommand(CharacterActionType.ACTION_MAIN);
+								case ButtonPressed.B:
+									addInputCommand(CharacterActionType.ACTION_1);
+								default:
+							}
+						},
+						function callback(angle:Float) {
+							addInputCommand(CharacterActionType.MOVE, angle);
+						});
+				} 
 
-			orientation = jsScreenParams.orientation;
+				orientation = jsScreenParams.orientation;
 
-			if (jsScreenParams.orientation == 'portrait') {
-				final ratio = jsScreenParams.availableScreenHeight / jsScreenParams.availableScreenWidth;
+				if (jsScreenParams.orientation == 'portrait') {
+					final ratio = jsScreenParams.availableScreenHeight / jsScreenParams.availableScreenWidth;
 
-				final additionalRatio = jsScreenParams.windowOuterHeight != jsScreenParams.availableScreenHeight ? 
-					jsScreenParams.windowOuterHeight / jsScreenParams.availableScreenHeight : 1;
+					final additionalRatio = jsScreenParams.windowOuterHeight != jsScreenParams.availableScreenHeight ? 
+						jsScreenParams.windowOuterHeight / jsScreenParams.availableScreenHeight : 1;
 
-				if (additionalRatio != 1) {
-					cameraOffsetY = 0;
+					if (additionalRatio != 1) {
+						cameraOffsetY = 0;
+					}
+
+					w = Std.int(720 * additionalRatio);
+					h = Std.int(720 * ratio);
+					scaleMode = ScaleMode.Stretch(w, h);
+
+					// camera.scaleX = 1.5;
+					// camera.scaleY = 1.5;
+				} else {
+					final ratio = jsScreenParams.windowOuterWidth / jsScreenParams.windowOuterHeight;
+
+					h = 720;
+					w = Std.int(720 * ratio);
+					scaleMode = ScaleMode.Stretch(w, h);
+
+					// camera.scaleX = 1.5;
+					// camera.scaleY = 1.5;
 				}
 
-				w = Std.int(720 * additionalRatio);
-				h = Std.int(720 * ratio);
-				scaleMode = ScaleMode.Stretch(w, h);
-
-				camera.scaleX = 1.5;
-				camera.scaleY = 1.5;
+				if (mobileControlsScene != null) {
+					mobileControlsScene.resize(orientation, w, h);
+				}
 			} else {
 				final ratio = jsScreenParams.windowOuterWidth / jsScreenParams.windowOuterHeight;
 
 				h = 720;
 				w = Std.int(720 * ratio);
-				scaleMode = ScaleMode.Stretch(w, h);
-
-				camera.scaleX = 1.5;
-				camera.scaleY = 1.5;
+ 
+				camera.scaleX = 0.35;
+				camera.scaleY = 0.35;
 			}
 
-			if (mobileControlsScene != null) {
-				mobileControlsScene.resize(orientation, w, h);
-			}
-
-			debugText.setPosition((w) / 2, (h) / 2);
-		} else {
-			final ratio = jsScreenParams.windowOuterWidth / jsScreenParams.windowOuterHeight;
-
-			h = 720;
-			w = Std.int(720 * ratio);
+			scaleMode = ScaleMode.Stretch(w, h);
+			camera.setViewport((w) / 2, (h) / 2, w, h);
 		}
-
-		scaleMode = ScaleMode.Stretch(w, h);
-		camera.setViewport((w) / 2, (h) / 2, w, h);
 	}
 
 	public function update(dt:Float, fps:Float) {
 		debugGraphics.clear();
 
-		Utils.DrawRect(debugGraphics, new Rectangle(0, 0, 100, 100, 0), GameConfig.RedColor);
+
+		// Utils.DrawLine(debugGraphics, new h2d.col.Point(), new h2d.col.Point(), GameConfig.RedColor);
+
+		// Utils.DrawRect(debugGraphics, new Rectangle(0, 0, 100, 100, 0), GameConfig.RedColor);
+		// Utils.DrawRect(debugGraphics, new Rectangle(400, 0, 100, 100, 0), GameConfig.RedColor);
+		// Utils.DrawRect(debugGraphics, new Rectangle(0, 300, 100, 100, 0), GameConfig.RedColor);
+		// Utils.DrawRect(debugGraphics, new Rectangle(800, 0, 100, 100, 0), GameConfig.RedColor);
+		// Utils.DrawRect(debugGraphics, new Rectangle(0, 600, 100, 100, 0), GameConfig.RedColor);
 
 		if (mobileControlsScene != null) {
 			mobileControlsScene.update();
@@ -384,15 +400,12 @@ abstract class BasicScene extends h2d.Scene {
 			camera.y = playerEntity.y + cameraOffsetY;
 
 			// TODO smooth movement
-			final line = playerEntity.getForwardLookingLine(80);	
-			targetCursor.setPosition(line.p2.x, line.p2.y);
+			// final line = playerEntity.getForwardLookingLine(80);	
+			// targetCursor.setPosition(line.p2.x, line.p2.y);
 		}
 	}
 
 	public override function render(e:Engine) {
-		if (mobileControlsScene != null) {
-			mobileControlsScene.render(e);
-		}
 		for (projectile in clientProjectileEntities) {
 			if (GameConfig.DebugDraw) {
 				projectile.debugDraw(debugGraphics);
@@ -405,11 +418,15 @@ abstract class BasicScene extends h2d.Scene {
 			}
 		}
 		super.render(e);
+		if (mobileControlsScene != null) {
+			mobileControlsScene.render(e);
+		}
 	}
 
 	public function getInputScene():h2d.Scene {
 		return mobileControlsScene != null ? mobileControlsScene : this;
 	}
+
 
 	private function updateDesktopInput() {
 		if (!isMobileDevice) {
@@ -432,21 +449,23 @@ abstract class BasicScene extends h2d.Scene {
 			}
 
 			// Action
-			final space = K.isDown(K.SPACE);
-			final alt = K.isDown(K.ALT);
-			var playerActionInputType:CharacterActionType = null;
+			// final space = K.isDown(K.SPACE);
+			// final alt = K.isDown(K.ALT);
+			// var playerActionInputType:CharacterActionType = null;
 
-			if (space) {
-				playerActionInputType = CharacterActionType.ACTION_MAIN;
-			} else if (alt) {
-				playerActionInputType = CharacterActionType.ACTION_1;
-			}
+			// if (space) {
+			// 	playerActionInputType = CharacterActionType.ACTION_MAIN;
+			// } else if (alt) {
+			// 	playerActionInputType = CharacterActionType.ACTION_1;
+			// }
 
-			if (playerActionInputType != null) {
-				addInputCommand(playerActionInputType);
-			}
+			// if (playerActionInputType != null) {
+			// 	addInputCommand(playerActionInputType);
+			// }
 		}
 	}
+
+	var inputsApplied = 0;
 
 	private function addInputCommand(characterActionType:CharacterActionType, moveAngle:Float = 0) {
 		final playerId = Player.instance.playerId;
@@ -457,6 +476,8 @@ abstract class BasicScene extends h2d.Scene {
 			baseEngine.checkLocalActionInputAllowance(playerEntityId, characterActionType);
 
 		if (allowInput) {
+			inputsApplied++;
+			trace('inputsApplied: ' + inputsApplied);
 			baseEngine.addInputCommandClient(new PlayerInputCommand(characterActionType, moveAngle, playerId, Player.instance.incrementAndGetInputIndex()));
 		}
 	}
@@ -498,6 +519,37 @@ abstract class BasicScene extends h2d.Scene {
 		text.textColor = GameConfig.RedColor;
 		text.text = label;
 		return text;
+	}
+
+	function addSlider( label : String, get : Void -> Float, set : Float -> Void, min : Float = 0., max : Float = 1. ) {
+		var f = new h2d.Flow(fui);
+
+		f.horizontalSpacing = 5;
+
+		var tf = new h2d.Text(hxd.res.DefaultFont.get(), f);
+		tf.text = label;
+		tf.maxWidth = 70;
+		tf.textAlign = Right;
+
+		var sli = new h2d.Slider(100, 10, f);
+		sli.minValue = min;
+		sli.maxValue = max;
+		sli.value = get();
+
+		var tf = new h2d.TextInput(hxd.res.DefaultFont.get(), f);
+		tf.text = "" + hxd.Math.fmt(sli.value);
+		sli.onChange = function() {
+			set(sli.value);
+			tf.text = "" + hxd.Math.fmt(sli.value);
+			f.needReflow = true;
+		};
+		tf.onChange = function() {
+			var v = Std.parseFloat(tf.text);
+			if( Math.isNaN(v) ) return;
+			sli.value = v;
+			set(v);
+		};
+		return sli;
 	}
 
 	// ----------------------------------

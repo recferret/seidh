@@ -106,6 +106,12 @@ Object.assign(engine_base_EntityShape.prototype, {
 });
 class engine_base_BaseEntity {
 	constructor(struct) {
+		if(engine_base_BaseEntity._hx_skip_constructor) {
+			return;
+		}
+		this._hx_constructor(struct);
+	}
+	_hx_constructor(struct) {
 		this.x = struct.x;
 		this.y = struct.y;
 		this.entityType = struct.entityType;
@@ -125,7 +131,14 @@ Object.assign(engine_base_BaseEntity.prototype, {
 });
 class engine_base_CharacterEntity extends engine_base_BaseEntity {
 	constructor(struct) {
-		super(struct.base);
+		engine_base_BaseEntity._hx_skip_constructor = true;
+		super();
+		engine_base_BaseEntity._hx_skip_constructor = false;
+		this._hx_constructor(struct);
+	}
+	_hx_constructor(struct) {
+		this.side = 2;
+		super._hx_constructor(struct.base);
 		this.health = struct.health;
 		this.movement = struct.movement;
 		this.actionMain = struct.actionMain;
@@ -139,7 +152,7 @@ class engine_base_CharacterEntity extends engine_base_BaseEntity {
 		return fullEntity;
 	}
 	toMinStruct() {
-		let minEntity = { id : this.id, x : this.x, y : this.y};
+		let minEntity = { id : this.id, x : this.x, y : this.y, side : this.side};
 		return minEntity;
 	}
 	static CreateFromDynamic(struct) {
@@ -226,6 +239,9 @@ class engine_base_MathUtils {
 		}
 	}
 	static differ(a,b,error) {
+		return Math.abs(a - b) > (error == 0 ? 1 : error);
+	}
+	static differInt(a,b,error) {
 		return Math.abs(a - b) > (error == 0 ? 1 : error);
 	}
 	static randomIntInRange(from,to) {
@@ -324,10 +340,17 @@ class engine_base_core_BaseEngine {
 		while(_g < minEntities.length) {
 			let minEntity = minEntities[_g];
 			++_g;
-			let entity = this.characterEntityManager.entities.get(minEntity.id);
+			let entity = js_Boot.__cast(this.characterEntityManager.entities.get(minEntity.id) , engine_base_entity_impl_EngineCharacterEntity);
 			if(entity != null) {
-				entity.setX(minEntity.x);
-				entity.setY(minEntity.y);
+				if(entity.getOwnerId() == this.localPlayerId) {
+					let xDiff = Math.abs(entity.getX() - minEntity.x);
+					let yDiff = Math.abs(entity.getY() - minEntity.y);
+					if(xDiff + yDiff <= entity.getMovementSpeed() * 5) {
+						continue;
+					}
+				}
+				console.log("src/engine/base/core/BaseEngine.hx:154:","UPDATE from server 1, x: " + entity.getX() + ", y: " + entity.getY());
+				console.log("src/engine/base/core/BaseEngine.hx:155:","UPDATE from server 2, x: " + minEntity.x + ", y: " + minEntity.y);
 			}
 		}
 	}
@@ -459,11 +482,6 @@ class engine_base_core_BaseEngine {
 	addInputCommandServer(input) {
 		let entityId = this.getCharacterEntityIdByOwnerId(input.playerId);
 		let allow = false;
-		if(input.actionType == 1) {
-			allow = this.checkLocalMovementInputAllowance(entityId);
-		} else {
-			allow = this.checkLocalActionInputAllowance(entityId,input.actionType);
-		}
 		if(allow) {
 			this.addInputCommandClient(new engine_base_PlayerInputCommand(input.actionType,input.movAngle,input.playerId));
 		}
@@ -474,6 +492,9 @@ class engine_base_core_BaseEngine {
 			this.hotInputCommands.push(wrappedCommand);
 			this.coldInputCommands.push(wrappedCommand);
 		}
+	}
+	setLocalPlayerId(localPlayerId) {
+		this.localPlayerId = localPlayerId;
 	}
 	destroy() {
 		this.postLoopCallback = null;
@@ -669,7 +690,6 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 		this.lastLocalMovementInputCheck = 0.0;
 		this.isRunning = false;
 		this.isWalking = false;
-		this.currentDirectionSide = 2;
 		this.botForwardLookingLineLength = 20;
 		this.intersectsWithCharacter = false;
 		this.canMove = true;
@@ -792,7 +812,7 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 		}
 	}
 	determenisticMove() {
-		let speed = this.characterEntity.movement.walkSpeed;
+		let speed = this.characterEntity.movement.runSpeed;
 		if(this.characterEntity.movement.canRun && this.currentVitality > 0) {
 			this.currentVitality -= this.characterEntity.movement.vitalityConsumptionPerSec;
 			speed = this.characterEntity.movement.runSpeed;
@@ -804,16 +824,16 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 		}
 		this.dx = speed * Math.cos(this.baseEntity.rotation);
 		this.dy = speed * Math.sin(this.baseEntity.rotation);
-		this.currentDirectionSide = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
+		this.characterEntity.side = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
 		this.baseEntity.x += this.dx | 0;
 		this.baseEntity.y += this.dy | 0;
 	}
 	moveToTarget() {
 		if(this.canMove && !this.ifTargetInAttackRange()) {
-			let speed = this.characterEntity.movement.walkSpeed;
+			let speed = this.characterEntity.movement.runSpeed;
 			this.dx = speed * Math.cos(this.baseEntity.rotation) * this.lastDeltaTime;
 			this.dy = speed * Math.sin(this.baseEntity.rotation) * this.lastDeltaTime;
-			this.currentDirectionSide = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
+			this.characterEntity.side = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
 			this.baseEntity.x += this.dx | 0;
 			this.baseEntity.y += this.dy | 0;
 		}
@@ -909,15 +929,24 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 	}
 	getCurrentActionRect() {
 		if(this.actionToPerform.meleeStruct != null) {
-			return this.actionToPerform.meleeStruct.shape.toRect(this.baseEntity.x,this.baseEntity.y,this.baseEntity.rotation,this.currentDirectionSide);
+			return this.actionToPerform.meleeStruct.shape.toRect(this.baseEntity.x,this.baseEntity.y,this.baseEntity.rotation,this.characterEntity.side);
 		} else if(this.actionToPerform.projectileStruct != null) {
-			return this.actionToPerform.projectileStruct.shape.toRect(this.baseEntity.x,this.baseEntity.y,this.baseEntity.rotation,this.currentDirectionSide);
+			return this.actionToPerform.projectileStruct.shape.toRect(this.baseEntity.x,this.baseEntity.y,this.baseEntity.rotation,this.characterEntity.side);
 		} else {
 			return null;
 		}
 	}
+	getMovementSpeed() {
+		return this.characterEntity.movement.runSpeed;
+	}
 	getHealth() {
 		return this.characterEntity.health;
+	}
+	getSide() {
+		return this.characterEntity.side;
+	}
+	setSide(side) {
+		this.characterEntity.side = side;
 	}
 }
 engine_base_entity_impl_EngineCharacterEntity.__name__ = true;
@@ -1439,7 +1468,7 @@ class engine_seidh_entity_impl_SeidhKnightEntity extends engine_seidh_entity_bas
 		let tmp1 = { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(140,100,80,100)}};
 		let tmp2 = { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : new engine_base_EntityShape(30,10,0,0)}};
 		let tmp3 = { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : new engine_base_EntityShape(100,100,0,0), shape : new engine_base_EntityShape(25,25,0,0)}};
-		return new engine_base_CharacterEntity({ base : tmp, health : 100, movement : { canWalk : true, canRun : false, walkSpeed : 10, runSpeed : 0, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : tmp1, action1 : tmp2, action2 : tmp3, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
+		return new engine_base_CharacterEntity({ base : tmp, health : 100, movement : { canWalk : true, canRun : false, runSpeed : 10, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : tmp1, action1 : tmp2, action2 : tmp3, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
 	}
 }
 engine_seidh_entity_impl_SeidhKnightEntity.__name__ = true;
@@ -1452,7 +1481,7 @@ class engine_seidh_entity_impl_SeidhSkeletonWarriorEntity extends engine_seidh_e
 		super(characterEntity);
 	}
 	static GenerateObjectEntity(id,ownerId,x,y) {
-		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId, rotation : 0}, health : 10, movement : { canWalk : true, canRun : true, walkSpeed : 20, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : new engine_base_EntityShape(140,100,80,100)}}});
+		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : new engine_base_EntityShape(64,64,64,100), id : id, ownerId : ownerId, rotation : 0}, health : 10, movement : { canWalk : true, canRun : true, runSpeed : 10, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : new engine_base_EntityShape(140,100,80,100)}}});
 	}
 }
 engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__name__ = true;
@@ -1460,144 +1489,6 @@ engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.__super__ = engine_seidh_ent
 Object.assign(engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.prototype, {
 	__class__: engine_seidh_entity_impl_SeidhSkeletonWarriorEntity
 });
-class haxe_IMap {
-}
-haxe_IMap.__name__ = true;
-haxe_IMap.__isInterface__ = true;
-class haxe_Exception extends Error {
-	constructor(message,previous,native) {
-		super(message);
-		this.message = message;
-		this.__previousException = previous;
-		this.__nativeException = native != null ? native : this;
-	}
-	get_native() {
-		return this.__nativeException;
-	}
-	static thrown(value) {
-		if(((value) instanceof haxe_Exception)) {
-			return value.get_native();
-		} else if(((value) instanceof Error)) {
-			return value;
-		} else {
-			let e = new haxe_ValueException(value);
-			return e;
-		}
-	}
-}
-haxe_Exception.__name__ = true;
-haxe_Exception.__super__ = Error;
-Object.assign(haxe_Exception.prototype, {
-	__class__: haxe_Exception
-});
-class haxe_Int32 {
-	static ucompare(a,b) {
-		if(a < 0) {
-			if(b < 0) {
-				return ~b - ~a | 0;
-			} else {
-				return 1;
-			}
-		}
-		if(b < 0) {
-			return -1;
-		} else {
-			return a - b | 0;
-		}
-	}
-}
-class haxe_Int64 {
-	static divMod(dividend,divisor) {
-		if(divisor.high == 0) {
-			switch(divisor.low) {
-			case 0:
-				throw haxe_Exception.thrown("divide by zero");
-			case 1:
-				return { quotient : new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low), modulus : new haxe__$Int64__$_$_$Int64(0,0)};
-			}
-		}
-		let divSign = dividend.high < 0 != divisor.high < 0;
-		let modulus;
-		if(dividend.high < 0) {
-			let high = ~dividend.high;
-			let low = ~dividend.low + 1 | 0;
-			if(low == 0) {
-				let ret = high++;
-				high = high | 0;
-			}
-			modulus = new haxe__$Int64__$_$_$Int64(high,low);
-		} else {
-			modulus = new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low);
-		}
-		if(divisor.high < 0) {
-			let high = ~divisor.high;
-			let low = ~divisor.low + 1 | 0;
-			if(low == 0) {
-				let ret = high++;
-				high = high | 0;
-			}
-			divisor = new haxe__$Int64__$_$_$Int64(high,low);
-		}
-		let quotient = new haxe__$Int64__$_$_$Int64(0,0);
-		let mask = new haxe__$Int64__$_$_$Int64(0,1);
-		while(!(divisor.high < 0)) {
-			let v = haxe_Int32.ucompare(divisor.high,modulus.high);
-			let cmp = v != 0 ? v : haxe_Int32.ucompare(divisor.low,modulus.low);
-			let b = 1;
-			b &= 63;
-			divisor = b == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high << b | divisor.low >>> 32 - b,divisor.low << b) : new haxe__$Int64__$_$_$Int64(divisor.low << b - 32,0);
-			let b1 = 1;
-			b1 &= 63;
-			mask = b1 == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(mask.high << b1 | mask.low >>> 32 - b1,mask.low << b1) : new haxe__$Int64__$_$_$Int64(mask.low << b1 - 32,0);
-			if(cmp >= 0) {
-				break;
-			}
-		}
-		while(true) {
-			let b_high = 0;
-			let b_low = 0;
-			if(!(mask.high != b_high || mask.low != b_low)) {
-				break;
-			}
-			let v = haxe_Int32.ucompare(modulus.high,divisor.high);
-			if((v != 0 ? v : haxe_Int32.ucompare(modulus.low,divisor.low)) >= 0) {
-				quotient = new haxe__$Int64__$_$_$Int64(quotient.high | mask.high,quotient.low | mask.low);
-				let high = modulus.high - divisor.high | 0;
-				let low = modulus.low - divisor.low | 0;
-				if(haxe_Int32.ucompare(modulus.low,divisor.low) < 0) {
-					let ret = high--;
-					high = high | 0;
-				}
-				modulus = new haxe__$Int64__$_$_$Int64(high,low);
-			}
-			let b = 1;
-			b &= 63;
-			mask = b == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(mask.high >>> b,mask.high << 32 - b | mask.low >>> b) : new haxe__$Int64__$_$_$Int64(0,mask.high >>> b - 32);
-			let b1 = 1;
-			b1 &= 63;
-			divisor = b1 == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high >>> b1,divisor.high << 32 - b1 | divisor.low >>> b1) : new haxe__$Int64__$_$_$Int64(0,divisor.high >>> b1 - 32);
-		}
-		if(divSign) {
-			let high = ~quotient.high;
-			let low = ~quotient.low + 1 | 0;
-			if(low == 0) {
-				let ret = high++;
-				high = high | 0;
-			}
-			quotient = new haxe__$Int64__$_$_$Int64(high,low);
-		}
-		if(dividend.high < 0) {
-			let high = ~modulus.high;
-			let low = ~modulus.low + 1 | 0;
-			if(low == 0) {
-				let ret = high++;
-				high = high | 0;
-			}
-			modulus = new haxe__$Int64__$_$_$Int64(high,low);
-		}
-		return { quotient : quotient, modulus : modulus};
-	}
-}
 class haxe__$Int64__$_$_$Int64 {
 	constructor(high,low) {
 		this.high = high;
@@ -1656,670 +1547,22 @@ class haxe_Int64Helper {
 	}
 }
 haxe_Int64Helper.__name__ = true;
-class haxe_Timer {
-	constructor(time_ms) {
-		let me = this;
-		this.id = setInterval(function() {
-			me.run();
-		},time_ms);
-	}
-	stop() {
-		if(this.id == null) {
-			return;
-		}
-		clearInterval(this.id);
-		this.id = null;
-	}
-	run() {
-	}
-	static delay(f,time_ms) {
-		let t = new haxe_Timer(time_ms);
-		t.run = function() {
-			t.stop();
-			f();
-		};
-		return t;
-	}
-}
-haxe_Timer.__name__ = true;
-Object.assign(haxe_Timer.prototype, {
-	__class__: haxe_Timer
-});
-class haxe_ValueException extends haxe_Exception {
-	constructor(value,previous,native) {
-		super(String(value),previous,native);
-		this.value = value;
-	}
-}
-haxe_ValueException.__name__ = true;
-haxe_ValueException.__super__ = haxe_Exception;
-Object.assign(haxe_ValueException.prototype, {
-	__class__: haxe_ValueException
-});
-class haxe_crypto_Md5 {
-	constructor() {
-	}
-	bitOR(a,b) {
-		let lsb = a & 1 | b & 1;
-		let msb31 = a >>> 1 | b >>> 1;
-		return msb31 << 1 | lsb;
-	}
-	bitXOR(a,b) {
-		let lsb = a & 1 ^ b & 1;
-		let msb31 = a >>> 1 ^ b >>> 1;
-		return msb31 << 1 | lsb;
-	}
-	bitAND(a,b) {
-		let lsb = a & 1 & (b & 1);
-		let msb31 = a >>> 1 & b >>> 1;
-		return msb31 << 1 | lsb;
-	}
-	addme(x,y) {
-		let lsw = (x & 65535) + (y & 65535);
-		let msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-		return msw << 16 | lsw & 65535;
-	}
-	rol(num,cnt) {
-		return num << cnt | num >>> 32 - cnt;
-	}
-	cmn(q,a,b,x,s,t) {
-		return this.addme(this.rol(this.addme(this.addme(a,q),this.addme(x,t)),s),b);
-	}
-	ff(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitOR(this.bitAND(b,c),this.bitAND(~b,d)),a,b,x,s,t);
-	}
-	gg(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitOR(this.bitAND(b,d),this.bitAND(c,~d)),a,b,x,s,t);
-	}
-	hh(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitXOR(this.bitXOR(b,c),d),a,b,x,s,t);
-	}
-	ii(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitXOR(c,this.bitOR(b,~d)),a,b,x,s,t);
-	}
-	doEncode(x) {
-		let a = 1732584193;
-		let b = -271733879;
-		let c = -1732584194;
-		let d = 271733878;
-		let step;
-		let i = 0;
-		while(i < x.length) {
-			let olda = a;
-			let oldb = b;
-			let oldc = c;
-			let oldd = d;
-			step = 0;
-			a = this.ff(a,b,c,d,x[i],7,-680876936);
-			d = this.ff(d,a,b,c,x[i + 1],12,-389564586);
-			c = this.ff(c,d,a,b,x[i + 2],17,606105819);
-			b = this.ff(b,c,d,a,x[i + 3],22,-1044525330);
-			a = this.ff(a,b,c,d,x[i + 4],7,-176418897);
-			d = this.ff(d,a,b,c,x[i + 5],12,1200080426);
-			c = this.ff(c,d,a,b,x[i + 6],17,-1473231341);
-			b = this.ff(b,c,d,a,x[i + 7],22,-45705983);
-			a = this.ff(a,b,c,d,x[i + 8],7,1770035416);
-			d = this.ff(d,a,b,c,x[i + 9],12,-1958414417);
-			c = this.ff(c,d,a,b,x[i + 10],17,-42063);
-			b = this.ff(b,c,d,a,x[i + 11],22,-1990404162);
-			a = this.ff(a,b,c,d,x[i + 12],7,1804603682);
-			d = this.ff(d,a,b,c,x[i + 13],12,-40341101);
-			c = this.ff(c,d,a,b,x[i + 14],17,-1502002290);
-			b = this.ff(b,c,d,a,x[i + 15],22,1236535329);
-			a = this.gg(a,b,c,d,x[i + 1],5,-165796510);
-			d = this.gg(d,a,b,c,x[i + 6],9,-1069501632);
-			c = this.gg(c,d,a,b,x[i + 11],14,643717713);
-			b = this.gg(b,c,d,a,x[i],20,-373897302);
-			a = this.gg(a,b,c,d,x[i + 5],5,-701558691);
-			d = this.gg(d,a,b,c,x[i + 10],9,38016083);
-			c = this.gg(c,d,a,b,x[i + 15],14,-660478335);
-			b = this.gg(b,c,d,a,x[i + 4],20,-405537848);
-			a = this.gg(a,b,c,d,x[i + 9],5,568446438);
-			d = this.gg(d,a,b,c,x[i + 14],9,-1019803690);
-			c = this.gg(c,d,a,b,x[i + 3],14,-187363961);
-			b = this.gg(b,c,d,a,x[i + 8],20,1163531501);
-			a = this.gg(a,b,c,d,x[i + 13],5,-1444681467);
-			d = this.gg(d,a,b,c,x[i + 2],9,-51403784);
-			c = this.gg(c,d,a,b,x[i + 7],14,1735328473);
-			b = this.gg(b,c,d,a,x[i + 12],20,-1926607734);
-			a = this.hh(a,b,c,d,x[i + 5],4,-378558);
-			d = this.hh(d,a,b,c,x[i + 8],11,-2022574463);
-			c = this.hh(c,d,a,b,x[i + 11],16,1839030562);
-			b = this.hh(b,c,d,a,x[i + 14],23,-35309556);
-			a = this.hh(a,b,c,d,x[i + 1],4,-1530992060);
-			d = this.hh(d,a,b,c,x[i + 4],11,1272893353);
-			c = this.hh(c,d,a,b,x[i + 7],16,-155497632);
-			b = this.hh(b,c,d,a,x[i + 10],23,-1094730640);
-			a = this.hh(a,b,c,d,x[i + 13],4,681279174);
-			d = this.hh(d,a,b,c,x[i],11,-358537222);
-			c = this.hh(c,d,a,b,x[i + 3],16,-722521979);
-			b = this.hh(b,c,d,a,x[i + 6],23,76029189);
-			a = this.hh(a,b,c,d,x[i + 9],4,-640364487);
-			d = this.hh(d,a,b,c,x[i + 12],11,-421815835);
-			c = this.hh(c,d,a,b,x[i + 15],16,530742520);
-			b = this.hh(b,c,d,a,x[i + 2],23,-995338651);
-			a = this.ii(a,b,c,d,x[i],6,-198630844);
-			d = this.ii(d,a,b,c,x[i + 7],10,1126891415);
-			c = this.ii(c,d,a,b,x[i + 14],15,-1416354905);
-			b = this.ii(b,c,d,a,x[i + 5],21,-57434055);
-			a = this.ii(a,b,c,d,x[i + 12],6,1700485571);
-			d = this.ii(d,a,b,c,x[i + 3],10,-1894986606);
-			c = this.ii(c,d,a,b,x[i + 10],15,-1051523);
-			b = this.ii(b,c,d,a,x[i + 1],21,-2054922799);
-			a = this.ii(a,b,c,d,x[i + 8],6,1873313359);
-			d = this.ii(d,a,b,c,x[i + 15],10,-30611744);
-			c = this.ii(c,d,a,b,x[i + 6],15,-1560198380);
-			b = this.ii(b,c,d,a,x[i + 13],21,1309151649);
-			a = this.ii(a,b,c,d,x[i + 4],6,-145523070);
-			d = this.ii(d,a,b,c,x[i + 11],10,-1120210379);
-			c = this.ii(c,d,a,b,x[i + 2],15,718787259);
-			b = this.ii(b,c,d,a,x[i + 9],21,-343485551);
-			a = this.addme(a,olda);
-			b = this.addme(b,oldb);
-			c = this.addme(c,oldc);
-			d = this.addme(d,oldd);
-			i += 16;
-		}
-		return [a,b,c,d];
-	}
-	static make(b) {
-		let h = new haxe_crypto_Md5().doEncode(haxe_crypto_Md5.bytes2blks(b));
-		let out = new haxe_io_Bytes(new ArrayBuffer(16));
-		let p = 0;
-		out.b[p++] = h[0] & 255;
-		out.b[p++] = h[0] >> 8 & 255;
-		out.b[p++] = h[0] >> 16 & 255;
-		out.b[p++] = h[0] >>> 24;
-		out.b[p++] = h[1] & 255;
-		out.b[p++] = h[1] >> 8 & 255;
-		out.b[p++] = h[1] >> 16 & 255;
-		out.b[p++] = h[1] >>> 24;
-		out.b[p++] = h[2] & 255;
-		out.b[p++] = h[2] >> 8 & 255;
-		out.b[p++] = h[2] >> 16 & 255;
-		out.b[p++] = h[2] >>> 24;
-		out.b[p++] = h[3] & 255;
-		out.b[p++] = h[3] >> 8 & 255;
-		out.b[p++] = h[3] >> 16 & 255;
-		out.b[p++] = h[3] >>> 24;
-		return out;
-	}
-	static bytes2blks(b) {
-		let nblk = (b.length + 8 >> 6) + 1;
-		let blks = [];
-		let blksSize = nblk * 16;
-		let _g = 0;
-		let _g1 = blksSize;
-		while(_g < _g1) {
-			let i = _g++;
-			blks[i] = 0;
-		}
-		let i = 0;
-		while(i < b.length) {
-			blks[i >> 2] |= b.b[i] << (((b.length << 3) + i & 3) << 3);
-			++i;
-		}
-		blks[i >> 2] |= 128 << (b.length * 8 + i) % 4 * 8;
-		let l = b.length * 8;
-		let k = nblk * 16 - 2;
-		blks[k] = l & 255;
-		blks[k] |= (l >>> 8 & 255) << 8;
-		blks[k] |= (l >>> 16 & 255) << 16;
-		blks[k] |= (l >>> 24 & 255) << 24;
-		return blks;
-	}
-}
-haxe_crypto_Md5.__name__ = true;
-Object.assign(haxe_crypto_Md5.prototype, {
-	__class__: haxe_crypto_Md5
-});
-class haxe_crypto_Sha1 {
-	constructor() {
-	}
-	doEncode(x) {
-		let w = [];
-		let a = 1732584193;
-		let b = -271733879;
-		let c = -1732584194;
-		let d = 271733878;
-		let e = -1009589776;
-		let i = 0;
-		while(i < x.length) {
-			let olda = a;
-			let oldb = b;
-			let oldc = c;
-			let oldd = d;
-			let olde = e;
-			let j = 0;
-			while(j < 80) {
-				if(j < 16) {
-					w[j] = x[i + j];
-				} else {
-					let num = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
-					w[j] = num << 1 | num >>> 31;
-				}
-				let t = (a << 5 | a >>> 27) + this.ft(j,b,c,d) + e + w[j] + this.kt(j);
-				e = d;
-				d = c;
-				c = b << 30 | b >>> 2;
-				b = a;
-				a = t;
-				++j;
-			}
-			a += olda;
-			b += oldb;
-			c += oldc;
-			d += oldd;
-			e += olde;
-			i += 16;
-		}
-		return [a,b,c,d,e];
-	}
-	ft(t,b,c,d) {
-		if(t < 20) {
-			return b & c | ~b & d;
-		}
-		if(t < 40) {
-			return b ^ c ^ d;
-		}
-		if(t < 60) {
-			return b & c | b & d | c & d;
-		}
-		return b ^ c ^ d;
-	}
-	kt(t) {
-		if(t < 20) {
-			return 1518500249;
-		}
-		if(t < 40) {
-			return 1859775393;
-		}
-		if(t < 60) {
-			return -1894007588;
-		}
-		return -899497514;
-	}
-	static make(b) {
-		let h = new haxe_crypto_Sha1().doEncode(haxe_crypto_Sha1.bytes2blks(b));
-		let out = new haxe_io_Bytes(new ArrayBuffer(20));
-		let p = 0;
-		out.b[p++] = h[0] >>> 24;
-		out.b[p++] = h[0] >> 16 & 255;
-		out.b[p++] = h[0] >> 8 & 255;
-		out.b[p++] = h[0] & 255;
-		out.b[p++] = h[1] >>> 24;
-		out.b[p++] = h[1] >> 16 & 255;
-		out.b[p++] = h[1] >> 8 & 255;
-		out.b[p++] = h[1] & 255;
-		out.b[p++] = h[2] >>> 24;
-		out.b[p++] = h[2] >> 16 & 255;
-		out.b[p++] = h[2] >> 8 & 255;
-		out.b[p++] = h[2] & 255;
-		out.b[p++] = h[3] >>> 24;
-		out.b[p++] = h[3] >> 16 & 255;
-		out.b[p++] = h[3] >> 8 & 255;
-		out.b[p++] = h[3] & 255;
-		out.b[p++] = h[4] >>> 24;
-		out.b[p++] = h[4] >> 16 & 255;
-		out.b[p++] = h[4] >> 8 & 255;
-		out.b[p++] = h[4] & 255;
-		return out;
-	}
-	static bytes2blks(b) {
-		let nblk = (b.length + 8 >> 6) + 1;
-		let blks = [];
-		let _g = 0;
-		let _g1 = nblk * 16;
-		while(_g < _g1) {
-			let i = _g++;
-			blks[i] = 0;
-		}
-		let _g2 = 0;
-		let _g3 = b.length;
-		while(_g2 < _g3) {
-			let i = _g2++;
-			let p = i >> 2;
-			blks[p] |= b.b[i] << 24 - ((i & 3) << 3);
-		}
-		let i = b.length;
-		let p = i >> 2;
-		blks[p] |= 128 << 24 - ((i & 3) << 3);
-		blks[nblk * 16 - 1] = b.length * 8;
-		return blks;
-	}
-}
-haxe_crypto_Sha1.__name__ = true;
-Object.assign(haxe_crypto_Sha1.prototype, {
-	__class__: haxe_crypto_Sha1
-});
-class haxe_ds_StringMap {
-	constructor() {
-		this.h = Object.create(null);
-	}
-}
-haxe_ds_StringMap.__name__ = true;
-haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
-Object.assign(haxe_ds_StringMap.prototype, {
-	__class__: haxe_ds_StringMap
-});
-class haxe_io_Bytes {
-	constructor(data) {
-		this.length = data.byteLength;
-		this.b = new Uint8Array(data);
-		this.b.bufferValue = data;
-		data.hxBytes = this;
-		data.bytes = this.b;
-	}
-	toHex() {
-		let s_b = "";
-		let chars = [];
-		let str = "0123456789abcdef";
-		let _g = 0;
-		let _g1 = str.length;
-		while(_g < _g1) {
-			let i = _g++;
-			chars.push(HxOverrides.cca(str,i));
-		}
-		let _g2 = 0;
-		let _g3 = this.length;
-		while(_g2 < _g3) {
-			let i = _g2++;
-			let c = this.b[i];
-			s_b += String.fromCodePoint(chars[c >> 4]);
-			s_b += String.fromCodePoint(chars[c & 15]);
-		}
-		return s_b;
-	}
-	static ofString(s,encoding) {
-		if(encoding == haxe_io_Encoding.RawNative) {
-			let buf = new Uint8Array(s.length << 1);
-			let _g = 0;
-			let _g1 = s.length;
-			while(_g < _g1) {
-				let i = _g++;
-				let c = s.charCodeAt(i);
-				buf[i << 1] = c & 255;
-				buf[i << 1 | 1] = c >> 8;
-			}
-			return new haxe_io_Bytes(buf.buffer);
-		}
-		let a = [];
-		let i = 0;
-		while(i < s.length) {
-			let c = s.charCodeAt(i++);
-			if(55296 <= c && c <= 56319) {
-				c = c - 55232 << 10 | s.charCodeAt(i++) & 1023;
-			}
-			if(c <= 127) {
-				a.push(c);
-			} else if(c <= 2047) {
-				a.push(192 | c >> 6);
-				a.push(128 | c & 63);
-			} else if(c <= 65535) {
-				a.push(224 | c >> 12);
-				a.push(128 | c >> 6 & 63);
-				a.push(128 | c & 63);
+class haxe_Int32 {
+	static ucompare(a,b) {
+		if(a < 0) {
+			if(b < 0) {
+				return ~b - ~a | 0;
 			} else {
-				a.push(240 | c >> 18);
-				a.push(128 | c >> 12 & 63);
-				a.push(128 | c >> 6 & 63);
-				a.push(128 | c & 63);
+				return 1;
 			}
 		}
-		return new haxe_io_Bytes(new Uint8Array(a).buffer);
-	}
-	static ofHex(s) {
-		if((s.length & 1) != 0) {
-			throw haxe_Exception.thrown("Not a hex string (odd number of digits)");
-		}
-		let a = [];
-		let i = 0;
-		let len = s.length >> 1;
-		while(i < len) {
-			let high = s.charCodeAt(i * 2);
-			let low = s.charCodeAt(i * 2 + 1);
-			high = (high & 15) + ((high & 64) >> 6) * 9;
-			low = (low & 15) + ((low & 64) >> 6) * 9;
-			a.push((high << 4 | low) & 255);
-			++i;
-		}
-		return new haxe_io_Bytes(new Uint8Array(a).buffer);
-	}
-}
-haxe_io_Bytes.__name__ = true;
-Object.assign(haxe_io_Bytes.prototype, {
-	__class__: haxe_io_Bytes
-});
-var haxe_io_Encoding = $hxEnums["haxe.io.Encoding"] = { __ename__:true,__constructs__:null
-	,UTF8: {_hx_name:"UTF8",_hx_index:0,__enum__:"haxe.io.Encoding",toString:$estr}
-	,RawNative: {_hx_name:"RawNative",_hx_index:1,__enum__:"haxe.io.Encoding",toString:$estr}
-};
-haxe_io_Encoding.__constructs__ = [haxe_io_Encoding.UTF8,haxe_io_Encoding.RawNative];
-class haxe_iterators_ArrayIterator {
-	constructor(array) {
-		this.current = 0;
-		this.array = array;
-	}
-	hasNext() {
-		return this.current < this.array.length;
-	}
-	next() {
-		return this.array[this.current++];
-	}
-}
-haxe_iterators_ArrayIterator.__name__ = true;
-Object.assign(haxe_iterators_ArrayIterator.prototype, {
-	__class__: haxe_iterators_ArrayIterator
-});
-class js_Boot {
-	static getClass(o) {
-		if(o == null) {
-			return null;
-		} else if(((o) instanceof Array)) {
-			return Array;
+		if(b < 0) {
+			return -1;
 		} else {
-			let cl = o.__class__;
-			if(cl != null) {
-				return cl;
-			}
-			let name = js_Boot.__nativeClassName(o);
-			if(name != null) {
-				return js_Boot.__resolveNativeClass(name);
-			}
-			return null;
+			return a - b | 0;
 		}
-	}
-	static __string_rec(o,s) {
-		if(o == null) {
-			return "null";
-		}
-		if(s.length >= 5) {
-			return "<...>";
-		}
-		let t = typeof(o);
-		if(t == "function" && (o.__name__ || o.__ename__)) {
-			t = "object";
-		}
-		switch(t) {
-		case "function":
-			return "<function>";
-		case "object":
-			if(o.__enum__) {
-				let e = $hxEnums[o.__enum__];
-				let con = e.__constructs__[o._hx_index];
-				let n = con._hx_name;
-				if(con.__params__) {
-					s = s + "\t";
-					return n + "(" + ((function($this) {
-						var $r;
-						let _g = [];
-						{
-							let _g1 = 0;
-							let _g2 = con.__params__;
-							while(true) {
-								if(!(_g1 < _g2.length)) {
-									break;
-								}
-								let p = _g2[_g1];
-								_g1 = _g1 + 1;
-								_g.push(js_Boot.__string_rec(o[p],s));
-							}
-						}
-						$r = _g;
-						return $r;
-					}(this))).join(",") + ")";
-				} else {
-					return n;
-				}
-			}
-			if(((o) instanceof Array)) {
-				let str = "[";
-				s += "\t";
-				let _g = 0;
-				let _g1 = o.length;
-				while(_g < _g1) {
-					let i = _g++;
-					str += (i > 0 ? "," : "") + js_Boot.__string_rec(o[i],s);
-				}
-				str += "]";
-				return str;
-			}
-			let tostr;
-			try {
-				tostr = o.toString;
-			} catch( _g ) {
-				return "???";
-			}
-			if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
-				let s2 = o.toString();
-				if(s2 != "[object Object]") {
-					return s2;
-				}
-			}
-			let str = "{\n";
-			s += "\t";
-			let hasp = o.hasOwnProperty != null;
-			let k = null;
-			for( k in o ) {
-			if(hasp && !o.hasOwnProperty(k)) {
-				continue;
-			}
-			if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
-				continue;
-			}
-			if(str.length != 2) {
-				str += ", \n";
-			}
-			str += s + k + " : " + js_Boot.__string_rec(o[k],s);
-			}
-			s = s.substring(1);
-			str += "\n" + s + "}";
-			return str;
-		case "string":
-			return o;
-		default:
-			return String(o);
-		}
-	}
-	static __interfLoop(cc,cl) {
-		if(cc == null) {
-			return false;
-		}
-		if(cc == cl) {
-			return true;
-		}
-		let intf = cc.__interfaces__;
-		if(intf != null && (cc.__super__ == null || cc.__super__.__interfaces__ != intf)) {
-			let _g = 0;
-			let _g1 = intf.length;
-			while(_g < _g1) {
-				let i = _g++;
-				let i1 = intf[i];
-				if(i1 == cl || js_Boot.__interfLoop(i1,cl)) {
-					return true;
-				}
-			}
-		}
-		return js_Boot.__interfLoop(cc.__super__,cl);
-	}
-	static __instanceof(o,cl) {
-		if(cl == null) {
-			return false;
-		}
-		switch(cl) {
-		case Array:
-			return ((o) instanceof Array);
-		case Bool:
-			return typeof(o) == "boolean";
-		case Dynamic:
-			return o != null;
-		case Float:
-			return typeof(o) == "number";
-		case Int:
-			if(typeof(o) == "number") {
-				return ((o | 0) === o);
-			} else {
-				return false;
-			}
-			break;
-		case String:
-			return typeof(o) == "string";
-		default:
-			if(o != null) {
-				if(typeof(cl) == "function") {
-					if(js_Boot.__downcastCheck(o,cl)) {
-						return true;
-					}
-				} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
-					if(((o) instanceof cl)) {
-						return true;
-					}
-				}
-			} else {
-				return false;
-			}
-			if(cl == Class ? o.__name__ != null : false) {
-				return true;
-			}
-			if(cl == Enum ? o.__ename__ != null : false) {
-				return true;
-			}
-			return o.__enum__ != null ? $hxEnums[o.__enum__] == cl : false;
-		}
-	}
-	static __downcastCheck(o,cl) {
-		if(!((o) instanceof cl)) {
-			if(cl.__isInterface__) {
-				return js_Boot.__interfLoop(js_Boot.getClass(o),cl);
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
-	static __cast(o,t) {
-		if(o == null || js_Boot.__instanceof(o,t)) {
-			return o;
-		} else {
-			throw haxe_Exception.thrown("Cannot cast " + Std.string(o) + " to " + Std.string(t));
-		}
-	}
-	static __nativeClassName(o) {
-		let name = js_Boot.__toStr.call(o).slice(8,-1);
-		if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
-			return null;
-		}
-		return name;
-	}
-	static __isNativeObj(o) {
-		return js_Boot.__nativeClassName(o) != null;
-	}
-	static __resolveNativeClass(name) {
-		return $global[name];
 	}
 }
-js_Boot.__name__ = true;
 class uuid_Uuid {
 	static splitmix64_seed(index) {
 		let b_high = -1640531527;
@@ -2860,6 +2103,809 @@ class uuid_Uuid {
 	}
 }
 uuid_Uuid.__name__ = true;
+class haxe_Int64 {
+	static divMod(dividend,divisor) {
+		if(divisor.high == 0) {
+			switch(divisor.low) {
+			case 0:
+				throw haxe_Exception.thrown("divide by zero");
+			case 1:
+				return { quotient : new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low), modulus : new haxe__$Int64__$_$_$Int64(0,0)};
+			}
+		}
+		let divSign = dividend.high < 0 != divisor.high < 0;
+		let modulus;
+		if(dividend.high < 0) {
+			let high = ~dividend.high;
+			let low = ~dividend.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
+				high = high | 0;
+			}
+			modulus = new haxe__$Int64__$_$_$Int64(high,low);
+		} else {
+			modulus = new haxe__$Int64__$_$_$Int64(dividend.high,dividend.low);
+		}
+		if(divisor.high < 0) {
+			let high = ~divisor.high;
+			let low = ~divisor.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
+				high = high | 0;
+			}
+			divisor = new haxe__$Int64__$_$_$Int64(high,low);
+		}
+		let quotient = new haxe__$Int64__$_$_$Int64(0,0);
+		let mask = new haxe__$Int64__$_$_$Int64(0,1);
+		while(!(divisor.high < 0)) {
+			let v = haxe_Int32.ucompare(divisor.high,modulus.high);
+			let cmp = v != 0 ? v : haxe_Int32.ucompare(divisor.low,modulus.low);
+			let b = 1;
+			b &= 63;
+			divisor = b == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high << b | divisor.low >>> 32 - b,divisor.low << b) : new haxe__$Int64__$_$_$Int64(divisor.low << b - 32,0);
+			let b1 = 1;
+			b1 &= 63;
+			mask = b1 == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(mask.high << b1 | mask.low >>> 32 - b1,mask.low << b1) : new haxe__$Int64__$_$_$Int64(mask.low << b1 - 32,0);
+			if(cmp >= 0) {
+				break;
+			}
+		}
+		while(true) {
+			let b_high = 0;
+			let b_low = 0;
+			if(!(mask.high != b_high || mask.low != b_low)) {
+				break;
+			}
+			let v = haxe_Int32.ucompare(modulus.high,divisor.high);
+			if((v != 0 ? v : haxe_Int32.ucompare(modulus.low,divisor.low)) >= 0) {
+				quotient = new haxe__$Int64__$_$_$Int64(quotient.high | mask.high,quotient.low | mask.low);
+				let high = modulus.high - divisor.high | 0;
+				let low = modulus.low - divisor.low | 0;
+				if(haxe_Int32.ucompare(modulus.low,divisor.low) < 0) {
+					let ret = high--;
+					high = high | 0;
+				}
+				modulus = new haxe__$Int64__$_$_$Int64(high,low);
+			}
+			let b = 1;
+			b &= 63;
+			mask = b == 0 ? new haxe__$Int64__$_$_$Int64(mask.high,mask.low) : b < 32 ? new haxe__$Int64__$_$_$Int64(mask.high >>> b,mask.high << 32 - b | mask.low >>> b) : new haxe__$Int64__$_$_$Int64(0,mask.high >>> b - 32);
+			let b1 = 1;
+			b1 &= 63;
+			divisor = b1 == 0 ? new haxe__$Int64__$_$_$Int64(divisor.high,divisor.low) : b1 < 32 ? new haxe__$Int64__$_$_$Int64(divisor.high >>> b1,divisor.high << 32 - b1 | divisor.low >>> b1) : new haxe__$Int64__$_$_$Int64(0,divisor.high >>> b1 - 32);
+		}
+		if(divSign) {
+			let high = ~quotient.high;
+			let low = ~quotient.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
+				high = high | 0;
+			}
+			quotient = new haxe__$Int64__$_$_$Int64(high,low);
+		}
+		if(dividend.high < 0) {
+			let high = ~modulus.high;
+			let low = ~modulus.low + 1 | 0;
+			if(low == 0) {
+				let ret = high++;
+				high = high | 0;
+			}
+			modulus = new haxe__$Int64__$_$_$Int64(high,low);
+		}
+		return { quotient : quotient, modulus : modulus};
+	}
+}
+class haxe_io_Bytes {
+	constructor(data) {
+		this.length = data.byteLength;
+		this.b = new Uint8Array(data);
+		this.b.bufferValue = data;
+		data.hxBytes = this;
+		data.bytes = this.b;
+	}
+	toHex() {
+		let s_b = "";
+		let chars = [];
+		let str = "0123456789abcdef";
+		let _g = 0;
+		let _g1 = str.length;
+		while(_g < _g1) {
+			let i = _g++;
+			chars.push(HxOverrides.cca(str,i));
+		}
+		let _g2 = 0;
+		let _g3 = this.length;
+		while(_g2 < _g3) {
+			let i = _g2++;
+			let c = this.b[i];
+			s_b += String.fromCodePoint(chars[c >> 4]);
+			s_b += String.fromCodePoint(chars[c & 15]);
+		}
+		return s_b;
+	}
+	static ofString(s,encoding) {
+		if(encoding == haxe_io_Encoding.RawNative) {
+			let buf = new Uint8Array(s.length << 1);
+			let _g = 0;
+			let _g1 = s.length;
+			while(_g < _g1) {
+				let i = _g++;
+				let c = s.charCodeAt(i);
+				buf[i << 1] = c & 255;
+				buf[i << 1 | 1] = c >> 8;
+			}
+			return new haxe_io_Bytes(buf.buffer);
+		}
+		let a = [];
+		let i = 0;
+		while(i < s.length) {
+			let c = s.charCodeAt(i++);
+			if(55296 <= c && c <= 56319) {
+				c = c - 55232 << 10 | s.charCodeAt(i++) & 1023;
+			}
+			if(c <= 127) {
+				a.push(c);
+			} else if(c <= 2047) {
+				a.push(192 | c >> 6);
+				a.push(128 | c & 63);
+			} else if(c <= 65535) {
+				a.push(224 | c >> 12);
+				a.push(128 | c >> 6 & 63);
+				a.push(128 | c & 63);
+			} else {
+				a.push(240 | c >> 18);
+				a.push(128 | c >> 12 & 63);
+				a.push(128 | c >> 6 & 63);
+				a.push(128 | c & 63);
+			}
+		}
+		return new haxe_io_Bytes(new Uint8Array(a).buffer);
+	}
+	static ofHex(s) {
+		if((s.length & 1) != 0) {
+			throw haxe_Exception.thrown("Not a hex string (odd number of digits)");
+		}
+		let a = [];
+		let i = 0;
+		let len = s.length >> 1;
+		while(i < len) {
+			let high = s.charCodeAt(i * 2);
+			let low = s.charCodeAt(i * 2 + 1);
+			high = (high & 15) + ((high & 64) >> 6) * 9;
+			low = (low & 15) + ((low & 64) >> 6) * 9;
+			a.push((high << 4 | low) & 255);
+			++i;
+		}
+		return new haxe_io_Bytes(new Uint8Array(a).buffer);
+	}
+}
+haxe_io_Bytes.__name__ = true;
+Object.assign(haxe_io_Bytes.prototype, {
+	__class__: haxe_io_Bytes
+});
+class game_Player {
+	constructor() {
+		this.inputIndex = 0;
+		this.playerId = uuid_Uuid.short().toLowerCase();
+		this.playerEntityId = "entity_" + this.playerId;
+	}
+	incrementAndGetInputIndex() {
+		return ++this.inputIndex;
+	}
+	getInputIndex() {
+		return this.inputIndex;
+	}
+}
+game_Player.__name__ = true;
+Object.assign(game_Player.prototype, {
+	__class__: game_Player
+});
+class haxe_IMap {
+}
+haxe_IMap.__name__ = true;
+haxe_IMap.__isInterface__ = true;
+class haxe_Exception extends Error {
+	constructor(message,previous,native) {
+		super(message);
+		this.message = message;
+		this.__previousException = previous;
+		this.__nativeException = native != null ? native : this;
+	}
+	get_native() {
+		return this.__nativeException;
+	}
+	static thrown(value) {
+		if(((value) instanceof haxe_Exception)) {
+			return value.get_native();
+		} else if(((value) instanceof Error)) {
+			return value;
+		} else {
+			let e = new haxe_ValueException(value);
+			return e;
+		}
+	}
+}
+haxe_Exception.__name__ = true;
+haxe_Exception.__super__ = Error;
+Object.assign(haxe_Exception.prototype, {
+	__class__: haxe_Exception
+});
+class haxe_Timer {
+	constructor(time_ms) {
+		let me = this;
+		this.id = setInterval(function() {
+			me.run();
+		},time_ms);
+	}
+	stop() {
+		if(this.id == null) {
+			return;
+		}
+		clearInterval(this.id);
+		this.id = null;
+	}
+	run() {
+	}
+	static delay(f,time_ms) {
+		let t = new haxe_Timer(time_ms);
+		t.run = function() {
+			t.stop();
+			f();
+		};
+		return t;
+	}
+}
+haxe_Timer.__name__ = true;
+Object.assign(haxe_Timer.prototype, {
+	__class__: haxe_Timer
+});
+class haxe_ValueException extends haxe_Exception {
+	constructor(value,previous,native) {
+		super(String(value),previous,native);
+		this.value = value;
+	}
+}
+haxe_ValueException.__name__ = true;
+haxe_ValueException.__super__ = haxe_Exception;
+Object.assign(haxe_ValueException.prototype, {
+	__class__: haxe_ValueException
+});
+class haxe_crypto_Md5 {
+	constructor() {
+	}
+	bitOR(a,b) {
+		let lsb = a & 1 | b & 1;
+		let msb31 = a >>> 1 | b >>> 1;
+		return msb31 << 1 | lsb;
+	}
+	bitXOR(a,b) {
+		let lsb = a & 1 ^ b & 1;
+		let msb31 = a >>> 1 ^ b >>> 1;
+		return msb31 << 1 | lsb;
+	}
+	bitAND(a,b) {
+		let lsb = a & 1 & (b & 1);
+		let msb31 = a >>> 1 & b >>> 1;
+		return msb31 << 1 | lsb;
+	}
+	addme(x,y) {
+		let lsw = (x & 65535) + (y & 65535);
+		let msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+		return msw << 16 | lsw & 65535;
+	}
+	rol(num,cnt) {
+		return num << cnt | num >>> 32 - cnt;
+	}
+	cmn(q,a,b,x,s,t) {
+		return this.addme(this.rol(this.addme(this.addme(a,q),this.addme(x,t)),s),b);
+	}
+	ff(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitOR(this.bitAND(b,c),this.bitAND(~b,d)),a,b,x,s,t);
+	}
+	gg(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitOR(this.bitAND(b,d),this.bitAND(c,~d)),a,b,x,s,t);
+	}
+	hh(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitXOR(this.bitXOR(b,c),d),a,b,x,s,t);
+	}
+	ii(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitXOR(c,this.bitOR(b,~d)),a,b,x,s,t);
+	}
+	doEncode(x) {
+		let a = 1732584193;
+		let b = -271733879;
+		let c = -1732584194;
+		let d = 271733878;
+		let step;
+		let i = 0;
+		while(i < x.length) {
+			let olda = a;
+			let oldb = b;
+			let oldc = c;
+			let oldd = d;
+			step = 0;
+			a = this.ff(a,b,c,d,x[i],7,-680876936);
+			d = this.ff(d,a,b,c,x[i + 1],12,-389564586);
+			c = this.ff(c,d,a,b,x[i + 2],17,606105819);
+			b = this.ff(b,c,d,a,x[i + 3],22,-1044525330);
+			a = this.ff(a,b,c,d,x[i + 4],7,-176418897);
+			d = this.ff(d,a,b,c,x[i + 5],12,1200080426);
+			c = this.ff(c,d,a,b,x[i + 6],17,-1473231341);
+			b = this.ff(b,c,d,a,x[i + 7],22,-45705983);
+			a = this.ff(a,b,c,d,x[i + 8],7,1770035416);
+			d = this.ff(d,a,b,c,x[i + 9],12,-1958414417);
+			c = this.ff(c,d,a,b,x[i + 10],17,-42063);
+			b = this.ff(b,c,d,a,x[i + 11],22,-1990404162);
+			a = this.ff(a,b,c,d,x[i + 12],7,1804603682);
+			d = this.ff(d,a,b,c,x[i + 13],12,-40341101);
+			c = this.ff(c,d,a,b,x[i + 14],17,-1502002290);
+			b = this.ff(b,c,d,a,x[i + 15],22,1236535329);
+			a = this.gg(a,b,c,d,x[i + 1],5,-165796510);
+			d = this.gg(d,a,b,c,x[i + 6],9,-1069501632);
+			c = this.gg(c,d,a,b,x[i + 11],14,643717713);
+			b = this.gg(b,c,d,a,x[i],20,-373897302);
+			a = this.gg(a,b,c,d,x[i + 5],5,-701558691);
+			d = this.gg(d,a,b,c,x[i + 10],9,38016083);
+			c = this.gg(c,d,a,b,x[i + 15],14,-660478335);
+			b = this.gg(b,c,d,a,x[i + 4],20,-405537848);
+			a = this.gg(a,b,c,d,x[i + 9],5,568446438);
+			d = this.gg(d,a,b,c,x[i + 14],9,-1019803690);
+			c = this.gg(c,d,a,b,x[i + 3],14,-187363961);
+			b = this.gg(b,c,d,a,x[i + 8],20,1163531501);
+			a = this.gg(a,b,c,d,x[i + 13],5,-1444681467);
+			d = this.gg(d,a,b,c,x[i + 2],9,-51403784);
+			c = this.gg(c,d,a,b,x[i + 7],14,1735328473);
+			b = this.gg(b,c,d,a,x[i + 12],20,-1926607734);
+			a = this.hh(a,b,c,d,x[i + 5],4,-378558);
+			d = this.hh(d,a,b,c,x[i + 8],11,-2022574463);
+			c = this.hh(c,d,a,b,x[i + 11],16,1839030562);
+			b = this.hh(b,c,d,a,x[i + 14],23,-35309556);
+			a = this.hh(a,b,c,d,x[i + 1],4,-1530992060);
+			d = this.hh(d,a,b,c,x[i + 4],11,1272893353);
+			c = this.hh(c,d,a,b,x[i + 7],16,-155497632);
+			b = this.hh(b,c,d,a,x[i + 10],23,-1094730640);
+			a = this.hh(a,b,c,d,x[i + 13],4,681279174);
+			d = this.hh(d,a,b,c,x[i],11,-358537222);
+			c = this.hh(c,d,a,b,x[i + 3],16,-722521979);
+			b = this.hh(b,c,d,a,x[i + 6],23,76029189);
+			a = this.hh(a,b,c,d,x[i + 9],4,-640364487);
+			d = this.hh(d,a,b,c,x[i + 12],11,-421815835);
+			c = this.hh(c,d,a,b,x[i + 15],16,530742520);
+			b = this.hh(b,c,d,a,x[i + 2],23,-995338651);
+			a = this.ii(a,b,c,d,x[i],6,-198630844);
+			d = this.ii(d,a,b,c,x[i + 7],10,1126891415);
+			c = this.ii(c,d,a,b,x[i + 14],15,-1416354905);
+			b = this.ii(b,c,d,a,x[i + 5],21,-57434055);
+			a = this.ii(a,b,c,d,x[i + 12],6,1700485571);
+			d = this.ii(d,a,b,c,x[i + 3],10,-1894986606);
+			c = this.ii(c,d,a,b,x[i + 10],15,-1051523);
+			b = this.ii(b,c,d,a,x[i + 1],21,-2054922799);
+			a = this.ii(a,b,c,d,x[i + 8],6,1873313359);
+			d = this.ii(d,a,b,c,x[i + 15],10,-30611744);
+			c = this.ii(c,d,a,b,x[i + 6],15,-1560198380);
+			b = this.ii(b,c,d,a,x[i + 13],21,1309151649);
+			a = this.ii(a,b,c,d,x[i + 4],6,-145523070);
+			d = this.ii(d,a,b,c,x[i + 11],10,-1120210379);
+			c = this.ii(c,d,a,b,x[i + 2],15,718787259);
+			b = this.ii(b,c,d,a,x[i + 9],21,-343485551);
+			a = this.addme(a,olda);
+			b = this.addme(b,oldb);
+			c = this.addme(c,oldc);
+			d = this.addme(d,oldd);
+			i += 16;
+		}
+		return [a,b,c,d];
+	}
+	static make(b) {
+		let h = new haxe_crypto_Md5().doEncode(haxe_crypto_Md5.bytes2blks(b));
+		let out = new haxe_io_Bytes(new ArrayBuffer(16));
+		let p = 0;
+		out.b[p++] = h[0] & 255;
+		out.b[p++] = h[0] >> 8 & 255;
+		out.b[p++] = h[0] >> 16 & 255;
+		out.b[p++] = h[0] >>> 24;
+		out.b[p++] = h[1] & 255;
+		out.b[p++] = h[1] >> 8 & 255;
+		out.b[p++] = h[1] >> 16 & 255;
+		out.b[p++] = h[1] >>> 24;
+		out.b[p++] = h[2] & 255;
+		out.b[p++] = h[2] >> 8 & 255;
+		out.b[p++] = h[2] >> 16 & 255;
+		out.b[p++] = h[2] >>> 24;
+		out.b[p++] = h[3] & 255;
+		out.b[p++] = h[3] >> 8 & 255;
+		out.b[p++] = h[3] >> 16 & 255;
+		out.b[p++] = h[3] >>> 24;
+		return out;
+	}
+	static bytes2blks(b) {
+		let nblk = (b.length + 8 >> 6) + 1;
+		let blks = [];
+		let blksSize = nblk * 16;
+		let _g = 0;
+		let _g1 = blksSize;
+		while(_g < _g1) {
+			let i = _g++;
+			blks[i] = 0;
+		}
+		let i = 0;
+		while(i < b.length) {
+			blks[i >> 2] |= b.b[i] << (((b.length << 3) + i & 3) << 3);
+			++i;
+		}
+		blks[i >> 2] |= 128 << (b.length * 8 + i) % 4 * 8;
+		let l = b.length * 8;
+		let k = nblk * 16 - 2;
+		blks[k] = l & 255;
+		blks[k] |= (l >>> 8 & 255) << 8;
+		blks[k] |= (l >>> 16 & 255) << 16;
+		blks[k] |= (l >>> 24 & 255) << 24;
+		return blks;
+	}
+}
+haxe_crypto_Md5.__name__ = true;
+Object.assign(haxe_crypto_Md5.prototype, {
+	__class__: haxe_crypto_Md5
+});
+class haxe_crypto_Sha1 {
+	constructor() {
+	}
+	doEncode(x) {
+		let w = [];
+		let a = 1732584193;
+		let b = -271733879;
+		let c = -1732584194;
+		let d = 271733878;
+		let e = -1009589776;
+		let i = 0;
+		while(i < x.length) {
+			let olda = a;
+			let oldb = b;
+			let oldc = c;
+			let oldd = d;
+			let olde = e;
+			let j = 0;
+			while(j < 80) {
+				if(j < 16) {
+					w[j] = x[i + j];
+				} else {
+					let num = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
+					w[j] = num << 1 | num >>> 31;
+				}
+				let t = (a << 5 | a >>> 27) + this.ft(j,b,c,d) + e + w[j] + this.kt(j);
+				e = d;
+				d = c;
+				c = b << 30 | b >>> 2;
+				b = a;
+				a = t;
+				++j;
+			}
+			a += olda;
+			b += oldb;
+			c += oldc;
+			d += oldd;
+			e += olde;
+			i += 16;
+		}
+		return [a,b,c,d,e];
+	}
+	ft(t,b,c,d) {
+		if(t < 20) {
+			return b & c | ~b & d;
+		}
+		if(t < 40) {
+			return b ^ c ^ d;
+		}
+		if(t < 60) {
+			return b & c | b & d | c & d;
+		}
+		return b ^ c ^ d;
+	}
+	kt(t) {
+		if(t < 20) {
+			return 1518500249;
+		}
+		if(t < 40) {
+			return 1859775393;
+		}
+		if(t < 60) {
+			return -1894007588;
+		}
+		return -899497514;
+	}
+	static make(b) {
+		let h = new haxe_crypto_Sha1().doEncode(haxe_crypto_Sha1.bytes2blks(b));
+		let out = new haxe_io_Bytes(new ArrayBuffer(20));
+		let p = 0;
+		out.b[p++] = h[0] >>> 24;
+		out.b[p++] = h[0] >> 16 & 255;
+		out.b[p++] = h[0] >> 8 & 255;
+		out.b[p++] = h[0] & 255;
+		out.b[p++] = h[1] >>> 24;
+		out.b[p++] = h[1] >> 16 & 255;
+		out.b[p++] = h[1] >> 8 & 255;
+		out.b[p++] = h[1] & 255;
+		out.b[p++] = h[2] >>> 24;
+		out.b[p++] = h[2] >> 16 & 255;
+		out.b[p++] = h[2] >> 8 & 255;
+		out.b[p++] = h[2] & 255;
+		out.b[p++] = h[3] >>> 24;
+		out.b[p++] = h[3] >> 16 & 255;
+		out.b[p++] = h[3] >> 8 & 255;
+		out.b[p++] = h[3] & 255;
+		out.b[p++] = h[4] >>> 24;
+		out.b[p++] = h[4] >> 16 & 255;
+		out.b[p++] = h[4] >> 8 & 255;
+		out.b[p++] = h[4] & 255;
+		return out;
+	}
+	static bytes2blks(b) {
+		let nblk = (b.length + 8 >> 6) + 1;
+		let blks = [];
+		let _g = 0;
+		let _g1 = nblk * 16;
+		while(_g < _g1) {
+			let i = _g++;
+			blks[i] = 0;
+		}
+		let _g2 = 0;
+		let _g3 = b.length;
+		while(_g2 < _g3) {
+			let i = _g2++;
+			let p = i >> 2;
+			blks[p] |= b.b[i] << 24 - ((i & 3) << 3);
+		}
+		let i = b.length;
+		let p = i >> 2;
+		blks[p] |= 128 << 24 - ((i & 3) << 3);
+		blks[nblk * 16 - 1] = b.length * 8;
+		return blks;
+	}
+}
+haxe_crypto_Sha1.__name__ = true;
+Object.assign(haxe_crypto_Sha1.prototype, {
+	__class__: haxe_crypto_Sha1
+});
+class haxe_ds_StringMap {
+	constructor() {
+		this.h = Object.create(null);
+	}
+}
+haxe_ds_StringMap.__name__ = true;
+haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
+Object.assign(haxe_ds_StringMap.prototype, {
+	__class__: haxe_ds_StringMap
+});
+var haxe_io_Encoding = $hxEnums["haxe.io.Encoding"] = { __ename__:true,__constructs__:null
+	,UTF8: {_hx_name:"UTF8",_hx_index:0,__enum__:"haxe.io.Encoding",toString:$estr}
+	,RawNative: {_hx_name:"RawNative",_hx_index:1,__enum__:"haxe.io.Encoding",toString:$estr}
+};
+haxe_io_Encoding.__constructs__ = [haxe_io_Encoding.UTF8,haxe_io_Encoding.RawNative];
+class haxe_iterators_ArrayIterator {
+	constructor(array) {
+		this.current = 0;
+		this.array = array;
+	}
+	hasNext() {
+		return this.current < this.array.length;
+	}
+	next() {
+		return this.array[this.current++];
+	}
+}
+haxe_iterators_ArrayIterator.__name__ = true;
+Object.assign(haxe_iterators_ArrayIterator.prototype, {
+	__class__: haxe_iterators_ArrayIterator
+});
+class js_Boot {
+	static getClass(o) {
+		if(o == null) {
+			return null;
+		} else if(((o) instanceof Array)) {
+			return Array;
+		} else {
+			let cl = o.__class__;
+			if(cl != null) {
+				return cl;
+			}
+			let name = js_Boot.__nativeClassName(o);
+			if(name != null) {
+				return js_Boot.__resolveNativeClass(name);
+			}
+			return null;
+		}
+	}
+	static __string_rec(o,s) {
+		if(o == null) {
+			return "null";
+		}
+		if(s.length >= 5) {
+			return "<...>";
+		}
+		let t = typeof(o);
+		if(t == "function" && (o.__name__ || o.__ename__)) {
+			t = "object";
+		}
+		switch(t) {
+		case "function":
+			return "<function>";
+		case "object":
+			if(o.__enum__) {
+				let e = $hxEnums[o.__enum__];
+				let con = e.__constructs__[o._hx_index];
+				let n = con._hx_name;
+				if(con.__params__) {
+					s = s + "\t";
+					return n + "(" + ((function($this) {
+						var $r;
+						let _g = [];
+						{
+							let _g1 = 0;
+							let _g2 = con.__params__;
+							while(true) {
+								if(!(_g1 < _g2.length)) {
+									break;
+								}
+								let p = _g2[_g1];
+								_g1 = _g1 + 1;
+								_g.push(js_Boot.__string_rec(o[p],s));
+							}
+						}
+						$r = _g;
+						return $r;
+					}(this))).join(",") + ")";
+				} else {
+					return n;
+				}
+			}
+			if(((o) instanceof Array)) {
+				let str = "[";
+				s += "\t";
+				let _g = 0;
+				let _g1 = o.length;
+				while(_g < _g1) {
+					let i = _g++;
+					str += (i > 0 ? "," : "") + js_Boot.__string_rec(o[i],s);
+				}
+				str += "]";
+				return str;
+			}
+			let tostr;
+			try {
+				tostr = o.toString;
+			} catch( _g ) {
+				return "???";
+			}
+			if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
+				let s2 = o.toString();
+				if(s2 != "[object Object]") {
+					return s2;
+				}
+			}
+			let str = "{\n";
+			s += "\t";
+			let hasp = o.hasOwnProperty != null;
+			let k = null;
+			for( k in o ) {
+			if(hasp && !o.hasOwnProperty(k)) {
+				continue;
+			}
+			if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+				continue;
+			}
+			if(str.length != 2) {
+				str += ", \n";
+			}
+			str += s + k + " : " + js_Boot.__string_rec(o[k],s);
+			}
+			s = s.substring(1);
+			str += "\n" + s + "}";
+			return str;
+		case "string":
+			return o;
+		default:
+			return String(o);
+		}
+	}
+	static __interfLoop(cc,cl) {
+		if(cc == null) {
+			return false;
+		}
+		if(cc == cl) {
+			return true;
+		}
+		let intf = cc.__interfaces__;
+		if(intf != null && (cc.__super__ == null || cc.__super__.__interfaces__ != intf)) {
+			let _g = 0;
+			let _g1 = intf.length;
+			while(_g < _g1) {
+				let i = _g++;
+				let i1 = intf[i];
+				if(i1 == cl || js_Boot.__interfLoop(i1,cl)) {
+					return true;
+				}
+			}
+		}
+		return js_Boot.__interfLoop(cc.__super__,cl);
+	}
+	static __instanceof(o,cl) {
+		if(cl == null) {
+			return false;
+		}
+		switch(cl) {
+		case Array:
+			return ((o) instanceof Array);
+		case Bool:
+			return typeof(o) == "boolean";
+		case Dynamic:
+			return o != null;
+		case Float:
+			return typeof(o) == "number";
+		case Int:
+			if(typeof(o) == "number") {
+				return ((o | 0) === o);
+			} else {
+				return false;
+			}
+			break;
+		case String:
+			return typeof(o) == "string";
+		default:
+			if(o != null) {
+				if(typeof(cl) == "function") {
+					if(js_Boot.__downcastCheck(o,cl)) {
+						return true;
+					}
+				} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
+					if(((o) instanceof cl)) {
+						return true;
+					}
+				}
+			} else {
+				return false;
+			}
+			if(cl == Class ? o.__name__ != null : false) {
+				return true;
+			}
+			if(cl == Enum ? o.__ename__ != null : false) {
+				return true;
+			}
+			return o.__enum__ != null ? $hxEnums[o.__enum__] == cl : false;
+		}
+	}
+	static __downcastCheck(o,cl) {
+		if(!((o) instanceof cl)) {
+			if(cl.__isInterface__) {
+				return js_Boot.__interfLoop(js_Boot.getClass(o),cl);
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	static __cast(o,t) {
+		if(o == null || js_Boot.__instanceof(o,t)) {
+			return o;
+		} else {
+			throw haxe_Exception.thrown("Cannot cast " + Std.string(o) + " to " + Std.string(t));
+		}
+	}
+	static __nativeClassName(o) {
+		let name = js_Boot.__toStr.call(o).slice(8,-1);
+		if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
+			return null;
+		}
+		return name;
+	}
+	static __isNativeObj(o) {
+		return js_Boot.__nativeClassName(o) != null;
+	}
+	static __resolveNativeClass(name) {
+		return $global[name];
+	}
+}
+js_Boot.__name__ = true;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $global.$haxeUID++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = m.bind(o); o.hx__closures__[m.__id__] = f; } return f; }
 $global.$haxeUID |= 0;
 if(typeof(performance) != "undefined" ? typeof(performance.now) == "function" : false) {
@@ -2878,8 +2924,9 @@ if( String.fromCodePoint == null ) String.fromCodePoint = function(c) { return c
 	var Enum = { };
 }
 js_Boot.__toStr = ({ }).toString;
+engine_base_BaseEntity._hx_skip_constructor = false;
 engine_base_EngineConfig.AI_ENABLED = true;
-engine_base_EngineConfig.TARGET_FPS = 15;
+engine_base_EngineConfig.TARGET_FPS = 20;
 engine_base_core_BaseEngine._hx_skip_constructor = false;
 engine_base_entity_base_EngineBaseEntity._hx_skip_constructor = false;
 haxe_Int32._mul = Math.imul != null ? Math.imul : function(a,b) {
@@ -2934,5 +2981,6 @@ uuid_Uuid.state1 = (function($this) {
 	return $r;
 }(this));
 uuid_Uuid.DVS = new haxe__$Int64__$_$_$Int64(1,0);
+game_Player.instance = new game_Player();
 engine_seidh_SeidhGameEngine.main();
 })(typeof exports != "undefined" ? exports : typeof window != "undefined" ? window : typeof self != "undefined" ? self : this, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);

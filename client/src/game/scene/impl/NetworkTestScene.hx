@@ -77,6 +77,7 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 		for (characterStruct in payload.charactersFullStruct ) {
 			baseEngine.createCharacterEntityFromFullStruct(characterStruct);
 		}
+		baseEngine.setLocalPlayerId(Player.instance.playerId);
 	}
 
 	private function processGameStateEvent(payload:GameStatePayload) {

@@ -42,7 +42,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// Movement
 	// ------------------------------------------------
 
-	public var currentDirectionSide = Side.RIGHT;
 	public var currentVitality:Int;
 	public var isWalking = false;
 	public var isRunning = false;
@@ -233,7 +232,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	public function determenisticMove() {
-		var speed = characterEntity.movement.walkSpeed;
+		var speed = characterEntity.movement.runSpeed;
 
 		if (characterEntity.movement.canRun && currentVitality > 0) {
 			currentVitality -= characterEntity.movement.vitalityConsumptionPerSec;
@@ -248,7 +247,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		dx = speed * Math.cos(baseEntity.rotation);
 		dy = speed * Math.sin(baseEntity.rotation);
 
-		currentDirectionSide = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
+		characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
 
 		baseEntity.x += Std.int(dx);
 		baseEntity.y += Std.int(dy);
@@ -256,12 +255,12 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function moveToTarget() {
 		if (canMove && !ifTargetInAttackRange()) {
-			final speed = characterEntity.movement.walkSpeed;
+			final speed = characterEntity.movement.runSpeed;
 
 			dx = speed * Math.cos(baseEntity.rotation) * lastDeltaTime;
 			dy = speed * Math.sin(baseEntity.rotation) * lastDeltaTime;
 
-			currentDirectionSide = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
+			characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
 
 			baseEntity.x += Std.int(dx);
 			baseEntity.y += Std.int(dy);
@@ -363,16 +362,31 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	
 	public function getCurrentActionRect() {
 		if (actionToPerform.meleeStruct != null) {
-			return actionToPerform.meleeStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, currentDirectionSide);
+			return actionToPerform.meleeStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
 		} else if (actionToPerform.projectileStruct != null) {
-			return actionToPerform.projectileStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, currentDirectionSide);
+			return actionToPerform.projectileStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
 		} else {
 			return null;
 		}
+	}
+
+	public function getMovementSpeed() {
+		return characterEntity.movement.runSpeed;
 	}
 
 	public function getHealth() {
 		return characterEntity.health;
 	}
 
+	public function getSide() {
+		return characterEntity.side;
+	}
+
+	// ------------------------------------------------
+	// Setters
+	// ------------------------------------------------
+
+	public function setSide(side:Side) {
+		characterEntity.side = side;
+	}
 }

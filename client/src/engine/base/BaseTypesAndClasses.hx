@@ -40,6 +40,8 @@ enum abstract EntityType(Int) {
 	var SKELETON_ARCHER = 5;
 	var PROJECTILE_MAGIC_ARROW = 6;
 	var PROJECTILE_MAGIC_SPHERE = 7;
+
+	var RAGNAR = 8;
 }
 
 class EntityShape {
@@ -79,7 +81,6 @@ class EntityShape {
 typedef CharacterMovementStruct = {
 	canWalk:Bool,
 	canRun:Bool,
-	walkSpeed:Int,
 	runSpeed:Int,
 	movementDelay:Float,
 	vitality:Int,
@@ -125,6 +126,7 @@ typedef CharacterEntityMinStruct = {
     ?ownerId:String,
     x:Int,
     y:Int,
+	?side: Side,
     ?entityType:EntityType,
 }
 
@@ -180,6 +182,7 @@ class CharacterEntity extends BaseEntity {
 	public var action2:CharacterActionStruct;
 	public var action3:CharacterActionStruct;
 	public var actionUltimate:CharacterActionStruct;
+	public var side = Side.RIGHT;
 
 	public function new(struct:CharacterEntityFullStruct) {
 		super(struct.base);
@@ -212,6 +215,7 @@ class CharacterEntity extends BaseEntity {
 			id: this.id,
 			x: this.x,
 			y: this.y,
+			side: this.side,
 		};
 		return minEntity;
 	}

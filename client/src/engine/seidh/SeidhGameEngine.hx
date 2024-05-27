@@ -88,6 +88,7 @@ class SeidhGameEngine extends BaseEngine {
         for (e1 in characterEntityManager.entities) {
             final character1 = cast(e1, EngineCharacterEntity);
             
+            // Ai movement and updates
             if (character1.isAlive && !character1.isPlayer()) {
                 if (EngineConfig.AI_ENABLED) {
                     final targetPlayer = getNearestPlayer(character1);

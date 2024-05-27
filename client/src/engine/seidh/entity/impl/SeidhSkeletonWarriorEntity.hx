@@ -28,8 +28,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
             movement: {
                 canWalk: true,
                 canRun: true,
-                walkSpeed: 20,
-                runSpeed: 35,
+                runSpeed: 10,
                 movementDelay: 0.100,
                 vitality: 100,
                 vitalityConsumptionPerSec: 20,

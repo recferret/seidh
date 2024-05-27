@@ -1,107 +1,76 @@
 package game.scene.impl;
 
-import game.effects.SlashEffect;
-import game.effects.SlashEffect.SlashEffectType;
-import h2d.Tile;
-// import engine.base.BaseTypesAndClasses.EntityAnimationState;
-// import engine.seidh.SeidhGameEngine;
+import game.terrain.TerrainManager;
+import h2d.filter.Outline;
+import h2d.filter.Glow;
+import h2d.filter.DropShadow;
 import game.scene.base.BasicScene;
 
 class SceneSpritesTest extends BasicScene {
 
+	var hue = 0.;
+	var sat = 0.;
+	var bright = 0.;
+	var contrast = 0.;
+
+	// final ragnar2:h2d.Bitmap;
+
     public function new() {
 		super(null);
 
-		// var knightX = 0;
-		// for (anim in [IDLE, WALK, RUN, ATTACK_1, ATTACK_2, ATTACK_3, ATTACK_RUN, HURT, DEAD, DEFEND]) {
-		// 	final knight = new KnightEntity(this);
-		// 	knight.setAnimationState(anim);
-		// 	knight.setPosition(knightX, 0);
-		// 	addChild(knight);
+		new TerrainManager(this);
 
-		// 	knightX += 100;
-		// }
+		// addSlider("Hue", function() return hue, function(s) hue = s, -180, 180);
+		// addSlider("Saturation", function() return sat, function(s) sat = s, -100, 100);
+		// addSlider("Brightness", function() return bright, function(s) bright = s, -100, 100);
+		// addSlider("Contrast", function() return contrast, function(s) contrast = s, -100, 100);
 
-		// var samuraiX = 0;
-		// for (anim in [IDLE, WALK, RUN, ATTACK_1, ATTACK_2, ATTACK_3, SHOT_1, HURT, DEAD]) {
-		// 	final samurai = new SamuraiEntity(this);
-		// 	samurai.setAnimationState(anim);
-		// 	samurai.setPosition(samuraiX, 100);
-		// 	addChild(samurai);
+		// final ragnar1 = new h2d.Bitmap(hxd.Res.ragnar.ragnar.toTile(), this);
+		// ragnar1.setPosition(100 , 100);
 
-		// 	samuraiX += 100;
-		// }
+		// final ragnarPixels = hxd.Res.ragnar.ragnar.toTile().getTexture().capturePixels();
+		// final gradient = new hxd.BitmapData(177, 261);
+		// gradient.setPixels(ragnarPixels);
 
-		// var skeletonWarriorX = 0;
-		// for (anim in [IDLE, WALK, RUN, ATTACK_1, ATTACK_2, ATTACK_3, ATTACK_RUN, HURT, DEAD]) {
-		// 	final skeletonWarrior = new SkeletonWarriorEntity(this);
-		// 	skeletonWarrior.setAnimationState(anim);
-		// 	skeletonWarrior.setPosition(skeletonWarriorX, 200);
-		// 	addChild(skeletonWarrior);
+		// // gradient.lock();
 
-		// 	skeletonWarriorX += 100;
-		// }
 
-		// var skeletonArcherX = 0;
-		// for (anim in [IDLE, WALK, ATTACK_1, ATTACK_2, ATTACK_3, SHOT_1, SHOT_2, HURT, DEAD, DODGE]) {
-		// 	final skeletonArcher = new SkeletonArcherEntity(this);
-		// 	skeletonArcher.setAnimationState(anim);
-		// 	skeletonArcher.setPosition(skeletonArcherX, 300);
-		// 	addChild(skeletonArcher);
+		// // // trace(0x71664C);
+		// // trace(gradient.getPixel(115, 14));
 
-		// 	skeletonArcherX += 100;
-		// }
+		// // for(x in 0...gradient.width) {
+		// // 	for(y in 0...gradient.height) {
 
-		// var mageX = 0;
-		// for (anim in [IDLE, WALK, RUN, ATTACK_1, ATTACK_2, SHOT_1, SHOT_2, HURT, DEAD]) {
-		// 	final mage = new MageEntity(this);
-		// 	mage.setAnimationState(anim);
-		// 	mage.setPosition(mageX, 400);
-		// 	addChild(mage);
+		// // 		if (gradient.getPixel(x, y) == -2787328) {
+		// // 			trace('Change pixel color');
+		// // 			gradient.setPixel(x,y, 0xFFFF0000);
+		// // 		}
+		// // 			// trace('РУБАХА');
+		// // 		// }
+		// // 	//   gradient.setPixel(x,y, 0xFF000000 | ((x << 16) * red) | ((y << 8) * green) | (((x + y) >> 1) * blue));
+		// // 	}
+		// // }
 
-		// 	mageX += 100;
-		// }
+		// // gradient.unlock();
 
-		// final skeletonRunEntity = new SkeletonEntity(this);
-		// skeletonRunEntity.setAnimationState(CharacterAnimationState.Run);
-		// skeletonRunEntity.setPosition(100, 100);
-		// addChild(skeletonRunEntity);
+		// ragnar2 = new h2d.Bitmap(h2d.Tile.fromBitmap(gradient), this);
+		// ragnar2.adjustColor({ saturation : 0, hue: 2 });
+		// ragnar2.setPosition(300 , 100);
 
-		// final skeletonWalkEntity = new SkeletonEntity(this);
-		// warrior1WalkEntity.setAnimationState(CharacterAnimationState.Walk);
-		// warrior1WalkEntity.setPosition(200, 100);
-		// addChild(warrior1WalkEntity);
 
-		// final skeletonDeadEntity = new SkeletonEntity(this);
-		// skeletonDeadEntity.setAnimationState(CharacterAnimationState.Dead);
-		// skeletonDeadEntity.setPosition(300, 100);
-		// addChild(skeletonDeadEntity);
+		// final ragnar3 = new h2d.Bitmap(hxd.Res.ragnar.ragnar.toTile(), this);
+		// ragnar3.filter = new DropShadow(10, 2, 0x66000000, 0.4);
+		// ragnar3.setPosition(500 , 100);
 
-		// final skeletonHurtEntity = new SkeletonEntity(this);
-		// skeletonHurtEntity.setAnimationState(CharacterAnimationState.Hurt);
-		// skeletonHurtEntity.setPosition(400, 100);
-		// addChild(skeletonHurtEntity);
 
-		// final skeletonAttack1Entity = new SkeletonEntity(this);
-		// skeletonAttack1Entity.setAnimationState(CharacterAnimationState.Attack1);
-		// skeletonAttack1Entity.setPosition(500, 100);
-		// addChild(skeletonAttack1Entity);
+		// final ragnar4 = new h2d.Bitmap(hxd.Res.ragnar.ragnar.toTile(), this);
+		// ragnar4.filter = new Glow(0xFF0000, 0.5);
+		// ragnar4.setPosition(700 , 100);
 
-		// final skeletonAttack2Entity = new SkeletonEntity(this);
-		// skeletonAttack2Entity.setAnimationState(CharacterAnimationState.Attack2);
-		// skeletonAttack2Entity.setPosition(600, 100);
-		// addChild(skeletonAttack2Entity);
-
-		// final skeletonAttack3Entity = new SkeletonEntity(this);
-		// skeletonAttack3Entity.setAnimationState(CharacterAnimationState.Attack3);
-		// skeletonAttack3Entity.setPosition(700, 100);
-		// addChild(skeletonAttack3Entity);
-
-		// final skeletonSpecialAttackEntity = new SkeletonEntity(this);
-		// skeletonSpecialAttackEntity.setAnimationState(CharacterAnimationState.RunAttack);
-		// skeletonSpecialAttackEntity.setPosition(800, 100);
-		// addChild(skeletonSpecialAttackEntity);
-    }
+		// final ragnar4 = new h2d.Bitmap(hxd.Res.ragnar.ragnar.toTile(), this);
+		// ragnar4.filter = new Outline(1);
+		// ragnar4.setPosition(900 , 100);
+	}	
 
     // --------------------------------------
 	// Impl
@@ -111,6 +80,7 @@ class SceneSpritesTest extends BasicScene {
 	}
 
 	public function customUpdate(dt:Float, fps:Float) {
+		// ragnar2.adjustColor({ saturation : sat / 100, lightness : bright / 100, hue : hue * Math.PI / 180, contrast : contrast / 100 });
 	}
 
 }

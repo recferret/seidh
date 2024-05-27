@@ -56,6 +56,8 @@ export class WsGatewayController {
   @MessagePattern(WsGatewayGameStatePattern)
   gameState(data: WsGatewayGameStateMessage) {
     this.wsGatewayWsController.broadcast(WsProtocolMessage.GameState, data);
+    // Logger.log('gameState, data:');
+    // Logger.log(data);
   }
 
 }

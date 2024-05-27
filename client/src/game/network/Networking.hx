@@ -60,8 +60,6 @@ class Networking {
         final type:String = message.type;
         final data:Dynamic = message.data;
 
-        trace(data);
-
         switch (type) {
             case 'GameInit':
                 EventManager.instance.notify(EventManager.EVENT_GAME_INIT, data);

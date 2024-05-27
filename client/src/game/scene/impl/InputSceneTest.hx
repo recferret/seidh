@@ -32,7 +32,7 @@ class SceneInputTest extends BasicScene {
         // });
 
 
-		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 0, 0, KNIGHT);
+		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 2000, 2000, RAGNAR);
 
 		// function spawn() {
 		// 	Timer.delay(function callback() {

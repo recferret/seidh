@@ -6,6 +6,8 @@ import engine.base.geometry.Rectangle;
 
 abstract class EngineBaseEntity {
 
+	public var serverX:Int;
+	public var serverY:Int;
     final baseEntity:BaseEntity;
     var previousTickHash:Int32;
 	var currentTickHash:Int32;
@@ -68,7 +70,7 @@ abstract class EngineBaseEntity {
 	}
 
 	public function isPlayer() {
-		return baseEntity.entityType == EntityType.KNIGHT;
+		return baseEntity.entityType != EntityType.SKELETON_WARRIOR;
 	}
 
     // ------------------------------------------------

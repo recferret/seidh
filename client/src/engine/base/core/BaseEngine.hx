@@ -1,5 +1,6 @@
 package engine.base.core;
 
+import game.Player;
 import engine.base.entity.base.EngineBaseEntity;
 import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.BaseTypesAndClasses;
@@ -48,6 +49,8 @@ abstract class BaseEngine {
 
 	private var createProjectileEntityQueue = new Array<CreateProjectileEntityTask>();
 	private var deleteProjectileEntityQueue = new Array<String>();
+
+	private var localPlayerId:String;
 
 	// Команды от пользователей, которые будут применены в начале каждого тика
 	private var hotInputCommands = new Array<InputCommandEngineWrapped>();
@@ -136,10 +139,23 @@ abstract class BaseEngine {
 
 	public function updateCharacterEntitiesByServer(minEntities:Array<CharacterEntityMinStruct>) {
 		for (minEntity in minEntities) {
-			final entity = characterEntityManager.entities.get(minEntity.id);
+			final entity = cast(characterEntityManager.entities.get(minEntity.id), EngineCharacterEntity);
 			if (entity != null) {
-				entity.setX(minEntity.x);
-				entity.setY(minEntity.y);
+				// Skip local player position update if it is close to the server
+				if (entity.getOwnerId() == localPlayerId) {
+					final xDiff = Math.abs(entity.getX() - minEntity.x);
+					final yDiff = Math.abs(entity.getY() - minEntity.y);
+					if (xDiff + yDiff <= (entity.getMovementSpeed() * 5)) {
+						continue;
+					}
+				}
+				
+				// trace('UPDATE internal, x: ' + character1.getX() +', y: ' + character1.getY());
+				trace('UPDATE from server 1, x: ' + entity.getX() +', y: ' + entity.getY());
+				trace('UPDATE from server 2, x: ' + minEntity.x +', y: ' + minEntity.y);
+				// entity.setX(minEntity.x);
+				// entity.setY(minEntity.y);
+				// entity.setSide(minEntity.side);
 			}
 		}
 	}
@@ -260,11 +276,12 @@ abstract class BaseEngine {
 		final entityId = getCharacterEntityIdByOwnerId(input.playerId);
 		var allow = false;
 
-		if (input.actionType == CharacterActionType.MOVE) {
-			allow = checkLocalMovementInputAllowance(entityId);
-		} else {
-			allow = checkLocalActionInputAllowance(entityId, input.actionType);
-		}
+		// Roll it back, looks like server cuts some of inputs because of spam check
+		// if (input.actionType == CharacterActionType.MOVE) {
+		// 	allow = checkLocalMovementInputAllowance(entityId);
+		// } else {
+		// 	allow = checkLocalActionInputAllowance(entityId, input.actionType);
+		// }
 
 		if (allow) {
 			addInputCommandClient(new PlayerInputCommand(input.actionType, input.movAngle, input.playerId));
@@ -282,6 +299,10 @@ abstract class BaseEngine {
 	// -----------------------------------
 	// General
 	// -----------------------------------
+
+	public function setLocalPlayerId(localPlayerId:String) {
+		this.localPlayerId = localPlayerId;
+	}
 
 	public function destroy() {
 		postLoopCallback = null;

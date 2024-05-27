@@ -28,8 +28,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
             movement: {
                 canWalk: true,
                 canRun: false,
-                walkSpeed: 10,
-                runSpeed: 0,
+                runSpeed: 10,
                 movementDelay: 0.100,
                 vitality: 100,
                 vitalityConsumptionPerSec: 20,

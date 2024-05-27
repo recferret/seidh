@@ -48,6 +48,10 @@ class MathUtils {
 		return Math.abs(a - b) > (error == 0 ? 1 : error);
 	}
 
+	public static function differInt(a:Int, b:Int, error:Int) {
+		return Math.abs(a - b) > (error == 0 ? 1 : error);
+	}
+
 	public static function randomIntInRange(from:Int, to:Int) {
 		return from + Math.floor(((to - from + 1) * Math.random()));
 	}

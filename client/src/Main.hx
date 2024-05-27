@@ -6,7 +6,7 @@ class Main extends hxd.App {
 	private var sceneManager:SceneManager;
 
 	override function init() {
-		engine.backgroundColor = 0xFCDCA1;
+		engine.backgroundColor = 0x71664C;
 
 		this.sceneManager = new SceneManager(function callback(scene:BasicScene) {
 			setScene2D(scene);
