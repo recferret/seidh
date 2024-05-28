@@ -30,23 +30,23 @@ function wsConnect(playerId, callback) {
     //
 
     socket.on('GameInit', function(data) {
-        // console.log('WS GameInit', data);
         callback({type: 'GameInit', data});
     });
 
     socket.on('GameState', function(data) {
-        // console.log('WS GameState', data);
         callback({type: 'GameState', data});
     });
 
     socket.on('CreateCharacter', function(data) {
-        // console.log('WS CreateCharacter', data);
         callback({type: 'CreateCharacter', data});
     });
 
     socket.on('DeleteCharacter', function(data) {
-        // console.log('WS DeleteCharacter', data);
         callback({type: 'DeleteCharacter', data});
+    });
+
+    socket.on('CharacterActions', function(data) {
+        callback({type: 'CharacterActions', data});
     });
 }
 

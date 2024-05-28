@@ -145,17 +145,14 @@ abstract class BaseEngine {
 				if (entity.getOwnerId() == localPlayerId) {
 					final xDiff = Math.abs(entity.getX() - minEntity.x);
 					final yDiff = Math.abs(entity.getY() - minEntity.y);
-					if (xDiff + yDiff <= (entity.getMovementSpeed() * 5)) {
+					if (xDiff + yDiff <= (entity.getMovementSpeed() * 3)) {
 						continue;
 					}
 				}
 				
-				// trace('UPDATE internal, x: ' + character1.getX() +', y: ' + character1.getY());
-				trace('UPDATE from server 1, x: ' + entity.getX() +', y: ' + entity.getY());
-				trace('UPDATE from server 2, x: ' + minEntity.x +', y: ' + minEntity.y);
-				// entity.setX(minEntity.x);
-				// entity.setY(minEntity.y);
-				// entity.setSide(minEntity.side);
+				entity.setX(minEntity.x);
+				entity.setY(minEntity.y);
+				entity.setSide(minEntity.side);
 			}
 		}
 	}
@@ -272,9 +269,10 @@ abstract class BaseEngine {
 		}
 	}
 
+	// TODO Better client input check
 	public function addInputCommandServer(input:PlayerInputCommand) {
-		final entityId = getCharacterEntityIdByOwnerId(input.playerId);
-		var allow = false;
+		// final entityId = getCharacterEntityIdByOwnerId(input.playerId);
+		// var allow = false;
 
 		// Roll it back, looks like server cuts some of inputs because of spam check
 		// if (input.actionType == CharacterActionType.MOVE) {
@@ -283,9 +281,9 @@ abstract class BaseEngine {
 		// 	allow = checkLocalActionInputAllowance(entityId, input.actionType);
 		// }
 
-		if (allow) {
-			addInputCommandClient(new PlayerInputCommand(input.actionType, input.movAngle, input.playerId));
-		}
+		// if (allow) {
+		addInputCommandClient(new PlayerInputCommand(input.actionType, input.movAngle, input.playerId));
+		// }
 	}
 
 	public function addInputCommandClient(input:PlayerInputCommand) {

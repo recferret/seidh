@@ -19,7 +19,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                 x: x, 
                 y: y,
                 entityType: EntityType.KNIGHT,
-                entityShape: new EntityShape(64, 64, 32, 100),
+                entityShape: {width: 64, height: 64, rectOffsetX: 32, rectOffsetY: 100},
                 id: id,
                 ownerId: ownerId,
                 rotation: 0
@@ -40,7 +40,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: true,
-                    shape: new EntityShape(140, 100, 80, 100),
+                    shape: {width: 140, height: 100, rectOffsetX: 80, rectOffsetY: 100},
                 }
             },
             action1: {
@@ -53,7 +53,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     speed: 200,
                     travelDistance: 900,
                     projectiles: 1,
-                    shape: new EntityShape(30, 10, 0, 0),
+                    shape: {width: 30, height: 10, rectOffsetX: 0, rectOffsetY: 0},
                 },
             },
             action2: {
@@ -66,8 +66,8 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                     speed: 10,
                     travelDistance: 200,
                     projectiles: 1,
-                    aoeShape: new EntityShape(100, 100, 0, 0),
-                    shape: new EntityShape(25, 25, 0, 0),
+                    aoeShape: {width: 100, height: 100, rectOffsetX: 0, rectOffsetY: 0},
+                    shape: {width: 25, height: 25, rectOffsetX: 0, rectOffsetY: 0},
                 },
             },
             action3: {
@@ -76,7 +76,7 @@ class SeidhKnightEntity extends SeidhBaseEntity {
                 inputDelay: 3,
                 meleeStruct: {
                     aoe: true,
-                    shape: new EntityShape(100, 100),
+                    shape: {width: 100, height: 100, rectOffsetX: 0, rectOffsetY: 0},
                 }
             }
         });

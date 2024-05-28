@@ -19,7 +19,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
                 x: x, 
                 y: y,
                 entityType: EntityType.SKELETON_WARRIOR,
-                entityShape: new EntityShape(64, 64, 64, 100),
+                entityShape: {width: 64, height: 64, rectOffsetX: 100, rectOffsetY: 0},
                 id: id,
                 ownerId: ownerId,
                 rotation: 0
@@ -40,7 +40,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: false,
-                    shape: new EntityShape(140, 100, 80, 100),
+                    shape: {width: 140, height: 100, rectOffsetX: 80, rectOffsetY: 0},
                 }
             }
         });

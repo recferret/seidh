@@ -45,35 +45,28 @@ enum abstract EntityType(Int) {
 }
 
 class EntityShape {
-	public var width:Int;
-	public var height:Int;
-	public var rectOffsetX:Int;
-	public var rectOffsetY:Int;
+	public var shape:ShapeStruct;
 
-	public function new(width:Int, height:Int, rectOffsetX:Int = 0, rectOffsetY:Int = 0) {
-		this.width = width;
-		this.height = height;
+	public function new(shape:ShapeStruct) {
+		this.shape = shape;
 
-		if (rectOffsetX == 0 && rectOffsetY == 0) {
-			this.rectOffsetX = Std.int(width / 2);
-			this.rectOffsetY = Std.int(height / 2);
-		} else {
-			this.rectOffsetX = rectOffsetX;
-			this.rectOffsetY = rectOffsetY;
+		if (shape.rectOffsetX == 0 && shape.rectOffsetY == 0) {
+			this.shape.rectOffsetX = Std.int(shape.width / 2);
+			this.shape.rectOffsetY = Std.int(shape.height / 2);
 		}
 	}
 
 	public function toRect(x:Float, y:Float, rotation:Float, side:Side) {
-		final sideOffset = side == RIGHT ? 0 : -width + 45;
-		return new Rectangle(x + this.rectOffsetX + sideOffset, y + this.rectOffsetY, width, height, rotation);
+		final sideOffset = side == RIGHT ? 0 : -shape.width + 45;
+		return new Rectangle(x + this.shape.rectOffsetX + sideOffset, y + this.shape.rectOffsetY, shape.width, shape.height, rotation);
 	}
 
 	public function toJson() {
 		return Json.stringify({
-			width: width,
-			height: height,
-			rectOffsetX: rectOffsetX,
-			rectOffsetY: rectOffsetY,
+			width: shape.width,
+			height: shape.height,
+			rectOffsetX: shape.rectOffsetX,
+			rectOffsetY: shape.rectOffsetY,
 		});
 	}
 }
@@ -88,9 +81,16 @@ typedef CharacterMovementStruct = {
 	vitalityRegenPerSec:Int,
 }
 
+typedef ShapeStruct = {
+	width:Int,
+	height:Int,
+	rectOffsetX:Int,
+	rectOffsetY:Int,
+}
+
 typedef MeleeStruct = {
 	aoe:Bool,
-	shape: EntityShape,
+	shape: ShapeStruct,
 }
 
 typedef ProjectileStruct = {
@@ -99,8 +99,8 @@ typedef ProjectileStruct = {
 	speed:Float,
 	travelDistance:Float,
 	projectiles:Int,
-	shape: EntityShape,
-	?aoeShape: EntityShape,
+	shape: ShapeStruct,
+	?aoeShape: ShapeStruct,
 }
 
 typedef CharacterActionStruct = {
@@ -115,7 +115,7 @@ typedef BaseEntityStruct = {
 	x:Int,
 	y:Int,
 	?entityType:EntityType,
-	?entityShape:EntityShape,
+	?entityShape:ShapeStruct,
 	?id:String,
 	?ownerId:String,
 	?rotation:Float,
@@ -141,11 +141,19 @@ typedef CharacterEntityFullStruct = {
 	health:Int,
 }
 
+typedef CharacterActionCallbackParams = { 
+    entityId:String, 
+    actionType:CharacterActionType, 
+    shape:ShapeStruct, 
+    hurtEntities: Array<String>,
+    deadEntities: Array<String>,
+};
+
 class BaseEntity {
 	public var x:Int;
 	public var y:Int;
 	public var entityType:EntityType;
-	public var entityShape:EntityShape;
+	public var entityShape:ShapeStruct;
 	public var id:String;
 	public var ownerId:String;
 	public var rotation:Float;

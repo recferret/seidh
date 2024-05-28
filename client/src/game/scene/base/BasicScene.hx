@@ -149,7 +149,7 @@ abstract class BasicScene extends h2d.Scene {
 		}
 
 		if (baseEngine != null) {
-			new TerrainManager(this);
+			// new TerrainManager(this);
 
 			this.baseEngine = baseEngine;
 
@@ -363,15 +363,16 @@ abstract class BasicScene extends h2d.Scene {
 			scaleMode = ScaleMode.Stretch(w, h);
 			camera.setViewport((w) / 2, (h) / 2, w, h);
 
-			camera.scaleX = 0.35;
-			camera.scaleY = 0.35;
+			// camera.scaleX = 0.35;
+			// camera.scaleY = 0.35;
+
+			camera.scaleX = 1.5;
+			camera.scaleY = 1.5;
 		}
 	}
 
 	public function update(dt:Float, fps:Float) {
 		debugGraphics.clear();
-
-
 		// Utils.DrawLine(debugGraphics, new h2d.col.Point(), new h2d.col.Point(), GameConfig.RedColor);
 
 		// Utils.DrawRect(debugGraphics, new Rectangle(0, 0, 100, 100, 0), GameConfig.RedColor);
@@ -427,7 +428,6 @@ abstract class BasicScene extends h2d.Scene {
 		return mobileControlsScene != null ? mobileControlsScene : this;
 	}
 
-
 	private function updateDesktopInput() {
 		if (!isMobileDevice) {
 			// Movement
@@ -449,23 +449,21 @@ abstract class BasicScene extends h2d.Scene {
 			}
 
 			// Action
-			// final space = K.isDown(K.SPACE);
-			// final alt = K.isDown(K.ALT);
-			// var playerActionInputType:CharacterActionType = null;
+			final space = K.isDown(K.SPACE);
+			final alt = K.isDown(K.ALT);
+			var playerActionInputType:CharacterActionType = null;
 
-			// if (space) {
-			// 	playerActionInputType = CharacterActionType.ACTION_MAIN;
-			// } else if (alt) {
-			// 	playerActionInputType = CharacterActionType.ACTION_1;
-			// }
+			if (space) {
+				playerActionInputType = CharacterActionType.ACTION_MAIN;
+			} else if (alt) {
+				playerActionInputType = CharacterActionType.ACTION_1;
+			}
 
-			// if (playerActionInputType != null) {
-			// 	addInputCommand(playerActionInputType);
-			// }
+			if (playerActionInputType != null) {
+				addInputCommand(playerActionInputType);
+			}
 		}
 	}
-
-	var inputsApplied = 0;
 
 	private function addInputCommand(characterActionType:CharacterActionType, moveAngle:Float = 0) {
 		final playerId = Player.instance.playerId;
@@ -476,8 +474,6 @@ abstract class BasicScene extends h2d.Scene {
 			baseEngine.checkLocalActionInputAllowance(playerEntityId, characterActionType);
 
 		if (allowInput) {
-			inputsApplied++;
-			trace('inputsApplied: ' + inputsApplied);
 			baseEngine.addInputCommandClient(new PlayerInputCommand(characterActionType, moveAngle, playerId, Player.instance.incrementAndGetInputIndex()));
 		}
 	}

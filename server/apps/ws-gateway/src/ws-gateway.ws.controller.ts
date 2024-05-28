@@ -42,8 +42,6 @@ export class WsGatewayWsController implements OnModuleInit {
   private readonly playerIdToGameplayService = new Map<string, string>();
   private readonly socketIdToPlayerId = new Map<string, string>();
 
-  private inputsReceived = 0;
-
   constructor(@Inject(ServiceName.Gameplay) private gameplayService: ClientProxy) {
   }
 
@@ -105,10 +103,6 @@ export class WsGatewayWsController implements OnModuleInit {
       movAngle: data.movAngle,
     };
     this.gameplayService.emit(GameplayInputPattern, request);
-
-    this.inputsReceived++;
-
-    console.log('inputsReceived: ' + this.inputsReceived);
   }
 
   // ----------------------------------------------

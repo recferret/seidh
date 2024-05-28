@@ -212,6 +212,7 @@ export class GameplayService {
   handleEventGameCharacterActions(payload: EventGameCharacterActions) {
     const message: WsGatewayGameCharacterActionsMessage = {
       gameId: payload.gameId,
+      actions: payload.actions
     }
     this.wsGatewayService.emit(WsGatewayGameCharacterActionsPattern, message);
   }

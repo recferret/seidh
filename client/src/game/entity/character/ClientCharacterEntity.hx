@@ -12,7 +12,7 @@ class ClientCharacterEntity extends h2d.Object {
 
     public var animation:CharacterAnimation;
 
-    private var debugActionShape:EntityShape;
+    private var debugActionShape:ShapeStruct;
     private var engineEntity:EngineCharacterEntity;
 
     var targetServerPosition = new Point();
@@ -41,7 +41,8 @@ class ClientCharacterEntity extends h2d.Object {
         }
 
         if (debugActionShape != null) {
-            Utils.DrawRect(graphics, debugActionShape.toRect(x, y, 0, engineEntity.getSide()), GameConfig.GreenColor);
+            final shape = new EntityShape(debugActionShape);
+            Utils.DrawRect(graphics, shape.toRect(x, y, 0, engineEntity.getSide()), GameConfig.GreenColor);
         }
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
@@ -100,7 +101,7 @@ class ClientCharacterEntity extends h2d.Object {
         }
     }
 
-    public function setDebugActionShape(shape:EntityShape) {
+    public function setDebugActionShape(shape:ShapeStruct) {
         debugActionShape = shape;
 
         // if (isRightSide()) {

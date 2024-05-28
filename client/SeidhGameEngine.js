@@ -480,11 +480,7 @@ class engine_base_core_BaseEngine {
 		}
 	}
 	addInputCommandServer(input) {
-		let entityId = this.getCharacterEntityIdByOwnerId(input.playerId);
-		let allow = false;
-		if(allow) {
-			this.addInputCommandClient(new engine_base_PlayerInputCommand(input.actionType,input.movAngle,input.playerId));
-		}
+		this.addInputCommandClient(new engine_base_PlayerInputCommand(input.actionType,input.movAngle,input.playerId));
 	}
 	addInputCommandClient(input) {
 		if(input.actionType != null && input.playerId != null) {
@@ -611,7 +607,7 @@ class engine_base_entity_base_EngineBaseEntity {
 		return this.baseEntity.rotation;
 	}
 	isPlayer() {
-		return this.baseEntity.entityType == 1;
+		return this.baseEntity.entityType != 4;
 	}
 	setX(x) {
 		this.baseEntity.x = x;
@@ -1435,6 +1431,9 @@ class engine_seidh_entity_factory_SeidhEntityFactory {
 		case 4:
 			entity = new engine_seidh_entity_impl_SeidhSkeletonWarriorEntity(engine_seidh_entity_impl_SeidhSkeletonWarriorEntity.GenerateObjectEntity(id,ownerId,x,y));
 			break;
+		case 8:
+			entity = new engine_seidh_entity_impl_RagnarEntity(engine_seidh_entity_impl_RagnarEntity.GenerateObjectEntity(id,ownerId,x,y));
+			break;
 		default:
 		}
 		return entity;
@@ -1450,6 +1449,9 @@ class engine_seidh_entity_factory_SeidhEntityFactory {
 			case 4:
 				entity = new engine_seidh_entity_impl_SeidhSkeletonWarriorEntity(new engine_base_CharacterEntity(struct));
 				break;
+			case 8:
+				entity = new engine_seidh_entity_impl_RagnarEntity(new engine_base_CharacterEntity(struct));
+				break;
 			default:
 			}
 		}
@@ -1459,6 +1461,23 @@ class engine_seidh_entity_factory_SeidhEntityFactory {
 	}
 }
 engine_seidh_entity_factory_SeidhEntityFactory.__name__ = true;
+class engine_seidh_entity_impl_RagnarEntity extends engine_seidh_entity_base_SeidhBaseEntity {
+	constructor(characterEntity) {
+		super(characterEntity);
+	}
+	static GenerateObjectEntity(id,ownerId,x,y) {
+		let tmp = { x : x, y : y, entityType : 8, entityShape : new engine_base_EntityShape(180,260,0,0), id : id, ownerId : ownerId, rotation : 0};
+		let tmp1 = { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(140,100,80,100)}};
+		let tmp2 = { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : new engine_base_EntityShape(30,10,0,0)}};
+		let tmp3 = { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : new engine_base_EntityShape(100,100,0,0), shape : new engine_base_EntityShape(25,25,0,0)}};
+		return new engine_base_CharacterEntity({ base : tmp, health : 100, movement : { canWalk : true, canRun : false, runSpeed : 35, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : tmp1, action1 : tmp2, action2 : tmp3, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : new engine_base_EntityShape(100,100)}}});
+	}
+}
+engine_seidh_entity_impl_RagnarEntity.__name__ = true;
+engine_seidh_entity_impl_RagnarEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
+Object.assign(engine_seidh_entity_impl_RagnarEntity.prototype, {
+	__class__: engine_seidh_entity_impl_RagnarEntity
+});
 class engine_seidh_entity_impl_SeidhKnightEntity extends engine_seidh_entity_base_SeidhBaseEntity {
 	constructor(characterEntity) {
 		super(characterEntity);

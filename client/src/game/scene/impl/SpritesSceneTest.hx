@@ -30,32 +30,7 @@ class SceneSpritesTest extends BasicScene {
 		final ragnar1 = new h2d.Bitmap(hxd.Res.ragnar.ragnar.toTile(), this);
 		ragnar1.setPosition(100 , 100);
 
-		final ragnarPixels = hxd.Res.ragnar.ragnar.toTile().getTexture().capturePixels();
-		final gradient = new hxd.BitmapData(177, 261);
-		gradient.setPixels(ragnarPixels);
-
-		// gradient.lock();
-
-
-		// // trace(0x71664C);
-		// trace(gradient.getPixel(115, 14));
-
-		// for(x in 0...gradient.width) {
-		// 	for(y in 0...gradient.height) {
-
-		// 		if (gradient.getPixel(x, y) == -2787328) {
-		// 			trace('Change pixel color');
-		// 			gradient.setPixel(x,y, 0xFFFF0000);
-		// 		}
-		// 			// trace('РУБАХА');
-		// 		// }
-		// 	//   gradient.setPixel(x,y, 0xFF000000 | ((x << 16) * red) | ((y << 8) * green) | (((x + y) >> 1) * blue));
-		// 	}
-		// }
-
-		// gradient.unlock();
-
-		ragnar2 = new h2d.Bitmap(h2d.Tile.fromBitmap(gradient), this);
+		ragnar2 = new h2d.Bitmap(hxd.Res.ragnar.ragnar.toTile(), this);
 		ragnar2.adjustColor({ saturation : 0, hue: 2 });
 		ragnar2.setPosition(300 , 100);
 
@@ -72,6 +47,38 @@ class SceneSpritesTest extends BasicScene {
 		final ragnar4 = new h2d.Bitmap(hxd.Res.ragnar.ragnar.toTile(), this);
 		ragnar4.filter = new Outline(1);
 		ragnar4.setPosition(900 , 100);
+
+
+		final ragnarPixels = hxd.Res.ragnar.ragnar.toTile().getTexture().capturePixels();
+		final gradient = new hxd.BitmapData(179, 256);
+		gradient.setPixels(ragnarPixels);
+		gradient.lock();
+
+		// trace(StringTools.hex(-11896204, 6));
+
+		for(x in 0...gradient.width) {
+			for(y in 0...gradient.height) {
+
+				if (gradient.getPixel(x, y) == 0xffd57800) {
+					// gradient.setPixel(x,y, 0x878787);
+				}
+				if (gradient.getPixel(x, y) == 0xffe5ad32) {
+					// gradient.setPixel(x,y, 0xb2b2b2);
+				}
+				if (gradient.getPixel(x, y) == 0xFF4A7A74) {
+					gradient.setPixel(x,y, 0xff5e8601);
+					// trace('РУБАХА');
+				}
+				
+				// }
+			//   gradient.setPixel(x,y, 0xFF000000 | ((x << 16) * red) | ((y << 8) * green) | (((x + y) >> 1) * blue));
+			}
+		}
+
+		gradient.unlock();
+
+		final ragnar5 = new h2d.Bitmap(h2d.Tile.fromBitmap(gradient), this);
+		ragnar5.setPosition(100 , 400);
 	}	
 
     // --------------------------------------

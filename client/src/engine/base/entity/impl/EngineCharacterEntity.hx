@@ -362,9 +362,11 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	
 	public function getCurrentActionRect() {
 		if (actionToPerform.meleeStruct != null) {
-			return actionToPerform.meleeStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
+			final shape = new EntityShape(actionToPerform.meleeStruct.shape);
+			return shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
 		} else if (actionToPerform.projectileStruct != null) {
-			return actionToPerform.projectileStruct.shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
+			final shape = new EntityShape(actionToPerform.projectileStruct.shape);
+			return shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
 		} else {
 			return null;
 		}

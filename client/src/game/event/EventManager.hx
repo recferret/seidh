@@ -10,7 +10,7 @@ class EventManager {
 	public static final EVENT_CREATE_CHARACTER = 'EVENT_CREATE_CHARACTER';
 	public static final EVENT_DELETE_CHARACTER = 'EVENT_DELETE_CHARACTER';
 	public static final EVENT_GAME_STATE = 'EVENT_GAME_STATE';
-	public static final EVENT_PERFORM_ACTION = 'EVENT_PERFORM_ACTION';
+	public static final EVENT_CHARACTER_ACTIONS = 'EVENT_CHARACTER_ACTIONS';
 
 	private final listeners = new Map<String, List<EventListener>>();
 

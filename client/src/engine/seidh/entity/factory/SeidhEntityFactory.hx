@@ -28,6 +28,7 @@ class SeidhEntityFactory {
 
     public static function InitiateCharacterFromFullStruct(struct:CharacterEntityFullStruct) {
         var entity:SeidhBaseEntity = null;
+
         switch (struct.base.entityType) {
             case RAGNAR:
                 entity = new RagnarEntity(new CharacterEntity(struct));

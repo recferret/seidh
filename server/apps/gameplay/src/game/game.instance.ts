@@ -77,6 +77,7 @@ export class GameInstance {
         };
 
         this.engine.characterActionCallbacks = (actions: CharacterActionCallbackParams[]) => {
+            Logger.log('characterActionCallbacks', 'GameInstance');
             this.eventEmitter.emit(
                 EventGameCharacterActions.EventName, 
                 new EventGameCharacterActions(

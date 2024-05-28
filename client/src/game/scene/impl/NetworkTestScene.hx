@@ -31,7 +31,7 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 		EventManager.instance.subscribe(EventManager.EVENT_GAME_STATE, this);
 		EventManager.instance.subscribe(EventManager.EVENT_CREATE_CHARACTER, this);
 		EventManager.instance.subscribe(EventManager.EVENT_DELETE_CHARACTER, this);
-		EventManager.instance.subscribe(EventManager.EVENT_PERFORM_ACTION, this);
+		EventManager.instance.subscribe(EventManager.EVENT_CHARACTER_ACTIONS, this);
 
 		initNetwork();
     }
@@ -50,8 +50,8 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 				processCreateCharacterEntityEvent(message);
 			case EventManager.EVENT_DELETE_CHARACTER:
 				processDeleteCharacterEntityEvent(message);
-			case EventManager.EVENT_PERFORM_ACTION:
-				processPerformActionEvent(message);
+			case EventManager.EVENT_CHARACTER_ACTIONS:
+				processCharacterActions(message);
 		}
 	}
 
@@ -92,7 +92,7 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 		baseEngine.deleteCharacterEntity(payload.characterId);
 	}
 
-	private function processPerformActionEvent(payload:ActionsPayload) {
+	private function processCharacterActions(payload:ActionsPayload) {
 		for (action in payload.actions) {
 			if (action.entityId != Player.instance.playerEntityId) {
 				baseEngine.setCharacterNextActionToPerform(action.entityId, action.actionType);

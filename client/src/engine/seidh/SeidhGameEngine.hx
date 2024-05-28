@@ -11,14 +11,6 @@ import engine.base.entity.impl.EngineCharacterEntity;
 import engine.seidh.entity.base.SeidhBaseEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
-typedef CharacterActionCallbackParams = { 
-    entityId:String, 
-    actionType:CharacterActionType, 
-    shape:EntityShape, 
-    hurtEntities: Array<String>,
-    deadEntities: Array<String>,
-};
-
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
@@ -144,7 +136,7 @@ class SeidhGameEngine extends BaseEngine {
                     final hurtEntities = new Array<String>();
                     final deadEntities = new Array<String>();
 
-                    var actionShape:EntityShape = null;
+                    var actionShape:ShapeStruct = null;
                     if (character1.actionToPerform.projectileStruct != null) {
                         createProjectileEntity(createProjectileByCharacter(character1));
                         actionShape = character1.actionToPerform.projectileStruct.shape;
