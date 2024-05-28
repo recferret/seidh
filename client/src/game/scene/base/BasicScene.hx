@@ -358,13 +358,13 @@ abstract class BasicScene extends h2d.Scene {
 
 				h = 720;
 				w = Std.int(720 * ratio);
- 
-				camera.scaleX = 0.35;
-				camera.scaleY = 0.35;
 			}
 
 			scaleMode = ScaleMode.Stretch(w, h);
 			camera.setViewport((w) / 2, (h) / 2, w, h);
+
+			camera.scaleX = 0.35;
+			camera.scaleY = 0.35;
 		}
 	}
 
