@@ -1,5 +1,6 @@
 package game.scene.base;
 
+import hxd.Event.EventKind;
 import game.terrain.TerrainManager;
 import h2d.Text;
 import h3d.Engine;
@@ -20,14 +21,10 @@ import engine.base.geometry.Point;
 import engine.base.geometry.Rectangle;
 import engine.seidh.SeidhGameEngine;
 
-enum abstract GameState(Int) {
-	var INIT = 1;
-	var PLAYING = 2;
-}
-
-typedef BasicSceneCallback = {
+typedef BasicSceneClickCallback = {
 	clickX:Float,
 	clickY:Float,
+	eventKind:EventKind,
 } 
 
 class MovementController extends h2d.Object {
@@ -118,6 +115,10 @@ class MovementController extends h2d.Object {
 
 abstract class BasicScene extends h2d.Scene {
 	public final baseEngine:SeidhGameEngine;
+
+	public var actualScreenWidth = 0;
+	public var actualScreenHeight = 0;
+
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
 
@@ -138,7 +139,7 @@ abstract class BasicScene extends h2d.Scene {
 	
 	var inputsSent = 0;
 
-	public function new(baseEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneCallback->Void) {
+	public function new(baseEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneClickCallback->Void) {
 		super();
 
 		final mobile = NativeWindowJS.getMobile();
@@ -149,7 +150,9 @@ abstract class BasicScene extends h2d.Scene {
 		}
 
 		if (baseEngine != null) {
-			// new TerrainManager(this);
+			NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
+
+			new TerrainManager(this);
 
 			this.baseEngine = baseEngine;
 
@@ -234,7 +237,7 @@ abstract class BasicScene extends h2d.Scene {
 					// }
 
 					// Draw shape only for melee attacks
-					clientEntity.setDebugActionShape(value.shape);
+					// clientEntity.setDebugActionShape(value.shape);
 
 					// Play hurt and dead animations
 					for (value in value.hurtEntities) {
@@ -249,6 +252,14 @@ abstract class BasicScene extends h2d.Scene {
 							clientEntity.animation.setAnimationState(DEAD);
 						}
 					}
+				}
+			};
+
+			this.baseEngine.gameStateCallback = function callback(gameState:GameState) {
+				if (gameState == GameState.WIN) {
+					trace('YOU HAVE WON THE GAME !');
+				} else {
+					trace('Game Over!');
 				}
 			};
 		}
@@ -267,16 +278,16 @@ abstract class BasicScene extends h2d.Scene {
 					mobileControlsScene.updateCursorPosition(event.relX, event.relY);
 				} else if (event.kind == ERelease) {
 					mobileControlsScene.release();
-				} else {
-					if (event.kind == EPush && basicSceneCallback != null) {
-						final clickPos = new h2d.col.Point(event.relX, event.relY);
-						camera.screenToCamera(clickPos);
-						basicSceneCallback({
-							clickX: clickPos.x,
-							clickY: clickPos.y
-						});
-					}
 				}
+			}
+			if (event.kind == EPush && basicSceneCallback != null) {
+				final clickPos = new h2d.col.Point(event.relX, event.relY);
+				camera.screenToCamera(clickPos);
+				basicSceneCallback({
+					clickX: clickPos.x,
+					clickY: clickPos.y,
+					eventKind: event.kind
+				});
 			}
 		}
 
@@ -296,13 +307,13 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public function onResize() {
+		final jsScreenParams = NativeWindowJS.getScreenParams();
+		final screenOrientation = jsScreenParams.orientation;
+		final ratio = jsScreenParams.pageHeight / jsScreenParams.pageWidth;
+		final w = actualScreenWidth = screenOrientation == 'portrait' ? 720 : 1280;
+		final h = actualScreenHeight = screenOrientation == 'portrait' ? Std.int(720 * ratio) : 720;
+		
 		if (baseEngine != null) {
-			final jsScreenParams = NativeWindowJS.getScreenParams();
-
-			var w = 0;
-			var h = 0;
-			var orientation = 'landscape';
-
 			if (isMobileDevice) {
 				if (mobileControlsScene == null) {
 					mobileControlsScene = new MobileControlsScene(
@@ -318,56 +329,16 @@ abstract class BasicScene extends h2d.Scene {
 						},
 						function callback(angle:Float) {
 							addInputCommand(CharacterActionType.MOVE, angle);
-						});
-				} 
-
-				orientation = jsScreenParams.orientation;
-
-				if (jsScreenParams.orientation == 'portrait') {
-					final ratio = jsScreenParams.availableScreenHeight / jsScreenParams.availableScreenWidth;
-
-					final additionalRatio = jsScreenParams.windowOuterHeight != jsScreenParams.availableScreenHeight ? 
-						jsScreenParams.windowOuterHeight / jsScreenParams.availableScreenHeight : 1;
-
-					if (additionalRatio != 1) {
-						cameraOffsetY = 0;
-					}
-
-					w = Std.int(720 * additionalRatio);
-					h = Std.int(720 * ratio);
-					scaleMode = ScaleMode.Stretch(w, h);
-
-					// camera.scaleX = 1.5;
-					// camera.scaleY = 1.5;
-				} else {
-					final ratio = jsScreenParams.windowOuterWidth / jsScreenParams.windowOuterHeight;
-
-					h = 720;
-					w = Std.int(720 * ratio);
-					scaleMode = ScaleMode.Stretch(w, h);
-
-					// camera.scaleX = 1.5;
-					// camera.scaleY = 1.5;
+						}
+					);
 				}
-
-				if (mobileControlsScene != null) {
-					mobileControlsScene.resize(orientation, w, h);
-				}
-			} else {
-				final ratio = jsScreenParams.windowOuterWidth / jsScreenParams.windowOuterHeight;
-
-				h = 720;
-				w = Std.int(720 * ratio);
+				mobileControlsScene.resize(screenOrientation, w, h);
 			}
+		}
 
+		if (isMobileDevice) {
 			scaleMode = ScaleMode.Stretch(w, h);
-			camera.setViewport((w) / 2, (h) / 2, w, h);
-
-			// camera.scaleX = 0.35;
-			// camera.scaleY = 0.35;
-
-			camera.scaleX = 1.5;
-			camera.scaleY = 1.5;
+			camera.setViewport(0, 0, w, h);
 		}
 	}
 
@@ -424,7 +395,7 @@ abstract class BasicScene extends h2d.Scene {
 		}
 	}
 
-	public function getInputScene():h2d.Scene {
+	public function getInputScene() {
 		return mobileControlsScene != null ? mobileControlsScene : this;
 	}
 
@@ -490,6 +461,10 @@ abstract class BasicScene extends h2d.Scene {
 			y: y, 
 			entityType: entityType
 		});
+	}
+
+	public function spawnMobs() {
+		baseEngine.spawnMobs();
 	}
 
 	// ----------------------------------

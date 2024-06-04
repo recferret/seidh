@@ -3,8 +3,24 @@
 <head>
     <meta charset="utf-8"/>
     <title>Seidh game</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
     <style>
-        body { margin:0;padding:0; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%; 
+            overflow:  hidden; 
+        }
+        canvas#webgl {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 
      <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
@@ -30,10 +46,10 @@
     <noscript><div><img src="https://mc.yandex.ru/watch/97317558" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
 </head>
-<body>
+<body style="margin:0;padding:0;">
     <div>
-		<div style="width:100%">
-			<canvas id="webgl" style="width:100%;height:100%;"></canvas>
+		<div>
+			<canvas id="webgl"></canvas>
 		</div>
 	</div>
 
@@ -49,9 +65,70 @@
     <script type="text/javascript" src="game.js"></script>
 
     <script>
+        // const canvas = document.getElementById('webgl');
+        // const ctx = canvas.getContext("2d");
+
+        // const innerWidth = window.innerWidth; //* window.devicePixelRatio;
+        // const innerHeight = window.innerHeight; // * window.devicePixelRatio;
+        // const width = window.screen.width;
+        // const height = window.screen.height;
+
+        // canvas.width = innerWidth;
+        // canvas.height = innerHeight;
+
+        // alert('calculated width: ' + (canvas.height * (canvas.clientWidth / canvas.clientHeight)));
+
+        // canvas.width = canvas.height * (canvas.clientWidth / canvas.clientHeight);
+
+        // canvas.width = canvas.clientWidth * window.devicePixelRatio;
+        // canvas.height = canvas.clientHeight * window.devicePixelRatio;
+
+        // alert(`innerWidth: ${innerWidth}, width: ${width}, innerHeight :${innerHeight}, height: ${height}, canvas.clientWidth: ${canvas.clientWidth}, canvas.clientHeight: ${canvas.clientHeight}`);
+
+        // ctx.scale(innerWidth / width, innerHeight / height);
+
+        // const DPR = window.devicePixelRatio;
+
+        // const windowInnerWidth = window.innerWidth;
+        // const windowInnerHeight = window.innerHeight;
+        // const screenWidth = window.screen.width;
+        // const screenHeight = window.screen.height;
+		// const widthDPR = screenWidth * DPR;
+		// const heightDPR = screenHeight * DPR;
+
+		// const magicalyCalculatedWidth = windowInnerWidth;
+		// const magicalyCalculatedHeight = windowInnerWidth * (heightDPR / widthDPR);
+
+        // canvas.width = magicalyCalculatedWidth;//widthDPR;
+        // canvas.height = magicalyCalculatedHeight;//heightDPR;
+
+        // var ctx = c.getContext('2d');
+        // ctx.fillStyle   = '#00FF00';
+        // ctx.fillRect(25, 25, 100, 100);
+
+        // ctx.lineWidth   = 1;
+        // ctx.strokeStyle = '#f00';
+
+        // ctx.fillRect(  10.5, 10.5, 20, 20 );
+        // ctx.strokeRect( 10.5, 10.5, 20, 20 );
+        // ctx.fillRect(   40, 10.5, 20, 20 );
+        // ctx.strokeRect( 40, 10.5, 20, 20 );
+        // ctx.fillRect(   70, 10, 20, 20 );
+        // ctx.strokeRect( 70, 10, 20, 20 );
+
+        // ctx.strokeStyle = '#fff';
+        // ctx.strokeRect( 10.5, 10.5, 20, 20 );
+        // ctx.strokeRect( 40, 10.5, 20, 20 );
+        // ctx.strokeRect( 70, 10, 20, 20 );
 
         async function init() {
-            // Telegram.WebApp.ready();
+            // var ratio = window.devicePixelRatio || 1;
+            // var w = window.screen.width * 1;
+            // var h = window.screen.height * 1;
+
+            // tgWebAppStartParam
+            // const urlParams = new URLSearchParams(window.location.search);
+            // Telegram.WebApp.showAlert(urlParams);
 
             // const tg = Telegram.WebApp;
             // tg.expand();

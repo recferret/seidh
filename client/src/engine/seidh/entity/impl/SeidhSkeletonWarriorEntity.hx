@@ -1,5 +1,6 @@
 package engine.seidh.entity.impl;
 
+import engine.base.MathUtils;
 import engine.base.BaseTypesAndClasses;
 import engine.seidh.entity.base.SeidhBaseEntity;
 
@@ -19,7 +20,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
                 x: x, 
                 y: y,
                 entityType: EntityType.SKELETON_WARRIOR,
-                entityShape: {width: 64, height: 64, rectOffsetX: 100, rectOffsetY: 0},
+                entityShape: {width: 200, height: 300, rectOffsetX: 200, rectOffsetY: 380},
                 id: id,
                 ownerId: ownerId,
                 rotation: 0
@@ -28,7 +29,7 @@ class SeidhSkeletonWarriorEntity extends SeidhBaseEntity {
             movement: {
                 canWalk: true,
                 canRun: true,
-                runSpeed: 10,
+                runSpeed: 50 + MathUtils.randomIntInRange(1, 50),
                 movementDelay: 0.100,
                 vitality: 100,
                 vitalityConsumptionPerSec: 20,

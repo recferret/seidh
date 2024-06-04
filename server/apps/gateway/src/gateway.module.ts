@@ -15,6 +15,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           servers: [NatsUrl],
         }
       },
+      {
+        name: ServiceName.Users,
+        transport: Transport.NATS,
+        options: {
+          servers: [NatsUrl],
+        }
+      },
     ]),
   ],
   controllers: [GatewayController],

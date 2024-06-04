@@ -9,6 +9,6 @@ export class AuthController {
   // TODO replace by gateway api
   @Post('validateTelegramInitData')
   validateTelegramInitData(@Body() dto: ValidateTelegramDataDto) {
-    this.authService.validateTelegramInitData(dto);
+    // this.authService.validateTelegramInitData(dto);
   }
 }

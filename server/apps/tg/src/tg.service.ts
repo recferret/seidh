@@ -9,10 +9,8 @@ export class TgService {
 
   constructor() {
     this.bot.on('callback_query', async (ctx) => {
-      console.log('1');
+      console.log('1222');
       console.log(ctx.callbackQuery);
-
-      await ctx.telegram.answerCbQuery(ctx.callbackQuery.id, 'here is your game', {url:'https://43a3-99-80-128-27.ngrok-free.app'})
     })
     
     this.bot.on('inline_query', async (ctx) => {
@@ -21,28 +19,15 @@ export class TgService {
     })
 
     this.bot.on(message('text'), async (ctx) => {
-      console.log(ctx.message.text);
+      console.log(ctx.message);
       ctx.reply(
         'Добро пожаловать! Нажмите на кнопку ниже, чтобы запустить приложение',
         Markup.keyboard([
-          Markup.button.webApp('Отправить сообщение', 'https://192.168.1.6:8080'),
+          Markup.button.webApp('Play Seidh', 'https://seidh-game.online'),
+          // Markup.button.webApp('Play Seidh', 'https://192.168.1.6:8080'),
         ])
       )
     });
-
-
-    // this.bot.command("link", ctx =>
-    //   /*
-    //     Go to @Botfather and create a new app for your bot first, using /newapp
-    //     Then modify this link appropriately.
-      
-    //     startapp is optional.
-    //     If provided, it will be passed as start_param in initData
-    //     and as ?tgWebAppStartParam=$command in the Web App URL
-    //   */
-    //   ctx.reply(link("Launch", "https://seidh-game.online")),
-    // );
-
 
     this.bot.launch();
   }

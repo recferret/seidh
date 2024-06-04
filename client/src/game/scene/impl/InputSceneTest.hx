@@ -34,6 +34,8 @@ class SceneInputTest extends BasicScene {
 
 		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 2000, 2000, RAGNAR);
 
+		spawnMobs();
+
 		// function spawn() {
 		// 	Timer.delay(function callback() {
 		// 		final monsterId = '' + id++;

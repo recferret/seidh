@@ -1,6 +1,7 @@
 let socket = undefined;
 
 function wsConnect(playerId, callback) {
+    // socket = io('wss://23.111.202.19:3004', {
     socket = io('ws://localhost:3004', {
         transport: [ "websocket" ],
         auth: {

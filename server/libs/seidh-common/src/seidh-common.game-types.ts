@@ -20,6 +20,8 @@ export enum EntityType {
 	SKELETON_ARCHER = 5,
 	PROJECTILE_MAGIC_ARROW = 6,
 	PROJECTILE_MAGIC_SPHERE = 7,
+
+	RAGNAR = 8,
 }
 
 export interface EntityShape {

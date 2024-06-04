@@ -12,6 +12,7 @@ export enum ServicePort {
     Gateway = 3003,
     WsGateway = 3004,
     Auth = 3005,
+    Users = 3006,
 }
 
 export enum ServiceName {
@@ -21,6 +22,7 @@ export enum ServiceName {
     Gateway = 'GatewayService',
     WsGateway = 'WsGatewayService',
     Auth = 'AuthService',
+    Users = 'UsersService',
 }
 
 const NatsUrl = 'nats://0.0.0.0:4222';

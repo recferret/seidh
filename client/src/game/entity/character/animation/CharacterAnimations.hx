@@ -201,95 +201,95 @@ class CharacterAnimations {
 
     public static function LoadRagnarAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
-        final leftOffsetX = 180;
+        final leftOffsetX = 0;
 
         animation.loadIdle(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadDefend(
             [
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile(),
+                hxd.Res.ragnar.ragnar.toTile().center(),
             ], leftOffsetX)
         );
 

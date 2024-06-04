@@ -40,7 +40,7 @@ class RagnarEntity extends SeidhBaseEntity {
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: true,
-                    shape: {width: 140, height: 100, rectOffsetX: 80, rectOffsetY: 100},
+                    shape: {width: 500, height: 400, rectOffsetX: 0, rectOffsetY: 0},
                 }
             },
             action1: {

@@ -16,12 +16,14 @@ extern class NativeWindowJS {
     static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;
 
     // Rest
-    // static function restPostTelegramInitData(initData:String):Void;
+    static function restPostTelegramInitData(initData:String):Void;
 
     // Common
     static function getMobile():String;
     static function getScreenParams():Dynamic;
     static function alertScreenParams():Void;
+    static function getCanvasAndDpr():Dynamic;
+    static function debugAlert(text:String):Void;
 
     // Telegram
     static function tgExpand():Void;

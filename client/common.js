@@ -4,6 +4,15 @@ function getMobile() {
     return md.mobile();
 }
 
+function getCanvasAndDpr() {
+    return {
+        canvas: document.getElementById('webgl'),
+        dpr: window.devicePixelRatio,
+    }
+    // const DPR = window.devicePixelRatio;
+    // alert('canvas.width: ' + canvas.width + ', canvas.height: ' + canvas.height);
+}
+
 function alertScreenParams() {
     const screenWidth = window.screen.width;
     const screenHeight = window.screen.height;
@@ -17,6 +26,7 @@ function alertScreenParams() {
     const windowInnerHeightClient = document.documentElement.clientHeight;
     const pageWidth = document.documentElement.scrollWidth;
     const pageHeight = document.documentElement.scrollHeight;
+    const dpr = window.devicePixelRatio;
 
     let orientation = undefined;
 
@@ -41,9 +51,16 @@ function alertScreenParams() {
         'windowInnerHeightClient:'+ windowInnerHeightClient + '\n' +
         'pageWidth:'+ pageWidth + '\n' +
         'pageHeight:'+ pageHeight + '\n' +
-        'orientation:'+ orientation
+        'orientation:'+ orientation + '\n' +
+        'dpr:'+ dpr
     );
 }
+
+function debugAlert(text) {
+    alert(text);
+}
+
+alertScreenParams();
 
 function getScreenParams() {
     const screenWidth = window.screen.width;
@@ -58,6 +75,7 @@ function getScreenParams() {
     const windowInnerHeightClient = document.documentElement.clientHeight;
     const pageWidth = document.documentElement.scrollWidth;
     const pageHeight = document.documentElement.scrollHeight;
+    const dpr = window.devicePixelRatio;
 
     let orientation = undefined;
 
@@ -82,6 +100,7 @@ function getScreenParams() {
         windowInnerHeightClient, 
         pageWidth, 
         pageHeight,
-        orientation
+        orientation,
+        dpr
     };
 }

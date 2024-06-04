@@ -102,7 +102,7 @@ export class GameInstance {
             ownerId: playerId,
             x: 200 * this.dummyCounter++,
             y: 200,
-            entityType: EntityType.KNIGHT,
+            entityType: EntityType.RAGNAR,
         };
         this.engine.createCharacterEntityFromMinimalStruct(struct);
     }

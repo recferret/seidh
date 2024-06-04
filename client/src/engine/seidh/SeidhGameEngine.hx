@@ -1,5 +1,8 @@
 package engine.seidh;
 
+import engine.base.MathUtils;
+import engine.base.geometry.Point;
+import haxe.Timer;
 import engine.base.EngineConfig;
 import js.lib.Date;
 
@@ -11,13 +14,25 @@ import engine.base.entity.impl.EngineCharacterEntity;
 import engine.seidh.entity.base.SeidhBaseEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
+enum abstract GameState(Int) {
+	var PLAYING = 1;
+	var WIN = 2;
+}
+
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
+    private var gameState = GameState.PLAYING;
     private var framesPassed = 0;
     private var timePassed = 0.0;
+    
+    private var mobsSpawned = 0;
+    private var mobsKilled = 0;
+    private final mobsMax = 1;
+    private final mobSpawnDelayMs = 250;
 
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
+    public var gameStateCallback:GameState->Void;
 
     public static function main() {}
 
@@ -60,128 +75,167 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function engineLoopUpdate(dt:Float) {
-        final beginTime = Date.now();
+        if (gameState == GameState.PLAYING) {
+            final beginTime = Date.now();
 
-		framesPassed++;
-		timePassed += dt;
+            framesPassed++;
+            timePassed += dt;
 
-        final characterActionCallbackParams = new Array<CharacterActionCallbackParams>();
+            final characterActionCallbackParams = new Array<CharacterActionCallbackParams>();
 
-        for (e in projectileEntityManager.entities) {
-            final projectile = cast(e, EngineProjectileEntity);
+            for (e in projectileEntityManager.entities) {
+                final projectile = cast(e, EngineProjectileEntity);
 
-            if (projectile.allowMovement) {
-                projectile.update(dt);
-            } else {
-                deleteProjectileEntity(projectile.getId());
+                if (projectile.allowMovement) {
+                    projectile.update(dt);
+                } else {
+                    deleteProjectileEntity(projectile.getId());
+                }
             }
-        }
 
-        for (e1 in characterEntityManager.entities) {
-            final character1 = cast(e1, EngineCharacterEntity);
-            
-            // Ai movement and updates
-            if (character1.isAlive && !character1.isPlayer()) {
-                if (EngineConfig.AI_ENABLED) {
-                    final targetPlayer = getNearestPlayer(character1);
-                    if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
-                        // TODO randomize target pos a bit
-                        character1.setTargetObject(targetPlayer, true);
-                    }
-                }
-
-                for (e2 in characterEntityManager.entities) {
-                    final character2 = cast(e2, EngineCharacterEntity);
-                    if (!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
-                        if (character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
-                            character1.intersectsWithCharacter = true;
-                            character1.canMove = false;
-                        }
-                    }
-                }
-
-                character1.update(dt);
-
-                character1.intersectsWithCharacter = false;
-                character1.canMove = true;
-            }
-        }
-
-        for (e in characterEntityManager.entities) {
-            final character1 = cast(e, EngineCharacterEntity);
-            if (character1.isAlive) {
-                if (character1.isPlayer()) {
-                    character1.update(dt);
-                }
+            for (e1 in characterEntityManager.entities) {
+                final character1 = cast(e1, EngineCharacterEntity);
                 
-                // Check projectile collisions against characters
-                for (e in projectileEntityManager.entities) {
-                    final projectile = cast(e, EngineProjectileEntity);
-
-                    // Skip self collision
-                    if (projectile.getOwnerId() != character1.getOwnerId()) {
-                        final projectileRect = projectile.getBodyRectangle();
-                        final characterRect = character1.getBodyRectangle();
-
-                        // Skip far collisions
-                        if (projectileRect.getCenter().distance(characterRect.getCenter()) < characterRect.w) {
-                            // TODO hit by projectile
-                            // TODO rename allowMovement
-                            projectile.allowMovement = false;
+                // Ai movement and updates
+                if (character1.isAlive && !character1.isPlayer()) {
+                    if (EngineConfig.AI_ENABLED) {
+                        final targetPlayer = getNearestPlayer(character1);
+                        if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
+                            character1.setTargetObject(targetPlayer, true);
                         }
-                    }
-                }
-
-                if (character1.isActing) {
-                    final hurtEntities = new Array<String>();
-                    final deadEntities = new Array<String>();
-
-                    var actionShape:ShapeStruct = null;
-                    if (character1.actionToPerform.projectileStruct != null) {
-                        createProjectileEntity(createProjectileByCharacter(character1));
-                        actionShape = character1.actionToPerform.projectileStruct.shape;
-                    } else if (character1.actionToPerform.meleeStruct != null) {
-                        actionShape = character1.actionToPerform.meleeStruct.shape;
                     }
 
                     for (e2 in characterEntityManager.entities) {
                         final character2 = cast(e2, EngineCharacterEntity);
-                        if (character2.isAlive && character1.getId() != character2.getId()) {
-                            // TODO add distance check
-                            if (character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
-                                final health = character2.subtractHealth(character1.actionToPerform.damage);
-                                if (health == 0) {
-                                    character2.isAlive = false;
-                                    deadEntities.push(character2.getId());
-                                    deleteCharacterEntity(character2.getId());
-                                } else {
-                                    hurtEntities.push(character2.getId());
-                                }
+                        if (!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
+                            if (character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
+                                character1.intersectsWithCharacter = true;
+                                character1.canMove = false;
                             }
                         }
                     }
 
-                    characterActionCallbackParams.push({
-                        entityId: character1.getId(),
-                        actionType: character1.actionToPerform.actionType,
-                        shape: actionShape,
-                        hurtEntities: hurtEntities,
-                        deadEntities: deadEntities,
-                    });
+                    character1.update(dt);
 
-                    character1.isActing = false;
+                    character1.intersectsWithCharacter = false;
+                    character1.canMove = true;
                 }
-
-                character1.isRunning = false;
-                character1.isWalking = false;
             }
-        }
 
-        if (characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
-            characterActionCallbacks(characterActionCallbackParams);
-        }
+            for (e in characterEntityManager.entities) {
+                final character1 = cast(e, EngineCharacterEntity);
+                if (character1.isAlive) {
+                    if (character1.isPlayer()) {
+                        character1.update(dt);
+                    }
+                    
+                    // Check projectile collisions against characters
+                    for (e in projectileEntityManager.entities) {
+                        final projectile = cast(e, EngineProjectileEntity);
 
-        recentEngineLoopTime = Date.now() - beginTime;
+                        // Skip self collision
+                        if (projectile.getOwnerId() != character1.getOwnerId()) {
+                            final projectileRect = projectile.getBodyRectangle();
+                            final characterRect = character1.getBodyRectangle();
+
+                            // Skip far collisions
+                            if (projectileRect.getCenter().distance(characterRect.getCenter()) < characterRect.w) {
+                                // TODO hit by projectile
+                                // TODO rename allowMovement
+                                projectile.allowMovement = false;
+                            }
+                        }
+                    }
+
+                    if (character1.isActing) {
+                        final hurtEntities = new Array<String>();
+                        final deadEntities = new Array<String>();
+
+                        var actionShape:ShapeStruct = null;
+                        if (character1.actionToPerform.projectileStruct != null) {
+                            createProjectileEntity(createProjectileByCharacter(character1));
+                            actionShape = character1.actionToPerform.projectileStruct.shape;
+                        } else if (character1.actionToPerform.meleeStruct != null) {
+                            actionShape = character1.actionToPerform.meleeStruct.shape;
+                        }
+
+                        for (e2 in characterEntityManager.entities) {
+                            final character2 = cast(e2, EngineCharacterEntity);
+                            if (character2.isAlive && character1.getId() != character2.getId()) {
+                                if (character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+                                    final health = character2.subtractHealth(character1.actionToPerform.damage);
+                                    if (health == 0) {
+                                        if (character2.getEntityType() == SKELETON_WARRIOR) {
+                                            mobsKilled++;
+                                        }
+                                        character2.isAlive = false;
+                                        deadEntities.push(character2.getId());
+                                        deleteCharacterEntity(character2.getId());
+                                    } else {
+                                        hurtEntities.push(character2.getId());
+                                    }
+                                }
+                            }
+                        }
+
+                        characterActionCallbackParams.push({
+                            entityId: character1.getId(),
+                            actionType: character1.actionToPerform.actionType,
+                            shape: actionShape,
+                            hurtEntities: hurtEntities,
+                            deadEntities: deadEntities,
+                        });
+
+                        character1.isActing = false;
+                        character1.actionToPerform = null;
+                    }
+
+                    character1.isRunning = false;
+                    character1.isWalking = false;
+                }
+            }
+
+            if (characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
+                characterActionCallbacks(characterActionCallbackParams);
+            }
+
+            if (mobsKilled == mobsMax) {
+                gameState = GameState.WIN;
+                if (gameStateCallback != null) {
+                    gameStateCallback(gameState);
+                }
+            }
+
+            // TODO add callback if all players are dead
+
+            recentEngineLoopTime = Date.now() - beginTime;
+        }
+    }
+
+    public function customDestroy() {
+        // clear callbacks
+        characterActionCallbacks = null;
+    }
+
+    // ---------------------------------------------------
+    // Custom logic
+    // ---------------------------------------------------
+
+    public function spawnMobs() {
+        if (mobsSpawned < mobsMax) {
+            mobsSpawned++;
+
+            // final positionX = MathUtils.randomIntInRange(0, 5000);
+            // final positionY = MathUtils.randomIntInRange(0, 5000);
+
+            final positionX = 1000;
+            final positionY = 1000;
+
+            createCharacterEntity(SeidhEntityFactory.InitiateEntity(null, null, positionX, positionY, EntityType.SKELETON_WARRIOR));
+            Timer.delay(function callback() {
+                spawnMobs();
+            }, mobSpawnDelayMs);
+        }
     }
 
     private function createProjectileByCharacter(character:EngineCharacterEntity) {
@@ -205,7 +259,7 @@ class SeidhGameEngine extends BaseEngine {
         var nearestPlayerDistance:Float = 0.0;
 
         for (targetEntity in characterEntityManager.entities) {
-            if (targetEntity.getEntityType() == EntityType.KNIGHT) {
+            if (targetEntity.getEntityType() == EntityType.RAGNAR) {
                 final dist = entity.getBodyRectangle().getCenter().distance(targetEntity.getBodyRectangle().getCenter());
                 if (nearestPlayer == null || dist < nearestPlayerDistance) {
                     nearestPlayer = targetEntity;
@@ -215,11 +269,6 @@ class SeidhGameEngine extends BaseEngine {
         }
 
         return nearestPlayer;
-    }
-
-    public function customDestroy() {
-        // clear callbacks
-        characterActionCallbacks = null;
     }
 
 }

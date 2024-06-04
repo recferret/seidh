@@ -36,7 +36,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public var killerId:String;
 
 	public var botForwardLookingLine:Line;
-	private final botForwardLookingLineLength = 20;
+	private final botForwardLookingLineLength = 100;
 
 	// ------------------------------------------------
 	// Movement
@@ -120,20 +120,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public function update(dt:Float) {
 		lastDeltaTime = dt;
 
-		if (customUpdate != null)
-			customUpdate.onUpdate();
-
-		if (targetObjectEntity != null)
-			moveToTarget();
-
-		if (customUpdate != null)
-			customUpdate.postUpdate();
-
-		renegerateVitality();
-		updateHash();
-
-		if (!this.isPlayer()) {
-			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(randomizedTargetPos.x, randomizedTargetPos.y), targetObjectEntity.getBodyRectangle().getCenter());
+		if (!this.isPlayer() && targetObjectEntity != null) {
+			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
 			baseEntity.rotation = angleBetweenEntities;
 
 			final l = getForwardLookingLine(botForwardLookingLineLength);
@@ -142,8 +130,20 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			botForwardLookingLine.x2 = l.p2.x;
 			botForwardLookingLine.y2 = l.p2.y;
 
-				// baseEntity.rotation = MathUtils.angleBetweenPoints(this.targetObjectEntity.getBodyRectangle().getCenter(), getBodyRectangle().getCenter());
+			// baseEntity.rotation = MathUtils.angleBetweenPoints(this.targetObjectEntity.getBodyRectangle().getCenter(), getBodyRectangle().getCenter());
 		}
+
+		if (customUpdate != null)
+			customUpdate.onUpdate();
+
+		if (targetObjectEntity != null && !isPlayer())
+			moveToTarget();
+
+		if (customUpdate != null)
+			customUpdate.postUpdate();
+
+		renegerateVitality();
+		updateHash();
 	}
 
 	public function getVirtualBodyRectangleInFuture(ticks:Int) {
@@ -197,8 +197,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			randomizedTargetPos.x = 0;
 			randomizedTargetPos.y = 0;
 		}
-
-		baseEntity.rotation = MathUtils.angleBetweenPoints(this.targetObjectEntity.getBodyRectangle().getCenter(), getBodyRectangle().getCenter());
 	}
 
 	public function getTargetObject() {
@@ -210,7 +208,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	public function ifTargetInAttackRange() {
-		return distanceBetweenTarget() < 80;
+		return distanceBetweenTarget() < 150;
 	}
 
 	private function distanceBetweenTarget() {
@@ -259,6 +257,13 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 			dx = speed * Math.cos(baseEntity.rotation) * lastDeltaTime;
 			dy = speed * Math.sin(baseEntity.rotation) * lastDeltaTime;
+
+			if (dx > 0.1 && dx < 1) {
+				dx = 1;
+			}
+			if (dy > 0 && dy < 1) {
+				dy = 1;
+			}
 
 			characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
 
@@ -361,12 +366,24 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 	
 	public function getCurrentActionRect() {
+		if (actionToPerform == null)
+			return null;
 		if (actionToPerform.meleeStruct != null) {
 			final shape = new EntityShape(actionToPerform.meleeStruct.shape);
-			return shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
+			return shape.toRect(
+				getBodyRectangle().getTopLeftPoint().x,
+				getBodyRectangle().getTopLeftPoint().y - (baseEntity.entityShape.height / 4),
+				baseEntity.rotation, 
+				characterEntity.side
+			);
 		} else if (actionToPerform.projectileStruct != null) {
 			final shape = new EntityShape(actionToPerform.projectileStruct.shape);
-			return shape.toRect(baseEntity.x, baseEntity.y, baseEntity.rotation, characterEntity.side);
+			return shape.toRect(
+				baseEntity.x, 
+				baseEntity.y, 
+				baseEntity.rotation, 
+				characterEntity.side
+			);
 		} else {
 			return null;
 		}
@@ -382,6 +399,10 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function getSide() {
 		return characterEntity.side;
+	}
+
+	public function getShape() {
+		return characterEntity.entityShape;
 	}
 
 	// ------------------------------------------------

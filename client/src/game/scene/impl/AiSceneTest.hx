@@ -8,7 +8,7 @@ class SceneAiTest extends BasicScene {
 	private var botId = 0;
 
     public function new() {
-		super(new SeidhGameEngine(), function callback(params:BasicSceneCallback) {
+		super(new SeidhGameEngine(), function callback(params:BasicSceneClickCallback) {
 			// TODO do not hardcode offsets
 			createCharacterEntityFromMinimalStruct('' + botId, '' + botId, Std.int(params.clickX) - 50, Std.int(params.clickY) - 100, SKELETON_WARRIOR);
 			botId++;

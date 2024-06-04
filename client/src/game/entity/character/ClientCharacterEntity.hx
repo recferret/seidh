@@ -12,7 +12,6 @@ class ClientCharacterEntity extends h2d.Object {
 
     public var animation:CharacterAnimation;
 
-    private var debugActionShape:ShapeStruct;
     private var engineEntity:EngineCharacterEntity;
 
     var targetServerPosition = new Point();
@@ -40,9 +39,9 @@ class ClientCharacterEntity extends h2d.Object {
             Utils.DrawLine(graphics, p1, p2, engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);    
         }
 
-        if (debugActionShape != null) {
-            final shape = new EntityShape(debugActionShape);
-            Utils.DrawRect(graphics, shape.toRect(x, y, 0, engineEntity.getSide()), GameConfig.GreenColor);
+        // TODO drop debugActionShape
+        if (engineEntity.getCurrentActionRect() != null) {
+            Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(), GameConfig.GreenColor);
         }
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
@@ -61,6 +60,7 @@ class ClientCharacterEntity extends h2d.Object {
                 animation = CharacterAnimations.LoadSamuraiAnimation(this);
             case EntityType.SKELETON_WARRIOR:
                 animation = CharacterAnimations.LoadSkeletonWarriorAnimation(this);
+                scale(4);
             case EntityType.SKELETON_ARCHER:
                 animation = CharacterAnimations.LoadSkeletonArcherAnimation(this);
             default:
@@ -93,27 +93,27 @@ class ClientCharacterEntity extends h2d.Object {
                 //     animation.setAnimationState(WALK);
                 // }
                 
-                x = Math.lerp(x, targetServerPosition.x, 0.1);
-                y = Math.lerp(y, targetServerPosition.y, 0.1);
+                x = Math.lerp(x, targetServerPosition.x, 0.045);
+                y = Math.lerp(y, targetServerPosition.y, 0.045);
             } else {
                 animation.setAnimationState(IDLE);
             }
         }
     }
 
-    public function setDebugActionShape(shape:ShapeStruct) {
-        debugActionShape = shape;
+    // public function setDebugActionShape(shape:ShapeStruct) {
+    //     debugActionShape = shape;
 
-        // if (isRightSide()) {
-        //     debugActionShape.rectOffsetX = shape.rectOffsetX;
-        // } else {
-        //     debugActionShape.rectOffsetX = -15;
-        // }
+    //     // if (isRightSide()) {
+    //     //     debugActionShape.rectOffsetX = shape.rectOffsetX;
+    //     // } else {
+    //     //     debugActionShape.rectOffsetX = -15;
+    //     // }
 
-        Timer.delay(function callback() {
-            debugActionShape = null;
-        }, 300);
-    }
+    //     Timer.delay(function callback() {
+    //         debugActionShape = null;
+    //     }, 300);
+    // }
 
     // Getters
 
@@ -137,8 +137,8 @@ class ClientCharacterEntity extends h2d.Object {
         return engineEntity.getForwardLookingLine(lineLength);
     }
 
-    public function getDebugActionShape() {
-        return debugActionShape;
-    }
+    // public function getDebugActionShape() {
+    //     return debugActionShape;
+    // }
 
 }
