@@ -10,11 +10,11 @@ class SceneAiTest extends BasicScene {
     public function new() {
 		super(new SeidhGameEngine(), function callback(params:BasicSceneClickCallback) {
 			// TODO do not hardcode offsets
-			createCharacterEntityFromMinimalStruct('' + botId, '' + botId, Std.int(params.clickX) - 50, Std.int(params.clickY) - 100, SKELETON_WARRIOR);
+			createCharacterEntityFromMinimalStruct('' + botId, '' + botId, Std.int(params.clickX) - 50, Std.int(params.clickY) - 100, ZOMBIE_BOY);
 			botId++;
 		});
 
-		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 350, 100, KNIGHT);
+		createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 350, 100, RAGNAR_LOH);
     }
 
     // --------------------------------------

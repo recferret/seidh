@@ -52,17 +52,14 @@ class ClientCharacterEntity extends h2d.Object {
 		setPosition(engineEntity.getX(), engineEntity.getY());
 
         switch (engineEntity.getEntityType()) {
-            case EntityType.RAGNAR:
-                animation = CharacterAnimations.LoadRagnarAnimation(this);
-            case EntityType.KNIGHT:
-                animation = CharacterAnimations.LoadKnightAnimation(this);
-            case EntityType.SAMURAI:
-                animation = CharacterAnimations.LoadSamuraiAnimation(this);
-            case EntityType.SKELETON_WARRIOR:
-                animation = CharacterAnimations.LoadSkeletonWarriorAnimation(this);
-                scale(4);
-            case EntityType.SKELETON_ARCHER:
-                animation = CharacterAnimations.LoadSkeletonArcherAnimation(this);
+            case EntityType.RAGNAR_LOH:
+                animation = CharacterAnimations.LoadRagnarLohAnimation(this);
+            case EntityType.RAGNAR_NORM:
+                animation = CharacterAnimations.LoadRagnarNormAnimation(this);
+            case EntityType.ZOMBIE_BOY:
+                animation = CharacterAnimations.LoadZombieBoyAnimation(this);
+            case EntityType.ZOMBIE_GIRL:
+                animation = CharacterAnimations.LoadZombieGirlAnimation(this);
             default:
         }
 	}

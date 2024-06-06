@@ -1,5 +1,6 @@
 package game.scene.base;
 
+import game.ui.BarHp;
 import hxd.Event.EventKind;
 import game.terrain.TerrainManager;
 import h2d.Text;
@@ -7,10 +8,10 @@ import h3d.Engine;
 import hxd.Key in K;
 
 import game.entity.character.ClientCharacterEntity;
-import game.entity.projectile.ClientProjectileEntity;
+// import game.entity.projectile.ClientProjectileEntity;
 import game.js.NativeWindowJS;
 import game.network.Networking;
-import game.scene.MobileControlsScene.ButtonPressed;
+import game.scene.GameUiScene.ButtonPressed;
 import game.utils.Utils;
 
 import engine.base.BaseTypesAndClasses;
@@ -27,102 +28,16 @@ typedef BasicSceneClickCallback = {
 	eventKind:EventKind,
 } 
 
-class MovementController extends h2d.Object {
-
-	private var outerCircle:h2d.Bitmap;
-	private var innerCircle:h2d.Bitmap;
-	private var customGraphics:h2d.Graphics;
-
-	private var inputActive = false;
-	private var camera:h2d.Camera;
-
-	private var angle = 0.0;
-	private var controlTargetPos = new Point();
-	private var lastMousePos = new h2d.col.Point();
-	private var callback:Float->Void;
-
-	private var shapeRect = new Rectangle(0,0,0,0,0);
-
-    public function new(s2d:h2d.Scene, callback:Float->Void) {
-        super(s2d);
-
-		this.callback = callback;
-
-		camera = s2d.camera;
-		customGraphics = new h2d.Graphics(s2d);
-
-		outerCircle = new h2d.Bitmap(hxd.Res.input.cirlce_1.toTile().center(), this);
-		innerCircle = new h2d.Bitmap(hxd.Res.input.circle_2.toTile().center(), this);
-		
-		innerCircleDefaultPos();
-    }
-
-	public function updateCursorPosition(x:Float, y:Float) {
-		var p = new h2d.col.Point(x, y);
-		camera.screenToCamera(p);
-
-		if (shapeRect.containtPoint(new Point(p.x, p.y))) {
-			lastMousePos.x = x;
-			lastMousePos.y = y;
-			camera.screenToCamera(lastMousePos);
-
-			innerCircle.alpha = 0.7;
-			inputActive = true;
-
-			innerCircle.setPosition(controlTargetPos.x - shapeRect.x, controlTargetPos.y - shapeRect.y);
-		} else {
-			innerCircle.alpha = 1;
-			inputActive = false;
-
-			innerCircleDefaultPos();
-		}
-	}
-
-	public function initiate(x:Float, y:Float, rectSize:Int) {
-		setPosition(x, y);
-		shapeRect = new Rectangle(x,y, rectSize, rectSize, 0);
-	}
-
-	public function update() {
-		if (inputActive) {
-			final p1 = new engine.base.geometry.Point(outerCircle.localToGlobal().x, outerCircle.localToGlobal().y);
-			final p2 = new engine.base.geometry.Point(lastMousePos.x, lastMousePos.y);
-			angle = MathUtils.angleBetweenPoints(p1, p2);
-			callback(angle);
-
-			controlTargetPos = MathUtils.rotatePointAroundCenter(p1.x + 80, p1.y, p1.x, p1.y, angle);
-
-			customGraphics.clear();
-
-			Utils.DrawRect(customGraphics, shapeRect, GameConfig.RedColor);
-
-			customGraphics.lineStyle(2, 0xEA8220);
-			customGraphics.moveTo(p1.x, p1.y);
-			customGraphics.lineTo(controlTargetPos.x, controlTargetPos.y);
-			customGraphics.endFill();
-		} else {
-			customGraphics.clear();
-			Utils.DrawRect(customGraphics, shapeRect, GameConfig.RedColor);
-		}
-	}
-
-	private function innerCircleDefaultPos() {
-		innerCircle.setPosition(
-			0, 0
-		);
-	}
-}
-
 abstract class BasicScene extends h2d.Scene {
 	public final baseEngine:SeidhGameEngine;
 
-	public var actualScreenWidth = 0;
-	public var actualScreenHeight = 0;
+	public static var ActualScreenWidth = 0;
+	public static var ActualScreenHeight = 0;
 
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
 
-	private var mobileControlsScene:MobileControlsScene;
+	private var gameUiScene:GameUiScene;
 	private var fui:h2d.Flow;
 	private var debugText:h2d.Text;
 
@@ -131,11 +46,14 @@ abstract class BasicScene extends h2d.Scene {
 
 	private final isMobileDevice:Bool;
 
-	private var cameraOffsetX = 32;
-	private var cameraOffsetY = 105;
+	private var cameraOffsetX = 0;
+	private var cameraOffsetY = 0;
+
+	// UI
+
 
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
-	final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
+	// final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
 	
 	var inputsSent = 0;
 
@@ -150,7 +68,7 @@ abstract class BasicScene extends h2d.Scene {
 		}
 
 		if (baseEngine != null) {
-			NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
+			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
 
 			new TerrainManager(this);
 
@@ -176,17 +94,17 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.baseEngine.createProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
-				final projectile = new ClientProjectileEntity(this);
-				projectile.initiateEngineEntity(projectileEntity);
-				clientProjectileEntities.set(projectileEntity.getId(), projectile);
+				// final projectile = new ClientProjectileEntity(this);
+				// projectile.initiateEngineEntity(projectileEntity);
+				// clientProjectileEntities.set(projectileEntity.getId(), projectile);
 			};
 
 			this.baseEngine.deleteProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
-				final projectile = clientProjectileEntities.get(projectileEntity.getId());
-				if (projectile != null) {
-					clientProjectileEntities.remove(projectileEntity.getId());
-					removeChild(projectile);
-				}
+				// final projectile = clientProjectileEntities.get(projectileEntity.getId());
+				// if (projectile != null) {
+				// 	clientProjectileEntities.remove(projectileEntity.getId());
+				// 	removeChild(projectile);
+				// }
 			};
 
 			this.baseEngine.postLoopCallback = function callback() {
@@ -273,11 +191,11 @@ abstract class BasicScene extends h2d.Scene {
 		fui.padding = 10;
 
 		function onEvent(event:hxd.Event) {
-			if (mobileControlsScene != null) {
+			if (gameUiScene != null) {
 				if (event.kind == EMove) {
-					mobileControlsScene.updateCursorPosition(event.relX, event.relY);
+					gameUiScene.updateCursorPosition(event.relX, event.relY);
 				} else if (event.kind == ERelease) {
-					mobileControlsScene.release();
+					gameUiScene.release();
 				}
 			}
 			if (event.kind == EPush && basicSceneCallback != null) {
@@ -310,20 +228,20 @@ abstract class BasicScene extends h2d.Scene {
 		final jsScreenParams = NativeWindowJS.getScreenParams();
 		final screenOrientation = jsScreenParams.orientation;
 		final ratio = jsScreenParams.pageHeight / jsScreenParams.pageWidth;
-		final w = actualScreenWidth = screenOrientation == 'portrait' ? 720 : 1280;
-		final h = actualScreenHeight = screenOrientation == 'portrait' ? Std.int(720 * ratio) : 720;
+		final w = ActualScreenWidth = screenOrientation == 'portrait' ? 720 : 1280;
+		final h = ActualScreenHeight = screenOrientation == 'portrait' ? Std.int(720 * ratio) : 720;
 		
 		if (baseEngine != null) {
 			if (isMobileDevice) {
-				if (mobileControlsScene == null) {
-					mobileControlsScene = new MobileControlsScene(
+				if (gameUiScene == null) {
+					gameUiScene = new GameUiScene(
 						isMobileDevice,
 						function callback(buttonPressed:ButtonPressed) {
 							switch (buttonPressed) {
 								case ButtonPressed.A:
 									addInputCommand(CharacterActionType.ACTION_MAIN);
-								case ButtonPressed.B:
-									addInputCommand(CharacterActionType.ACTION_1);
+								// case ButtonPressed.B:
+									// addInputCommand(CharacterActionType.ACTION_1);
 								default:
 							}
 						},
@@ -332,13 +250,24 @@ abstract class BasicScene extends h2d.Scene {
 						}
 					);
 				}
-				mobileControlsScene.resize(screenOrientation, w, h);
+				gameUiScene.resize(screenOrientation, w, h);
 			}
 		}
 
 		if (isMobileDevice) {
 			scaleMode = ScaleMode.Stretch(w, h);
-			camera.setViewport(0, 0, w, h);
+			camera.setViewport(w / 2, h / 2, w, h);
+
+			// cameraOffsetX = -Std.int(w / 2);
+			// cameraOffsetY = 700;//Std.int(h);
+		} else {
+			scaleMode = ScaleMode.LetterBox(w, h, true);
+			// camera.scale(0.5, 0.5);
+			// scale(0.5);
+			// camera.setViewport(0, 0, w, h);
+
+			// cameraOffsetX = -Std.int(w / 2);
+			// cameraOffsetY = -Std.int(h / 2);
 		}
 	}
 
@@ -352,16 +281,16 @@ abstract class BasicScene extends h2d.Scene {
 		// Utils.DrawRect(debugGraphics, new Rectangle(800, 0, 100, 100, 0), GameConfig.RedColor);
 		// Utils.DrawRect(debugGraphics, new Rectangle(0, 600, 100, 100, 0), GameConfig.RedColor);
 
-		if (mobileControlsScene != null) {
-			mobileControlsScene.update();
+		if (gameUiScene != null) {
+			gameUiScene.update();
 		}
 
 		updateDesktopInput();
 		customUpdate(dt, fps);
 
-		for (projectile in clientProjectileEntities) {
-			projectile.update(dt);
-		}
+		// for (projectile in clientProjectileEntities) {
+		// 	projectile.update(dt);
+		// }
 
 		for (character in clientCharacterEntities) {
 			character.update(dt);
@@ -378,11 +307,11 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public override function render(e:Engine) {
-		for (projectile in clientProjectileEntities) {
-			if (GameConfig.DebugDraw) {
-				projectile.debugDraw(debugGraphics);
-			}
-		}
+		// for (projectile in clientProjectileEntities) {
+		// 	if (GameConfig.DebugDraw) {
+		// 		projectile.debugDraw(debugGraphics);
+		// 	}
+		// }
 
 		for (character in clientCharacterEntities) {
 			if (GameConfig.DebugDraw) {
@@ -390,13 +319,13 @@ abstract class BasicScene extends h2d.Scene {
 			}
 		}
 		super.render(e);
-		if (mobileControlsScene != null) {
-			mobileControlsScene.render(e);
+		if (gameUiScene != null) {
+			gameUiScene.render(e);
 		}
 	}
 
 	public function getInputScene() {
-		return mobileControlsScene != null ? mobileControlsScene : this;
+		return gameUiScene != null ? gameUiScene : this;
 	}
 
 	private function updateDesktopInput() {

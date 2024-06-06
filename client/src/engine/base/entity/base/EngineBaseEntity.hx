@@ -70,7 +70,7 @@ abstract class EngineBaseEntity {
 	}
 
 	public function isPlayer() {
-		return baseEntity.entityType != EntityType.SKELETON_WARRIOR;
+		return baseEntity.entityType == EntityType.RAGNAR_LOH || baseEntity.entityType == EntityType.RAGNAR_NORM;
 	}
 
     // ------------------------------------------------

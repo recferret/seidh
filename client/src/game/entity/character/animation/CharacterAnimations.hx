@@ -199,856 +199,389 @@ class CharacterAnimation {
 
 class CharacterAnimations {
 
-    public static function LoadRagnarAnimation(parent:h2d.Object) {
+    public static function LoadRagnarLohAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
         final leftOffsetX = 0;
 
         animation.loadIdle(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadDefend(
             [
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar.toTile().center(),
+                hxd.Res.ragnar.ragnar_loh.toTile().center(),
             ], leftOffsetX)
         );
 
         return animation;
     }
 
-    public static function LoadKnightAnimation(parent:h2d.Object) {
+    public static function LoadRagnarNormAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
-        final leftOffsetX = 62;
+        final leftOffsetX = 0;
 
         animation.loadIdle(
             [
-                hxd.Res.knight.idle._1.toTile(),
-                hxd.Res.knight.idle._2.toTile(), 
-                hxd.Res.knight.idle._3.toTile(), 
-                hxd.Res.knight.idle._4.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.idle._1.toTile(),
-                hxd.Res.knight.idle._2.toTile(), 
-                hxd.Res.knight.idle._3.toTile(), 
-                hxd.Res.knight.idle._4.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.knight.run._1.toTile(),
-                hxd.Res.knight.run._2.toTile(), 
-                hxd.Res.knight.run._3.toTile(), 
-                hxd.Res.knight.run._4.toTile(), 
-                hxd.Res.knight.run._5.toTile(), 
-                hxd.Res.knight.run._6.toTile(), 
-                hxd.Res.knight.run._7.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.run._1.toTile(),
-                hxd.Res.knight.run._2.toTile(), 
-                hxd.Res.knight.run._3.toTile(), 
-                hxd.Res.knight.run._4.toTile(), 
-                hxd.Res.knight.run._5.toTile(), 
-                hxd.Res.knight.run._6.toTile(), 
-                hxd.Res.knight.run._7.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.knight.walk._1.toTile(), 
-                hxd.Res.knight.walk._2.toTile(), 
-                hxd.Res.knight.walk._3.toTile(), 
-                hxd.Res.knight.walk._4.toTile(), 
-                hxd.Res.knight.walk._5.toTile(), 
-                hxd.Res.knight.walk._6.toTile(), 
-                hxd.Res.knight.walk._7.toTile(), 
-                hxd.Res.knight.walk._8.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.walk._2.toTile(), 
-                hxd.Res.knight.walk._3.toTile(), 
-                hxd.Res.knight.walk._4.toTile(), 
-                hxd.Res.knight.walk._5.toTile(), 
-                hxd.Res.knight.walk._6.toTile(), 
-                hxd.Res.knight.walk._7.toTile(), 
-                hxd.Res.knight.walk._8.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.knight.dead._1.toTile(),
-                hxd.Res.knight.dead._2.toTile(), 
-                hxd.Res.knight.dead._3.toTile(), 
-                hxd.Res.knight.dead._4.toTile(),
-                hxd.Res.knight.dead._5.toTile(),
-                hxd.Res.knight.dead._6.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.dead._1.toTile(),
-                hxd.Res.knight.dead._2.toTile(), 
-                hxd.Res.knight.dead._3.toTile(), 
-                hxd.Res.knight.dead._4.toTile(),
-                hxd.Res.knight.dead._5.toTile(),
-                hxd.Res.knight.dead._6.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.knight.hurt._1.toTile(),
-                hxd.Res.knight.hurt._2.toTile(), 
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.hurt._1.toTile(),
-                hxd.Res.knight.hurt._2.toTile(), 
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.knight.attack_1._1.toTile(),
-                hxd.Res.knight.attack_1._2.toTile(), 
-                hxd.Res.knight.attack_1._3.toTile(), 
-                hxd.Res.knight.attack_1._4.toTile(),
-                hxd.Res.knight.attack_1._5.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.attack_1._1.toTile(),
-                hxd.Res.knight.attack_1._2.toTile(), 
-                hxd.Res.knight.attack_1._3.toTile(), 
-                hxd.Res.knight.attack_1._4.toTile(),
-                hxd.Res.knight.attack_1._5.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.knight.attack_2._1.toTile(),
-                hxd.Res.knight.attack_2._2.toTile(), 
-                hxd.Res.knight.attack_2._3.toTile(), 
-                hxd.Res.knight.attack_2._4.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.attack_2._1.toTile(),
-                hxd.Res.knight.attack_2._2.toTile(), 
-                hxd.Res.knight.attack_2._3.toTile(), 
-                hxd.Res.knight.attack_2._4.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.knight.attack_3._1.toTile(),
-                hxd.Res.knight.attack_3._2.toTile(), 
-                hxd.Res.knight.attack_3._3.toTile(), 
-                hxd.Res.knight.attack_3._4.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.attack_3._1.toTile(),
-                hxd.Res.knight.attack_3._2.toTile(), 
-                hxd.Res.knight.attack_3._3.toTile(), 
-                hxd.Res.knight.attack_3._4.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.knight.attack_run._1.toTile(),
-                hxd.Res.knight.attack_run._2.toTile(), 
-                hxd.Res.knight.attack_run._3.toTile(), 
-                hxd.Res.knight.attack_run._4.toTile(), 
-                hxd.Res.knight.attack_run._5.toTile(), 
-                hxd.Res.knight.attack_run._6.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.attack_run._1.toTile(),
-                hxd.Res.knight.attack_run._2.toTile(), 
-                hxd.Res.knight.attack_run._3.toTile(), 
-                hxd.Res.knight.attack_run._4.toTile(), 
-                hxd.Res.knight.attack_run._5.toTile(), 
-                hxd.Res.knight.attack_run._6.toTile(),
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadDefend(
             [
-                hxd.Res.knight.defend._1.toTile(),
-                hxd.Res.knight.defend._2.toTile(), 
-                hxd.Res.knight.defend._3.toTile(), 
-                hxd.Res.knight.defend._4.toTile(), 
-                hxd.Res.knight.defend._5.toTile(), 
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.knight.defend._1.toTile(),
-                hxd.Res.knight.defend._2.toTile(), 
-                hxd.Res.knight.defend._3.toTile(), 
-                hxd.Res.knight.defend._4.toTile(), 
-                hxd.Res.knight.defend._5.toTile(), 
+                hxd.Res.ragnar.ragnar_norm.toTile().center(),
             ], leftOffsetX)
         );
 
         return animation;
     }
-
-    public static function LoadSamuraiAnimation(parent:h2d.Object) {
+    
+    public static function LoadZombieBoyAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
-        final leftOffsetX = 62;
-        
+        final leftOffsetX = 0;
+
         animation.loadIdle(
             [
-                hxd.Res.samurai.idle._1.toTile(), 
-                hxd.Res.samurai.idle._2.toTile(), 
-                hxd.Res.samurai.idle._3.toTile(), 
-                hxd.Res.samurai.idle._4.toTile(), 
-                hxd.Res.samurai.idle._5.toTile(), 
-                hxd.Res.samurai.idle._6.toTile(),
-                hxd.Res.samurai.idle._7.toTile(),
-                hxd.Res.samurai.idle._8.toTile(),
-                hxd.Res.samurai.idle._9.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.idle._1.toTile(), 
-                hxd.Res.samurai.idle._2.toTile(), 
-                hxd.Res.samurai.idle._3.toTile(), 
-                hxd.Res.samurai.idle._4.toTile(), 
-                hxd.Res.samurai.idle._5.toTile(), 
-                hxd.Res.samurai.idle._6.toTile(),
-                hxd.Res.samurai.idle._7.toTile(),
-                hxd.Res.samurai.idle._8.toTile(),
-                hxd.Res.samurai.idle._9.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.samurai.run._1.toTile(),
-                hxd.Res.samurai.run._2.toTile(), 
-                hxd.Res.samurai.run._3.toTile(), 
-                hxd.Res.samurai.run._4.toTile(), 
-                hxd.Res.samurai.run._5.toTile(), 
-                hxd.Res.samurai.run._6.toTile(), 
-                hxd.Res.samurai.run._7.toTile(), 
-                hxd.Res.samurai.run._8.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.run._1.toTile(),
-                hxd.Res.samurai.run._2.toTile(), 
-                hxd.Res.samurai.run._3.toTile(), 
-                hxd.Res.samurai.run._4.toTile(), 
-                hxd.Res.samurai.run._5.toTile(), 
-                hxd.Res.samurai.run._6.toTile(), 
-                hxd.Res.samurai.run._7.toTile(), 
-                hxd.Res.samurai.run._8.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.samurai.walk._1.toTile(), 
-                hxd.Res.samurai.walk._2.toTile(), 
-                hxd.Res.samurai.walk._3.toTile(), 
-                hxd.Res.samurai.walk._4.toTile(), 
-                hxd.Res.samurai.walk._5.toTile(), 
-                hxd.Res.samurai.walk._6.toTile(), 
-                hxd.Res.samurai.walk._7.toTile(), 
-                hxd.Res.samurai.walk._8.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.walk._1.toTile(), 
-                hxd.Res.samurai.walk._2.toTile(), 
-                hxd.Res.samurai.walk._3.toTile(), 
-                hxd.Res.samurai.walk._4.toTile(), 
-                hxd.Res.samurai.walk._5.toTile(), 
-                hxd.Res.samurai.walk._6.toTile(), 
-                hxd.Res.samurai.walk._7.toTile(), 
-                hxd.Res.samurai.walk._8.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.samurai.dead._1.toTile(),
-                hxd.Res.samurai.dead._2.toTile(), 
-                hxd.Res.samurai.dead._3.toTile(), 
-                hxd.Res.samurai.dead._4.toTile(),
-                hxd.Res.samurai.dead._5.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.dead._1.toTile(),
-                hxd.Res.samurai.dead._2.toTile(), 
-                hxd.Res.samurai.dead._3.toTile(), 
-                hxd.Res.samurai.dead._4.toTile(),
-                hxd.Res.samurai.dead._5.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.samurai.hurt._1.toTile(),
-                hxd.Res.samurai.hurt._2.toTile(), 
-                hxd.Res.samurai.hurt._3.toTile(), 
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.hurt._1.toTile(),
-                hxd.Res.samurai.hurt._2.toTile(), 
-                hxd.Res.samurai.hurt._3.toTile(), 
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.samurai.attack_1._1.toTile(),
-                hxd.Res.samurai.attack_1._2.toTile(), 
-                hxd.Res.samurai.attack_1._3.toTile(), 
-                hxd.Res.samurai.attack_1._4.toTile(),
-                hxd.Res.samurai.attack_1._5.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.attack_1._1.toTile(),
-                hxd.Res.samurai.attack_1._2.toTile(), 
-                hxd.Res.samurai.attack_1._3.toTile(), 
-                hxd.Res.samurai.attack_1._4.toTile(),
-                hxd.Res.samurai.attack_1._5.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.samurai.attack_2._1.toTile(),
-                hxd.Res.samurai.attack_2._2.toTile(), 
-                hxd.Res.samurai.attack_2._3.toTile(), 
-                hxd.Res.samurai.attack_2._4.toTile(),
-                hxd.Res.samurai.attack_2._5.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.attack_2._1.toTile(),
-                hxd.Res.samurai.attack_2._2.toTile(), 
-                hxd.Res.samurai.attack_2._3.toTile(), 
-                hxd.Res.samurai.attack_2._4.toTile(),
-                hxd.Res.samurai.attack_2._5.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.samurai.attack_3._1.toTile(),
-                hxd.Res.samurai.attack_3._2.toTile(), 
-                hxd.Res.samurai.attack_3._3.toTile(), 
-                hxd.Res.samurai.attack_3._4.toTile(), 
-                hxd.Res.samurai.attack_3._5.toTile(), 
-                hxd.Res.samurai.attack_3._6.toTile(), 
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.samurai.attack_3._1.toTile(),
-                hxd.Res.samurai.attack_3._2.toTile(), 
-                hxd.Res.samurai.attack_3._3.toTile(), 
-                hxd.Res.samurai.attack_3._4.toTile(), 
-                hxd.Res.samurai.attack_3._5.toTile(), 
-                hxd.Res.samurai.attack_3._6.toTile(),
-            ], leftOffsetX)
-        );
-
-        animation.loadShot1(
-            [
-                hxd.Res.samurai.shot_1._1.toTile(),
-                hxd.Res.samurai.shot_1._2.toTile(), 
-                hxd.Res.samurai.shot_1._3.toTile(), 
-                hxd.Res.samurai.shot_1._4.toTile(), 
-                hxd.Res.samurai.shot_1._5.toTile(),
-                hxd.Res.samurai.shot_1._6.toTile(), 
-                hxd.Res.samurai.shot_1._7.toTile(), 
-                hxd.Res.samurai.shot_1._8.toTile(),
-                hxd.Res.samurai.shot_1._9.toTile(),
-                hxd.Res.samurai.shot_1._10.toTile(), 
-                hxd.Res.samurai.shot_1._11.toTile(), 
-                hxd.Res.samurai.shot_1._12.toTile(),
-                hxd.Res.samurai.shot_1._13.toTile(), 
-                hxd.Res.samurai.shot_1._14.toTile(),
-            ],
-            flipTilesLeft([
-                hxd.Res.samurai.shot_1._1.toTile(),
-                hxd.Res.samurai.shot_1._2.toTile(), 
-                hxd.Res.samurai.shot_1._3.toTile(), 
-                hxd.Res.samurai.shot_1._4.toTile(), 
-                hxd.Res.samurai.shot_1._5.toTile(),
-                hxd.Res.samurai.shot_1._6.toTile(), 
-                hxd.Res.samurai.shot_1._7.toTile(), 
-                hxd.Res.samurai.shot_1._8.toTile(),
-                hxd.Res.samurai.shot_1._9.toTile(),
-                hxd.Res.samurai.shot_1._10.toTile(), 
-                hxd.Res.samurai.shot_1._11.toTile(), 
-                hxd.Res.samurai.shot_1._12.toTile(),
-                hxd.Res.samurai.shot_1._13.toTile(), 
-                hxd.Res.samurai.shot_1._14.toTile(),
-            ], leftOffsetX)
-        );
-
-        return animation;
-    }
-
-    public static function LoadSkeletonWarriorAnimation(parent:h2d.Object) {
-        final animation = new CharacterAnimation(parent);
-        final leftOffsetX = 120;
-
-        animation.loadIdle(
-            [
-                hxd.Res.skeleton.idle._1.toTile(), 
-                hxd.Res.skeleton.idle._2.toTile(), 
-                hxd.Res.skeleton.idle._3.toTile(), 
-                hxd.Res.skeleton.idle._4.toTile(), 
-                hxd.Res.skeleton.idle._5.toTile(), 
-                hxd.Res.skeleton.idle._6.toTile(),
-                hxd.Res.skeleton.idle._7.toTile(),
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.idle._1.toTile(), 
-                hxd.Res.skeleton.idle._2.toTile(), 
-                hxd.Res.skeleton.idle._3.toTile(), 
-                hxd.Res.skeleton.idle._4.toTile(), 
-                hxd.Res.skeleton.idle._5.toTile(), 
-                hxd.Res.skeleton.idle._6.toTile(),
-                hxd.Res.skeleton.idle._7.toTile(),
-            ], leftOffsetX)
-        );
-
-        animation.loadRun(
-            [
-                hxd.Res.skeleton.run._1.toTile(), 
-                hxd.Res.skeleton.run._2.toTile(), 
-                hxd.Res.skeleton.run._3.toTile(), 
-                hxd.Res.skeleton.run._4.toTile(), 
-                hxd.Res.skeleton.run._5.toTile(), 
-                hxd.Res.skeleton.run._6.toTile(),
-                hxd.Res.skeleton.run._7.toTile(),
-                hxd.Res.skeleton.run._8.toTile(),
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.run._1.toTile(), 
-                hxd.Res.skeleton.run._2.toTile(), 
-                hxd.Res.skeleton.run._3.toTile(), 
-                hxd.Res.skeleton.run._4.toTile(), 
-                hxd.Res.skeleton.run._5.toTile(), 
-                hxd.Res.skeleton.run._6.toTile(),
-                hxd.Res.skeleton.run._7.toTile(),
-                hxd.Res.skeleton.run._8.toTile(),
-            ], leftOffsetX)
-        );
-
-        animation.loadWalk(
-            [
-                hxd.Res.skeleton.walk._1.toTile(), 
-                hxd.Res.skeleton.walk._2.toTile(), 
-                hxd.Res.skeleton.walk._3.toTile(), 
-                hxd.Res.skeleton.walk._4.toTile(), 
-                hxd.Res.skeleton.walk._5.toTile(), 
-                hxd.Res.skeleton.walk._6.toTile(),
-                hxd.Res.skeleton.walk._7.toTile(),
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.walk._1.toTile(), 
-                hxd.Res.skeleton.walk._2.toTile(), 
-                hxd.Res.skeleton.walk._3.toTile(), 
-                hxd.Res.skeleton.walk._4.toTile(), 
-                hxd.Res.skeleton.walk._5.toTile(), 
-                hxd.Res.skeleton.walk._6.toTile(),
-                hxd.Res.skeleton.walk._7.toTile(),
-            ], leftOffsetX)
-        );
-
-        animation.loadDead(
-            [
-                hxd.Res.skeleton.dead._1.toTile(),
-                hxd.Res.skeleton.dead._2.toTile(), 
-                hxd.Res.skeleton.dead._3.toTile(), 
-                hxd.Res.skeleton.dead._4.toTile(), 
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.dead._1.toTile(),
-                hxd.Res.skeleton.dead._2.toTile(), 
-                hxd.Res.skeleton.dead._3.toTile(), 
-                hxd.Res.skeleton.dead._4.toTile(), 
-            ], leftOffsetX)
-        );
-
-        animation.loadHurt(
-            [
-                hxd.Res.skeleton.hurt._1.toTile(),
-                hxd.Res.skeleton.hurt._2.toTile(), 
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.hurt._1.toTile(),
-                hxd.Res.skeleton.hurt._2.toTile(), 
-            ], leftOffsetX)
-        );
-
-        animation.loadAttack1(
-            [
-                hxd.Res.skeleton.attack_1._1.toTile(),
-                hxd.Res.skeleton.attack_1._2.toTile(),
-                hxd.Res.skeleton.attack_1._3.toTile(),
-                hxd.Res.skeleton.attack_1._4.toTile(),
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.attack_1._1.toTile(),
-                hxd.Res.skeleton.attack_1._2.toTile(),
-                hxd.Res.skeleton.attack_1._3.toTile(),
-                hxd.Res.skeleton.attack_1._4.toTile(),
-            ], leftOffsetX)
-        );
-
-        animation.loadAttack2(
-            [
-                hxd.Res.skeleton.attack_2._1.toTile(),
-                hxd.Res.skeleton.attack_2._2.toTile(),
-                hxd.Res.skeleton.attack_2._3.toTile(),
-                hxd.Res.skeleton.attack_2._4.toTile(),
-                hxd.Res.skeleton.attack_2._5.toTile(),
-                hxd.Res.skeleton.attack_2._6.toTile(),
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.attack_2._1.toTile(),
-                hxd.Res.skeleton.attack_2._2.toTile(),
-                hxd.Res.skeleton.attack_2._3.toTile(),
-                hxd.Res.skeleton.attack_2._4.toTile(),
-                hxd.Res.skeleton.attack_2._5.toTile(),
-                hxd.Res.skeleton.attack_2._6.toTile(),
-            ], leftOffsetX)
-        );
-
-        animation.loadAttack3(
-            [
-                hxd.Res.skeleton.attack_3._1.toTile(),
-                hxd.Res.skeleton.attack_3._2.toTile(),
-                hxd.Res.skeleton.attack_3._3.toTile(),
-                hxd.Res.skeleton.attack_3._4.toTile(),
-            ],
-            flipTilesLeft([
-                hxd.Res.skeleton.attack_3._1.toTile(),
-                hxd.Res.skeleton.attack_3._2.toTile(),
-                hxd.Res.skeleton.attack_3._3.toTile(),
-                hxd.Res.skeleton.attack_3._4.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.skeleton.attack_run._1.toTile(),
-                hxd.Res.skeleton.attack_run._2.toTile(),
-                hxd.Res.skeleton.attack_run._3.toTile(),
-                hxd.Res.skeleton.attack_run._4.toTile(),
-                hxd.Res.skeleton.attack_run._5.toTile(),
-                hxd.Res.skeleton.attack_run._6.toTile(),
-                hxd.Res.skeleton.attack_run._7.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ],
             flipTilesLeft([
-                hxd.Res.skeleton.attack_run._1.toTile(),
-                hxd.Res.skeleton.attack_run._2.toTile(),
-                hxd.Res.skeleton.attack_run._3.toTile(),
-                hxd.Res.skeleton.attack_run._4.toTile(),
-                hxd.Res.skeleton.attack_run._5.toTile(),
-                hxd.Res.skeleton.attack_run._6.toTile(),
-                hxd.Res.skeleton.attack_run._7.toTile(),
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+            ], leftOffsetX)
+        );
+
+        animation.loadDefend(
+            [
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+            ],
+            flipTilesLeft([
+                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
             ], leftOffsetX)
         );
 
         return animation;
     }
 
-    public static function LoadSkeletonArcherAnimation(parent:h2d.Object) {
+    public static function LoadZombieGirlAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
+        final leftOffsetX = 0;
 
         animation.loadIdle(
             [
-                hxd.Res.skeleton_archer.idle._1.toTile(), 
-                hxd.Res.skeleton_archer.idle._2.toTile(), 
-                hxd.Res.skeleton_archer.idle._3.toTile(), 
-                hxd.Res.skeleton_archer.idle._4.toTile(), 
-                hxd.Res.skeleton_archer.idle._5.toTile(), 
-                hxd.Res.skeleton_archer.idle._6.toTile(),
-                hxd.Res.skeleton_archer.idle._7.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
+        );
+
+        animation.loadRun(
             [
-                hxd.Res.skeleton_archer.idle._1.toTile(), 
-                hxd.Res.skeleton_archer.idle._2.toTile(), 
-                hxd.Res.skeleton_archer.idle._3.toTile(), 
-                hxd.Res.skeleton_archer.idle._4.toTile(), 
-                hxd.Res.skeleton_archer.idle._5.toTile(), 
-                hxd.Res.skeleton_archer.idle._6.toTile(),
-                hxd.Res.skeleton_archer.idle._7.toTile(),
-            ]
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ],
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.skeleton_archer.walk._1.toTile(), 
-                hxd.Res.skeleton_archer.walk._2.toTile(), 
-                hxd.Res.skeleton_archer.walk._3.toTile(), 
-                hxd.Res.skeleton_archer.walk._4.toTile(), 
-                hxd.Res.skeleton_archer.walk._5.toTile(), 
-                hxd.Res.skeleton_archer.walk._6.toTile(),
-                hxd.Res.skeleton_archer.walk._7.toTile(),
-                hxd.Res.skeleton_archer.walk._8.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.walk._1.toTile(), 
-                hxd.Res.skeleton_archer.walk._2.toTile(), 
-                hxd.Res.skeleton_archer.walk._3.toTile(), 
-                hxd.Res.skeleton_archer.walk._4.toTile(), 
-                hxd.Res.skeleton_archer.walk._5.toTile(), 
-                hxd.Res.skeleton_archer.walk._6.toTile(),
-                hxd.Res.skeleton_archer.walk._7.toTile(),
-                hxd.Res.skeleton_archer.walk._8.toTile(),
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.skeleton_archer.dead._1.toTile(),
-                hxd.Res.skeleton_archer.dead._2.toTile(), 
-                hxd.Res.skeleton_archer.dead._3.toTile(), 
-                hxd.Res.skeleton_archer.dead._4.toTile(), 
-                hxd.Res.skeleton_archer.dead._5.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.dead._1.toTile(),
-                hxd.Res.skeleton_archer.dead._2.toTile(), 
-                hxd.Res.skeleton_archer.dead._3.toTile(), 
-                hxd.Res.skeleton_archer.dead._4.toTile(), 
-                hxd.Res.skeleton_archer.dead._5.toTile(),
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.skeleton_archer.hurt._1.toTile(),
-                hxd.Res.skeleton_archer.hurt._2.toTile(), 
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.hurt._1.toTile(),
-                hxd.Res.skeleton_archer.hurt._2.toTile(), 
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.skeleton_archer.attack_1._1.toTile(),
-                hxd.Res.skeleton_archer.attack_1._2.toTile(),
-                hxd.Res.skeleton_archer.attack_1._3.toTile(),
-                hxd.Res.skeleton_archer.attack_1._4.toTile(),
-                hxd.Res.skeleton_archer.attack_1._4.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.attack_1._1.toTile(),
-                hxd.Res.skeleton_archer.attack_1._2.toTile(),
-                hxd.Res.skeleton_archer.attack_1._3.toTile(),
-                hxd.Res.skeleton_archer.attack_1._4.toTile(),
-                hxd.Res.skeleton_archer.attack_1._4.toTile(),
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.skeleton_archer.attack_2._1.toTile(),
-                hxd.Res.skeleton_archer.attack_2._2.toTile(),
-                hxd.Res.skeleton_archer.attack_2._3.toTile(),
-                hxd.Res.skeleton_archer.attack_2._4.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.attack_2._1.toTile(),
-                hxd.Res.skeleton_archer.attack_2._2.toTile(),
-                hxd.Res.skeleton_archer.attack_2._3.toTile(),
-                hxd.Res.skeleton_archer.attack_2._4.toTile(),
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.skeleton_archer.attack_3._1.toTile(),
-                hxd.Res.skeleton_archer.attack_3._2.toTile(),
-                hxd.Res.skeleton_archer.attack_3._3.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.attack_3._1.toTile(),
-                hxd.Res.skeleton_archer.attack_3._2.toTile(),
-                hxd.Res.skeleton_archer.attack_3._3.toTile(),
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
-        animation.loadDodge(
+        animation.loadAttackRun(
             [
-                hxd.Res.skeleton_archer.dodge._1.toTile(),
-                hxd.Res.skeleton_archer.dodge._2.toTile(),
-                hxd.Res.skeleton_archer.dodge._3.toTile(),
-                hxd.Res.skeleton_archer.dodge._4.toTile(),
-                hxd.Res.skeleton_archer.dodge._5.toTile(),
-                hxd.Res.skeleton_archer.dodge._6.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.dodge._1.toTile(),
-                hxd.Res.skeleton_archer.dodge._2.toTile(),
-                hxd.Res.skeleton_archer.dodge._3.toTile(),
-                hxd.Res.skeleton_archer.dodge._4.toTile(),
-                hxd.Res.skeleton_archer.dodge._5.toTile(),
-                hxd.Res.skeleton_archer.dodge._6.toTile(),
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
-        animation.loadShot1(
+        animation.loadDefend(
             [
-                hxd.Res.skeleton_archer.shot_1._1.toTile(),
-                hxd.Res.skeleton_archer.shot_1._2.toTile(),
-                hxd.Res.skeleton_archer.shot_1._3.toTile(),
-                hxd.Res.skeleton_archer.shot_1._4.toTile(),
-                hxd.Res.skeleton_archer.shot_1._5.toTile(),
-                hxd.Res.skeleton_archer.shot_1._6.toTile(),
-                hxd.Res.skeleton_archer.shot_1._7.toTile(),
-                hxd.Res.skeleton_archer.shot_1._8.toTile(),
-                hxd.Res.skeleton_archer.shot_1._9.toTile(),
-                hxd.Res.skeleton_archer.shot_1._10.toTile(),
-                hxd.Res.skeleton_archer.shot_1._11.toTile(),
-                hxd.Res.skeleton_archer.shot_1._12.toTile(),
-                hxd.Res.skeleton_archer.shot_1._13.toTile(),
-                hxd.Res.skeleton_archer.shot_1._14.toTile(),
-                hxd.Res.skeleton_archer.shot_1._15.toTile(),
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
             ],
-            [
-                hxd.Res.skeleton_archer.shot_1._1.toTile(),
-                hxd.Res.skeleton_archer.shot_1._2.toTile(),
-                hxd.Res.skeleton_archer.shot_1._3.toTile(),
-                hxd.Res.skeleton_archer.shot_1._4.toTile(),
-                hxd.Res.skeleton_archer.shot_1._5.toTile(),
-                hxd.Res.skeleton_archer.shot_1._6.toTile(),
-                hxd.Res.skeleton_archer.shot_1._7.toTile(),
-                hxd.Res.skeleton_archer.shot_1._8.toTile(),
-                hxd.Res.skeleton_archer.shot_1._9.toTile(),
-                hxd.Res.skeleton_archer.shot_1._10.toTile(),
-                hxd.Res.skeleton_archer.shot_1._11.toTile(),
-                hxd.Res.skeleton_archer.shot_1._12.toTile(),
-                hxd.Res.skeleton_archer.shot_1._13.toTile(),
-                hxd.Res.skeleton_archer.shot_1._14.toTile(),
-                hxd.Res.skeleton_archer.shot_1._15.toTile(),
-            ]
-        );
-
-        animation.loadShot2(
-            [
-                hxd.Res.skeleton_archer.shot_2._1.toTile(),
-                hxd.Res.skeleton_archer.shot_2._2.toTile(),
-                hxd.Res.skeleton_archer.shot_2._3.toTile(),
-                hxd.Res.skeleton_archer.shot_2._4.toTile(),
-                hxd.Res.skeleton_archer.shot_2._5.toTile(),
-                hxd.Res.skeleton_archer.shot_2._6.toTile(),
-                hxd.Res.skeleton_archer.shot_2._7.toTile(),
-                hxd.Res.skeleton_archer.shot_2._8.toTile(),
-                hxd.Res.skeleton_archer.shot_2._9.toTile(),
-                hxd.Res.skeleton_archer.shot_2._10.toTile(),
-                hxd.Res.skeleton_archer.shot_2._11.toTile(),
-                hxd.Res.skeleton_archer.shot_2._12.toTile(),
-                hxd.Res.skeleton_archer.shot_2._13.toTile(),
-                hxd.Res.skeleton_archer.shot_2._14.toTile(),
-                hxd.Res.skeleton_archer.shot_2._15.toTile(),
-            ],
-            [
-                hxd.Res.skeleton_archer.shot_2._1.toTile(),
-                hxd.Res.skeleton_archer.shot_2._2.toTile(),
-                hxd.Res.skeleton_archer.shot_2._3.toTile(),
-                hxd.Res.skeleton_archer.shot_2._4.toTile(),
-                hxd.Res.skeleton_archer.shot_2._5.toTile(),
-                hxd.Res.skeleton_archer.shot_2._6.toTile(),
-                hxd.Res.skeleton_archer.shot_2._7.toTile(),
-                hxd.Res.skeleton_archer.shot_2._8.toTile(),
-                hxd.Res.skeleton_archer.shot_2._9.toTile(),
-                hxd.Res.skeleton_archer.shot_2._10.toTile(),
-                hxd.Res.skeleton_archer.shot_2._11.toTile(),
-                hxd.Res.skeleton_archer.shot_2._12.toTile(),
-                hxd.Res.skeleton_archer.shot_2._13.toTile(),
-                hxd.Res.skeleton_archer.shot_2._14.toTile(),
-                hxd.Res.skeleton_archer.shot_2._15.toTile(),
-            ]
+            flipTilesLeft([
+                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+            ], leftOffsetX)
         );
 
         return animation;

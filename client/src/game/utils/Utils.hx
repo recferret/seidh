@@ -40,4 +40,10 @@ class Utils {
 		// Left line
 		graphics.lineTo(rect.getTopLeftPoint().x, rect.getTopLeftPoint().y);
 	}
+
+	public static function DrawRectFilled(graphics:h2d.Graphics, rect:Rectangle, color:Int) {
+		graphics.beginFill(color);
+		graphics.drawRect(rect.x, rect.y, rect.w, rect.h);
+		graphics.endFill();
+	}
 }

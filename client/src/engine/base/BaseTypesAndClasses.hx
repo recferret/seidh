@@ -33,15 +33,10 @@ enum abstract CharacterAnimationState(Int) {
 }
 
 enum abstract EntityType(Int) {
-	var KNIGHT = 1;
-	var SAMURAI = 2;
-	var MAGE = 3;
-	var SKELETON_WARRIOR = 4;
-	var SKELETON_ARCHER = 5;
-	var PROJECTILE_MAGIC_ARROW = 6;
-	var PROJECTILE_MAGIC_SPHERE = 7;
-
-	var RAGNAR = 8;
+	var RAGNAR_LOH = 1;
+	var RAGNAR_NORM = 2;
+	var ZOMBIE_BOY = 3;
+	var ZOMBIE_GIRL = 4;
 }
 
 class EntityShape {

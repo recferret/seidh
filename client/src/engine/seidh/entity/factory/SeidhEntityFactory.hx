@@ -1,9 +1,10 @@
 package engine.seidh.entity.factory;
 
 import engine.base.BaseTypesAndClasses;
-import engine.seidh.entity.impl.RagnarEntity;
-import engine.seidh.entity.impl.SeidhKnightEntity;
-import engine.seidh.entity.impl.SeidhSkeletonWarriorEntity;
+import engine.seidh.entity.impl.RagnarLohEntity;
+import engine.seidh.entity.impl.RagnarNormEntity;
+import engine.seidh.entity.impl.ZombieBoyEntity;
+import engine.seidh.entity.impl.ZombieGirlEntity;
 import engine.seidh.entity.base.SeidhBaseEntity;
 
 class SeidhEntityFactory {
@@ -11,16 +12,14 @@ class SeidhEntityFactory {
     public static function InitiateEntity(id: String, ownerId: String, x:Int, y:Int, entityType: EntityType) {
         var entity:SeidhBaseEntity = null;
         switch (entityType) {
-            case RAGNAR:
-                entity = new RagnarEntity(RagnarEntity.GenerateObjectEntity(id, ownerId, x, y));
-            case KNIGHT:
-                entity = new SeidhKnightEntity(SeidhKnightEntity.GenerateObjectEntity(id, ownerId, x, y));
-            // case SAMURAI:
-                // entity = new SeidhSamuraiEntity(SeidhSamuraiEntity.GenerateObjectEntity(id, ownerId, x, y));
-            case SKELETON_WARRIOR:
-                entity = new SeidhSkeletonWarriorEntity(SeidhSkeletonWarriorEntity.GenerateObjectEntity(id, ownerId, x, y));
-            // case SKELETON_ARCHER:
-                // entity = new SeidhSkeletonArcherEntity(SeidhSkeletonArcherEntity.GenerateObjectEntity(id, ownerId, x, y));
+            case RAGNAR_LOH:
+                entity = new RagnarLohEntity(RagnarLohEntity.GenerateObjectEntity(id, ownerId, x, y));
+            case RAGNAR_NORM:
+                entity = new RagnarNormEntity(RagnarNormEntity.GenerateObjectEntity(id, ownerId, x, y));
+            case ZOMBIE_BOY:
+                entity = new ZombieBoyEntity(ZombieBoyEntity.GenerateObjectEntity(id, ownerId, x, y));
+            case ZOMBIE_GIRL:
+                entity = new ZombieGirlEntity(ZombieGirlEntity.GenerateObjectEntity(id, ownerId, x, y));
             default:
         }
         return entity;
@@ -30,12 +29,14 @@ class SeidhEntityFactory {
         var entity:SeidhBaseEntity = null;
 
         switch (struct.base.entityType) {
-            case RAGNAR:
-                entity = new RagnarEntity(new CharacterEntity(struct));
-            case KNIGHT:
-                entity = new SeidhKnightEntity(new CharacterEntity(struct));
-            case SKELETON_WARRIOR:
-                entity = new SeidhSkeletonWarriorEntity(new CharacterEntity(struct));
+            case RAGNAR_LOH:
+                entity = new RagnarLohEntity(new CharacterEntity(struct));
+            case RAGNAR_NORM:
+                entity = new RagnarNormEntity(new CharacterEntity(struct));
+            case ZOMBIE_BOY:
+                entity = new ZombieBoyEntity(new CharacterEntity(struct));
+            case ZOMBIE_GIRL:
+                entity = new ZombieGirlEntity(new CharacterEntity(struct));
             default:
         }
         return entity;

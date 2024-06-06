@@ -1,0 +1,50 @@
+package engine.seidh.entity.impl;
+
+import engine.base.MathUtils;
+import engine.base.BaseTypesAndClasses;
+import engine.seidh.entity.base.SeidhBaseEntity;
+
+class ZombieBoyEntity extends SeidhBaseEntity {
+
+    public function new(characterEntity:CharacterEntity) {
+        super(characterEntity);
+    }
+
+    // ------------------------------------------------
+	// Dummy stats hardcode instead of database
+	// ------------------------------------------------
+
+    public static function GenerateObjectEntity(id: String, ownerId: String, x:Int, y:Int) {
+        return new CharacterEntity({
+            base: {
+                x: x, 
+                y: y,
+                entityType: EntityType.ZOMBIE_BOY,
+                entityShape: {width: 200, height: 300, rectOffsetX: 0, rectOffsetY: 0},
+                id: id,
+                ownerId: ownerId,
+                rotation: 0
+            },
+            health: 10,
+            movement: {
+                canWalk: true,
+                canRun: true,
+                runSpeed: 50 + MathUtils.randomIntInRange(1, 50),
+                movementDelay: 0.100,
+                vitality: 100,
+                vitalityConsumptionPerSec: 20,
+                vitalityRegenPerSec: 10,
+            },
+            actionMain: {
+                actionType: CharacterActionType.ACTION_MAIN,
+                damage: 10,
+                inputDelay: 1,
+                meleeStruct: {
+                    aoe: false,
+                    shape: {width: 140, height: 100, rectOffsetX: 80, rectOffsetY: 0},
+                }
+            }
+        });
+    }
+    
+}

@@ -165,7 +165,7 @@ class SeidhGameEngine extends BaseEngine {
                                 if (character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
                                     final health = character2.subtractHealth(character1.actionToPerform.damage);
                                     if (health == 0) {
-                                        if (character2.getEntityType() == SKELETON_WARRIOR) {
+                                        if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
                                             mobsKilled++;
                                         }
                                         character2.isAlive = false;
@@ -231,7 +231,7 @@ class SeidhGameEngine extends BaseEngine {
             final positionX = 1000;
             final positionY = 1000;
 
-            createCharacterEntity(SeidhEntityFactory.InitiateEntity(null, null, positionX, positionY, EntityType.SKELETON_WARRIOR));
+            createCharacterEntity(SeidhEntityFactory.InitiateEntity(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
             Timer.delay(function callback() {
                 spawnMobs();
             }, mobSpawnDelayMs);
@@ -239,19 +239,20 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     private function createProjectileByCharacter(character:EngineCharacterEntity) {
-        final ownerRect = character.getBodyRectangle();
-        final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
-            base: {
-                x: Std.int(ownerRect.getCenter().x),
-                y: Std.int(ownerRect.getCenter().y),
-                entityType: EntityType.PROJECTILE_MAGIC_ARROW,
-                entityShape: character.actionToPerform.projectileStruct.shape,
-                ownerId: character.getOwnerId(),
-                rotation: character.getRotation(),
-            },
-	        projectile: character.actionToPerform.projectileStruct
-        }));
-        return projectileEntity;
+        // final ownerRect = character.getBodyRectangle();
+        // final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
+        //     base: {
+        //         x: Std.int(ownerRect.getCenter().x),
+        //         y: Std.int(ownerRect.getCenter().y),
+        //         entityType: EntityType.PROJECTILE_MAGIC_ARROW,
+        //         entityShape: character.actionToPerform.projectileStruct.shape,
+        //         ownerId: character.getOwnerId(),
+        //         rotation: character.getRotation(),
+        //     },
+	    //     projectile: character.actionToPerform.projectileStruct
+        // }));
+        // return projectileEntity;
+        return null;
     }
 
     private function getNearestPlayer(entity:EngineBaseEntity) {
@@ -259,7 +260,7 @@ class SeidhGameEngine extends BaseEngine {
         var nearestPlayerDistance:Float = 0.0;
 
         for (targetEntity in characterEntityManager.entities) {
-            if (targetEntity.getEntityType() == EntityType.RAGNAR) {
+            if (targetEntity.getEntityType() == EntityType.RAGNAR_LOH || targetEntity.getEntityType() == EntityType.RAGNAR_NORM) {
                 final dist = entity.getBodyRectangle().getCenter().distance(targetEntity.getBodyRectangle().getCenter());
                 if (nearestPlayer == null || dist < nearestPlayerDistance) {
                     nearestPlayer = targetEntity;
