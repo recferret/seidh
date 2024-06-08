@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import h2d.Tile;
 import h3d.Vector;
 import hxsl.Types.Vec;
 import game.terrain.TerrainManager;
@@ -82,6 +83,38 @@ class SceneSpritesTest extends BasicScene {
 
 		// final ragnar5 = new h2d.Bitmap(h2d.Tile.fromBitmap(gradient), this);
 		// ragnar5.setPosition(100 , 400);
+
+
+		// Slashes
+
+		// final slash1Anim = new h2d.Anim([
+		// 	hxd.Res.slash._6._1.toTile().center(),
+		// 	hxd.Res.slash._6._2.toTile().center(),
+		// 	hxd.Res.slash._6._3.toTile().center(),
+		// 	hxd.Res.slash._6._4.toTile().center(),
+		// 	hxd.Res.slash._6._5.toTile().center(),
+		// 	hxd.Res.slash._6._6.toTile().center(),
+		// 	hxd.Res.slash._6._7.toTile().center(),
+		// 	hxd.Res.slash._6._8.toTile().center(),
+		// 	hxd.Res.slash._6._9.toTile().center(),
+		// 	hxd.Res.slash._6._10.toTile().center(),
+		// ], this);
+		// slash1Anim.setPosition(100, 600);
+
+		// final slash2Anim = new h2d.Anim([
+		// 	hxd.Res.slash._7._1.toTile().center(),
+		// 	hxd.Res.slash._7._2.toTile().center(),
+		// 	hxd.Res.slash._7._3.toTile().center(),
+		// 	hxd.Res.slash._7._4.toTile().center(),
+		// 	hxd.Res.slash._7._5.toTile().center(),
+		// 	hxd.Res.slash._7._6.toTile().center(),
+		// 	hxd.Res.slash._7._7.toTile().center(),
+		// 	hxd.Res.slash._7._8.toTile().center(),
+		// 	hxd.Res.slash._7._9.toTile().center(),
+		// 	hxd.Res.slash._7._10.toTile().center(),
+		// ], this);
+		// slash2Anim.setPosition(600, 500);
+
 	}	
 
     // --------------------------------------

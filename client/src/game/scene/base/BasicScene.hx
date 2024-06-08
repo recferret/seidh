@@ -1,6 +1,5 @@
 package game.scene.base;
 
-import game.ui.BarHp;
 import hxd.Event.EventKind;
 import game.terrain.TerrainManager;
 import h2d.Text;
@@ -8,18 +7,16 @@ import h3d.Engine;
 import hxd.Key in K;
 
 import game.entity.character.ClientCharacterEntity;
+import game.event.EventManager;
 // import game.entity.projectile.ClientProjectileEntity;
 import game.js.NativeWindowJS;
 import game.network.Networking;
 import game.scene.GameUiScene.ButtonPressed;
-import game.utils.Utils;
 
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
 import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
-import engine.base.geometry.Point;
-import engine.base.geometry.Rectangle;
 import engine.seidh.SeidhGameEngine;
 
 typedef BasicSceneClickCallback = {
@@ -50,7 +47,6 @@ abstract class BasicScene extends h2d.Scene {
 	private var cameraOffsetY = 0;
 
 	// UI
-
 
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
 	// final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
@@ -177,6 +173,9 @@ abstract class BasicScene extends h2d.Scene {
 			this.baseEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
 					trace('YOU HAVE WON THE GAME !');
+
+					// TODO stop the game and show win dialog
+					EventManager.instance.notify(EventManager.EVENT_RETURN_HOME, {});
 				} else {
 					trace('Game Over!');
 				}

@@ -197,6 +197,7 @@ class CharacterAnimation {
     }
 }
 
+// TODO rmk, no need to flip x that way any more
 class CharacterAnimations {
 
     public static function LoadRagnarLohAnimation(parent:h2d.Object) {

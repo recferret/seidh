@@ -13,8 +13,9 @@ class EventManager {
 	public static final EVENT_GAME_STATE = 'EVENT_GAME_STATE';
 	public static final EVENT_CHARACTER_ACTIONS = 'EVENT_CHARACTER_ACTIONS';
 
-	// Internal UI events
+	// Internal events
 	public static final EVENT_HOME_PLAY = 'EVENT_HOME_PLAY';
+	public static final EVENT_RETURN_HOME = 'EVENT_RETURN_HOME';
 
 	private final listeners = new Map<String, List<EventListener>>();
 

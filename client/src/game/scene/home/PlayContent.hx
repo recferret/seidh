@@ -1,8 +1,9 @@
 package game.scene.home;
 
-import motion.Actuate;
 import h2d.filter.Displacement;
+import game.event.EventManager;
 import game.scene.base.BasicScene;
+import motion.Actuate;
 
 class Bunny extends h2d.Object {
 
@@ -191,39 +192,39 @@ class PlayContent extends BasicHomeContent {
         final playButtonInactiveTile = hxd.Res.ui.home.PLAY_nay.toTile();
         final playButtonActiveTile = hxd.Res.ui.home.PLAY_yay.toTile();
 
-        final playButton = new h2d.Bitmap(playButtonInactiveTile, this);
+        final playButton = new h2d.Bitmap(playButtonActiveTile, this);
         playButton.setPosition(
-            BasicScene.ActualScreenWidth / 2 - playButtonInactiveTile.width / 2, 
-            BasicScene.ActualScreenHeight / 5 - playButtonInactiveTile.height / 2
+            BasicScene.ActualScreenWidth / 2 - playButtonActiveTile.width / 2, 
+            BasicScene.ActualScreenHeight / 5 - playButtonActiveTile.height / 2
         );
 
         final playButtonInteractive = new h2d.Interactive(playButtonActiveTile.width, playButtonActiveTile.height, playButton);
         playButtonInteractive.onPush = function(event : hxd.Event) {
-            playButton.tile = playButtonActiveTile;
-        }
-        playButtonInteractive.onRelease = function(event : hxd.Event) {
             playButton.tile = playButtonInactiveTile;
         }
+        playButtonInteractive.onRelease = function(event : hxd.Event) {
+            playButton.tile = playButtonActiveTile;
+        }
         playButtonInteractive.onClick = function(event : hxd.Event) {
-            // TODO run the game
+            EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
         }
 
         // Play button
         final lvlButtonInactiveTile = hxd.Res.ui.home.LVL_nay.toTile();
         final lvlButtonActiveTile = hxd.Res.ui.home.LVL_yay.toTile();
         
-        final lvlButton = new h2d.Bitmap(lvlButtonInactiveTile, this);
+        final lvlButton = new h2d.Bitmap(lvlButtonActiveTile, this);
         lvlButton.setPosition(
-            BasicScene.ActualScreenWidth / 2 - lvlButtonInactiveTile.width / 2, 
-            BasicScene.ActualScreenHeight * 0.8 - lvlButtonInactiveTile.height / 2
+            BasicScene.ActualScreenWidth / 2 - lvlButtonActiveTile.width / 2, 
+            BasicScene.ActualScreenHeight * 0.8 - lvlButtonActiveTile.height / 2
         );
         
         final lvlButtonInteractive = new h2d.Interactive(lvlButtonActiveTile.width, lvlButtonActiveTile.height, lvlButton);
         lvlButtonInteractive.onPush = function(event : hxd.Event) {
-            lvlButton.tile = lvlButtonActiveTile;
+            lvlButton.tile = lvlButtonInactiveTile;
         }
         lvlButtonInteractive.onRelease = function(event : hxd.Event) {
-            lvlButton.tile = lvlButtonInactiveTile;
+            lvlButton.tile = lvlButtonActiveTile;
         }
         lvlButtonInteractive.onClick = function(event : hxd.Event) {
             // TODO run the game

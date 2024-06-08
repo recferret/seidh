@@ -1,116 +1,12 @@
 package game.scene.impl;
 
-import game.scene.home.PlayContent;
 import h2d.Tile;
 import h2d.Bitmap;
 import hxd.Event.EventKind;
 import game.scene.SceneManager.GameScene;
 import game.scene.base.BasicScene;
 import game.scene.home.BasicHomeContent;
-
-// class PlayContent extends h2d.Object {
-// 	public function new(scene:h2d.Scene) {
-// 		super(scene);
-
-// 		// Top bar players online
-// 		final textPlayersOnline = new h2d.Text(hxd.res.DefaultFont.get(), this);
-// 		textPlayersOnline.setPosition(15, 15);
-// 		textPlayersOnline.text = 'Players online: 100';
-// 		textPlayersOnline.setScale(2);
-
-// 		// Top bar player info
-// 		final fuiUserInfo = new h2d.Flow(this);
-// 		fuiUserInfo.layout = Vertical;
-// 		fuiUserInfo.verticalSpacing = 10;
-
-// 		final textUsername = new h2d.Text(hxd.res.DefaultFont.get(), fuiUserInfo);
-// 		textUsername.text = 'Andrey Sokolov';
-// 		textUsername.setScale(2);
-
-// 		fuiUserInfo.setPosition(BasicScene.ActualScreenWidth - (textUsername.calcTextWidth('Andrey Sokolov') * 2) - 15, 15);
-
-// 		final textUserBalance = new h2d.Text(hxd.res.DefaultFont.get(), fuiUserInfo);
-// 		textUserBalance.text = 'Balance: 12000';
-// 		textUserBalance.setScale(2);
-
-// 		fuiUserInfo.setPosition(BasicScene.ActualScreenWidth - (textUserBalance.calcTextWidth('Balance: 12000') * 2) - 15, 15);
-
-// 		// Current ragnar
-// 		final ragnar = new h2d.Bitmap(hxd.Res.ragnar.ragnar_loh.toTile().center(), this);
-// 		ragnar.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 4);
-// 		ragnar.setScale(1.5);
-
-// 		// Level up button
-// 		// final levelUpButton = addButton(this, 'Level up', function callback(button:h2d.Flow) {
-// 		// 	trace('Level up');
-// 		// });
-// 		// levelUpButton.setPosition(ragnar.x - 128, ragnar.y + 128 * 2);
-
-// 		// // Play Button
-// 		// final playButton = addButton(this, 'Play', function callback(button:h2d.Flow) {
-// 		// 	trace('Play');
-// 		// });
-// 		// playButton.setPosition(ragnar.x - 128, ragnar.y + 128 * 4);
-
-// 	}
-
-// 	public function addButton(parent:h2d.Object, label: String, onClick: h2d.Flow -> Void) {
-// 		final f = new h2d.Flow(parent);
-// 		f.paddingHorizontal = 128;
-// 		f.paddingVertical = 64;
-// 		f.backgroundTile = h2d.Tile.fromColor(0x404040);
-// 		var tf = new h2d.Text(hxd.res.DefaultFont.get(), f);
-// 		tf.text = label;
-// 		f.enableInteractive = true;
-// 		f.interactive.cursor = Button;
-// 		f.interactive.onClick = function(_) onClick(f);
-// 		return f;
-// 	}
-// }
-
-class LeadersContent extends h2d.Object {
-	public function new(scene:h2d.Scene) {
-		super(scene);
-
-		final textPlayersOnline = new h2d.Text(hxd.res.DefaultFont.get(), this);
-		textPlayersOnline.setPosition(15, 15);
-		textPlayersOnline.text = 'LEADERS CONTENT';
-		textPlayersOnline.setScale(2);
-	}
-}
-
-class BoostContent extends h2d.Object {
-	public function new(scene:h2d.Scene) {
-		super(scene);
-
-		final textPlayersOnline = new h2d.Text(hxd.res.DefaultFont.get(), this);
-		textPlayersOnline.setPosition(15, 15);
-		textPlayersOnline.text = 'BOOST CONTENT';
-		textPlayersOnline.setScale(2);
-	}
-}
-
-class CollectionContent extends h2d.Object {
-	public function new(scene:h2d.Scene) {
-		super(scene);
-
-		final textPlayersOnline = new h2d.Text(hxd.res.DefaultFont.get(), this);
-		textPlayersOnline.setPosition(15, 15);
-		textPlayersOnline.text = 'COLLECTION CONTENT';
-		textPlayersOnline.setScale(2);
-	}
-}
-
-class FriendsContent extends h2d.Object {
-	public function new(scene:h2d.Scene) {
-		super(scene);
-
-		final textPlayersOnline = new h2d.Text(hxd.res.DefaultFont.get(), this);
-		textPlayersOnline.setPosition(15, 15);
-		textPlayersOnline.text = 'FRIENDS CONTENT';
-		textPlayersOnline.setScale(2);
-	}
-}
+import game.scene.home.PlayContent;
 
 enum HomeSceneContent {
 	HomePlayContent;
@@ -121,17 +17,10 @@ enum HomeSceneContent {
 }
 
 class HomeScene extends BasicScene {
-	private var selectSceneCallback:GameScene->Void;
-
 	private var homeSceneContent:HomeSceneContent;
-
-	// private final menuButtonSize:Int;
-	// private final menuButtonSizeHalf:Int;
-	// private final buttonBottomPosY:Float;
-
 	private var pageContent:BasicHomeContent;
 
-	public function new(selectSceneCallback:GameScene->Void) {
+	public function new() {
 		super(null, function callback(params:BasicSceneClickCallback) {
 			// if (params.eventKind == EventKind.EPush) {
 			// 	trace(params.clickY, buttonBottomPosY);
@@ -165,7 +54,7 @@ class HomeScene extends BasicScene {
 			// }
 		});
 
-		this.selectSceneCallback = selectSceneCallback;
+		// this.selectSceneCallback = selectSceneCallback;
 
 
 		setSceneContent(HomeSceneContent.HomePlayContent);
@@ -212,7 +101,7 @@ class HomeScene extends BasicScene {
 	}
 
 	// --------------------------------------
-	// General
+	// Common
 	// --------------------------------------
 
 	public function addBottomBarButton(targetButtonSize:Float, text:String) {
@@ -264,9 +153,4 @@ class HomeScene extends BasicScene {
 		}
 	}
 
-	private function selectScene(gameScene:GameScene) {
-		if (selectSceneCallback != null) {
-			selectSceneCallback(gameScene);
-		}
-	}
 }

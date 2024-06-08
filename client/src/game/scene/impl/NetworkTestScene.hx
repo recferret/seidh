@@ -1,7 +1,6 @@
 package game.scene.impl;
 
 import game.event.EventManager;
-import game.event.EventManager.EventListener;
 import game.network.Networking;
 import game.scene.base.BasicScene;
 import engine.seidh.SeidhGameEngine;
@@ -52,6 +51,7 @@ class SceneNetworkTest extends BasicScene implements EventListener {
 				processDeleteCharacterEntityEvent(message);
 			case EventManager.EVENT_CHARACTER_ACTIONS:
 				processCharacterActions(message);
+			default:
 		}
 	}
 

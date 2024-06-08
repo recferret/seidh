@@ -5,7 +5,6 @@ import game.entity.character.animation.CharacterAnimations;
 import engine.base.BaseTypesAndClasses;
 import engine.base.geometry.Point;
 import engine.base.entity.impl.EngineCharacterEntity;
-import haxe.Timer;
 import hxd.Math;
 
 class ClientCharacterEntity extends h2d.Object {
