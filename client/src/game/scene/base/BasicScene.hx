@@ -1,7 +1,6 @@
 package game.scene.base;
 
 import hxd.Event.EventKind;
-import game.terrain.TerrainManager;
 import h2d.Text;
 import h3d.Engine;
 import hxd.Key in K;
@@ -12,6 +11,7 @@ import game.event.EventManager;
 import game.js.NativeWindowJS;
 import game.network.Networking;
 import game.scene.GameUiScene.ButtonPressed;
+import game.terrain.TerrainManager;
 
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
@@ -59,9 +59,11 @@ abstract class BasicScene extends h2d.Scene {
 		// final mobile = NativeWindowJS.getMobile();
 		// if (mobile != null) {
 		// 	if (mobile != 'null' || mobile != 'undefined') {
-				isMobileDevice = true;
+		// 		isMobileDevice = true;
 		// 	}
 		// }
+
+		isMobileDevice = true;
 
 		if (baseEngine != null) {
 			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
@@ -172,9 +174,6 @@ abstract class BasicScene extends h2d.Scene {
 
 			this.baseEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
-					trace('YOU HAVE WON THE GAME !');
-
-					// TODO stop the game and show win dialog
 					EventManager.instance.notify(EventManager.EVENT_RETURN_HOME, {});
 				} else {
 					trace('Game Over!');
@@ -276,13 +275,6 @@ abstract class BasicScene extends h2d.Scene {
 
 	public function update(dt:Float, fps:Float) {
 		debugGraphics.clear();
-		// Utils.DrawLine(debugGraphics, new h2d.col.Point(), new h2d.col.Point(), GameConfig.RedColor);
-
-		// Utils.DrawRect(debugGraphics, new Rectangle(0, 0, 100, 100, 0), GameConfig.RedColor);
-		// Utils.DrawRect(debugGraphics, new Rectangle(400, 0, 100, 100, 0), GameConfig.RedColor);
-		// Utils.DrawRect(debugGraphics, new Rectangle(0, 300, 100, 100, 0), GameConfig.RedColor);
-		// Utils.DrawRect(debugGraphics, new Rectangle(800, 0, 100, 100, 0), GameConfig.RedColor);
-		// Utils.DrawRect(debugGraphics, new Rectangle(0, 600, 100, 100, 0), GameConfig.RedColor);
 
 		if (gameUiScene != null) {
 			gameUiScene.update();
@@ -291,10 +283,6 @@ abstract class BasicScene extends h2d.Scene {
 		updateDesktopInput();
 		customUpdate(dt, fps);
 
-		// for (projectile in clientProjectileEntities) {
-		// 	projectile.update(dt);
-		// }
-
 		for (character in clientCharacterEntities) {
 			character.update(dt);
 		}
@@ -302,20 +290,10 @@ abstract class BasicScene extends h2d.Scene {
 		if (playerEntity != null) {
 			camera.x = playerEntity.x + cameraOffsetX;
 			camera.y = playerEntity.y + cameraOffsetY;
-
-			// TODO smooth movement
-			// final line = playerEntity.getForwardLookingLine(80);	
-			// targetCursor.setPosition(line.p2.x, line.p2.y);
 		}
 	}
 
 	public override function render(e:Engine) {
-		// for (projectile in clientProjectileEntities) {
-		// 	if (GameConfig.DebugDraw) {
-		// 		projectile.debugDraw(debugGraphics);
-		// 	}
-		// }
-
 		for (character in clientCharacterEntities) {
 			if (GameConfig.DebugDraw) {
 				character.debugDraw(debugGraphics);
@@ -454,10 +432,5 @@ abstract class BasicScene extends h2d.Scene {
 		};
 		return sli;
 	}
-
-	// ----------------------------------
-	// Device
-	// ----------------------------------
-
 
 }

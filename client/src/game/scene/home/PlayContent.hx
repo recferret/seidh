@@ -265,8 +265,6 @@ class PlayContent extends BasicHomeContent {
         nextRagnarButtonInteractive.onClick = function(event : hxd.Event) {
             switchRagner('right');
         }
-
-
     }
 
     public function update(dt:Float) {

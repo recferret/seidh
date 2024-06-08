@@ -33,6 +33,7 @@ class GameScene extends BasicScene implements EventListener {
             }, 1000);
 		} else {
 			createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 2000, 2000, RAGNAR_LOH);
+			
 		}
 
 		// var wsConnectButton:h2d.Flow;
