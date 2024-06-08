@@ -11,6 +11,4 @@ COPY ./apps/ ./apps
 RUN npm i
 RUN npm install pm2 -g
 
-EXPOSE 3003
-
-CMD npm run start:ws:prod
+CMD npm run start:ws-gateway:prod

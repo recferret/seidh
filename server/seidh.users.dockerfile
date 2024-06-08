@@ -11,6 +11,4 @@ COPY ./apps/ ./apps
 RUN npm i
 RUN npm install pm2 -g
 
-EXPOSE 3006
-
 CMD npm run start:users:prod
