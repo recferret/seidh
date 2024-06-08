@@ -26,7 +26,7 @@ typedef BasicSceneClickCallback = {
 } 
 
 abstract class BasicScene extends h2d.Scene {
-	public final baseEngine:SeidhGameEngine;
+	public final seidhGameEngine:SeidhGameEngine;
 
 	public static var ActualScreenWidth = 0;
 	public static var ActualScreenHeight = 0;
@@ -53,7 +53,7 @@ abstract class BasicScene extends h2d.Scene {
 	
 	var inputsSent = 0;
 
-	public function new(baseEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneClickCallback->Void) {
+	public function new(seidhGameEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneClickCallback->Void) {
 		super();
 
 		// final mobile = NativeWindowJS.getMobile();
@@ -65,14 +65,14 @@ abstract class BasicScene extends h2d.Scene {
 
 		isMobileDevice = true;
 
-		if (baseEngine != null) {
+		if (seidhGameEngine != null) {
 			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
 
 			new TerrainManager(this);
 
-			this.baseEngine = baseEngine;
+			this.seidhGameEngine = seidhGameEngine;
 
-			this.baseEngine.createCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
+			this.seidhGameEngine.createCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
 				final character = new ClientCharacterEntity(this);
 				character.initiateEngineEntity(characterEntity);
 				clientCharacterEntities.set(character.getId(), character);
@@ -83,7 +83,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
+			this.seidhGameEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
 				final character = clientCharacterEntities.get(characterEntity.getId());
 				if (character != null) {
 					character.animation.setAnimationState(DEAD);
@@ -92,13 +92,13 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.createProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
+			this.seidhGameEngine.createProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
 				// final projectile = new ClientProjectileEntity(this);
 				// projectile.initiateEngineEntity(projectileEntity);
 				// clientProjectileEntities.set(projectileEntity.getId(), projectile);
 			};
 
-			this.baseEngine.deleteProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
+			this.seidhGameEngine.deleteProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
 				// final projectile = clientProjectileEntities.get(projectileEntity.getId());
 				// if (projectile != null) {
 				// 	clientProjectileEntities.remove(projectileEntity.getId());
@@ -106,8 +106,8 @@ abstract class BasicScene extends h2d.Scene {
 				// }
 			};
 
-			this.baseEngine.postLoopCallback = function callback() {
-				for (mainEntity in baseEngine.getCharacterEntitiesMap()) {
+			this.seidhGameEngine.postLoopCallback = function callback() {
+				for (mainEntity in seidhGameEngine.getCharacterEntitiesMap()) {
 					if (clientCharacterEntities.exists(mainEntity.getId())) {
 						final clientEntity = clientCharacterEntities.get(mainEntity.getId());
 						clientEntity.setTragetServerPosition(mainEntity.getX(), mainEntity.getY());
@@ -115,7 +115,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 
 				if (networking != null) {
-					for (input in baseEngine.validatedInputCommands) {
+					for (input in seidhGameEngine.validatedInputCommands) {
 						if (input.playerId == Player.instance.playerId) {
 							inputsSent++;
 							networking.input(input);
@@ -124,7 +124,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
+			this.seidhGameEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
 				for (value in params) {
 					// Play action initiator animation
 					final clientEntity = clientCharacterEntities.get(value.entityId);
@@ -172,7 +172,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
-			this.baseEngine.gameStateCallback = function callback(gameState:GameState) {
+			this.seidhGameEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
 					EventManager.instance.notify(EventManager.EVENT_RETURN_HOME, {});
 				} else {
@@ -232,7 +232,7 @@ abstract class BasicScene extends h2d.Scene {
 		final w = ActualScreenWidth = screenOrientation == 'portrait' ? 720 : Std.int(720 * ratio);
 		final h = ActualScreenHeight = screenOrientation == 'portrait' ? Std.int(720 * ratio) : 720;
 		
-		if (baseEngine != null) {
+		if (seidhGameEngine != null) {
 			if (isMobileDevice) {
 				if (gameUiScene == null) {
 					gameUiScene = new GameUiScene(
@@ -258,7 +258,7 @@ abstract class BasicScene extends h2d.Scene {
 		if (isMobileDevice) {
 			scaleMode = ScaleMode.Stretch(w, h);
 
-			if (baseEngine != null) {
+			if (seidhGameEngine != null) {
 				camera.setViewport(w / 2, h / 2, w, h);
 				camera.setScale(0.5, 0.5);
 			}
@@ -351,11 +351,11 @@ abstract class BasicScene extends h2d.Scene {
 		final playerEntityId = Player.instance.playerEntityId;
 
 		final allowInput = characterActionType == CharacterActionType.MOVE ? 
-			baseEngine.checkLocalMovementInputAllowance(playerEntityId) :
-			baseEngine.checkLocalActionInputAllowance(playerEntityId, characterActionType);
+		seidhGameEngine.checkLocalMovementInputAllowance(playerEntityId) :
+			seidhGameEngine.checkLocalActionInputAllowance(playerEntityId, characterActionType);
 
 		if (allowInput) {
-			baseEngine.addInputCommandClient(new PlayerInputCommand(characterActionType, moveAngle, playerId, Player.instance.incrementAndGetInputIndex()));
+			seidhGameEngine.addInputCommandClient(new PlayerInputCommand(characterActionType, moveAngle, playerId, Player.instance.incrementAndGetInputIndex()));
 		}
 	}
 
@@ -364,17 +364,13 @@ abstract class BasicScene extends h2d.Scene {
 	// ----------------------------------
 
 	public function createCharacterEntityFromMinimalStruct(id: String, ownerId: String, x:Int, y:Int, entityType:EntityType) {
-		baseEngine.createCharacterEntityFromMinimalStruct({
+		seidhGameEngine.createCharacterEntityFromMinimalStruct({
 			id: id, 
 			ownerId: ownerId, 
 			x: x, 
 			y: y, 
 			entityType: entityType
 		});
-	}
-
-	public function spawnMobs() {
-		baseEngine.allowMobsSpawn(true);
 	}
 
 	// ----------------------------------

@@ -2,17 +2,8 @@ package game.scene;
 
 import game.event.EventManager;
 import game.scene.base.BasicScene;
-import game.scene.impl.SpritesSceneTest.SceneSpritesTest;
-import game.scene.impl.InputSceneTest;
-import game.scene.impl.AiSceneTest;
 import game.scene.impl.HomeScene;
-import game.scene.impl.SceneGeomTest;
 import game.scene.impl.GameScene;
-
-// enum GameScene {
-// 	SceneHome;
-// 	SceneGame;
-// }
 
 class SceneManager implements EventListener {
 	private var sceneChangedCallback:BasicScene->Void;

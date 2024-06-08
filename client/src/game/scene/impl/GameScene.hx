@@ -33,7 +33,7 @@ class GameScene extends BasicScene implements EventListener {
             }, 1000);
 		} else {
 			createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 2000, 2000, RAGNAR_LOH);
-			
+			seidhGameEngine.allowMobsSpawn(true);
 		}
 
 		// var wsConnectButton:h2d.Flow;
@@ -92,31 +92,31 @@ class GameScene extends BasicScene implements EventListener {
 
 	private function processGameInitEvent(payload:GameInitPayload) {
 		for (characterStruct in payload.charactersFullStruct ) {
-			baseEngine.createCharacterEntityFromFullStruct(characterStruct);
+			seidhGameEngine.createCharacterEntityFromFullStruct(characterStruct);
 		}
-		baseEngine.setLocalPlayerId(Player.instance.playerId);
+		seidhGameEngine.setLocalPlayerId(Player.instance.playerId);
 	}
 
 	private function processLoopStateEvent(payload:LoopStatePayload) {
-		baseEngine.updateCharacterEntitiesByServer(payload.charactersMinStruct);
+		seidhGameEngine.updateCharacterEntitiesByServer(payload.charactersMinStruct);
 	}
 
 	private function processGameStateEvent(payload:GameStatePayload) {
-		baseEngine.setGameState(payload.gameState);
+		seidhGameEngine.setGameState(payload.gameState);
 	}
 
 	private function processCreateCharacterEntityEvent(payload:CreateCharacterPayload) {
-		baseEngine.createCharacterEntityFromFullStruct(payload.characterEntityFullStruct);
+		seidhGameEngine.createCharacterEntityFromFullStruct(payload.characterEntityFullStruct);
 	}
 
 	private function processDeleteCharacterEntityEvent(payload:DeleteCharacterPayload) {
-		baseEngine.deleteCharacterEntity(payload.characterId);
+		seidhGameEngine.deleteCharacterEntity(payload.characterId);
 	}
 
 	private function processCharacterActions(payload:ActionsPayload) {
 		for (action in payload.actions) {
 			if (action.entityId != Player.instance.playerEntityId) {
-				baseEngine.setCharacterNextActionToPerform(action.entityId, action.actionType);
+				seidhGameEngine.setCharacterNextActionToPerform(action.entityId, action.actionType);
 			}
 		}
 	}

@@ -31,7 +31,7 @@ class SeidhGameEngine extends BaseEngine {
     private final mobsMax = 10;
 
     // TODO change this value if backend
-    private final mobSpawnDelayMs = 0.500;
+    private final mobSpawnDelayMs = 3.500;
     
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
     public var gameStateCallback:GameState->Void;
