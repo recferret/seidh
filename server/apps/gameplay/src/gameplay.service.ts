@@ -11,7 +11,6 @@ import {
   GameplayLobbyUpdateGamesPattern 
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.update.games.msg';
 import { GameplayJoinGameMessage } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { GameType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { WsGatewayGameInitMessage, WsGatewayGameInitPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.init.msg';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
@@ -19,9 +18,8 @@ import { EventGameCreateCharacter } from './events/event.game.create-character';
 import { EventGameDeleteCharacter } from './events/event.game.delete-character';
 import { EventGameCreateProjectile } from './events/event.game.create-projectile';
 import { EventGameDeleteProjectile } from './events/event.game.delete-projectile';
-import { EventGameGameState } from './events/event.game.state';
+import { EventGameLoopState } from './events/event.game.loop-state';
 import { EventGameCharacterActions } from './events/event.game.character-actions';
-import { WsGatewayGameStateMessage, WsGatewayGameStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.state.msg';
 import { WsGatewayGameCharacterActionsMessage, WsGatewayGameCharacterActionsPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.character.actions.msg';
 import { WsGatewayGameCreateCharacterMessage, WsGatewayGameCreateCharacterPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.character.msg';
 import { WsGatewayGameCreateProjectileMessage, WsGatewayGameCreateProjectilePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.projectile.msg';
@@ -29,6 +27,9 @@ import { WsGatewayGameDeleteCharacterMessage, WsGatewayGameDeleteCharacterPatter
 import { WsGatewayGameDeleteProjectileMessage, WsGatewayGameDeleteProjectilePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.projectile.msg';
 import { GameplayInputMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
 import { GameplayDisconnectedMessage } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+import { EventGameGameState } from './events/event.game.game-state';
+import { WsGatewayGameLoopStateMessage, WsGatewayGameLoopStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.loop.state.msg';
+import { WsGatewayGameGameStateMessage, WsGatewayGameGameStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.game.state';
 
 @Injectable()
 export class GameplayService {
@@ -85,15 +86,13 @@ export class GameplayService {
 
   public joinGame(message: GameplayJoinGameMessage) {
     this.playerLastRequestTime.set(message.playerId, Date.now());
-    
-    // let gameInstance: GameInstance = undefined;
-
-    this.gameInstance.addPlayer(message.playerId);
-
     this.playerGameInstance.set(message.playerId, this.gameInstance.gameId);
     this.playersToInit.add(message.playerId);
+    this.gameInstance.addPlayer(message.playerId);
 
     GameplayService.ConnectedPlayers.add(message.playerId);
+
+    // let gameInstance: GameInstance = undefined;
 
     // if (message.gameId) {
     //   // TODO impl join game
@@ -148,8 +147,8 @@ export class GameplayService {
   // Server -> Client
   // ----------------------------------------------
 
-  @OnEvent(EventGameGameState.EventName)
-  handleEventGameGameState(payload: EventGameGameState) {
+  @OnEvent(EventGameLoopState.EventName)
+  handleEventGameLoopState(payload: EventGameLoopState) {
     // Notify new players about full game state
     if (payload.charactersFullStruct.length > 0) {
       this.playersToInit.forEach(playerId => {
@@ -165,11 +164,11 @@ export class GameplayService {
 
     // Notify all players about changed game state
     if (payload.charactersMinStruct.length > 0) {
-      const message: WsGatewayGameStateMessage = {
+      const message: WsGatewayGameLoopStateMessage = {
         gameId: payload.gameId,
         charactersMinStruct: payload.charactersMinStruct
       }
-      this.wsGatewayService.emit(WsGatewayGameStatePattern, message);
+      this.wsGatewayService.emit(WsGatewayGameLoopStatePattern, message);
     }
   }
 
@@ -215,6 +214,15 @@ export class GameplayService {
       actions: payload.actions
     }
     this.wsGatewayService.emit(WsGatewayGameCharacterActionsPattern, message);
+  }
+
+  @OnEvent(EventGameGameState.EventName)
+  handleEventGameGameState(payload: EventGameGameState) {
+    const message: WsGatewayGameGameStateMessage = {
+      gameId: payload.gameId,
+      gameState: payload.gameState
+    }
+    this.wsGatewayService.emit(WsGatewayGameGameStatePattern, message);
   }
 
   // ----------------------------------------------

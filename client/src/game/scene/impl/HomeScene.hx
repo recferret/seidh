@@ -3,7 +3,6 @@ package game.scene.impl;
 import h2d.Tile;
 import h2d.Bitmap;
 import hxd.Event.EventKind;
-import game.scene.SceneManager.GameScene;
 import game.scene.base.BasicScene;
 import game.scene.home.BasicHomeContent;
 import game.scene.home.PlayContent;

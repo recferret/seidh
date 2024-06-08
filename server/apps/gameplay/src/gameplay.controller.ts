@@ -46,6 +46,7 @@ export class GameplayController {
   @UseGuards(InstanceIdGuard)
   @MessagePattern(GameplayJoinGamePattern)
   joinGame(message: GameplayJoinGameMessage) {
+    Logger.log('joinGame', message);
     this.gameplayService.joinGame(message);
   }
 }

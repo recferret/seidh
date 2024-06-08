@@ -22,6 +22,7 @@ export enum WsProtocolMessage {
   CreateProjectile = 'CreateProjectile',
   DeleteProjectile = 'DeleteProjectile',
   CharacterActions = 'CharacterActions',
+  LoopState = 'LoopState',
   GameState = 'GameState',
 }
 

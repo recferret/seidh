@@ -13,15 +13,10 @@ export enum CharacterActionType {
 }
 
 export enum EntityType {
-	KNIGHT = 1,
-	SAMURAI = 2,
-	MAGE = 3,
-	SKELETON_WARRIOR = 4,
-	SKELETON_ARCHER = 5,
-	PROJECTILE_MAGIC_ARROW = 6,
-	PROJECTILE_MAGIC_SPHERE = 7,
-
-	RAGNAR = 8,
+	RAGNAR_LOH = 1,
+	RAGNAR_NORM = 2,
+	ZOMBIE_BOY = 3,
+	ZOMBIE_GIRL = 4,
 }
 
 export interface EntityShape {
@@ -123,4 +118,9 @@ export interface PlayerInputCommand {
 	actionType: CharacterActionType;
 	movAngle: number;
 	playerId: string;
+}
+
+export enum GameState {
+	PLAYING = 1,
+	WIN = 2,
 }

@@ -1,5 +1,6 @@
 package engine.base.entity.base;
 
+import engine.base.BaseTypesAndClasses.EntityType;
 import js.lib.Map;
 
 class EngineBaseEntityManager {
@@ -16,6 +17,16 @@ class EngineBaseEntityManager {
 		final result = new Array<EngineBaseEntity>();
 		entities.forEach((value, key, map) -> {
 			if (value.isChanged()) {
+				result.push(value);
+			}
+		});
+		return result;
+	}
+
+	public function getEntitiesByEntityType(entityType:EntityType) {
+		final result = new Array<EngineBaseEntity>();
+		entities.forEach((value, key, map) -> {
+			if (value.getEntityType() == entityType) {
 				result.push(value);
 			}
 		});

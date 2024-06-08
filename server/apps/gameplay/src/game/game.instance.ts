@@ -8,21 +8,21 @@ import {
     PlayerInputCommand,
     CreateCharacterMinStruct,
     EntityType,
-    CharacterEntityFullStruct, 
+    CharacterEntityFullStruct,
+    GameState, 
 } from "@app/seidh-common/seidh-common.game-types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { EventGameGameState } from "../events/event.game.state";
 import { EventGameCharacterActions } from "../events/event.game.character-actions";
 import { EventGameCreateCharacter } from "../events/event.game.create-character";
 import { EventGameCreateProjectile } from "../events/event.game.create-projectile";
 import { EventGameDeleteCharacter } from "../events/event.game.delete-character";
 import { EventGameDeleteProjectile } from "../events/event.game.delete-projectile";
-import { Logger } from "@nestjs/common";
+import { EventGameLoopState } from "../events/event.game.loop-state";
+import { EventGameGameState } from "../events/event.game.game-state";
 
 export class GameInstance {
 
     private readonly engine: Engine.SeidhGameEngine;
-    private dummyCounter = 1;
 
     constructor(private eventEmitter: EventEmitter2, public gameId: string, public gameType: GameType) {
         this.engine = new Engine.engine.seidh.SeidhGameEngine();
@@ -36,6 +36,11 @@ export class GameInstance {
                 EventGameCreateCharacter.EventName, 
                 new EventGameCreateCharacter(gameId, characterEntity.getEntityFullStruct())
             );
+
+            // Stop mobs from spwawning if there is no more players
+            if (this.engine.getPlayersCount() > 0)  {
+                this.engine.allowMobsSpawn(true);
+            }
         };
 
         this.engine.deleteCharacterCallback = (characterEntity: EngineCharacterEntity) => {
@@ -43,6 +48,12 @@ export class GameInstance {
                 EventGameDeleteCharacter.EventName,
                 new EventGameDeleteCharacter(gameId, characterEntity.getEntityMinStruct().id)
             );
+
+            // Stop mobs from spwawning if there is no more players
+            if (this.engine.getPlayersCount() == 0)  {
+                this.engine.allowMobsSpawn(false);
+                this.engine.cleanAllMobs();
+            }
         };
 
         this.engine.createProjectileCallback = (projectileEntity: EngineProjectileEntity) => {
@@ -66,8 +77,8 @@ export class GameInstance {
 
             if (charactersMinStruct.length > 0 || charactersFullStruct.length > 0) {
                 this.eventEmitter.emit(
-                    EventGameGameState.EventName, 
-                    new EventGameGameState(
+                    EventGameLoopState.EventName, 
+                    new EventGameLoopState(
                         gameId,
                         charactersMinStruct,
                         charactersFullStruct
@@ -77,12 +88,21 @@ export class GameInstance {
         };
 
         this.engine.characterActionCallbacks = (actions: CharacterActionCallbackParams[]) => {
-            Logger.log('characterActionCallbacks', 'GameInstance');
             this.eventEmitter.emit(
                 EventGameCharacterActions.EventName, 
                 new EventGameCharacterActions(
                     gameId,
                     actions
+                )
+            );
+        };
+
+        this.engine.gameStateCallback = (gameState: GameState) => {
+            this.eventEmitter.emit(
+                EventGameGameState.EventName, 
+                new EventGameGameState(
+                    gameId,
+                    gameState
                 )
             );
         };
@@ -100,9 +120,9 @@ export class GameInstance {
         const struct: CreateCharacterMinStruct = {
             id: 'entity_' + playerId,
             ownerId: playerId,
-            x: 200 * this.dummyCounter++,
-            y: 200,
-            entityType: EntityType.RAGNAR,
+            x: 2000,
+            y: 2000,
+            entityType: EntityType.RAGNAR_LOH,
         };
         this.engine.createCharacterEntityFromMinimalStruct(struct);
     }

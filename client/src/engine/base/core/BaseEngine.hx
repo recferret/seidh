@@ -188,7 +188,9 @@ abstract class BaseEngine {
 	function processCreateCharacterQueue() {
 		for (queueTask in createCharacterEntityQueue) {
 			characterEntityManager.add(queueTask.entity);
-			playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
+			if (queueTask.entity.getEntityType() == RAGNAR_LOH || queueTask.entity.getEntityType() == RAGNAR_NORM) {
+				playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
+			}
 			if (createCharacterCallback != null) {
 				createCharacterCallback(queueTask.entity);
 			}

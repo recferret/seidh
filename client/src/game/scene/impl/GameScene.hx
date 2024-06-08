@@ -1,16 +1,39 @@
 package game.scene.impl;
 
+import haxe.Timer;
+
+import engine.seidh.SeidhGameEngine;
+
 import game.event.EventManager;
 import game.event.EventManager.EventListener;
 import game.network.Networking;
 import game.scene.base.BasicScene;
-import engine.seidh.SeidhGameEngine;
+
+enum abstract GameMode(Int) {
+	var SINGLEPLAYER = 1;
+	var MULTIPLAYER = 2;
+}
 
 class GameScene extends BasicScene implements EventListener {
 
-    public function new() {
-		// super(new SeidhGameEngine());
-		super(null);
+    public function new(gameMode:GameMode) {
+		super(new SeidhGameEngine());
+
+		if (gameMode == GameMode.MULTIPLAYER) {
+			EventManager.instance.subscribe(EventManager.EVENT_GAME_INIT, this);
+			EventManager.instance.subscribe(EventManager.EVENT_LOOP_STATE, this);
+			EventManager.instance.subscribe(EventManager.EVENT_GAME_STATE, this);
+			EventManager.instance.subscribe(EventManager.EVENT_CREATE_CHARACTER, this);
+			EventManager.instance.subscribe(EventManager.EVENT_DELETE_CHARACTER, this);
+			EventManager.instance.subscribe(EventManager.EVENT_CHARACTER_ACTIONS, this);
+
+			initNetwork();
+			Timer.delay(function callback() {
+                networking.findAndJoinGame();
+            }, 1000);
+		} else {
+			createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 2000, 2000, RAGNAR_LOH);
+		}
 
 		// var wsConnectButton:h2d.Flow;
 		// var wsConnectButton:h2d.Flow; 
@@ -27,14 +50,6 @@ class GameScene extends BasicScene implements EventListener {
         //     networking.findAndJoinGame();
 		// 	fui.removeChild(button);
         // });
-
-		// EventManager.instance.subscribe(EventManager.EVENT_GAME_INIT, this);
-		// EventManager.instance.subscribe(EventManager.EVENT_GAME_STATE, this);
-		// EventManager.instance.subscribe(EventManager.EVENT_CREATE_CHARACTER, this);
-		// EventManager.instance.subscribe(EventManager.EVENT_DELETE_CHARACTER, this);
-		// EventManager.instance.subscribe(EventManager.EVENT_CHARACTER_ACTIONS, this);
-
-		// initNetwork();
     }
 
     // --------------------------------------
@@ -81,8 +96,12 @@ class GameScene extends BasicScene implements EventListener {
 		baseEngine.setLocalPlayerId(Player.instance.playerId);
 	}
 
-	private function processGameStateEvent(payload:GameStatePayload) {
+	private function processLoopStateEvent(payload:LoopStatePayload) {
 		baseEngine.updateCharacterEntitiesByServer(payload.charactersMinStruct);
+	}
+
+	private function processGameStateEvent(payload:GameStatePayload) {
+		baseEngine.setGameState(payload.gameState);
 	}
 
 	private function processCreateCharacterEntityEvent(payload:CreateCharacterPayload) {

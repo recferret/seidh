@@ -1,16 +1,14 @@
 package engine.seidh;
 
-import engine.base.MathUtils;
-import engine.base.geometry.Point;
-import haxe.Timer;
-import engine.base.EngineConfig;
 import js.lib.Date;
 
 import engine.base.BaseTypesAndClasses;
+import engine.base.EngineConfig;
+import engine.base.MathUtils;
 import engine.base.entity.base.EngineBaseEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
-import engine.base.core.BaseEngine;
 import engine.base.entity.impl.EngineCharacterEntity;
+import engine.base.core.BaseEngine;
 import engine.seidh.entity.base.SeidhBaseEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
@@ -26,11 +24,13 @@ class SeidhGameEngine extends BaseEngine {
     private var framesPassed = 0;
     private var timePassed = 0.0;
     
+    private var allowSpawnMobs = false;
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
-    private final mobsMax = 1;
-    private final mobSpawnDelayMs = 250;
-
+    private var mobsLastSpawnTime = 0.0;
+    private final mobsMax = 10;
+    private final mobSpawnDelayMs = 3;
+    
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
     public var gameStateCallback:GameState->Void;
 
@@ -38,6 +38,13 @@ class SeidhGameEngine extends BaseEngine {
 
     public function new(engineMode = EngineMode.Server) {
 	    super(engineMode);
+    }
+
+    public function setGameState(gameState:GameState) {
+        this.gameState = gameState;
+        if (gameStateCallback != null) {
+            gameStateCallback(gameState);
+        }
     }
 
     public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
@@ -209,6 +216,7 @@ class SeidhGameEngine extends BaseEngine {
             // TODO add callback if all players are dead
 
             recentEngineLoopTime = Date.now() - beginTime;
+            spawnMobs();
         }
     }
 
@@ -221,9 +229,23 @@ class SeidhGameEngine extends BaseEngine {
     // Custom logic
     // ---------------------------------------------------
 
+    public function allowMobsSpawn(allowSpawnMobs:Bool) {
+        this.allowSpawnMobs = allowSpawnMobs;
+    }
+
     public function spawnMobs() {
-        if (mobsSpawned < mobsMax) {
+        final now = haxe.Timer.stamp();
+
+        if (allowSpawnMobs && mobsSpawned < mobsMax && (mobsLastSpawnTime == 0 || mobsLastSpawnTime + mobSpawnDelayMs < now)) {
             mobsSpawned++;
+            mobsLastSpawnTime = now;
+
+            // if (lastLocalMovementInputCheck == 0 || lastLocalMovementInputCheck + characterEntity.movement.movementDelay < now) {
+            //     lastLocalMovementInputCheck = now;
+            //     return true;
+            // } else {
+            //     return false;
+            // }
 
             // final positionX = MathUtils.randomIntInRange(0, 5000);
             // final positionY = MathUtils.randomIntInRange(0, 5000);
@@ -232,10 +254,26 @@ class SeidhGameEngine extends BaseEngine {
             final positionY = 1000;
 
             createCharacterEntity(SeidhEntityFactory.InitiateEntity(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
-            Timer.delay(function callback() {
-                spawnMobs();
-            }, mobSpawnDelayMs);
+            // Timer.delay(function callback() {
+            //     spawnMobs();
+            // }, mobSpawnDelayMs);
         }
+    }
+
+    public function cleanAllMobs() {
+        mobsSpawned = 0;
+        for (entity in characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY)) {
+            characterEntityManager.delete(entity.getId());
+        };
+        for (entity in characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL)) {
+            characterEntityManager.delete(entity.getId());
+        };
+    }
+
+    public function getPlayersCount() {
+        return 
+            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
+            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
     }
 
     private function createProjectileByCharacter(character:EngineCharacterEntity) {

@@ -56,12 +56,12 @@ abstract class BasicScene extends h2d.Scene {
 	public function new(baseEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneClickCallback->Void) {
 		super();
 
-		final mobile = NativeWindowJS.getMobile();
-		if (mobile != null) {
-			if (mobile != 'null' || mobile != 'undefined') {
+		// final mobile = NativeWindowJS.getMobile();
+		// if (mobile != null) {
+		// 	if (mobile != 'null' || mobile != 'undefined') {
 				isMobileDevice = true;
-			}
-		}
+		// 	}
+		// }
 
 		if (baseEngine != null) {
 			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
@@ -396,7 +396,7 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public function spawnMobs() {
-		baseEngine.spawnMobs();
+		baseEngine.allowMobsSpawn(true);
 	}
 
 	// ----------------------------------

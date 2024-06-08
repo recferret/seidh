@@ -1,5 +1,6 @@
 package game.network;
 
+import engine.seidh.SeidhGameEngine.GameState;
 import engine.base.BaseTypesAndClasses;
 import game.event.EventManager;
 import game.js.NativeWindowJS;
@@ -17,8 +18,12 @@ typedef DeleteCharacterPayload = {
 	characterId:String,
 }
 
-typedef GameStatePayload = {
+typedef LoopStatePayload = {
 	charactersMinStruct:Array<CharacterEntityMinStruct>,
+}
+
+typedef GameStatePayload = {
+	gameState:GameState,
 }
 
 typedef ActionsPayload = {
@@ -48,6 +53,8 @@ class Networking {
         switch (type) {
             case 'GameInit':
                 EventManager.instance.notify(EventManager.EVENT_GAME_INIT, data);
+            case 'LoopState':
+                EventManager.instance.notify(EventManager.EVENT_LOOP_STATE, data);
             case 'GameState':
                 EventManager.instance.notify(EventManager.EVENT_GAME_STATE, data);
             case 'CreateCharacter':

@@ -2,17 +2,17 @@ package game.scene;
 
 import game.event.EventManager;
 import game.scene.base.BasicScene;
-import game.scene.impl.NetworkTestScene.SceneNetworkTest;
 import game.scene.impl.SpritesSceneTest.SceneSpritesTest;
 import game.scene.impl.InputSceneTest;
 import game.scene.impl.AiSceneTest;
 import game.scene.impl.HomeScene;
 import game.scene.impl.SceneGeomTest;
+import game.scene.impl.GameScene;
 
-enum GameScene {
-	SceneHome;
-	SceneGame;
-}
+// enum GameScene {
+// 	SceneHome;
+// 	SceneGame;
+// }
 
 class SceneManager implements EventListener {
 	private var sceneChangedCallback:BasicScene->Void;
@@ -23,6 +23,8 @@ class SceneManager implements EventListener {
 
 		EventManager.instance.subscribe(EventManager.EVENT_HOME_PLAY, this);
 		EventManager.instance.subscribe(EventManager.EVENT_RETURN_HOME, this);
+
+		// currentScene = new GameScene(GameMode.SINGLEPLAYER);
 
 		currentScene = new HomeScene();
 		// currentScene = new SceneAiTest();
@@ -43,7 +45,7 @@ class SceneManager implements EventListener {
 	public function notify(event:String, message:Dynamic) {
 		switch (event) {
 			case EventManager.EVENT_HOME_PLAY:
-				currentScene = new SceneInputTest();
+				currentScene = new GameScene(GameMode.MULTIPLAYER);
 				changeSceneCallback();
 			case EventManager.EVENT_RETURN_HOME:
 				currentScene = new HomeScene();
