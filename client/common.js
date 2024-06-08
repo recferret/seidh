@@ -60,8 +60,6 @@ function debugAlert(text) {
     alert(text);
 }
 
-alertScreenParams();
-
 function getScreenParams() {
     const screenWidth = window.screen.width;
     const screenHeight = window.screen.height;

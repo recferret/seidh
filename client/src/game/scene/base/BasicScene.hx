@@ -89,6 +89,7 @@ abstract class BasicScene extends h2d.Scene {
 				final character = clientCharacterEntities.get(characterEntity.getId());
 				if (character != null) {
 					character.animation.setAnimationState(DEAD);
+					removeChild(character);
 					clientCharacterEntities.remove(characterEntity.getId());
 				}
 			};
@@ -227,8 +228,10 @@ abstract class BasicScene extends h2d.Scene {
 	public function onResize() {
 		final jsScreenParams = NativeWindowJS.getScreenParams();
 		final screenOrientation = jsScreenParams.orientation;
-		final ratio = jsScreenParams.pageHeight / jsScreenParams.pageWidth;
-		final w = ActualScreenWidth = screenOrientation == 'portrait' ? 720 : 1280;
+		final ratio = screenOrientation == 'portrait' ? 
+			jsScreenParams.pageHeight / jsScreenParams.pageWidth : 
+			jsScreenParams.pageWidth / jsScreenParams.pageHeight;
+		final w = ActualScreenWidth = screenOrientation == 'portrait' ? 720 : Std.int(720 * ratio);
 		final h = ActualScreenHeight = screenOrientation == 'portrait' ? Std.int(720 * ratio) : 720;
 		
 		if (baseEngine != null) {
@@ -256,10 +259,11 @@ abstract class BasicScene extends h2d.Scene {
 
 		if (isMobileDevice) {
 			scaleMode = ScaleMode.Stretch(w, h);
-			camera.setViewport(w / 2, h / 2, w, h);
 
-			// cameraOffsetX = -Std.int(w / 2);
-			// cameraOffsetY = 700;//Std.int(h);
+			if (baseEngine != null) {
+				camera.setViewport(w / 2, h / 2, w, h);
+				camera.setScale(0.5, 0.5);
+			}
 		} else {
 			scaleMode = ScaleMode.LetterBox(w, h, true);
 			// camera.scale(0.5, 0.5);

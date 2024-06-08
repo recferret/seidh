@@ -1,10 +1,15 @@
 package game.scene.impl;
 
+import h3d.Vector;
+import hxsl.Types.Vec;
 import game.terrain.TerrainManager;
 import h2d.filter.Outline;
 import h2d.filter.Glow;
 import h2d.filter.DropShadow;
+import h2d.filter.Mask;
 import game.scene.base.BasicScene;
+
+
 
 class SceneSpritesTest extends BasicScene {
 

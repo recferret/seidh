@@ -11,7 +11,6 @@ class BarGold extends h2d.Object {
 
         barBmp = new h2d.Bitmap(hxd.Res.ui.bar_gold.toTile(), this);
 
-
         final font : h2d.Font = DefaultFont.get();
         final tf = new h2d.Text(font);
         tf.text = "1234";

@@ -373,7 +373,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			return shape.toRect(
 				getBodyRectangle().getTopLeftPoint().x,
 				getBodyRectangle().getTopLeftPoint().y - (baseEntity.entityShape.height / 4),
-				baseEntity.rotation, 
+				0, 
 				characterEntity.side
 			);
 		} else if (actionToPerform.projectileStruct != null) {
@@ -381,7 +381,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			return shape.toRect(
 				baseEntity.x, 
 				baseEntity.y, 
-				baseEntity.rotation, 
+				0, 
 				characterEntity.side
 			);
 		} else {
