@@ -9,6 +9,5 @@ COPY ./libs/ ./libs
 COPY ./apps/ ./apps
 
 RUN npm i
-RUN npm install pm2 -g
 
 CMD npm run start:gameplay:prod

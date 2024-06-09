@@ -17,6 +17,12 @@ services:
     ports:
       - "3004:3004"
 
+  users:
+    build:
+        context: .
+        dockerfile: seidh.users.dockerfile
+    networks: ["nats"]   
+
   gameplay:
     build:
       context: .
