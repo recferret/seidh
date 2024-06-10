@@ -25,7 +25,7 @@ export enum ServiceName {
     Users = 'UsersService',
 }
 
-// const NatsUrl = 'nats://0.0.0.0:4222';
-const NatsUrl = 'nats://nats:4222';
+const NatsUrl = 'nats://0.0.0.0:4222';
+// const NatsUrl = 'nats://nats:4222';
 
 export default NatsUrl;

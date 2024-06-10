@@ -65,61 +65,6 @@
     <script type="text/javascript" src="game.js"></script>
 
     <script>
-        // const canvas = document.getElementById('webgl');
-        // const ctx = canvas.getContext("2d");
-
-        // const innerWidth = window.innerWidth; //* window.devicePixelRatio;
-        // const innerHeight = window.innerHeight; // * window.devicePixelRatio;
-        // const width = window.screen.width;
-        // const height = window.screen.height;
-
-        // canvas.width = innerWidth;
-        // canvas.height = innerHeight;
-
-        // alert('calculated width: ' + (canvas.height * (canvas.clientWidth / canvas.clientHeight)));
-
-        // canvas.width = canvas.height * (canvas.clientWidth / canvas.clientHeight);
-
-        // canvas.width = canvas.clientWidth * window.devicePixelRatio;
-        // canvas.height = canvas.clientHeight * window.devicePixelRatio;
-
-        // alert(`innerWidth: ${innerWidth}, width: ${width}, innerHeight :${innerHeight}, height: ${height}, canvas.clientWidth: ${canvas.clientWidth}, canvas.clientHeight: ${canvas.clientHeight}`);
-
-        // ctx.scale(innerWidth / width, innerHeight / height);
-
-        // const DPR = window.devicePixelRatio;
-
-        // const windowInnerWidth = window.innerWidth;
-        // const windowInnerHeight = window.innerHeight;
-        // const screenWidth = window.screen.width;
-        // const screenHeight = window.screen.height;
-		// const widthDPR = screenWidth * DPR;
-		// const heightDPR = screenHeight * DPR;
-
-		// const magicalyCalculatedWidth = windowInnerWidth;
-		// const magicalyCalculatedHeight = windowInnerWidth * (heightDPR / widthDPR);
-
-        // canvas.width = magicalyCalculatedWidth;//widthDPR;
-        // canvas.height = magicalyCalculatedHeight;//heightDPR;
-
-        // var ctx = c.getContext('2d');
-        // ctx.fillStyle   = '#00FF00';
-        // ctx.fillRect(25, 25, 100, 100);
-
-        // ctx.lineWidth   = 1;
-        // ctx.strokeStyle = '#f00';
-
-        // ctx.fillRect(  10.5, 10.5, 20, 20 );
-        // ctx.strokeRect( 10.5, 10.5, 20, 20 );
-        // ctx.fillRect(   40, 10.5, 20, 20 );
-        // ctx.strokeRect( 40, 10.5, 20, 20 );
-        // ctx.fillRect(   70, 10, 20, 20 );
-        // ctx.strokeRect( 70, 10, 20, 20 );
-
-        // ctx.strokeStyle = '#fff';
-        // ctx.strokeRect( 10.5, 10.5, 20, 20 );
-        // ctx.strokeRect( 40, 10.5, 20, 20 );
-        // ctx.strokeRect( 70, 10, 20, 20 );
 
         async function init() {
             // var ratio = window.devicePixelRatio || 1;
@@ -131,30 +76,50 @@
             // Telegram.WebApp.showAlert(urlParams);
 
             // const tg = Telegram.WebApp;
-            // tg.expand();
+            // alert(tg.initData);
 
             // Telegram.WebApp.MainButton.setParams({
             //     text: 'Main Button'
             // });
             // Telegram.WebApp.MainButton.onClick(function () {
             //     // Telegram.WebApp.showAlert(Telegram.WebApp.initData);
-            //     fetch('https://seidh-game.online/validateTelegramInitData', {
-            //         method: 'POST',
-            //         headers: {
-            //         'Content-Type': 'application/json;charset=utf-8'
-            //         },
-            //         body: JSON.stringify({
-            //             initData: 'FFFF'
-            //         })
-            //     }).then((r) => {
-            //         Telegram.WebApp.showAlert(r);
-            //     }).catch((e) => {
-            //         Telegram.WebApp.showAlert(e);
-            //     });
+            //     // fetch('https://seidh-game.online/validateTelegramInitData', {
+            //     //     method: 'POST',
+            //     //     headers: {
+            //     //     'Content-Type': 'application/json;charset=utf-8'
+            //     //     },
+            //     //     body: JSON.stringify({
+            //     //         initData: 'FFFF'
+            //     //     })
+            //     // }).then((r) => {
+            //     //     Telegram.WebApp.showAlert(r);
+            //     // }).catch((e) => {
+            //     //     Telegram.WebApp.showAlert(e);
+            //     // });
+            //     Telegram.WebApp.showAlert('zaebal');
+
+            //     Telegram.WebApp.showAlert(tg.initData);
+
             // });	
             // Telegram.WebApp.MainButton.show();
-            // const tg = window.Telegram.WebApp;
-            // await tg.ready();
+
+            // try {
+                // const tg = window.Telegram.WebApp;
+                // await tg.ready();
+
+
+
+            //     const tgInitData = tg.initData;
+                
+            //     if (tgInitData == null || tgInitData == undefined || tgInitData.length == 0) {
+
+            //     }
+
+            //     console.log(tg.initData);
+            // } catch (error) {
+            //     console.error(error);
+            // }
+
             // alert(window.Telegram.WebApp.tgWebAppPlatform);
             // let tg = window.Telegram.WebApp; //получаем объект webapp телеграма 
             // tg.expand(); 

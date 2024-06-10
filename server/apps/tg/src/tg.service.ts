@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Telegraf, Markup  } from 'telegraf';
 import { message } from 'telegraf/filters'
-import { link } from 'telegraf/format';
 
 @Injectable()
 export class TgService {
@@ -23,8 +22,9 @@ export class TgService {
       ctx.reply(
         'Добро пожаловать! Нажмите на кнопку ниже, чтобы запустить приложение',
         Markup.keyboard([
-          Markup.button.webApp('Play Seidh', 'https://seidh-game.online'),
-          // Markup.button.webApp('Play Seidh', 'https://192.168.1.6:8080'),
+          // Markup.button.webApp('Play Seidh', 'https://seidh-game.online'),
+          Markup.button.webApp('Play Seidh', 'https://192.168.1.6:8080'),
+          // Markup.button.webApp('Play Seidh', 'https://localhost:8080'),
         ])
       )
     });

@@ -1,6 +1,8 @@
 package game.scene;
 
 import game.event.EventManager;
+import game.js.NativeWindowJS;
+import game.scene.impl.LoadingScene;
 import game.scene.base.BasicScene;
 import game.scene.impl.HomeScene;
 import game.scene.impl.GameScene;
@@ -13,7 +15,8 @@ class SceneManager implements EventListener {
 		this.sceneChangedCallback = sceneChangedCallback;
 
 		EventManager.instance.subscribe(EventManager.EVENT_HOME_PLAY, this);
-		EventManager.instance.subscribe(EventManager.EVENT_RETURN_HOME, this);
+		EventManager.instance.subscribe(EventManager.EVENT_HOME_SCENE, this);
+		EventManager.instance.subscribe(EventManager.EVENT_REF_SHARE, this);
 
 		// currentScene = new GameScene(GameMode.SINGLEPLAYER);
 
@@ -24,6 +27,8 @@ class SceneManager implements EventListener {
 		// currentScene = new SceneGeomTest();
 		// currentScene = new SceneNetworkTest();
 		// currentScene = new SceneUiTest();
+
+		// currentScene = new LoadingScene();
 		// currentScene.start();
 
 		changeSceneCallback();
@@ -37,11 +42,13 @@ class SceneManager implements EventListener {
 		switch (event) {
 			case EventManager.EVENT_HOME_PLAY:
 				currentScene = new GameScene(GameMode.SINGLEPLAYER);
-				// currentScene = new GameScene(GameMode.SINGLEPLAYER);
+				// currentScene = new GameScene(GameMode.MULTIPLAYER);
 				changeSceneCallback();
-			case EventManager.EVENT_RETURN_HOME:
+			case EventManager.EVENT_HOME_SCENE:
 				currentScene = new HomeScene();
 				changeSceneCallback();
+			case EventManager.EVENT_REF_SHARE:
+				NativeWindowJS.tgShareMyRefLink(Player.instance.userId);
 			default:
 		}
 	}

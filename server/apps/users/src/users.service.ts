@@ -5,7 +5,7 @@ import {
 } from '@app/seidh-common/dto/users/users.authenticate.msg';
 import { Character, CharacterType } from '@app/seidh-common/schemas/schema.character';
 import { User } from '@app/seidh-common/schemas/schema.user';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,6 +16,12 @@ const crypto = require('crypto');
 export class UsersService implements OnModuleInit {
 
   private readonly botKey = '7109468529:AAHvO4toPIdlBVgEJkDc8Yjozx1uXsM4QV8';
+
+
+  private readonly referrerPremiumRewardTokens = 1000;
+  private readonly referrerNoPremiumRewardTokens = 200;
+  private readonly referralPremiumRewardTokens = 200;
+  private readonly referralNoPremiumRewardTokens = 50;
 
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
@@ -66,6 +72,7 @@ export class UsersService implements OnModuleInit {
       const existingUser = await this.userModel.findOne({telegramId: telegramParseResult.userInfo.id}).populate(['characters']);
 
       if (existingUser) {
+        response.userId = existingUser.id;
         response.kills = existingUser.kills;
         response.tokens = existingUser.virtualTokenBalance;
         response.characters = existingUser.characters.map(dbCharacterToStruct);
@@ -75,7 +82,7 @@ export class UsersService implements OnModuleInit {
         });
       } else {
         const newCharacter = await this.characterModel.create({
-          type: CharacterType.Ragnar,
+          type: CharacterType.RagnarLoh,
           movement: {
             runSpeed: 20,
             walkSpeed: 10,
@@ -85,13 +92,32 @@ export class UsersService implements OnModuleInit {
           }
         });
 
+        let virtualTokenBalance = 0;
+
+        if (message.startParam) {
+          Logger.log('Have some start param');
+          const referrer = await this.userModel.findOne({ id: message.startParam });
+
+          // Referrer exists and referrer is not the same user.
+          if (referrer && referrer.telegramId != telegramParseResult.userInfo.id) {
+            // Give some bonus to the referrer
+            referrer.virtualTokenBalance += telegramParseResult.userInfo.telegramPremium ? 
+              this.referrerPremiumRewardTokens : this.referrerNoPremiumRewardTokens;
+            // Give some bonus to the referral
+            virtualTokenBalance = telegramParseResult.userInfo.telegramPremium ? 
+              this.referralPremiumRewardTokens : this.referralNoPremiumRewardTokens;
+          }
+        }
+
         const newUser = await this.userModel.create({
           telegramId: telegramParseResult.userInfo.id,
           telegramName: telegramParseResult.userInfo.username,
           telegramPremium: telegramParseResult.userInfo.is_premium,
+          virtualTokenBalance,
           characters: [newCharacter],
         });
 
+        response.userId = newUser.id;
         response.kills = newUser.kills;
         response.tokens = newUser.virtualTokenBalance;
         response.characters = newUser.characters.map(dbCharacterToStruct);
@@ -109,9 +135,11 @@ export class UsersService implements OnModuleInit {
 
   }
 
-
   private parseTelegramInitData(telegramInitData: string) {
     const encoded = decodeURIComponent(telegramInitData);
+
+    Logger.log('encoded', encoded);
+
     const secret = crypto.createHmac('sha256', 'WebAppData').update(this.botKey);
     const arr = encoded.split("&");
     const hashIndex = arr.findIndex((str) => str.startsWith("hash="));

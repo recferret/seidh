@@ -1,5 +1,6 @@
 package game.scene.base;
 
+import game.ui.dialog.Dialog;
 import hxd.Event.EventKind;
 import h2d.Text;
 import h3d.Engine;
@@ -66,6 +67,8 @@ abstract class BasicScene extends h2d.Scene {
 		isMobileDevice = true;
 
 		if (seidhGameEngine != null) {
+
+
 			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
 
 			new TerrainManager(this);
@@ -174,7 +177,7 @@ abstract class BasicScene extends h2d.Scene {
 
 			this.seidhGameEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
-					EventManager.instance.notify(EventManager.EVENT_RETURN_HOME, {});
+					gameUiScene.showWinDialog();
 				} else {
 					trace('Game Over!');
 				}
@@ -190,7 +193,7 @@ abstract class BasicScene extends h2d.Scene {
 		fui.padding = 10;
 
 		function onEvent(event:hxd.Event) {
-			if (gameUiScene != null) {
+			if (gameUiScene != null && this.seidhGameEngine.getGameState() == GameState.PLAYING) {
 				if (event.kind == EMove) {
 					gameUiScene.updateCursorPosition(event.relX, event.relY);
 				} else if (event.kind == ERelease) {

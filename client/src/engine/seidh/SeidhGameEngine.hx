@@ -28,7 +28,7 @@ class SeidhGameEngine extends BaseEngine {
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
     private var mobsLastSpawnTime = 0.0;
-    private final mobsMax = 10;
+    private final mobsMax = 2;
 
     // TODO change this value if backend
     private final mobSpawnDelayMs = 3.500;
@@ -40,13 +40,6 @@ class SeidhGameEngine extends BaseEngine {
 
     public function new(engineMode = EngineMode.Server) {
 	    super(engineMode);
-    }
-
-    public function setGameState(gameState:GameState) {
-        this.gameState = gameState;
-        if (gameStateCallback != null) {
-            gameStateCallback(gameState);
-        }
     }
 
     public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
@@ -312,4 +305,22 @@ class SeidhGameEngine extends BaseEngine {
         return nearestPlayer;
     }
 
+    // ---------------------------------------------------
+    // Getters
+    // ---------------------------------------------------
+
+    public function getGameState() {
+        return gameState;
+    }
+
+    // ---------------------------------------------------
+    // Setters
+    // ---------------------------------------------------
+
+    public function setGameState(gameState:GameState) {
+        this.gameState = gameState;
+        if (gameStateCallback != null) {
+            gameStateCallback(gameState);
+        }
+    }
 }

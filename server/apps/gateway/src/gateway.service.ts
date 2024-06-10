@@ -26,11 +26,13 @@ export class GatewayService {
 
   async authenticate(authenticateRequest: AuthenticateRequest) {
     const request: UsersAuthenticateMessageRequest = {
-      telegramInitData: authenticateRequest.telegramInitData
+      telegramInitData: authenticateRequest.telegramInitData,
+      startParam: authenticateRequest.startParam,
     };
     const result: UsersAuthenticateMessageResponse = await firstValueFrom(this.usersService.send(UsersAuthenticatePattern, request));
     const response: AuthenticateResponse = {
       success: result.success,
+      userId: result.userId,
       telegramName: result.telegramName,
       authToken: result.authToken,
       tokens: result.tokens,

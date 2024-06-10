@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 export type CharacterDocument = HydratedDocument<Character>;
 
 export enum CharacterType {
-  Ragnar = 'Ragnar'
+  RagnarLoh =  'RagnarLoh'
 }
 
 export type CharacterMovementStruct =  {

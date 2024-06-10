@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersAuthenticateMessageRequest, UsersAuthenticatePattern } from '@app/seidh-common/dto/users/users.authenticate.msg';
 import { MessagePattern } from '@nestjs/microservices';

@@ -1,9 +1,11 @@
 package game.scene;
 
+import game.event.EventManager;
 import game.scene.base.BasicScene;
-import game.ui.BarGold;
-import game.ui.BarXp;
-import game.ui.BarHp;
+import game.ui.dialog.Dialog;
+import game.ui.bar.BarGold;
+import game.ui.bar.BarXp;
+import game.ui.bar.BarHp;
 import game.utils.Utils;
 import engine.base.MathUtils;
 import engine.base.geometry.Point;
@@ -191,5 +193,17 @@ class GameUiScene extends h2d.Scene {
     public function updateCursorPosition(x:Float, y:Float) {
         movementController.updateCursorPosition(x, y);
     }
+
+	public function showWinDialog() {
+		new Dialog(
+			this, 
+			DialogType.BIG, 
+			"You have won!", 
+			"Zombies killed: 2",
+			function callback() {
+				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+			}
+		);
+	}
 
 }

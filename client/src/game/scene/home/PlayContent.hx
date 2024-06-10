@@ -1,5 +1,7 @@
 package game.scene.home;
 
+import game.ui.dialog.Dialog;
+import game.ui.dialog.Dialog.DialogType;
 import h2d.filter.Displacement;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
@@ -227,7 +229,7 @@ class PlayContent extends BasicHomeContent {
             lvlButton.tile = lvlButtonActiveTile;
         }
         lvlButtonInteractive.onClick = function(event : hxd.Event) {
-            // TODO run the game
+            EventManager.instance.notify(EventManager.EVENT_REF_SHARE, {});
         }
 
         // Prev button

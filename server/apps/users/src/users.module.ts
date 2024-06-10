@@ -8,6 +8,7 @@ import { Character, CharacterSchema } from '@app/seidh-common/schemas/schema.cha
 
 @Module({
   imports: [
+    // TODO connect to mongodb inside container
     MongooseModule.forRoot('mongodb://localhost/seidh'),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },

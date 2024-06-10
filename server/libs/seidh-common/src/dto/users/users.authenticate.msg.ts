@@ -17,11 +17,12 @@ export interface UserCharacterStruct {
 
 export interface UsersAuthenticateMessageRequest {
     telegramInitData: string;
-    refCode?: string;
+    startParam?: string;
 }
 
 export interface UsersAuthenticateMessageResponse {
     success: boolean;
+    userId?: string;
     telegramName?: string;
     authToken?: string;
     tokens?: number;

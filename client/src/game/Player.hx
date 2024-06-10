@@ -8,11 +8,23 @@ class Player {
 	public var playerId:String;
 	public var playerEntityId:String;
 
+	public var userId:String;
+	public var authToken:String;
+	public var tokens:Int;
+	public var kills:Int;
+
 	private var inputIndex = 0;
 
 	private function new() {
 		playerId = Uuid.short().toLowerCase();
 		playerEntityId = "entity_" + playerId;
+	}
+
+	public function setUserData(userData:Dynamic) {
+		userId = userData.userId;
+		authToken = userData.userId;
+		tokens = userData.tokens;
+		kills = userData.userId;
 	}
 
 	public function incrementAndGetInputIndex() {

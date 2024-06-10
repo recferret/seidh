@@ -16,7 +16,8 @@ class EventManager {
 
 	// Internal events
 	public static final EVENT_HOME_PLAY = 'EVENT_HOME_PLAY';
-	public static final EVENT_RETURN_HOME = 'EVENT_RETURN_HOME';
+	public static final EVENT_HOME_SCENE = 'EVENT_HOME_SCENE';
+	public static final EVENT_REF_SHARE = 'EVENT_REF_SHARE';
 
 	private final listeners = new Map<String, List<EventListener>>();
 
