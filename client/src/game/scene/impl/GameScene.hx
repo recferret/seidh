@@ -36,6 +36,8 @@ class GameScene extends BasicScene implements EventListener {
 			seidhGameEngine.allowMobsSpawn(true);
 		}
 
+		SceneManager.Sound.playGameplayTheme();
+
 		// var wsConnectButton:h2d.Flow;
 		// var wsConnectButton:h2d.Flow; 
 

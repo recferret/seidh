@@ -1,9 +1,10 @@
 package game.scene.impl;
 
-import game.scene.home.FriendsContent;
-import h2d.Tile;
+import game.scene.home.CollectionContent;
 import h2d.Bitmap;
 import hxd.Event.EventKind;
+import game.scene.home.BoostContent;
+import game.scene.home.FriendsContent;
 import game.scene.base.BasicScene;
 import game.scene.home.BasicHomeContent;
 import game.scene.home.PlayContent;
@@ -20,7 +21,6 @@ class HomeScene extends BasicScene {
 	private var homeSceneContent:HomeSceneContent;
 	private var pageContent:BasicHomeContent;
 
-
 	private var menuButtonSize = 0.0;
 	private var menuButtonSizeHalf = 0.0;
 	private var buttonBottomPosY = 0.0;
@@ -36,35 +36,25 @@ class HomeScene extends BasicScene {
 					trace('Play click');
 					setSceneContent(HomeSceneContent.HomePlayContent);
 				} 
-			}
-			// 	if (params.clickX >= menuButtonSize && params.clickX <= menuButtonSize * 2) {
-			// 		trace('Leaders click');
-			// 		setSceneContent(HomeSceneContent.LeadersContent);
-			// 	}
-
-			// 	if (params.clickX >= menuButtonSize * 2 && params.clickX <= menuButtonSize * 3) {
-			// 		trace('Boost click');
-			// 		setSceneContent(HomeSceneContent.BoostContent);
-			// 	}
-
-			// 	if (params.clickX >= menuButtonSize * 3 && params.clickX <= menuButtonSize * 4) {
-			// 		trace('Collection click');
-			// 		setSceneContent(HomeSceneContent.CollectionContent);
-			// 	}
-
 				if (params.clickX >= menuButtonSize * 4 && params.clickX <= menuButtonSize * 5) {
 					trace('Friends click');
 					setSceneContent(HomeSceneContent.HomeFriendsContent);
 				}
-			// }
+				if (params.clickX >= menuButtonSize * 2 && params.clickX <= menuButtonSize * 3) {
+					trace('Boost click');
+					setSceneContent(HomeSceneContent.HomeBoostContent);
+				}
+
+				if (params.clickX >= menuButtonSize * 3 && params.clickX <= menuButtonSize * 4) {
+					trace('Collection click');
+					setSceneContent(HomeSceneContent.HomeCollectionContent);
+				}
+			}
 		});
 
-		// this.selectSceneCallback = selectSceneCallback;
 
-
-		// setSceneContent(HomeSceneContent.HomePlayContent);
-
-		setSceneContent(HomeSceneContent.HomeFriendsContent);
+		setSceneContent(HomeSceneContent.HomePlayContent);
+		// setSceneContent(HomeSceneContent.HomeBoostContent);
 
 		// Bottom bar buttons
 
@@ -85,16 +75,18 @@ class HomeScene extends BasicScene {
 		// final b2 = addBottomBarButton(menuButtonSize, 'Leaders');
 		// b2.fui.setPosition(menuButtonSize + menuButtonSizeHalf, buttonBottomPosY);
 
-		// final b3 = addBottomBarButton(menuButtonSize, 'Boost');
-		// b3.fui.setPosition(menuButtonSize * 2 + menuButtonSizeHalf, buttonBottomPosY);
+		final b3 = addBottomBarButton(menuButtonSize, 'Boost');
+		b3.fui.setPosition(menuButtonSize * 2 + menuButtonSizeHalf, buttonBottomPosY);
 
-		// final b4 = addBottomBarButton(menuButtonSize, 'Collection');
-		// b4.fui.setPosition(menuButtonSize * 3 + menuButtonSizeHalf, buttonBottomPosY);
+		final b4 = addBottomBarButton(menuButtonSize, 'Collection');
+		b4.fui.setPosition(menuButtonSize * 3 + menuButtonSizeHalf, buttonBottomPosY);
 
 		final b5 = addBottomBarButton(menuButtonSize, 'Friends');
 		b5.fui.setPosition(menuButtonSize * 4 + menuButtonSizeHalf, buttonBottomPosY);
 
 		// 
+
+		SceneManager.Sound.playMenuTheme();
 	}
 
 	// --------------------------------------
@@ -149,16 +141,16 @@ class HomeScene extends BasicScene {
 					pageContent = new PlayContent(this); 
 				// case LeadersContent:
 				// 	pageContent = new LeadersContent(this); 
-				// case BoostContent:
-				// 	pageContent = new BoostContent(this); 
-				// case CollectionContent:
-				// 	pageContent = new CollectionContent(this); 
+				case HomeBoostContent:
+					pageContent = new BoostContent(this); 
+				case HomeCollectionContent:
+					pageContent = new CollectionContent(this); 
 				case HomeFriendsContent:
 					pageContent = new FriendsContent(this); 
 				default:
 			}
 
-			addChild(pageContent);
+			addChildAt(pageContent, 0);
 		}
 	}
 

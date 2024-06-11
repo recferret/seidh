@@ -1,5 +1,6 @@
 package game.scene;
 
+import game.sound.SoundManager;
 import game.event.EventManager;
 import game.js.NativeWindowJS;
 import game.scene.impl.LoadingScene;
@@ -10,6 +11,8 @@ import game.scene.impl.GameScene;
 class SceneManager implements EventListener {
 	private var sceneChangedCallback:BasicScene->Void;
 	private var currentScene:BasicScene;
+	
+	public static var Sound:SoundManager;
 
 	public function new(sceneChangedCallback:BasicScene->Void) {
 		this.sceneChangedCallback = sceneChangedCallback;
@@ -17,6 +20,8 @@ class SceneManager implements EventListener {
 		EventManager.instance.subscribe(EventManager.EVENT_HOME_PLAY, this);
 		EventManager.instance.subscribe(EventManager.EVENT_HOME_SCENE, this);
 		EventManager.instance.subscribe(EventManager.EVENT_REF_SHARE, this);
+
+		SceneManager.Sound = new SoundManager();
 
 		// currentScene = new GameScene(GameMode.SINGLEPLAYER);
 

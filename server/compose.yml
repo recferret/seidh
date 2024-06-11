@@ -21,7 +21,9 @@ services:
     build:
         context: .
         dockerfile: seidh.users.dockerfile
-    networks: ["nats"]   
+    networks: ["nats", "mongo"]
+    depends_on:
+      - mongodb
 
   gameplay:
     build:
@@ -53,6 +55,23 @@ services:
     networks: ["nats"]
     depends_on: ["nats"]
 
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user1
+      - MONGO_INITDB_ROOT_PASSWORD=pass1
+    networks: ["mongo"]
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data/db
+
 networks:
   nats:
     name: nats
+  mongo:
+    name: mongo
+
+# mongodb://user:pass@mongodb

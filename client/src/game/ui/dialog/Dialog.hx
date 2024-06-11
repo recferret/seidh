@@ -7,7 +7,7 @@ import game.scene.base.BasicScene;
 enum abstract DialogType(Int) {
 	var SMALL = 1;
 	var MEDIUM = 2;
-    var BIG = 2;
+    var BIG = 3;
 }
 
 class DialogButton extends h2d.Object {
