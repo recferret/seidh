@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { FindGameRequest, FindGameResponse } from './dto/find.game.dto';
 import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -25,6 +25,7 @@ export class GatewayService {
   }
 
   async authenticate(authenticateRequest: AuthenticateRequest) {
+    Logger.log(authenticateRequest);
     const request: UsersAuthenticateMessageRequest = {
       telegramInitData: authenticateRequest.telegramInitData,
       startParam: authenticateRequest.startParam,
