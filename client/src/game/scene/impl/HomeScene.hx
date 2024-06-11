@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import game.scene.home.FriendsContent;
 import h2d.Tile;
 import h2d.Bitmap;
 import hxd.Event.EventKind;
@@ -19,18 +20,23 @@ class HomeScene extends BasicScene {
 	private var homeSceneContent:HomeSceneContent;
 	private var pageContent:BasicHomeContent;
 
+
+	private var menuButtonSize = 0.0;
+	private var menuButtonSizeHalf = 0.0;
+	private var buttonBottomPosY = 0.0;
+
 	public function new() {
 		super(null, function callback(params:BasicSceneClickCallback) {
 			// if (params.eventKind == EventKind.EPush) {
 			// 	trace(params.clickY, buttonBottomPosY);
 			// }
 
-			// if (params.eventKind == EventKind.EPush && params.clickY > buttonBottomPosY - menuButtonSize) {
-			// 	if (params.clickX <= menuButtonSize) {
-			// 		trace('Play click');
-			// 		setSceneContent(HomeSceneContent.PlayContent);
-			// 	} 
-				
+			if (params.eventKind == EventKind.EPush && params.clickY > buttonBottomPosY - menuButtonSize) {
+				if (params.clickX <= menuButtonSize) {
+					trace('Play click');
+					setSceneContent(HomeSceneContent.HomePlayContent);
+				} 
+			}
 			// 	if (params.clickX >= menuButtonSize && params.clickX <= menuButtonSize * 2) {
 			// 		trace('Leaders click');
 			// 		setSceneContent(HomeSceneContent.LeadersContent);
@@ -46,17 +52,21 @@ class HomeScene extends BasicScene {
 			// 		setSceneContent(HomeSceneContent.CollectionContent);
 			// 	}
 
-			// 	if (params.clickX >= menuButtonSize * 4 && params.clickX <= menuButtonSize * 5) {
-			// 		trace('Friends click');
-			// 		setSceneContent(HomeSceneContent.FriendsContent);
-			// 	}
+				if (params.clickX >= menuButtonSize * 4 && params.clickX <= menuButtonSize * 5) {
+					trace('Friends click');
+					setSceneContent(HomeSceneContent.HomeFriendsContent);
+				}
 			// }
 		});
 
 		// this.selectSceneCallback = selectSceneCallback;
 
 
-		setSceneContent(HomeSceneContent.HomePlayContent);
+		// setSceneContent(HomeSceneContent.HomePlayContent);
+
+		setSceneContent(HomeSceneContent.HomeFriendsContent);
+
+		// Bottom bar buttons
 
         final homeFrame = new h2d.Bitmap(hxd.Res.ui.home.home_frame.toTile(), this);
 		homeFrame.scaleY = BasicScene.ActualScreenHeight / 1280;
@@ -64,13 +74,13 @@ class HomeScene extends BasicScene {
 		// ragnar.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 4);
 		// ragnar.setScale(1.5);
 
-		// menuButtonSize = Std.int(BasicScene.ActualScreenWidth / 5);
-		// menuButtonSizeHalf = Std.int(menuButtonSize / 2);
+		menuButtonSize = Std.int(BasicScene.ActualScreenWidth / 5);
+		menuButtonSizeHalf = Std.int(menuButtonSize / 2);
 
-		// final b1 = addBottomBarButton(menuButtonSize, 'Play');
-		// buttonBottomPosY = BasicScene.ActualScreenHeight - menuButtonSizeHalf - (b1.tf.getSize().height * 2);
+		final b1 = addBottomBarButton(menuButtonSize, 'Play');
+		buttonBottomPosY = BasicScene.ActualScreenHeight - menuButtonSizeHalf - (b1.tf.getSize().height * 2);
 
-		// b1.fui.setPosition(menuButtonSizeHalf, buttonBottomPosY);
+		b1.fui.setPosition(menuButtonSizeHalf, buttonBottomPosY);
 
 		// final b2 = addBottomBarButton(menuButtonSize, 'Leaders');
 		// b2.fui.setPosition(menuButtonSize + menuButtonSizeHalf, buttonBottomPosY);
@@ -81,8 +91,8 @@ class HomeScene extends BasicScene {
 		// final b4 = addBottomBarButton(menuButtonSize, 'Collection');
 		// b4.fui.setPosition(menuButtonSize * 3 + menuButtonSizeHalf, buttonBottomPosY);
 
-		// final b5 = addBottomBarButton(menuButtonSize, 'Friends');
-		// b5.fui.setPosition(menuButtonSize * 4 + menuButtonSizeHalf, buttonBottomPosY);
+		final b5 = addBottomBarButton(menuButtonSize, 'Friends');
+		b5.fui.setPosition(menuButtonSize * 4 + menuButtonSizeHalf, buttonBottomPosY);
 
 		// 
 	}
@@ -143,8 +153,8 @@ class HomeScene extends BasicScene {
 				// 	pageContent = new BoostContent(this); 
 				// case CollectionContent:
 				// 	pageContent = new CollectionContent(this); 
-				// case FriendsContent:
-				// 	pageContent = new FriendsContent(this); 
+				case HomeFriendsContent:
+					pageContent = new FriendsContent(this); 
 				default:
 			}
 

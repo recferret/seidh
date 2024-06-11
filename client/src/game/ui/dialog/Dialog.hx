@@ -16,7 +16,7 @@ class DialogButton extends h2d.Object {
     private final h = 0.0;
     private final bmp:h2d.Bitmap;
 
-    public function new(parent:Object, s2d:h2d.Scene, text:String) {
+    public function new(parent:Object, text:String) {
         super(parent);
 
         // TODO replace toTile by center later
@@ -115,7 +115,7 @@ class Dialog extends h2d.Object {
         }
 
         // Ok button
-        final buttonOk = new DialogButton(this, s2d, "OK");
+        final buttonOk = new DialogButton(this, "OK");
         buttonOk.setPosition(
             BasicScene.ActualScreenWidth / 2 - (buttonOk.getWidth() / 2), 
             BasicScene.ActualScreenHeight / 2 + (buttonOk.getHeight() / 2.2)

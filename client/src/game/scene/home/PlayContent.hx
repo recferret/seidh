@@ -229,7 +229,7 @@ class PlayContent extends BasicHomeContent {
             lvlButton.tile = lvlButtonActiveTile;
         }
         lvlButtonInteractive.onClick = function(event : hxd.Event) {
-            EventManager.instance.notify(EventManager.EVENT_REF_SHARE, {});
+            
         }
 
         // Prev button
