@@ -25,7 +25,7 @@ class SceneManager implements EventListener {
 
 		// currentScene = new GameScene(GameMode.SINGLEPLAYER);
 
-		currentScene = new HomeScene();
+		// currentScene = new HomeScene();
 		// currentScene = new SceneAiTest();
 		// currentScene = new SceneInputTest();
 		// currentScene = new SceneSpritesTest();
@@ -33,8 +33,8 @@ class SceneManager implements EventListener {
 		// currentScene = new SceneNetworkTest();
 		// currentScene = new SceneUiTest();
 
-		// currentScene = new LoadingScene();
-		// currentScene.start();
+		currentScene = new LoadingScene();
+		currentScene.start();
 
 		changeSceneCallback();
 	}

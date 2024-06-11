@@ -18,7 +18,7 @@ class SoundManager {
 
     public function playMenuTheme() {
         if (menuTheme != null){
-            menuTheme.play(true);
+            // menuTheme.play(true);
         }
         if (gameplayTheme != null){
             gameplayTheme.stop();
@@ -27,7 +27,7 @@ class SoundManager {
 
     public function playGameplayTheme() {
         if (menuTheme != null){
-            menuTheme.stop();
+            // menuTheme.stop();
         }
         if (gameplayTheme != null){
             gameplayTheme.play(true);
