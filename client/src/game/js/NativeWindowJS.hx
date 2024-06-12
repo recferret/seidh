@@ -31,6 +31,10 @@ extern class NativeWindowJS {
     static function tgGetInitDataUnsafe():Dynamic;
     static function tgShareMyRefLink(refLink:String):Void;
 
+    // Ton
+    static function tonConnect():Void;
+    static function tonMintRagnar():String;
+
     // YandexMetrics
     static function ymTrackGoal(goal:YandexMetricsGoals):Void;
 }
