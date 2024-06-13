@@ -5,12 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '@app/seidh-common/schemas/schema.user';
 import { JwtModule } from '@nestjs/jwt';
 import { Character, CharacterSchema } from '@app/seidh-common/schemas/schema.character';
+import { InternalProtocol } from '@app/seidh-common';
 
 @Module({
   imports: [
-    // TODO connect to mongodb inside container
-    MongooseModule.forRoot('mongodb://localhost:27017/seidh'),
-    // MongooseModule.forRoot('mongodb://mongodb:27017'),
+    MongooseModule.forRoot(InternalProtocol.MongoUrl),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Character.name, schema: CharacterSchema }

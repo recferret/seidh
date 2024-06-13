@@ -22,8 +22,6 @@
     "start:gameplay:prod": "nest start gameplay",
     "start:gameplay-lobby": "nest start gameplay-lobby --debug --watch",
     "start:gameplay-lobby:prod": "nest start gameplay-lobby",
-    "start:auth": "nest start auth --debug --watch",
-    "start:auth:prod": "nest start auth",
     "start:users": "nest start users --debug --watch",
     "start:users:prod": "nest start users"
   },

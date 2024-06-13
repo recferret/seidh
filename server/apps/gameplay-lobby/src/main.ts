@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { GameplayLobbyModule } from './gameplay-lobby.module';
 import { ServiceName, ServicePort } from '@app/seidh-common';
-import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
+import { InternalProtocol } from '@app/seidh-common/seidh-common.internal-protocol';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
@@ -12,7 +12,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,
     options: {
-      servers: [NatsUrl],
+      servers: [InternalProtocol.NatsUrl],
       name: ServiceName.GameplayLobby,
     },
   });

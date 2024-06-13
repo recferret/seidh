@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { WsGatewayController } from './ws-gateway.controller';
 import { WsGatewayWsController } from './ws-gateway.ws.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ServiceName } from '@app/seidh-common';
-import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
+import { InternalProtocol, ServiceName } from '@app/seidh-common';
 
 @Module({
   imports: [
@@ -12,7 +11,7 @@ import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
         name: ServiceName.Gameplay,
         transport: Transport.NATS,
         options: {
-          servers: [NatsUrl],
+          servers: [InternalProtocol.NatsUrl],
         }
       },
     ]),
