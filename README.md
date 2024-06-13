@@ -2,6 +2,9 @@
 
 Seidh is a online game that built for Telegram and TON.
 
+https://t.me/SeidhGameBot/
+This is available only from telegram client. Very WIP.
+
 Core parts:
 * client
     * Haxe + Heaps.io
@@ -16,3 +19,7 @@ Core parts:
     * https://nats.io for interservice communication
     * Docker compose file that contains everythin
 * ton
+    * Not working ATM
+    * Various vikings NFTs
+    * Various boosts 
+    * Seidh token
