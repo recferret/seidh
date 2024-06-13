@@ -49,6 +49,8 @@ abstract class BasicScene extends h2d.Scene {
 	private var cameraOffsetX = 0;
 	private var cameraOffsetY = 0;
 
+	private var basicSceneCallback:BasicSceneClickCallback->Void;
+
 	// UI
 
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
@@ -58,6 +60,8 @@ abstract class BasicScene extends h2d.Scene {
 
 	public function new(seidhGameEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneClickCallback->Void) {
 		super();
+
+		this.basicSceneCallback = basicSceneCallback;
 
 		// final mobile = NativeWindowJS.getMobile();
 		// if (mobile != null) {
@@ -139,7 +143,6 @@ abstract class BasicScene extends h2d.Scene {
 			this.seidhGameEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
 				// TODO make callbacks work
 				for (value in params) {
-					trace(value);
 					// SceneManager.Sound.playZombieDeath();
 
 					// Play action initiator animation
@@ -230,10 +233,11 @@ abstract class BasicScene extends h2d.Scene {
 					gameUiScene.release();
 				}
 			}
-			if (event.kind == EPush && basicSceneCallback != null) {
+			if (event.kind == EPush && this.basicSceneCallback != null) {
 				final clickPos = new h2d.col.Point(event.relX, event.relY);
 				camera.screenToCamera(clickPos);
-				basicSceneCallback({
+
+				this.basicSceneCallback({
 					clickX: clickPos.x,
 					clickY: clickPos.y,
 					eventKind: event.kind
@@ -254,6 +258,10 @@ abstract class BasicScene extends h2d.Scene {
 		if (networking == null) {
 			networking = new Networking();
 		}
+	}
+
+	public function destroy() {
+		this.basicSceneCallback = null;
 	}
 
 	public function onResize() {

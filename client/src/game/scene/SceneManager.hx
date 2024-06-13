@@ -48,10 +48,16 @@ class SceneManager implements EventListener {
 	public function notify(event:String, message:Dynamic) {
 		switch (event) {
 			case EventManager.EVENT_HOME_PLAY:
+				if (currentScene != null) {
+					currentScene.destroy();
+				}
 				currentScene = new GameScene(EngineMode.CLIENT_MULTIPLAYER);
 				// currentScene = new GameScene(EngineMode.CLIENT_SINGLEPLAYER);
 				changeSceneCallback();
 			case EventManager.EVENT_HOME_SCENE:
+				if (currentScene != null) {
+					currentScene.destroy();
+				}
 				currentScene = new HomeScene();
 				changeSceneCallback();
 			case EventManager.EVENT_REF_SHARE:

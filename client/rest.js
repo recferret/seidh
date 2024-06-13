@@ -1,9 +1,10 @@
-const url = 'http://localhost:3003/';
+// const url = 'http://localhost:3003/';
 // const url = 'http://192.168.1.6:3003/';
-// const url = 'https://seidh-game.online/api/';
+const restUrl = 'https://seidh-game.online/api/';
+// const restUrl = 'http://23.111.202.19:3003/';
 
 async function restFindGame(playerId) {
-    const findGameResult = await fetch(url + 'findGame', {
+    const findGameResult = await fetch(restUrl + 'findGame', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
@@ -22,7 +23,7 @@ async function restFindGame(playerId) {
 // test data sofia:  query_id=AAFEJ_ExAwAAAEQn8TGuddzY&user=%7B%22id%22%3A7280338756%2C%22first_name%22%3A%22Sofia%22%2C%22last_name%22%3A%22%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1718130576&hash=97bac32b6a9134e02cf7f91045d82db5908c3b1d62baddbaf2d20e84280e363c
 
 async function restPostTelegramInitData(telegramInitData, startParam, callback) {
-    const authenticateResult = await fetch(url + 'authenticate', {
+    const authenticateResult = await fetch(restUrl + 'authenticate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
