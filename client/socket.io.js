@@ -1,5 +1,9 @@
 let socket = undefined;
 
+// const url = 'ws://localhost:3004/';
+// const url = 'http://192.168.1.6:3003/';
+// const url = 'wss://seidh-game.online:3004/';
+
 function wsConnect(playerId, callback) {
     // socket = io('wss://23.111.202.19:3004', {
     socket = io('ws://localhost:3004', {
@@ -36,6 +40,10 @@ function wsConnect(playerId, callback) {
 
     socket.on('GameState', function(data) {
         callback({type: 'GameState', data});
+    });
+
+    socket.on('LoopState', function(data) {
+        callback({type: 'LoopState', data});
     });
 
     socket.on('CreateCharacter', function(data) {

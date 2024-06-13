@@ -3,6 +3,7 @@ import {
   UsersAuthenticateMessageRequest, 
   UsersAuthenticateMessageResponse 
 } from '@app/seidh-common/dto/users/users.authenticate.msg';
+import { UsersGetFriendsMessageRequest, UsersGetFriendsMessageResponse } from '@app/seidh-common/dto/users/users.get.friends.msg';
 import { Character, CharacterType } from '@app/seidh-common/schemas/schema.character';
 import { User } from '@app/seidh-common/schemas/schema.user';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
@@ -77,7 +78,7 @@ export class UsersService implements OnModuleInit {
         response.tokens = existingUser.virtualTokenBalance;
         response.characters = existingUser.characters.map(dbCharacterToStruct);
         response.authToken = await this.jwtService.signAsync({
-          internalId: existingUser.id,
+          userId: existingUser.id,
           telegramId: telegramParseResult.userInfo.id
         });
       } else {
@@ -94,21 +95,6 @@ export class UsersService implements OnModuleInit {
 
         let virtualTokenBalance = 0;
 
-        if (message.startParam) {
-          Logger.log('Have some start param');
-          const referrer = await this.userModel.findOne({ id: message.startParam });
-
-          // Referrer exists and referrer is not the same user.
-          if (referrer && referrer.telegramId != telegramParseResult.userInfo.id) {
-            // Give some bonus to the referrer
-            referrer.virtualTokenBalance += telegramParseResult.userInfo.telegramPremium ? 
-              this.referrerPremiumRewardTokens : this.referrerNoPremiumRewardTokens;
-            // Give some bonus to the referral
-            virtualTokenBalance = telegramParseResult.userInfo.telegramPremium ? 
-              this.referralPremiumRewardTokens : this.referralNoPremiumRewardTokens;
-          }
-        }
-
         const newUser = await this.userModel.create({
           telegramId: telegramParseResult.userInfo.id,
           telegramName: telegramParseResult.userInfo.username,
@@ -117,15 +103,64 @@ export class UsersService implements OnModuleInit {
           characters: [newCharacter],
         });
 
+        if (message.startParam) {
+          Logger.log('Have some start param');
+          const referrer = await this.userModel.findOne({ id: message.startParam });
+          // Referrer exists and referrer is not the same user.
+          if (referrer && referrer.telegramId != telegramParseResult.userInfo.id) {
+            // Give some bonus to the referrer
+            referrer.virtualTokenBalance += telegramParseResult.userInfo.telegramPremium ? 
+              this.referrerPremiumRewardTokens : this.referrerNoPremiumRewardTokens;
+            referrer.friendsInvited.push(newUser._id);
+
+            // Give some bonus to the referral
+            newUser.virtualTokenBalance = telegramParseResult.userInfo.telegramPremium ? 
+              this.referralPremiumRewardTokens : this.referralNoPremiumRewardTokens;
+            newUser.invitedBy = referrer._id;
+
+            await referrer.save();
+            await newUser.save();
+          }
+        }
+
         response.userId = newUser.id;
         response.kills = newUser.kills;
         response.tokens = newUser.virtualTokenBalance;
         response.characters = newUser.characters.map(dbCharacterToStruct);
         response.authToken = await this.jwtService.signAsync({
-          internalId: newUser.id,
+          userId: newUser.id,
           telegramId: telegramParseResult.userInfo.id
         });
       }
+    }
+
+    return response;
+  }
+
+  async getFriends(message: UsersGetFriendsMessageRequest) {
+    const response: UsersGetFriendsMessageResponse = {
+      success: false,
+    };
+    const user = await this.userModel.findOne({ id: message.userId }).populate(['friendsInvited']);
+    if (user)  {
+      response.success = true;
+      // TODO get friendsInvited
+      console.log('ASS');
+      console.log(user);
+
+     
+      // response.friends = user.friendsInvited.map(friend => {
+      //   return {
+      //       userId: friend.id,
+      //       telegramName: friend.
+      //       telegramPremium: boolean;
+      //       referralReward: number
+      //       online: boolean;
+      //       playing: boolean;
+      //       possibleToJoinGame: boolean;
+      //   }
+      // });
+     
     }
 
     return response;
@@ -137,8 +172,6 @@ export class UsersService implements OnModuleInit {
 
   private parseTelegramInitData(telegramInitData: string) {
     const encoded = decodeURIComponent(telegramInitData);
-
-    Logger.log('encoded', encoded);
 
     const secret = crypto.createHmac('sha256', 'WebAppData').update(this.botKey);
     const arr = encoded.split("&");

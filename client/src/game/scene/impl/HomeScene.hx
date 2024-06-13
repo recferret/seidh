@@ -27,34 +27,28 @@ class HomeScene extends BasicScene {
 
 	public function new() {
 		super(null, function callback(params:BasicSceneClickCallback) {
-			// if (params.eventKind == EventKind.EPush) {
-			// 	trace(params.clickY, buttonBottomPosY);
-			// }
-
 			if (params.eventKind == EventKind.EPush && params.clickY > buttonBottomPosY - menuButtonSize) {
 				if (params.clickX <= menuButtonSize) {
-					trace('Play click');
 					setSceneContent(HomeSceneContent.HomePlayContent);
+					SceneManager.Sound.playButton1();
 				} 
 				if (params.clickX >= menuButtonSize * 4 && params.clickX <= menuButtonSize * 5) {
-					trace('Friends click');
 					setSceneContent(HomeSceneContent.HomeFriendsContent);
+					SceneManager.Sound.playButton1();
 				}
 				if (params.clickX >= menuButtonSize * 2 && params.clickX <= menuButtonSize * 3) {
-					trace('Boost click');
 					setSceneContent(HomeSceneContent.HomeBoostContent);
+					SceneManager.Sound.playButton1();
 				}
 
 				if (params.clickX >= menuButtonSize * 3 && params.clickX <= menuButtonSize * 4) {
-					trace('Collection click');
 					setSceneContent(HomeSceneContent.HomeCollectionContent);
+					SceneManager.Sound.playButton1();
 				}
 			}
 		});
 
-
 		setSceneContent(HomeSceneContent.HomePlayContent);
-		// setSceneContent(HomeSceneContent.HomeBoostContent);
 
 		// Bottom bar buttons
 

@@ -1,5 +1,7 @@
 package game.scene.base;
 
+import game.sound.SoundManager;
+import format.pex.Data.EmitterType;
 import game.ui.dialog.Dialog;
 import hxd.Event.EventKind;
 import h2d.Text;
@@ -67,8 +69,6 @@ abstract class BasicScene extends h2d.Scene {
 		isMobileDevice = true;
 
 		if (seidhGameEngine != null) {
-
-
 			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
 
 			new TerrainManager(this);
@@ -89,6 +89,15 @@ abstract class BasicScene extends h2d.Scene {
 			this.seidhGameEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
 				final character = clientCharacterEntities.get(characterEntity.getId());
 				if (character != null) {
+					if (character.getEntityType() == EntityType.RAGNAR_LOH || 
+						character.getEntityType() == EntityType.RAGNAR_NORM) {
+						SceneManager.Sound.playVikingDeath();
+					} else if (
+						character.getEntityType() == EntityType.ZOMBIE_BOY || 
+						character.getEntityType() == EntityType.ZOMBIE_GIRL) {
+						SceneManager.Sound.playZombieDeath();
+					}
+
 					character.animation.setAnimationState(DEAD);
 					removeChild(character);
 					clientCharacterEntities.remove(characterEntity.getId());
@@ -128,11 +137,24 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.seidhGameEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
+				// TODO make callbacks work
 				for (value in params) {
+					trace(value);
+					// SceneManager.Sound.playZombieDeath();
+
 					// Play action initiator animation
 					final clientEntity = clientCharacterEntities.get(value.entityId);
 					switch (value.actionType) {
 						case CharacterActionType.ACTION_MAIN:
+							if (clientEntity.getEntityType() == EntityType.RAGNAR_LOH ||
+								clientEntity.getEntityType() == EntityType.RAGNAR_NORM) {
+								SceneManager.Sound.playVikingHit();
+							} else if (
+								clientEntity.getEntityType() == EntityType.ZOMBIE_BOY ||
+								clientEntity.getEntityType() == EntityType.ZOMBIE_GIRL) {
+								SceneManager.Sound.playZombieHit();
+							}
+
 							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
 						case CharacterActionType.ACTION_1:
 							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
@@ -163,6 +185,14 @@ abstract class BasicScene extends h2d.Scene {
 					for (value in value.hurtEntities) {
 						final clientEntity = clientCharacterEntities.get(value);
 						if (clientEntity != null) {
+							if (clientEntity.getEntityType() == EntityType.RAGNAR_LOH ||
+								clientEntity.getEntityType() == EntityType.RAGNAR_NORM) {
+								SceneManager.Sound.playVikingDmg();
+							} else if (
+								clientEntity.getEntityType() == EntityType.ZOMBIE_BOY ||
+								clientEntity.getEntityType() == EntityType.ZOMBIE_GIRL) {
+								SceneManager.Sound.playZombieDmg();
+							}
 							clientEntity.animation.setAnimationState(HURT);
 						}
 					}

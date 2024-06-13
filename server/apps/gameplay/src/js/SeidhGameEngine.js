@@ -256,11 +256,6 @@
 		}
 	}
 	engine_base_EngineUtils.__name__ = true;
-	var engine_base_core_EngineMode = $hxEnums["engine.base.core.EngineMode"] = { __ename__:true,__constructs__:null
-		,Client: {_hx_name:"Client",_hx_index:0,__enum__:"engine.base.core.EngineMode",toString:$estr}
-		,Server: {_hx_name:"Server",_hx_index:1,__enum__:"engine.base.core.EngineMode",toString:$estr}
-	};
-	engine_base_core_EngineMode.__constructs__ = [engine_base_core_EngineMode.Client,engine_base_core_EngineMode.Server];
 	class engine_base_core_BaseEngine {
 		constructor(engineMode) {
 			if(engine_base_core_BaseEngine._hx_skip_constructor) {
@@ -1209,11 +1204,8 @@
 			this._hx_constructor(engineMode);
 		}
 		_hx_constructor(engineMode) {
-			if(engineMode == null) {
-				engineMode = engine_base_core_EngineMode.Server;
-			}
-			this.mobSpawnDelayMs = 3;
-			this.mobsMax = 10;
+			this.mobSpawnDelayMs = 3.500;
+			this.mobsMax = 2;
 			this.mobsLastSpawnTime = 0.0;
 			this.mobsKilled = 0;
 			this.mobsSpawned = 0;
@@ -1269,53 +1261,56 @@
 						this.deleteProjectileEntity(projectile.getId());
 					}
 				}
+				let allowServerLogic = this.engineMode == 3 || this.engineMode == 1;
+				if(allowServerLogic) {
+					let jsIterator = this.characterEntityManager.entities.values();
+					let _g_jsIterator = jsIterator;
+					let _g_lastStep = jsIterator.next();
+					while(!_g_lastStep.done) {
+						let v = _g_lastStep.value;
+						_g_lastStep = _g_jsIterator.next();
+						let e1 = v;
+						let character1 = js_Boot.__cast(e1 , engine_base_entity_impl_EngineCharacterEntity);
+						if(character1.isAlive && !character1.isPlayer()) {
+							if(engine_base_EngineConfig.AI_ENABLED) {
+								let targetPlayer = this.getNearestPlayer(character1);
+								if(targetPlayer != null && character1.getTargetObject() != targetPlayer) {
+									character1.setTargetObject(targetPlayer,true);
+								}
+							}
+							let jsIterator = this.characterEntityManager.entities.values();
+							let _g_jsIterator = jsIterator;
+							let _g_lastStep = jsIterator.next();
+							while(!_g_lastStep.done) {
+								let v = _g_lastStep.value;
+								_g_lastStep = _g_jsIterator.next();
+								let e2 = v;
+								let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
+								if(!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
+									if(character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
+										character1.intersectsWithCharacter = true;
+										character1.canMove = false;
+									}
+								}
+							}
+							character1.update(dt);
+							character1.intersectsWithCharacter = false;
+							character1.canMove = true;
+						}
+					}
+				}
 				let jsIterator1 = this.characterEntityManager.entities.values();
 				let _g_jsIterator1 = jsIterator1;
 				let _g_lastStep1 = jsIterator1.next();
 				while(!_g_lastStep1.done) {
 					let v = _g_lastStep1.value;
 					_g_lastStep1 = _g_jsIterator1.next();
-					let e1 = v;
-					let character1 = js_Boot.__cast(e1 , engine_base_entity_impl_EngineCharacterEntity);
-					if(character1.isAlive && !character1.isPlayer()) {
-						if(engine_base_EngineConfig.AI_ENABLED) {
-							let targetPlayer = this.getNearestPlayer(character1);
-							if(targetPlayer != null && character1.getTargetObject() != targetPlayer) {
-								character1.setTargetObject(targetPlayer,true);
-							}
-						}
-						let jsIterator = this.characterEntityManager.entities.values();
-						let _g_jsIterator = jsIterator;
-						let _g_lastStep = jsIterator.next();
-						while(!_g_lastStep.done) {
-							let v = _g_lastStep.value;
-							_g_lastStep = _g_jsIterator.next();
-							let e2 = v;
-							let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
-							if(!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
-								if(character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
-									character1.intersectsWithCharacter = true;
-									character1.canMove = false;
-								}
-							}
-						}
-						character1.update(dt);
-						character1.intersectsWithCharacter = false;
-						character1.canMove = true;
-					}
-				}
-				let jsIterator2 = this.characterEntityManager.entities.values();
-				let _g_jsIterator2 = jsIterator2;
-				let _g_lastStep2 = jsIterator2.next();
-				while(!_g_lastStep2.done) {
-					let v = _g_lastStep2.value;
-					_g_lastStep2 = _g_jsIterator2.next();
 					let e = v;
 					let character1 = js_Boot.__cast(e , engine_base_entity_impl_EngineCharacterEntity);
 					if(character1.isAlive) {
-						if(character1.isPlayer()) {
-							character1.update(dt);
-						}
+						character1.update(dt);
+					}
+					if(character1.isAlive) {
 						let jsIterator = this.projectileEntityManager.entities.values();
 						let _g_jsIterator = jsIterator;
 						let _g_lastStep = jsIterator.next();
@@ -1346,34 +1341,37 @@
 							} else if(character1.actionToPerform.meleeStruct != null) {
 								actionShape = character1.actionToPerform.meleeStruct.shape;
 							}
-							let jsIterator = this.characterEntityManager.entities.values();
-							let _g_jsIterator = jsIterator;
-							let _g_lastStep = jsIterator.next();
-							while(!_g_lastStep.done) {
-								let v = _g_lastStep.value;
-								_g_lastStep = _g_jsIterator.next();
-								let e2 = v;
-								let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
-								if(character2.isAlive && character1.getId() != character2.getId()) {
-									if(character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
-										let health = character2.subtractHealth(character1.actionToPerform.damage);
-										if(health == 0) {
-											if(character2.getEntityType() == 3 || character2.getEntityType() == 4) {
-												this.mobsKilled++;
+							if(allowServerLogic) {
+								let jsIterator = this.characterEntityManager.entities.values();
+								let _g_jsIterator = jsIterator;
+								let _g_lastStep = jsIterator.next();
+								while(!_g_lastStep.done) {
+									let v = _g_lastStep.value;
+									_g_lastStep = _g_jsIterator.next();
+									let e2 = v;
+									let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
+									if(character2.isAlive && character1.getId() != character2.getId()) {
+										if(character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+											let health = character2.subtractHealth(character1.actionToPerform.damage);
+											if(health == 0) {
+												if(character2.getEntityType() == 3 || character2.getEntityType() == 4) {
+													this.mobsKilled++;
+													this.mobsSpawned--;
+												}
+												character2.isAlive = false;
+												deadEntities.push(character2.getId());
+												this.deleteCharacterEntity(character2.getId());
+											} else {
+												hurtEntities.push(character2.getId());
 											}
-											character2.isAlive = false;
-											deadEntities.push(character2.getId());
-											this.deleteCharacterEntity(character2.getId());
-										} else {
-											hurtEntities.push(character2.getId());
 										}
 									}
 								}
 							}
 							characterActionCallbackParams.push({ entityId : character1.getId(), actionType : character1.actionToPerform.actionType, shape : actionShape, hurtEntities : hurtEntities, deadEntities : deadEntities});
-							character1.isActing = false;
-							character1.actionToPerform = null;
 						}
+						character1.isActing = false;
+						character1.actionToPerform = null;
 						character1.isRunning = false;
 						character1.isWalking = false;
 					}
@@ -1381,12 +1379,7 @@
 				if(this.characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
 					this.characterActionCallbacks(characterActionCallbackParams);
 				}
-				if(this.mobsKilled == this.mobsMax) {
-					this.gameState = 2;
-					if(this.gameStateCallback != null) {
-						this.gameStateCallback(this.gameState);
-					}
-				}
+				let tmp = this.mobsKilled == this.mobsMax && allowServerLogic;
 				this.recentEngineLoopTime = Date.now() - beginTime;
 				this.spawnMobs();
 			}
@@ -1453,6 +1446,15 @@
 				}
 			}
 			return nearestPlayer;
+		}
+		getGameState() {
+			return this.gameState;
+		}
+		setGameState(gameState) {
+			this.gameState = gameState;
+			if(this.gameStateCallback != null) {
+				this.gameStateCallback(gameState);
+			}
 		}
 		static main() {
 		}
@@ -2388,6 +2390,12 @@
 			this.inputIndex = 0;
 			this.playerId = uuid_Uuid.short().toLowerCase();
 			this.playerEntityId = "entity_" + this.playerId;
+		}
+		setUserData(userData) {
+			this.userId = userData.userId;
+			this.authToken = userData.userId;
+			this.tokens = userData.tokens;
+			this.kills = userData.userId;
 		}
 		incrementAndGetInputIndex() {
 			return ++this.inputIndex;

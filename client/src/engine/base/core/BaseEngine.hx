@@ -8,11 +8,6 @@ import engine.base.core.GameLoop;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
 
-enum EngineMode {
-	Client;
-	Server;
-}
-
 typedef CreateCharacterEntityTask = {
 	var entity:EngineCharacterEntity;
 }

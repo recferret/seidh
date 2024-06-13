@@ -9,7 +9,8 @@ import {
     CreateCharacterMinStruct,
     EntityType,
     CharacterEntityFullStruct,
-    GameState, 
+    GameState,
+    EngineMode, 
 } from "@app/seidh-common/seidh-common.game-types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EventGameCharacterActions } from "../events/event.game.character-actions";
@@ -25,7 +26,7 @@ export class GameInstance {
     private readonly engine: Engine.SeidhGameEngine;
 
     constructor(private eventEmitter: EventEmitter2, public gameId: string, public gameType: GameType) {
-        this.engine = new Engine.engine.seidh.SeidhGameEngine();
+        this.engine = new Engine.engine.seidh.SeidhGameEngine(EngineMode.SERVER);
 
         // -----------------------------------
         // Engine callbacks
@@ -130,15 +131,5 @@ export class GameInstance {
     deletePlayer(playerId: string) {
         this.engine.deleteCharacterEntityByOwnerId(playerId);
     }
-
-    // getters
-    
-    // getCharactersFullStruct() {
-    //     const characters: CharacterEntityFullStruct[] = [];
-    //     for (const entity of this.engine.getCharactersStruct({ changed: false, full: true })) {
-    //         characters.push(entity);
-    //     }
-    //     return characters;
-    // }
     
 }

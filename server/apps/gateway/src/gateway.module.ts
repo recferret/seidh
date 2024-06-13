@@ -4,6 +4,7 @@ import { GatewayService } from './gateway.service';
 import { ServiceName } from '@app/seidh-common';
 import NatsUrl from '@app/seidh-common/seidh-common.internal-protocol';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -23,6 +24,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         }
       },
     ]),
+    JwtModule.register({
+      global: true,
+      secret: 'MY SUPER SECRET',
+    }),
   ],
   controllers: [GatewayController],
   providers: [GatewayService],

@@ -199,6 +199,10 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		}
 	}
 
+	public function clearTargetObject() {
+		this.targetObjectEntity = null;
+	}
+
 	public function getTargetObject() {
 		return targetObjectEntity;
 	}

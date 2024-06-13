@@ -1,6 +1,6 @@
-// const url = 'http://localhost:3003/';
+const url = 'http://localhost:3003/';
 // const url = 'http://192.168.1.6:3003/';
-const url = 'https://seidh-game.online/api/';
+// const url = 'https://seidh-game.online/api/';
 
 async function restFindGame(playerId) {
     const findGameResult = await fetch(url + 'findGame', {

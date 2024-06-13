@@ -1,12 +1,14 @@
 package game.scene;
 
-import game.sound.SoundManager;
+import engine.base.BaseTypesAndClasses;
+
 import game.event.EventManager;
 import game.js.NativeWindowJS;
 import game.scene.impl.LoadingScene;
 import game.scene.base.BasicScene;
 import game.scene.impl.HomeScene;
 import game.scene.impl.GameScene;
+import game.sound.SoundManager;
 
 class SceneManager implements EventListener {
 	private var sceneChangedCallback:BasicScene->Void;
@@ -25,7 +27,7 @@ class SceneManager implements EventListener {
 
 		// currentScene = new GameScene(GameMode.SINGLEPLAYER);
 
-		// currentScene = new HomeScene();
+		currentScene = new HomeScene();
 		// currentScene = new SceneAiTest();
 		// currentScene = new SceneInputTest();
 		// currentScene = new SceneSpritesTest();
@@ -33,7 +35,7 @@ class SceneManager implements EventListener {
 		// currentScene = new SceneNetworkTest();
 		// currentScene = new SceneUiTest();
 
-		currentScene = new LoadingScene();
+		// currentScene = new LoadingScene();
 		currentScene.start();
 
 		changeSceneCallback();
@@ -46,8 +48,8 @@ class SceneManager implements EventListener {
 	public function notify(event:String, message:Dynamic) {
 		switch (event) {
 			case EventManager.EVENT_HOME_PLAY:
-				currentScene = new GameScene(GameMode.SINGLEPLAYER);
-				// currentScene = new GameScene(GameMode.MULTIPLAYER);
+				currentScene = new GameScene(EngineMode.CLIENT_MULTIPLAYER);
+				// currentScene = new GameScene(EngineMode.CLIENT_SINGLEPLAYER);
 				changeSceneCallback();
 			case EventManager.EVENT_HOME_SCENE:
 				currentScene = new HomeScene();

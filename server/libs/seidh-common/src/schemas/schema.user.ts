@@ -32,6 +32,9 @@ export class User {
 
   @Prop([{ type: SchemaTypes.ObjectId, ref: 'User' }])
   friendsInvited: Types.ObjectId[];
+
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
+  invitedBy: Types.ObjectId;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

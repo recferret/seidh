@@ -152,18 +152,19 @@ export class GameplayService {
     // Notify new players about full game state
     if (payload.charactersFullStruct.length > 0) {
       this.playersToInit.forEach(playerId => {
-        const initMessage: WsGatewayGameInitMessage = {
+        const message: WsGatewayGameInitMessage = {
           targetPlayerId : playerId,
           gameId: payload.gameId,
           charactersFullStruct: payload.charactersFullStruct
         };
-        this.wsGatewayService.emit(WsGatewayGameInitPattern, initMessage);
+        this.wsGatewayService.emit(WsGatewayGameInitPattern, message);
       });
       this.playersToInit.clear();
     }
 
     // Notify all players about changed game state
     if (payload.charactersMinStruct.length > 0) {
+      
       const message: WsGatewayGameLoopStateMessage = {
         gameId: payload.gameId,
         charactersMinStruct: payload.charactersMinStruct

@@ -2,6 +2,7 @@ package game.scene.impl;
 
 import haxe.Timer;
 
+import engine.base.BaseTypesAndClasses;
 import engine.seidh.SeidhGameEngine;
 
 import game.event.EventManager;
@@ -9,17 +10,12 @@ import game.event.EventManager.EventListener;
 import game.network.Networking;
 import game.scene.base.BasicScene;
 
-enum abstract GameMode(Int) {
-	var SINGLEPLAYER = 1;
-	var MULTIPLAYER = 2;
-}
-
 class GameScene extends BasicScene implements EventListener {
 
-    public function new(gameMode:GameMode) {
-		super(new SeidhGameEngine());
+    public function new(engineMode:EngineMode) {
+		super(new SeidhGameEngine(engineMode));
 
-		if (gameMode == GameMode.MULTIPLAYER) {
+		if (engineMode == EngineMode.CLIENT_MULTIPLAYER) {
 			EventManager.instance.subscribe(EventManager.EVENT_GAME_INIT, this);
 			EventManager.instance.subscribe(EventManager.EVENT_LOOP_STATE, this);
 			EventManager.instance.subscribe(EventManager.EVENT_GAME_STATE, this);
@@ -31,28 +27,12 @@ class GameScene extends BasicScene implements EventListener {
 			Timer.delay(function callback() {
                 networking.findAndJoinGame();
             }, 1000);
-		} else {
+		} else if (engineMode == EngineMode.CLIENT_SINGLEPLAYER) {
 			createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 2000, 2000, RAGNAR_LOH);
 			seidhGameEngine.allowMobsSpawn(true);
 		}
 
 		SceneManager.Sound.playGameplayTheme();
-
-		// var wsConnectButton:h2d.Flow;
-		// var wsConnectButton:h2d.Flow; 
-
-        // wsConnectButton = addButton('WS CONNECT', function callback(button:h2d.Flow) {
-            // networking.wsConnect();
-        // });
-
-		// wsConnectButton = addButton('CONNECT', function callback(button:h2d.Flow) {
-        //     networking.wsConnect();
-        // });
-
-        // addButton('LOGIN', function callback(button:h2d.Flow) {
-        //     networking.findAndJoinGame();
-		// 	fui.removeChild(button);
-        // });
     }
 
     // --------------------------------------
@@ -65,6 +45,8 @@ class GameScene extends BasicScene implements EventListener {
 				processGameInitEvent(message);
 			case EventManager.EVENT_GAME_STATE:
 				processGameStateEvent(message);
+			case EventManager.EVENT_LOOP_STATE:
+				processLoopStateEvent(message);
 			case EventManager.EVENT_CREATE_CHARACTER:
 				processCreateCharacterEntityEvent(message);
 			case EventManager.EVENT_DELETE_CHARACTER:

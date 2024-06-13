@@ -1,3 +1,9 @@
+export enum EngineMode {
+	CLIENT_SINGLEPLAYER = 1,
+	CLIENT_MULTIPLAYER = 2,
+	SERVER = 3,
+}
+
 export enum Side {
 	LEFT = 1,
 	RIGHT = 2

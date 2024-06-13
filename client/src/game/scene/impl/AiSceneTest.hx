@@ -1,14 +1,16 @@
 package game.scene.impl;
 
-import engine.seidh.SeidhGameEngine;
 import game.scene.base.BasicScene;
+
+import engine.base.BaseTypesAndClasses.ClientGameMode;
+import engine.seidh.SeidhGameEngine;
 
 class SceneAiTest extends BasicScene {
 
 	private var botId = 0;
 
     public function new() {
-		super(new SeidhGameEngine(), function callback(params:BasicSceneClickCallback) {
+		super(new SeidhGameEngine(ClientGameMode.SINGLEPLAYER), function callback(params:BasicSceneClickCallback) {
 			// TODO do not hardcode offsets
 			createCharacterEntityFromMinimalStruct('' + botId, '' + botId, Std.int(params.clickX) - 50, Std.int(params.clickY) - 100, ZOMBIE_BOY);
 			botId++;

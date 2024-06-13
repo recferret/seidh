@@ -209,6 +209,7 @@ class PlayContent extends BasicHomeContent {
         }
         playButtonInteractive.onClick = function(event : hxd.Event) {
             EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
+			SceneManager.Sound.playButton2();
         }
 
         // Play button
@@ -276,6 +277,8 @@ class PlayContent extends BasicHomeContent {
     }
 
     private function switchRagner(dir:String) {
+        SceneManager.Sound.playButton2();
+
         if (dir == 'right') {
             // Current is left, after one spin
             if (currentRagnar == 1) {

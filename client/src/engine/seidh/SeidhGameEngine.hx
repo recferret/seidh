@@ -38,7 +38,7 @@ class SeidhGameEngine extends BaseEngine {
 
     public static function main() {}
 
-    public function new(engineMode = EngineMode.Server) {
+    public function new(engineMode:EngineMode) {
 	    super(engineMode);
     }
 
@@ -95,41 +95,52 @@ class SeidhGameEngine extends BaseEngine {
                 }
             }
 
-            for (e1 in characterEntityManager.entities) {
-                final character1 = cast(e1, EngineCharacterEntity);
-                
-                // Ai movement and updates
-                if (character1.isAlive && !character1.isPlayer()) {
-                    if (EngineConfig.AI_ENABLED) {
-                        final targetPlayer = getNearestPlayer(character1);
-                        if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
-                            character1.setTargetObject(targetPlayer, true);
-                        }
-                    }
+            // AI
+            final allowServerLogic = engineMode == EngineMode.SERVER || engineMode == EngineMode.CLIENT_SINGLEPLAYER;
 
-                    for (e2 in characterEntityManager.entities) {
-                        final character2 = cast(e2, EngineCharacterEntity);
-                        if (!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
-                            if (character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
-                                character1.intersectsWithCharacter = true;
-                                character1.canMove = false;
+            if (allowServerLogic) {
+                for (e1 in characterEntityManager.entities) {
+                    final character1 = cast(e1, EngineCharacterEntity);
+                    
+                    // Ai movement and updates
+                    if (character1.isAlive && !character1.isPlayer()) {
+                        if (EngineConfig.AI_ENABLED) {
+                            final targetPlayer = getNearestPlayer(character1);
+                            if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
+                                character1.setTargetObject(targetPlayer, true);
+                            } else {
+                                character1.clearTargetObject();
                             }
                         }
+
+                        for (e2 in characterEntityManager.entities) {
+                            final character2 = cast(e2, EngineCharacterEntity);
+                            if (!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
+                                if (character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
+                                    character1.intersectsWithCharacter = true;
+                                    character1.canMove = false;
+                                }
+                            }
+                        }
+
+                        character1.update(dt);
+
+                        character1.intersectsWithCharacter = false;
+                        character1.canMove = true;
                     }
-
-                    character1.update(dt);
-
-                    character1.intersectsWithCharacter = false;
-                    character1.canMove = true;
                 }
             }
 
             for (e in characterEntityManager.entities) {
                 final character1 = cast(e, EngineCharacterEntity);
                 if (character1.isAlive) {
-                    if (character1.isPlayer()) {
-                        character1.update(dt);
-                    }
+                    character1.update(dt);
+                }
+
+                if (character1.isAlive) {
+                    // if (character1.isPlayer()) {
+                        // character1.update(dt);
+                    // }
                     
                     // Check projectile collisions against characters
                     for (e in projectileEntityManager.entities) {
@@ -165,14 +176,19 @@ class SeidhGameEngine extends BaseEngine {
                             final character2 = cast(e2, EngineCharacterEntity);
                             if (character2.isAlive && character1.getId() != character2.getId()) {
                                 if (character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
-                                    final health = character2.subtractHealth(character1.actionToPerform.damage);
-                                    if (health == 0) {
-                                        if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
-                                            mobsKilled++;
+                                    if (allowServerLogic) {
+                                        final health = character2.subtractHealth(character1.actionToPerform.damage);
+                                        if (health == 0) {
+                                            if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
+                                                mobsKilled++;
+                                                mobsSpawned--;
+                                            }
+                                            character2.isAlive = false;
+                                            deadEntities.push(character2.getId());
+                                            deleteCharacterEntity(character2.getId());
+                                        } else {
+                                            hurtEntities.push(character2.getId());
                                         }
-                                        character2.isAlive = false;
-                                        deadEntities.push(character2.getId());
-                                        deleteCharacterEntity(character2.getId());
                                     } else {
                                         hurtEntities.push(character2.getId());
                                     }
@@ -187,11 +203,10 @@ class SeidhGameEngine extends BaseEngine {
                             hurtEntities: hurtEntities,
                             deadEntities: deadEntities,
                         });
-
-                        character1.isActing = false;
-                        character1.actionToPerform = null;
                     }
-
+                    
+                    character1.isActing = false;
+                    character1.actionToPerform = null;
                     character1.isRunning = false;
                     character1.isWalking = false;
                 }
@@ -201,14 +216,13 @@ class SeidhGameEngine extends BaseEngine {
                 characterActionCallbacks(characterActionCallbackParams);
             }
 
-            if (mobsKilled == mobsMax) {
-                gameState = GameState.WIN;
-                if (gameStateCallback != null) {
-                    gameStateCallback(gameState);
-                }
+            // Infinite play
+            if (mobsKilled == mobsMax && allowServerLogic) {
+                // gameState = GameState.WIN;
+                // if (gameStateCallback != null) {
+                //     gameStateCallback(gameState);
+                // }
             }
-
-            // TODO add callback if all players are dead
 
             recentEngineLoopTime = Date.now() - beginTime;
             spawnMobs();
@@ -235,23 +249,10 @@ class SeidhGameEngine extends BaseEngine {
             mobsSpawned++;
             mobsLastSpawnTime = now;
 
-            // if (lastLocalMovementInputCheck == 0 || lastLocalMovementInputCheck + characterEntity.movement.movementDelay < now) {
-            //     lastLocalMovementInputCheck = now;
-            //     return true;
-            // } else {
-            //     return false;
-            // }
-
-            // final positionX = MathUtils.randomIntInRange(0, 5000);
-            // final positionY = MathUtils.randomIntInRange(0, 5000);
-
             final positionX = 1000;
             final positionY = 1000;
 
             createCharacterEntity(SeidhEntityFactory.InitiateEntity(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
-            // Timer.delay(function callback() {
-            //     spawnMobs();
-            // }, mobSpawnDelayMs);
         }
     }
 

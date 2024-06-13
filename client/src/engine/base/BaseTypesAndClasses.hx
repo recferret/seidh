@@ -7,6 +7,12 @@ import engine.base.geometry.Rectangle;
 // General
 // -------------------------------
 
+enum abstract EngineMode(Int) {
+	var CLIENT_SINGLEPLAYER = 1;
+	var CLIENT_MULTIPLAYER = 2;
+	var SERVER = 3;
+}
+
 enum abstract Side(Int) {
 	var LEFT = 1;
 	var RIGHT = 2;

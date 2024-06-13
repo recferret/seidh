@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { FindGameRequest, FindGameResponse } from './dto/find.game.dto';
 import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -10,14 +10,21 @@ import {
   UsersAuthenticateMessageResponse, 
   UsersAuthenticatePattern 
 } from '@app/seidh-common/dto/users/users.authenticate.msg';
+import { UsersGetFriendsMessageRequest, UsersGetFriendsMessageResponse, UsersGetFriendsPattern } from '@app/seidh-common/dto/users/users.get.friends.msg';
+import { GetFriendsResponse } from './dto/friends.dto';
+
 
 @Injectable()
-export class GatewayService {
+export class GatewayService implements OnModuleInit {
   
   constructor(
     @Inject(ServiceName.GameplayLobby) private gameplayLobbyService: ClientProxy,
     @Inject(ServiceName.Users) private usersService: ClientProxy
-  ) { }
+  ) { 
+  }
+
+  async onModuleInit() {
+  }
 
   async findGame(findGameRequest: FindGameRequest) {
     const response: FindGameResponse = await firstValueFrom(this.gameplayLobbyService.send(GameplayLobbyFindGamePattern, findGameRequest));
@@ -39,6 +46,18 @@ export class GatewayService {
       tokens: result.tokens,
       kills: result.kills,
       characters: result.characters
+    };
+    return response;
+  }
+
+  async getFriends(userId: string) {
+    const request: UsersGetFriendsMessageRequest = {
+      userId
+    };
+    const result: UsersGetFriendsMessageResponse = await firstValueFrom(this.usersService.send(UsersGetFriendsPattern, request));
+    const response: GetFriendsResponse = {
+      success: result.success,
+      friends: result.friends,
     };
     return response;
   }

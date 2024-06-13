@@ -22,18 +22,20 @@ class LoadingScene extends BasicScene {
             var tgInitData = null;
 
             if (checkTg) {
-                NativeWindowJS.debugAlert('1');
                 tgInitData = NativeWindowJS.tgGetInitData(); 
                 if (tgInitData == null || tgInitData.length == 0) {
-                    NativeWindowJS.debugAlert('2');
                     trace('TG INIT ERROR');
                     // TODO show some popup about game error
                 } else {
                     final tgUnsafeData = NativeWindowJS.tgGetInitDataUnsafe();
                     final startParam = tgUnsafeData.start_param;
 
+                    // final startParam = "e2b9a99c-25dc-4835-b983-a887ccb3be08";
+
                     NativeWindowJS.restPostTelegramInitData(tgInitData, startParam, function callback(data:Dynamic) {
                         // TODO validate data, success etc
+                        NativeWindowJS.tonConnect();
+
                         Player.instance.setUserData(data);
                         EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
                     });

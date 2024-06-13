@@ -133,6 +133,10 @@ class ClientCharacterEntity extends h2d.Object {
         return engineEntity.getForwardLookingLine(lineLength);
     }
 
+    public function getEntityType() {
+        return engineEntity.getEntityType();
+    }
+
     // public function getDebugActionShape() {
     //     return debugActionShape;
     // }
