@@ -28,7 +28,7 @@ class SeidhGameEngine extends BaseEngine {
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
     private var mobsLastSpawnTime = 0.0;
-    private final mobsMax = 2;
+    private final mobsMax = 20;
 
     // TODO change this value if backend
     private final mobSpawnDelayMs = 3.500;
@@ -249,8 +249,24 @@ class SeidhGameEngine extends BaseEngine {
             mobsSpawned++;
             mobsLastSpawnTime = now;
 
-            final positionX = 1000;
-            final positionY = 1000;
+            var positionX = 0;
+            var positionY = 0;
+
+            final rnd = MathUtils.randomIntInRange(1, 4);
+            switch (rnd) {
+                case 1:
+                    positionX = 800;
+                    positionY = 800;
+                case 2:
+                    positionX = 2800;
+                    positionY = 800;
+                case 3:
+                    positionX = 800;
+                    positionY = 2800;
+                case 4:
+                    positionX = 2800;
+                    positionY = 2800;
+            }
 
             createCharacterEntity(SeidhEntityFactory.InitiateEntity(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
         }

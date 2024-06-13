@@ -1,8 +1,10 @@
 package game.scene.impl;
 
-import game.scene.home.CollectionContent;
+import engine.base.MathUtils;
+import hxd.res.DefaultFont;
 import h2d.Bitmap;
-import hxd.Event.EventKind;
+
+import game.scene.home.CollectionContent;
 import game.scene.home.BoostContent;
 import game.scene.home.FriendsContent;
 import game.scene.base.BasicScene;
@@ -26,59 +28,169 @@ class HomeScene extends BasicScene {
 	private var buttonBottomPosY = 0.0;
 
 	public function new() {
-		super(null, function callback(params:BasicSceneClickCallback) {
-			if (params.eventKind == EventKind.EPush && params.clickY > buttonBottomPosY - menuButtonSize) {
-				if (params.clickX <= menuButtonSize) {
-					setSceneContent(HomeSceneContent.HomePlayContent);
-					SceneManager.Sound.playButton1();
-				} 
-				if (params.clickX >= menuButtonSize * 4 && params.clickX <= menuButtonSize * 5) {
-					setSceneContent(HomeSceneContent.HomeFriendsContent);
-					SceneManager.Sound.playButton1();
-				}
-				if (params.clickX >= menuButtonSize * 2 && params.clickX <= menuButtonSize * 3) {
-					setSceneContent(HomeSceneContent.HomeBoostContent);
-					SceneManager.Sound.playButton1();
-				}
-
-				if (params.clickX >= menuButtonSize * 3 && params.clickX <= menuButtonSize * 4) {
-					setSceneContent(HomeSceneContent.HomeCollectionContent);
-					SceneManager.Sound.playButton1();
-				}
-			}
-		});
+		super(null);
 
 		setSceneContent(HomeSceneContent.HomePlayContent);
-
-		// Bottom bar buttons
 
         final homeFrame = new h2d.Bitmap(hxd.Res.ui.home.home_frame.toTile(), this);
 		homeFrame.scaleY = BasicScene.ActualScreenHeight / 1280;
 
-		// ragnar.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 4);
-		// ragnar.setScale(1.5);
+		// ---------------------------------------------------
+		// Bottom bar buttons
+		// ---------------------------------------------------
 
-		menuButtonSize = Std.int(BasicScene.ActualScreenWidth / 5);
+		menuButtonSize = Std.int(BasicScene.ActualScreenWidth / 6) + 10;
 		menuButtonSizeHalf = Std.int(menuButtonSize / 2);
+		buttonBottomPosY = BasicScene.ActualScreenHeight - 68;
 
-		final b1 = addBottomBarButton(menuButtonSize, 'Play');
-		buttonBottomPosY = BasicScene.ActualScreenHeight - menuButtonSizeHalf - (b1.tf.getSize().height * 2);
+		final homeTileOn = hxd.Res.ui.home.button_home_on.toTile().center();
+		final homeTileOff = hxd.Res.ui.home.button_home_off.toTile().center();
 
-		b1.fui.setPosition(menuButtonSizeHalf, buttonBottomPosY);
+		final boostTileOn = hxd.Res.ui.home.button_boost_on.toTile().center();
+		final boostTileOff = hxd.Res.ui.home.button_boost_off.toTile().center();
 
-		// final b2 = addBottomBarButton(menuButtonSize, 'Leaders');
-		// b2.fui.setPosition(menuButtonSize + menuButtonSizeHalf, buttonBottomPosY);
+		final collectionTileOn = hxd.Res.ui.home.button_collect_on.toTile().center();
+		final collectionTileOff = hxd.Res.ui.home.button_collect_off.toTile().center();
 
-		final b3 = addBottomBarButton(menuButtonSize, 'Boost');
-		b3.fui.setPosition(menuButtonSize * 2 + menuButtonSizeHalf, buttonBottomPosY);
+		final friendsTileOn = hxd.Res.ui.home.button_friends_on.toTile().center();
+		final friendsTileOff = hxd.Res.ui.home.button_friends_off.toTile().center();
+		
+		final bottomButtonHome = new h2d.Bitmap(homeTileOn, this);
+		final bottomButtonBoost = new h2d.Bitmap(boostTileOff, this);
+		final bottomButtonCollection = new h2d.Bitmap(collectionTileOff, this);
+		final bottomButtonFriends = new h2d.Bitmap(friendsTileOff, this);
 
-		final b4 = addBottomBarButton(menuButtonSize, 'Collection');
-		b4.fui.setPosition(menuButtonSize * 3 + menuButtonSizeHalf, buttonBottomPosY);
+		// Home button
 
-		final b5 = addBottomBarButton(menuButtonSize, 'Friends');
-		b5.fui.setPosition(menuButtonSize * 4 + menuButtonSizeHalf, buttonBottomPosY);
+		bottomButtonHome.setPosition(menuButtonSize, buttonBottomPosY);
+		bottomButtonHome.setScale(1.1);
 
-		// 
+		final interactionHome = new h2d.Interactive(bottomButtonHome.tile.width, bottomButtonHome.tile.height);
+		interactionHome.setPosition(menuButtonSize - bottomButtonHome.tile.width / 2, buttonBottomPosY - bottomButtonHome.tile.height / 2);
+		addChild(interactionHome);
+
+		interactionHome.onPush = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+				bottomButtonHome.tile = homeTileOff;
+			} else {
+				bottomButtonHome.tile = homeTileOn;
+			}
+		}
+		interactionHome.onRelease = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+				bottomButtonHome.tile = homeTileOn;
+			} else {
+				bottomButtonHome.tile = homeTileOff;
+			}
+		}
+		interactionHome.onClick = function(event : hxd.Event) {
+			SceneManager.Sound.playButton1();
+			if (this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+				bottomButtonBoost.tile = boostTileOff;
+				bottomButtonCollection.tile = collectionTileOff;
+				bottomButtonFriends.tile = friendsTileOff;
+				setSceneContent(HomeSceneContent.HomePlayContent);
+			}
+		}
+
+		// Boost button
+
+		bottomButtonBoost.setPosition(menuButtonSize * 2.2, buttonBottomPosY);
+		bottomButtonBoost.setScale(1.1);
+
+		final interactionBoost = new h2d.Interactive(bottomButtonBoost.tile.width, bottomButtonBoost.tile.height);
+		interactionBoost.setPosition(menuButtonSize * 2.2 - bottomButtonBoost.tile.width / 2, buttonBottomPosY - bottomButtonBoost.tile.height / 2);
+		addChild(interactionBoost);
+
+		interactionBoost.onPush = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+				bottomButtonBoost.tile = boostTileOff;
+			} else {
+				bottomButtonBoost.tile = boostTileOn;
+			}
+		}
+		interactionBoost.onRelease = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+				bottomButtonBoost.tile = boostTileOn;
+			} else {
+				bottomButtonBoost.tile = boostTileOff;
+			}
+		}
+		interactionBoost.onClick = function(event : hxd.Event) {
+			SceneManager.Sound.playButton1();
+			if (this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+				bottomButtonHome.tile = homeTileOff;
+				bottomButtonCollection.tile = collectionTileOff;
+				bottomButtonFriends.tile = friendsTileOff;
+				setSceneContent(HomeSceneContent.HomeBoostContent);
+			}
+		}
+
+		// Collection button
+
+		bottomButtonCollection.setPosition(menuButtonSize * 3.4, buttonBottomPosY);
+		bottomButtonCollection.setScale(1.1);
+
+		final interactionCollection = new h2d.Interactive(bottomButtonCollection.tile.width, bottomButtonCollection.tile.height);
+		interactionCollection.setPosition(menuButtonSize * 3.4 - bottomButtonCollection.tile.width / 2, buttonBottomPosY - bottomButtonCollection.tile.height / 2);
+		addChild(interactionCollection);
+
+		interactionCollection.onPush = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+				bottomButtonCollection.tile = collectionTileOff;
+			} else {
+				bottomButtonCollection.tile = collectionTileOn;
+			}
+		}
+		interactionCollection.onRelease = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+				bottomButtonCollection.tile = collectionTileOn;
+			} else {
+				bottomButtonCollection.tile = collectionTileOff;
+			}
+		}
+		interactionCollection.onClick = function(event : hxd.Event) {
+			SceneManager.Sound.playButton1();
+			if (this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+				bottomButtonHome.tile = homeTileOff;
+				bottomButtonBoost.tile = boostTileOff;
+				bottomButtonFriends.tile = friendsTileOff;
+				setSceneContent(HomeSceneContent.HomeCollectionContent);
+			}
+		}
+
+		// Friends button
+
+		bottomButtonFriends.setPosition(menuButtonSize * 4.6, buttonBottomPosY);
+		bottomButtonFriends.setScale(1.1);
+
+		final interactionFriends = new h2d.Interactive(bottomButtonFriends.tile.width, bottomButtonFriends.tile.height);
+		interactionFriends.setPosition(menuButtonSize * 4.6 - bottomButtonFriends.tile.width / 2, buttonBottomPosY - bottomButtonFriends.tile.height / 2);
+		addChild(interactionFriends);
+
+		interactionFriends.onPush = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+				bottomButtonFriends.tile = friendsTileOff;
+			} else {
+				bottomButtonFriends.tile = friendsTileOn;
+			}
+		}
+		interactionFriends.onRelease = function(event : hxd.Event) {
+			if (this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+				bottomButtonFriends.tile = friendsTileOn;
+			} else {
+				bottomButtonFriends.tile = friendsTileOff;
+			}
+		}
+		interactionFriends.onClick = function(event : hxd.Event) {
+			SceneManager.Sound.playButton1();
+			if (this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+				bottomButtonHome.tile = homeTileOff;
+				bottomButtonBoost.tile = boostTileOff;
+				bottomButtonCollection.tile = collectionTileOff;
+				setSceneContent(HomeSceneContent.HomeFriendsContent);
+			}
+		}
 
 		SceneManager.Sound.playMenuTheme();
 	}
@@ -99,28 +211,6 @@ class HomeScene extends BasicScene {
 	// Common
 	// --------------------------------------
 
-	public function addBottomBarButton(targetButtonSize:Float, text:String) {
-		final fui = new h2d.Flow(this);
-		fui.layout = Vertical;
-		fui.verticalSpacing = 10;
-
-		final iconTile = h2d.Tile.fromColor(0xFF0000);
-		iconTile.setSize(targetButtonSize, targetButtonSize);
-		final iconBmp = new h2d.Bitmap(iconTile.center());
-
-		fui.addChild(iconBmp);
-
-		final tf = new h2d.Text(hxd.res.DefaultFont.get(), fui);
-		tf.text = text;
-		tf.setScale(2);
-		tf.textAlign = Center;
-
-		return {
-			fui: fui,
-			tf: tf
-		}
-	}
-
 	private function setSceneContent(homeSceneContent:HomeSceneContent) {
 		if (this.homeSceneContent != homeSceneContent) {
 			this.homeSceneContent = homeSceneContent;
@@ -133,8 +223,6 @@ class HomeScene extends BasicScene {
 			switch (homeSceneContent) {
 				case HomePlayContent:
 					pageContent = new PlayContent(this); 
-				// case LeadersContent:
-				// 	pageContent = new LeadersContent(this); 
 				case HomeBoostContent:
 					pageContent = new BoostContent(this); 
 				case HomeCollectionContent:

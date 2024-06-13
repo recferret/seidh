@@ -52,6 +52,7 @@ class MathUtils {
 		return Math.abs(a - b) > (error == 0 ? 1 : error);
 	}
 
+	// 1, 4 > 1, 2, 3, 4
 	public static function randomIntInRange(from:Int, to:Int) {
 		return from + Math.floor(((to - from + 1) * Math.random()));
 	}

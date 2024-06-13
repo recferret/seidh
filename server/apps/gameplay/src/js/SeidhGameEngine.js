@@ -780,6 +780,9 @@
 				this.randomizedTargetPos.y = 0;
 			}
 		}
+		clearTargetObject() {
+			this.targetObjectEntity = null;
+		}
 		getTargetObject() {
 			return this.targetObjectEntity;
 		}
@@ -1205,7 +1208,7 @@
 		}
 		_hx_constructor(engineMode) {
 			this.mobSpawnDelayMs = 3.500;
-			this.mobsMax = 2;
+			this.mobsMax = 20;
 			this.mobsLastSpawnTime = 0.0;
 			this.mobsKilled = 0;
 			this.mobsSpawned = 0;
@@ -1276,6 +1279,8 @@
 								let targetPlayer = this.getNearestPlayer(character1);
 								if(targetPlayer != null && character1.getTargetObject() != targetPlayer) {
 									character1.setTargetObject(targetPlayer,true);
+								} else {
+									character1.clearTargetObject();
 								}
 							}
 							let jsIterator = this.characterEntityManager.entities.values();
@@ -1341,17 +1346,17 @@
 							} else if(character1.actionToPerform.meleeStruct != null) {
 								actionShape = character1.actionToPerform.meleeStruct.shape;
 							}
-							if(allowServerLogic) {
-								let jsIterator = this.characterEntityManager.entities.values();
-								let _g_jsIterator = jsIterator;
-								let _g_lastStep = jsIterator.next();
-								while(!_g_lastStep.done) {
-									let v = _g_lastStep.value;
-									_g_lastStep = _g_jsIterator.next();
-									let e2 = v;
-									let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
-									if(character2.isAlive && character1.getId() != character2.getId()) {
-										if(character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+							let jsIterator = this.characterEntityManager.entities.values();
+							let _g_jsIterator = jsIterator;
+							let _g_lastStep = jsIterator.next();
+							while(!_g_lastStep.done) {
+								let v = _g_lastStep.value;
+								_g_lastStep = _g_jsIterator.next();
+								let e2 = v;
+								let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
+								if(character2.isAlive && character1.getId() != character2.getId()) {
+									if(character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+										if(allowServerLogic) {
 											let health = character2.subtractHealth(character1.actionToPerform.damage);
 											if(health == 0) {
 												if(character2.getEntityType() == 3 || character2.getEntityType() == 4) {
@@ -1364,6 +1369,8 @@
 											} else {
 												hurtEntities.push(character2.getId());
 											}
+										} else {
+											hurtEntities.push(character2.getId());
 										}
 									}
 								}
@@ -1395,8 +1402,27 @@
 			if(this.allowSpawnMobs && this.mobsSpawned < this.mobsMax && (this.mobsLastSpawnTime == 0 || this.mobsLastSpawnTime + this.mobSpawnDelayMs < now)) {
 				this.mobsSpawned++;
 				this.mobsLastSpawnTime = now;
-				let positionX = 1000;
-				let positionY = 1000;
+				let positionX = 0;
+				let positionY = 0;
+				let rnd = engine_base_MathUtils.randomIntInRange(1,4);
+				switch(rnd) {
+				case 1:
+					positionX = 800;
+					positionY = 800;
+					break;
+				case 2:
+					positionX = 2800;
+					positionY = 800;
+					break;
+				case 3:
+					positionX = 800;
+					positionY = 2800;
+					break;
+				case 4:
+					positionX = 2800;
+					positionY = 2800;
+					break;
+				}
 				this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateEntity(null,null,positionX,positionY,engine_base_MathUtils.randomIntInRange(1,2) == 1 ? 3 : 4));
 			}
 		}

@@ -20,6 +20,10 @@ class SoundManager {
 
     public function new() {
         if (hxd.res.Sound.supportedFormat(Mp3)) {
+            final manager = hxd.snd.Manager.get();
+            manager.masterVolume = 0.5;
+            manager.masterSoundGroup.maxAudible = 4;
+
             menuTheme = hxd.Res.sound.menu_theme_1;
             gameplayTheme = hxd.Res.sound.gameplay_theme_1;
 
