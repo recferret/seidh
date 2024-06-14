@@ -381,6 +381,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// Getters
 	// ------------------------------------------------
 
+	// Make it a part of an abstraction
 	public function getEntityFullStruct() {
 		return characterEntity.toFullStruct();
 	}
@@ -443,5 +444,9 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function setSide(side:Side) {
 		characterEntity.side = side;
+	}
+
+	public function setHealth(health:Int) {
+		return characterEntity.health = health;
 	}
 }

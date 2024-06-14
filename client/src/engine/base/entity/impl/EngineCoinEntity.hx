@@ -21,4 +21,8 @@ class EngineCoinEntity extends EngineBaseEntity {
 	public function update(dt:Float) {
 	}
 
+	public function getEntityBaseStruct() {
+		return baseEntity.getBaseStruct();
+	}
+
 }

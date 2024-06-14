@@ -129,6 +129,7 @@ typedef CharacterEntityMinStruct = {
     ?ownerId:String,
     x:Int,
     y:Int,
+	?health:Int,
 	?side: Side,
     ?entityType:EntityType,
 }
@@ -226,6 +227,7 @@ class CharacterEntity extends BaseEntity {
 			id: this.id,
 			x: this.x,
 			y: this.y,
+			health: this.health,
 			side: this.side,
 		};
 		return minEntity;

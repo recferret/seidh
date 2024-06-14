@@ -102,7 +102,7 @@ class Friend extends h2d.Object {
                 joinGameButton.setScale(0.4);
             }
             interactionJoin.onClick = function(event : hxd.Event) {
-                // TODO join exact player here
+                SceneManager.Sound.playButton2();
             }
         }
     }
@@ -221,6 +221,7 @@ class FriendsContent extends BasicHomeContent {
             inviteButton.setScale(0.6);
         }
         interactionInvite.onClick = function(event : hxd.Event) {
+            SceneManager.Sound.playButton2();
             EventManager.instance.notify(EventManager.EVENT_REF_SHARE, {});
         }
 

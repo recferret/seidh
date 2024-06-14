@@ -19,6 +19,8 @@ export enum WsProtocolMessage {
   GameInit = 'GameInit',
   CreateCharacter = 'CreateCharacter',
   DeleteCharacter = 'DeleteCharacter',
+  CreateCoin = 'CreateCoin',
+  DeleteCoin = 'DeleteCoin',
   CreateProjectile = 'CreateProjectile',
   DeleteProjectile = 'DeleteProjectile',
   CharacterActions = 'CharacterActions',

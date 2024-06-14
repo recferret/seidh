@@ -186,6 +186,10 @@ class GameUiScene extends h2d.Scene {
 		barXp.update();
     }
 
+	public function addGold() {
+		barGold.addGold();
+	}
+
 	public function release() {
 		movementController.release();
 	}
@@ -199,7 +203,7 @@ class GameUiScene extends h2d.Scene {
 			this, 
 			DialogType.BIG, 
 			"You have won!", 
-			"Zombies killed: " + zombiesKilled,
+			"",// "Zombies killed: " + zombiesKilled,
 			function callback() {
 				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
 			}
@@ -211,7 +215,7 @@ class GameUiScene extends h2d.Scene {
 			this, 
 			DialogType.BIG, 
 			"You lose!", 
-			"Zombies killed: " + zombiesKilled,
+			"",// "Zombies killed: " + zombiesKilled,
 			function callback() {
 				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
 			}

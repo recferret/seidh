@@ -5,10 +5,9 @@ async function tonConnect() {
 
     await tonConnectUI.openModal();
 
-    const Address = TonWeb.utils.Address;
-    const address = new Address(currentAccount.address);
-
-    console.log(address.toString(true));
+    // const Address = TonWeb.utils.Address;
+    // const address = new Address(currentAccount.address);
+    // console.log(address.toString(true));
 }
 
 async function tonMintRagnar() {

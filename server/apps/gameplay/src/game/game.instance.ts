@@ -10,7 +10,9 @@ import {
     EntityType,
     CharacterEntityFullStruct,
     GameState,
-    EngineMode, 
+    EngineMode,
+    EngineCoinEntity,
+    CoinEntityStruct, 
 } from "@app/seidh-common/seidh-common.game-types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EventGameCharacterActions } from "../events/event.game.character-actions";
@@ -20,6 +22,8 @@ import { EventGameDeleteCharacter } from "../events/event.game.delete-character"
 import { EventGameDeleteProjectile } from "../events/event.game.delete-projectile";
 import { EventGameLoopState } from "../events/event.game.loop-state";
 import { EventGameGameState } from "../events/event.game.game-state";
+import { EventGameDeleteCoin } from "../events/event.game.delete-coin";
+import { EventGameCreateCoin } from "../events/event.game.create-coin";
 
 export class GameInstance {
 
@@ -63,6 +67,24 @@ export class GameInstance {
 
         this.engine.deleteProjectileCallback = (projectileEntity: EngineProjectileEntity) => {
             this.eventEmitter.emit(EventGameDeleteProjectile.EventName, new EventGameDeleteProjectile(gameId));
+        };
+
+        this.engine.createCoinCallback = (coinEntity: EngineCoinEntity) => {
+            const coinEntityStruct: CoinEntityStruct = {
+                baseEntityStruct: coinEntity.getEntityBaseStruct(),
+                amount: coinEntity.amount,
+            };
+            this.eventEmitter.emit(
+                EventGameCreateCoin.EventName,
+                new EventGameCreateCoin(gameId, coinEntityStruct)
+            );
+        };
+
+        this.engine.deleteCoinCallback = (coinEntity: EngineCoinEntity) => {
+            this.eventEmitter.emit(
+                EventGameDeleteCoin.EventName,
+                new EventGameDeleteCoin(gameId, coinEntity.getEntityBaseStruct().id)
+            );
         };
 
         this.engine.postLoopCallback = () => {

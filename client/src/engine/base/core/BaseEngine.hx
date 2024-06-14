@@ -18,9 +18,18 @@ typedef CreateProjectileEntityTask = {
 	var entity:EngineProjectileEntity;
 }
 
+enum abstract GameState(Int) {
+	var PLAYING = 1;
+	var WIN = 2;
+    var LOSE = 3;
+	var ENDED = 4;
+}
+
 @:expose
 abstract class BaseEngine {
 	final gameLoop:GameLoop;
+
+    public var gameState = GameState.PLAYING;
 
 	public var tick:Int;
 
@@ -149,6 +158,8 @@ abstract class BaseEngine {
 		for (minEntity in minEntities) {
 			final entity = cast(characterEntityManager.entities.get(minEntity.id), EngineCharacterEntity);
 			if (entity != null) {
+				entity.setHealth(minEntity.health);
+
 				// Skip local player position update if it is close to the server
 				if (entity.getOwnerId() == localPlayerId) {
 					final xDiff = Math.abs(entity.getX() - minEntity.x);
@@ -215,6 +226,13 @@ abstract class BaseEngine {
 				}
 				playerToEntityMap.remove(entity.getOwnerId());
 				characterEntityManager.delete(entity.getId());
+
+				// Game lose if player died
+				if (localPlayerId != null) {
+					if (localPlayerId == entity.getOwnerId()) {
+						gameState = GameState.LOSE;
+					}
+				}
 			}
 		}
 		deleteCharacterEntityQueue = [];
@@ -261,13 +279,13 @@ abstract class BaseEngine {
 	// Coins
 	// -----------------------------------
 
-	function createCoinEntity(entity:EngineCoinEntity) {
+	public function createCoinEntity(entity:EngineCoinEntity) {
 		createCoinEntityQueue.push({
 			entity: entity
 		});
 	}
 
-	function deleteCoinEntity(entityId:String) {
+	public function deleteCoinEntity(entityId:String) {
 		deleteCoinEntityQueue.push(entityId);
 	}
 

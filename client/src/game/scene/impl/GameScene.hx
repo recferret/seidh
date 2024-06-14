@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import engine.seidh.entity.factory.SeidhEntityFactory;
 import haxe.Timer;
 
 import engine.base.BaseTypesAndClasses;
@@ -21,6 +22,8 @@ class GameScene extends BasicScene implements EventListener {
 			EventManager.instance.subscribe(EventManager.EVENT_GAME_STATE, this);
 			EventManager.instance.subscribe(EventManager.EVENT_CREATE_CHARACTER, this);
 			EventManager.instance.subscribe(EventManager.EVENT_DELETE_CHARACTER, this);
+			EventManager.instance.subscribe(EventManager.EVENT_CREATE_COIN, this);
+			EventManager.instance.subscribe(EventManager.EVENT_DELETE_COIN, this);
 			EventManager.instance.subscribe(EventManager.EVENT_CHARACTER_ACTIONS, this);
 
 			initNetwork();
@@ -52,6 +55,10 @@ class GameScene extends BasicScene implements EventListener {
 				processCreateCharacterEntityEvent(message);
 			case EventManager.EVENT_DELETE_CHARACTER:
 				processDeleteCharacterEntityEvent(message);
+			case EventManager.EVENT_CREATE_COIN:
+				processCreateCoinEntityEvent(message);
+			case EventManager.EVENT_DELETE_COIN:
+				processDeleteCoinEntityEvent(message);
 			case EventManager.EVENT_CHARACTER_ACTIONS:
 				processCharacterActions(message);
 		}
@@ -104,6 +111,16 @@ class GameScene extends BasicScene implements EventListener {
 
 	private function processDeleteCharacterEntityEvent(payload:DeleteCharacterPayload) {
 		seidhGameEngine.deleteCharacterEntity(payload.characterId);
+	}
+
+	// TODO rmk, make it like characters
+	private function processCreateCoinEntityEvent(payload:CreateCoinPayload) {
+		final coinStruct = payload.coinEntityStruct.baseEntityStruct;
+		seidhGameEngine.createCoinEntity(SeidhEntityFactory.InitiateCoin(coinStruct.id, coinStruct.x, coinStruct.y, payload.coinEntityStruct.amount));
+	}
+
+	private function processDeleteCoinEntityEvent(payload:DeleteCoinPayload) {
+		seidhGameEngine.deleteCoinEntity(payload.id);
 	}
 
 	private function processCharacterActions(payload:ActionsPayload) {

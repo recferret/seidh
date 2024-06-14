@@ -10,7 +10,7 @@ import engine.seidh.entity.base.SeidhBaseEntity;
 
 class SeidhEntityFactory {
 
-    public static function InitiateCharacter(id: String, ownerId: String, x:Int, y:Int, entityType: EntityType) {
+    public static function InitiateCharacter(id:String, ownerId:String, x:Int, y:Int, entityType:EntityType) {
         var entity:SeidhBaseEntity = null;
         switch (entityType) {
             case RAGNAR_LOH:
@@ -42,8 +42,9 @@ class SeidhEntityFactory {
         return entity;
     }
 
-    public static function InitiateCoin(x:Int, y:Int) {
+    public static function InitiateCoin(?id:String, x:Int, y:Int, amount:Int) {
         return new EngineCoinEntity(new BaseEntity({
+            id: id,
             x: x,
             y: y,
             entityType: EntityType.SMALL_COIN,
@@ -53,7 +54,7 @@ class SeidhEntityFactory {
                 rectOffsetX: 0,
                 rectOffsetY: 0,
             },
-        }), 1);
+        }), amount);
     }
 
     public static function InitiateProjectile() {

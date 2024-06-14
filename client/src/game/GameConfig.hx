@@ -11,8 +11,8 @@ class GameConfig {
 
 	public static final FontColor = 0xebddae;
 
-	public static var PlayMusic = false;
-	public static var PlaySounds = false;
+	public static var PlayMusic = true;
+	public static var PlaySounds = true;
 
-	public static var DebugDraw = true;
+	public static var DebugDraw = false;
 }

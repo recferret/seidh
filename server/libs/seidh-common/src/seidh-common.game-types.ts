@@ -23,6 +23,8 @@ export enum EntityType {
 	RAGNAR_NORM = 2,
 	ZOMBIE_BOY = 3,
 	ZOMBIE_GIRL = 4,
+
+	SMALL_COIN = 99,
 }
 
 export interface EntityShape {
@@ -40,6 +42,11 @@ export interface BaseEntityStruct {
 	id: string;
 	ownerId: string;
 	rotation: number;
+}
+
+export interface CoinEntityStruct {
+	baseEntityStruct: BaseEntityStruct;
+	amount: number;
 }
 
 export interface CharacterMovementStruct {
@@ -88,10 +95,21 @@ export interface CharacterEntityFullStruct {
 }
 
 export interface CharacterEntityMinStruct {
-	id: string,
-	x: number,
-	y: number,
-	side: Side
+	id: string;
+	x: number;
+	y: number;
+	health: number;
+	side: Side;
+}
+
+export interface BaseEntityStruct {
+	x: number;
+	y: number;
+	entityType:EntityType;
+	entityShape:EntityShape;
+	id: string;
+	ownerId: string;
+	rotation: number;
 }
 
 export interface EngineCharacterEntity {
@@ -101,6 +119,11 @@ export interface EngineCharacterEntity {
 
 export interface EngineProjectileEntity {
 
+}
+
+export interface EngineCoinEntity {
+	getEntityBaseStruct(): BaseEntityStruct;
+	amount: number;
 }
 
 export interface CharacterActionCallbackParams {

@@ -1,7 +1,6 @@
 let socket = undefined;
 
-// const e = 'ws://localhost:3004/';
-// const e = 'http://192.168.1.6:3003/';
+// const socketUrl = 'ws://localhost:3004/';
 const socketUrl = 'wss://seidh-game.online/';
 // const socketUrl = 'ws://23.111.202.19:3004/'
 
@@ -53,6 +52,14 @@ function wsConnect(playerId, callback) {
 
     socket.on('DeleteCharacter', function(data) {
         callback({type: 'DeleteCharacter', data});
+    });
+
+    socket.on('CreateCoin', function(data) {
+        callback({type: 'CreateCoin', data});
+    });
+
+    socket.on('DeleteCoin', function(data) {
+        callback({type: 'DeleteCoin', data});
     });
 
     socket.on('CharacterActions', function(data) {

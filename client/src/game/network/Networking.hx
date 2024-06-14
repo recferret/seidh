@@ -1,6 +1,6 @@
 package game.network;
 
-import engine.seidh.SeidhGameEngine.GameState;
+import engine.base.core.BaseEngine.GameState;
 import engine.base.BaseTypesAndClasses;
 import game.event.EventManager;
 import game.js.NativeWindowJS;
@@ -16,6 +16,17 @@ typedef CreateCharacterPayload = {
 
 typedef DeleteCharacterPayload = {
 	characterId:String,
+}
+
+typedef CreateCoinPayload = {
+    coinEntityStruct: {
+        baseEntityStruct: BaseEntityStruct,
+        amount:Int,
+    }
+}
+
+typedef DeleteCoinPayload = {
+	id:String,
 }
 
 typedef LoopStatePayload = {
@@ -61,6 +72,10 @@ class Networking {
                 EventManager.instance.notify(EventManager.EVENT_CREATE_CHARACTER, data);
             case 'DeleteCharacter':
                 EventManager.instance.notify(EventManager.EVENT_DELETE_CHARACTER, data);
+            case 'CreateCoin':
+                EventManager.instance.notify(EventManager.EVENT_CREATE_COIN, data);
+            case 'DeleteCoin':
+                EventManager.instance.notify(EventManager.EVENT_DELETE_COIN, data);
             case 'CharacterActions':
                 EventManager.instance.notify(EventManager.EVENT_CHARACTER_ACTIONS, data);
             default:

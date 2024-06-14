@@ -15,6 +15,7 @@ import game.terrain.TerrainManager;
 
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
+import engine.base.core.BaseEngine.GameState;
 import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.entity.impl.EngineCoinEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
@@ -47,9 +48,6 @@ abstract class BasicScene extends h2d.Scene {
 	private var targetCursor:h2d.Bitmap;
 
 	private final isMobileDevice:Bool;
-
-	private var cameraOffsetX = 0;
-	private var cameraOffsetY = 0;
 
 	private var basicSceneCallback:BasicSceneClickCallback->Void;
 
@@ -138,8 +136,8 @@ abstract class BasicScene extends h2d.Scene {
 				if (coin != null) {
 					clientCoinEntities.remove(coinEntity.getId());
 
-					final point = new h2d.col.Point(600, 0);
-					camera.screenToCamera(point);
+					final point = new h2d.col.Point(camera.x + 530, camera.y - BasicScene.ActualScreenHeight);
+					// camera.screenToCamera(point);
 					Actuate.tween(coin, 1, { 
 						x: point.x,
 						y: point.y,
@@ -149,6 +147,7 @@ abstract class BasicScene extends h2d.Scene {
 					}).onComplete(function callback() {
 						removeChild(coin);
 					});
+					gameUiScene.addGold();
 				}
 			};
 
@@ -171,10 +170,7 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.seidhGameEngine.characterActionCallbacks = function callback(params:Array<CharacterActionCallbackParams>) {
-				// TODO make callbacks work
 				for (value in params) {
-					// SceneManager.Sound.playZombieDeath();
-
 					// Play action initiator animation
 					final clientEntity = clientCharacterEntities.get(value.entityId);
 					switch (value.actionType) {
@@ -195,26 +191,6 @@ abstract class BasicScene extends h2d.Scene {
 							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
 						default: 
 					}
-						// case MELEE_ATTACK_1:
-						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
-						// case MELEE_ATTACK_2:
-						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_2);
-						// case MELEE_ATTACK_3:
-						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
-						// case RUN_ATTACK:
-						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_RUN);
-						// case RANGED_ATTACK1:
-						// 	// clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_1);
-						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
-						// case RANGED_ATTACK2:
-						// 	// clientEntity.animation.setAnimationState(CharacterAnimationState.SHOT_2);
-						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_2);
-						// case DEFEND:
-						// 	clientEntity.animation.setAnimationState(CharacterAnimationState.DEFEND);
-					// }
-
-					// Draw shape only for melee attacks
-					// clientEntity.setDebugActionShape(value.shape);
 
 					// Play hurt and dead animations
 					for (value in value.hurtEntities) {
@@ -223,12 +199,13 @@ abstract class BasicScene extends h2d.Scene {
 							if (clientEntity.getEntityType() == EntityType.RAGNAR_LOH ||
 								clientEntity.getEntityType() == EntityType.RAGNAR_NORM) {
 								SceneManager.Sound.playVikingDmg();
+								fxManager.blood(clientEntity.x + (clientEntity.getSide() == Side.RIGHT ? 100 : -100), clientEntity.y, clientEntity.getSide());
 							} else if (
 								clientEntity.getEntityType() == EntityType.ZOMBIE_BOY ||
 								clientEntity.getEntityType() == EntityType.ZOMBIE_GIRL) {
 								SceneManager.Sound.playZombieDmg();
+								fxManager.blood(clientEntity.x + (clientEntity.getSide() == Side.RIGHT ? 100 : -80), clientEntity.y, clientEntity.getSide());
 							}
-							fxManager.blood(clientEntity.x + clientEntity.getBodyRectangle().w / 3, clientEntity.y, clientEntity.getSide());
 							clientEntity.animation.setAnimationState(HURT);
 						}
 					}
@@ -340,12 +317,6 @@ abstract class BasicScene extends h2d.Scene {
 			}
 		} else {
 			scaleMode = ScaleMode.LetterBox(w, h, true);
-			// camera.scale(0.5, 0.5);
-			// scale(0.5);
-			// camera.setViewport(0, 0, w, h);
-
-			// cameraOffsetX = -Std.int(w / 2);
-			// cameraOffsetY = -Std.int(h / 2);
 		}
 	}
 
@@ -360,8 +331,8 @@ abstract class BasicScene extends h2d.Scene {
 		customUpdate(dt, fps);
 
 		if (playerEntity != null) {
-			camera.x = playerEntity.x + cameraOffsetX;
-			camera.y = playerEntity.y + cameraOffsetY;
+			camera.x = playerEntity.x;
+			camera.y = playerEntity.y;
 		}
 	}
 
@@ -440,7 +411,7 @@ abstract class BasicScene extends h2d.Scene {
 			id: id, 
 			ownerId: ownerId, 
 			x: x, 
-			y: y, 
+			y: y,
 			entityType: entityType
 		});
 	}

@@ -59,6 +59,7 @@ class PlayContent extends BasicHomeContent {
 
     private final ragnarLohTile:h2d.Tile;
     private final ragnarNormTile:h2d.Tile;
+    private final ragnarDudeTile:h2d.Tile;
 
     public function new(scene:h2d.Scene) {
 		super(scene);
@@ -155,6 +156,7 @@ class PlayContent extends BasicHomeContent {
 
         ragnarLohTile = hxd.Res.ragnar.ragnar_loh.toTile().center();
         ragnarNormTile = hxd.Res.ragnar.ragnar_norm.toTile().center();
+        ragnarDudeTile = hxd.Res.ragnar.ragnar_dude.toTile().center();
 
         leftRagnarPosX = 100;
         leftRagnarPosY = BasicScene.ActualScreenHeight / 2.5;
@@ -163,13 +165,13 @@ class PlayContent extends BasicHomeContent {
         rightRagnarPosX = BasicScene.ActualScreenWidth - ragnarLohTile.width / 2 - 20;
         rightRagnarPosY = BasicScene.ActualScreenHeight / 2.5;
 
-        leftRagnar = new h2d.Bitmap(ragnarLohTile, this);
+        leftRagnar = new h2d.Bitmap(ragnarNormTile, this);
         leftRagnar.setPosition(leftRagnarPosX, leftRagnarPosY);
 
-        rightRagnar = new h2d.Bitmap(ragnarLohTile, this);
+        rightRagnar = new h2d.Bitmap(ragnarDudeTile, this);
         rightRagnar.setPosition(rightRagnarPosX, rightRagnarPosY);
 
-        centralRagnar = new h2d.Bitmap(ragnarNormTile, this);
+        centralRagnar = new h2d.Bitmap(ragnarLohTile, this);
         centralRagnar.setPosition(centralRagnarPosX, centralRagnarPosY);
 
         // ------------------------------------

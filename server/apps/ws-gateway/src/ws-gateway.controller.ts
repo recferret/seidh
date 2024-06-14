@@ -9,16 +9,22 @@ import { WsGatewayGameDeleteCharacterPattern, WsGatewayGameDeleteCharacterMessag
 import { WsGatewayGameDeleteProjectilePattern, WsGatewayGameDeleteProjectileMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.projectile.msg';
 import { WsGatewayGameLoopStateMessage, WsGatewayGameLoopStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.loop.state.msg';
 import { WsGatewayGameGameStatePattern, WsGatewayGameGameStateMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.game.state';
+import { WsGatewayGameCreateCoinPattern, WsGatewayGameCreateCoinMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.coin.msg';
+import { WsGatewayGameDeleteCoinPattern, WsGatewayGameDeleteCoinMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.coin.msg';
 
 @Controller()
 export class WsGatewayController {
   
   constructor(private readonly wsGatewayWsController: WsGatewayWsController) { }
 
+  // Init
+
   @MessagePattern(WsGatewayGameInitPattern)
   gameInit(data: WsGatewayGameInitMessage) {
     this.wsGatewayWsController.broadcast(WsProtocolMessage.GameInit, data);
   }
+
+  // Character
 
   @MessagePattern(WsGatewayGameCreateCharacterPattern)
   createCharacter(data: WsGatewayGameCreateCharacterMessage) {
@@ -30,6 +36,20 @@ export class WsGatewayController {
     this.wsGatewayWsController.broadcast(WsProtocolMessage.DeleteCharacter, data);
   }
 
+  // Coin
+
+  @MessagePattern(WsGatewayGameCreateCoinPattern)
+  createCoin(data: WsGatewayGameCreateCoinMessage) {
+    this.wsGatewayWsController.broadcast(WsProtocolMessage.CreateCoin, data);
+  }
+
+  @MessagePattern(WsGatewayGameDeleteCoinPattern)
+  deleteCoin(data: WsGatewayGameDeleteCoinMessage) {
+    this.wsGatewayWsController.broadcast(WsProtocolMessage.DeleteCoin, data);
+  }
+
+  // Projectile
+
   @MessagePattern(WsGatewayGameCreateProjectilePattern)
   createProjectile(data: WsGatewayGameCreateProjectileMessage) {
     this.wsGatewayWsController.broadcast(WsProtocolMessage.CreateProjectile, data);
@@ -40,10 +60,14 @@ export class WsGatewayController {
     this.wsGatewayWsController.broadcast(WsProtocolMessage.DeleteProjectile, data);
   }
 
+  // Actions
+
   @MessagePattern(WsGatewayGameCharacterActionsPattern)
   characterActions(data: WsGatewayGameCharacterActionsMessage) {
     this.wsGatewayWsController.broadcast(WsProtocolMessage.CharacterActions, data);
   }
+
+  // States
 
   @MessagePattern(WsGatewayGameLoopStatePattern)
   loopState(data: WsGatewayGameLoopStateMessage) {

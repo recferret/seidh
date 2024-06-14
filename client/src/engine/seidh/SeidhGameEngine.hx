@@ -13,16 +13,9 @@ import engine.base.core.BaseEngine;
 import engine.seidh.entity.base.SeidhBaseEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
-enum abstract GameState(Int) {
-	var PLAYING = 1;
-	var WIN = 2;
-    var LOSE = 3;
-}
-
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
-    private var gameState = GameState.PLAYING;
     private var framesPassed = 0;
     private var timePassed = 0.0;
 
@@ -30,7 +23,7 @@ class SeidhGameEngine extends BaseEngine {
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
     private var mobsLastSpawnTime = 0.0;
-    private final mobsMax = 1;
+    private final mobsMax = 20;
     private final mobSpawnDelayMs = 3.500;
     
     private final playerZombieKills = new Map<String, Int>();
@@ -45,6 +38,10 @@ class SeidhGameEngine extends BaseEngine {
     public function new(engineMode:EngineMode) {
 	    super(engineMode);
     }
+
+    // ---------------------------------------------------
+    // Create entity helpers
+    // ---------------------------------------------------
 
     public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
         createCharacterEntity(SeidhEntityFactory.InitiateCharacter(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType));
@@ -191,25 +188,25 @@ class SeidhGameEngine extends BaseEngine {
                                             // Update counter, spawn token
                                             if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
                                                 mobsKilled++;
-                                                // mobsSpawned--;
+                                                mobsSpawned--;
 
                                                 playerZombieKills.set(character1.getOwnerId(), playerZombieKills.get(character1.getOwnerId()) + 1);
 
                                                 final coinX = Std.int(character2.getBodyRectangle().x);
                                                 final coinY = Std.int(character2.getBodyRectangle().y);
                                                 
-                                                createCoinEntity(SeidhEntityFactory.InitiateCoin(coinX, coinY));
+                                                createCoinEntity(SeidhEntityFactory.InitiateCoin(null, coinX, coinY, 1));
                                             }
                                             character2.isAlive = false;
                                             deadEntities.push(character2.getId());
                                             deleteCharacterEntity(character2.getId());
 
-                                            // Game lose condition if single player
-                                            if (engineMode == EngineMode.CLIENT_SINGLEPLAYER && localPlayerId != null) {
-                                                if (localPlayerId == character2.getOwnerId()) {
-                                                    gameState = GameState.LOSE;
-                                                }
-                                            }
+                                            // // Game lose condition if single player
+                                            // if (engineMode == EngineMode.CLIENT_SINGLEPLAYER && localPlayerId != null) {
+                                            //     if (localPlayerId == character2.getOwnerId()) {
+                                            //         gameState = GameState.LOSE;
+                                            //     }
+                                            // }
                                         } else {
                                             hurtEntities.push(character2.getId());
                                         }
@@ -248,14 +245,10 @@ class SeidhGameEngine extends BaseEngine {
                 // }
             }
 
-            if (gameState == GameState.LOSE) {
-                if (gameStateCallback != null) {
-                    gameStateCallback(gameState);
-                }
-            }
-
             recentEngineLoopTime = Date.now() - beginTime;
             spawnMobs();
+        } else if (gameState == GameState.LOSE) {
+            lose();
         }
     }
 
@@ -328,6 +321,15 @@ class SeidhGameEngine extends BaseEngine {
 
     public function clearPlayerKills(playerId:String) {
         playerZombieKills.remove(playerId);
+    }
+
+    public function lose() {
+        if (gameState == GameState.LOSE) {
+            if (gameStateCallback != null) {
+                gameStateCallback(gameState);
+            }
+            gameState = GameState.ENDED;
+        }
     }
 
     private function createProjectileByCharacter(character:EngineCharacterEntity) {
