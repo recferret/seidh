@@ -8,7 +8,6 @@ class LoadingScene extends BasicScene {
 
     public function new() {
         super(null);
-
         trace('Loading...');
     }
 
@@ -33,9 +32,6 @@ class LoadingScene extends BasicScene {
                     // final startParam = "e2b9a99c-25dc-4835-b983-a887ccb3be08";
 
                     NativeWindowJS.restPostTelegramInitData(tgInitData, startParam, function callback(data:Dynamic) {
-                        // TODO validate data, success etc
-                        NativeWindowJS.tonConnect();
-
                         Player.instance.setUserData(data);
                         EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
                     });

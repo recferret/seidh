@@ -1508,8 +1508,27 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 		if(this.allowSpawnMobs && this.mobsSpawned < this.mobsMax && (this.mobsLastSpawnTime == 0 || this.mobsLastSpawnTime + this.mobSpawnDelayMs < now)) {
 			this.mobsSpawned++;
 			this.mobsLastSpawnTime = now;
-			let positionX = 1800;
-			let positionY = 1800;
+			let positionX = 0;
+			let positionY = 0;
+			let rnd = engine_base_MathUtils.randomIntInRange(1,4);
+			switch(rnd) {
+			case 1:
+				positionX = 800;
+				positionY = 800;
+				break;
+			case 2:
+				positionX = 2800;
+				positionY = 800;
+				break;
+			case 3:
+				positionX = 800;
+				positionY = 2800;
+				break;
+			case 4:
+				positionX = 2800;
+				positionY = 2800;
+				break;
+			}
 			this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCharacter(null,null,positionX,positionY,engine_base_MathUtils.randomIntInRange(1,2) == 1 ? 3 : 4));
 		}
 	}
@@ -1679,7 +1698,7 @@ class engine_seidh_entity_impl_RagnarLohEntity extends engine_seidh_entity_base_
 		super(characterEntity);
 	}
 	static GenerateObjectEntity(id,ownerId,x,y) {
-		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 1, entityShape : { width : 180, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 100, movement : { canWalk : true, canRun : false, runSpeed : 65, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : { width : 500, height : 400, rectOffsetX : 0, rectOffsetY : 0}}}, action1 : { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : { width : 30, height : 10, rectOffsetX : 0, rectOffsetY : 0}}}, action2 : { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}, shape : { width : 25, height : 25, rectOffsetX : 0, rectOffsetY : 0}}}, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}}}});
+		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 1, entityShape : { width : 180, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 100, movement : { canWalk : true, canRun : false, runSpeed : 40, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : { width : 500, height : 400, rectOffsetX : 0, rectOffsetY : 0}}}, action1 : { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : { width : 30, height : 10, rectOffsetX : 0, rectOffsetY : 0}}}, action2 : { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}, shape : { width : 25, height : 25, rectOffsetX : 0, rectOffsetY : 0}}}, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}}}});
 	}
 }
 engine_seidh_entity_impl_RagnarLohEntity.__name__ = true;
@@ -1692,7 +1711,7 @@ class engine_seidh_entity_impl_RagnarNormEntity extends engine_seidh_entity_base
 		super(characterEntity);
 	}
 	static GenerateObjectEntity(id,ownerId,x,y) {
-		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 2, entityShape : { width : 180, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 100, movement : { canWalk : true, canRun : false, runSpeed : 65, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : { width : 500, height : 400, rectOffsetX : 0, rectOffsetY : 0}}}, action1 : { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : { width : 30, height : 10, rectOffsetX : 0, rectOffsetY : 0}}}, action2 : { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}, shape : { width : 25, height : 25, rectOffsetX : 0, rectOffsetY : 0}}}, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}}}});
+		return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 2, entityShape : { width : 180, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 100, movement : { canWalk : true, canRun : false, runSpeed : 40, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 5, inputDelay : 1, meleeStruct : { aoe : true, shape : { width : 500, height : 400, rectOffsetX : 0, rectOffsetY : 0}}}, action1 : { actionType : 3, damage : 5, inputDelay : 1, projectileStruct : { aoe : false, penetration : false, speed : 200, travelDistance : 900, projectiles : 1, shape : { width : 30, height : 10, rectOffsetX : 0, rectOffsetY : 0}}}, action2 : { actionType : 4, damage : 5, inputDelay : 1, projectileStruct : { aoe : true, penetration : false, speed : 10, travelDistance : 200, projectiles : 1, aoeShape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}, shape : { width : 25, height : 25, rectOffsetX : 0, rectOffsetY : 0}}}, action3 : { actionType : 5, damage : 0, inputDelay : 3, meleeStruct : { aoe : true, shape : { width : 100, height : 100, rectOffsetX : 0, rectOffsetY : 0}}}});
 	}
 }
 engine_seidh_entity_impl_RagnarNormEntity.__name__ = true;

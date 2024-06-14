@@ -272,24 +272,24 @@ class SeidhGameEngine extends BaseEngine {
             mobsSpawned++;
             mobsLastSpawnTime = now;
 
-            var positionX = 1800;
-            var positionY = 1800;
+            var positionX = 0;
+            var positionY = 0;
 
-            // final rnd = MathUtils.randomIntInRange(1, 4);
-            // switch (rnd) {
-            //     case 1:
-            //         positionX = 800;
-            //         positionY = 800;
-            //     case 2:
-            //         positionX = 2800;
-            //         positionY = 800;
-            //     case 3:
-            //         positionX = 800;
-            //         positionY = 2800;
-            //     case 4:
-            //         positionX = 2800;
-            //         positionY = 2800;
-            // }
+            final rnd = MathUtils.randomIntInRange(1, 4);
+            switch (rnd) {
+                case 1:
+                    positionX = 800;
+                    positionY = 800;
+                case 2:
+                    positionX = 2800;
+                    positionY = 800;
+                case 3:
+                    positionX = 800;
+                    positionY = 2800;
+                case 4:
+                    positionX = 2800;
+                    positionY = 2800;
+            }
 
             createCharacterEntity(SeidhEntityFactory.InitiateCharacter(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
         }
