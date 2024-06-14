@@ -1,5 +1,6 @@
 package engine.base.entity.impl;
 
+import engine.base.geometry.Rectangle;
 import haxe.Int32;
 import uuid.Uuid;
 import engine.base.BaseTypesAndClasses;
@@ -23,6 +24,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// ------------------------------------------------
 
 	private var characterEntity:CharacterEntity;
+	private var maxHealth:Int;
+
 	private var targetObjectEntity:EngineBaseEntity;
 	private var randomizedTargetPos = new Point();
 
@@ -37,6 +40,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public var botForwardLookingLine:Line;
 	private final botForwardLookingLineLength = 100;
+	private final botAttackRange = 200;
 
 	// ------------------------------------------------
 	// Movement
@@ -57,6 +61,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public var isActing = false;
 	public var actionToPerform:CharacterActionStruct;
+	public var debugActionToPerform:CharacterActionStruct;
 
 	private var lastActionMainInputCheck = 0.0;
 	private var lastAction1InputCheck = 0.0;
@@ -81,6 +86,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		super(characterEntity);
 
 		this.characterEntity = characterEntity;
+		this.maxHealth = characterEntity.health;
 
 		if (!isPlayer()) {
 			botForwardLookingLine = new Line();
@@ -120,10 +126,14 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public function update(dt:Float) {
 		lastDeltaTime = dt;
 
-		if (!this.isPlayer() && targetObjectEntity != null) {
+		debugActionToPerform = null;
+
+		if (hasTargetObject() && !isPlayer()) {
+			// Rotate bot in the target direction
 			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
 			baseEntity.rotation = angleBetweenEntities;
 
+			// Bit line sight for debug
 			final l = getForwardLookingLine(botForwardLookingLineLength);
 			botForwardLookingLine.x1 = l.p1.x;
 			botForwardLookingLine.y1 = l.p1.y; 
@@ -136,8 +146,13 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		if (customUpdate != null)
 			customUpdate.onUpdate();
 
-		if (targetObjectEntity != null && !isPlayer())
-			moveToTarget();
+		// Ai
+		if (hasTargetObject() && !isPlayer()) {
+			aiMoveToTarget();
+			if (ifTargetInAttackRange()) {
+				aiMeleeAttack();
+			}
+		}
 
 		if (customUpdate != null)
 			customUpdate.postUpdate();
@@ -212,7 +227,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	public function ifTargetInAttackRange() {
-		return distanceBetweenTarget() < 150;
+		return distanceBetweenTarget() < botAttackRange;
 	}
 
 	private function distanceBetweenTarget() {
@@ -253,27 +268,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 		baseEntity.x += Std.int(dx);
 		baseEntity.y += Std.int(dy);
-	}
-
-	public function moveToTarget() {
-		if (canMove && !ifTargetInAttackRange()) {
-			final speed = characterEntity.movement.runSpeed;
-
-			dx = speed * Math.cos(baseEntity.rotation) * lastDeltaTime;
-			dy = speed * Math.sin(baseEntity.rotation) * lastDeltaTime;
-
-			if (dx > 0.1 && dx < 1) {
-				dx = 1;
-			}
-			if (dy > 0 && dy < 1) {
-				dy = 1;
-			}
-
-			characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
-
-			baseEntity.x += Std.int(dx);
-			baseEntity.y += Std.int(dy);
-		}
 	}
 
 	public function checkLocalMovementInput() {
@@ -322,12 +316,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		return allow;
 	}
 
-	public function aiMeleeAttack() {
-		if (checkLocalActionInput(CharacterActionType.ACTION_MAIN)) {
-			isActing = true;
-		}
-	}
-
 	public function setNextActionToPerform(characterActionType:CharacterActionType) {
 		isActing = true;
 		switch (characterActionType) {
@@ -343,6 +331,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 				actionToPerform = actionUltimate;
 			default:
 		}
+		debugActionToPerform = actionToPerform;
 	}
 
 	public function addHealth(add:Int) {
@@ -358,6 +347,37 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	// ------------------------------------------------
+	// AI
+	// ------------------------------------------------
+
+	private function aiMoveToTarget() {
+		if (canMove && !ifTargetInAttackRange()) {
+			final speed = characterEntity.movement.runSpeed;
+
+			dx = speed * Math.cos(baseEntity.rotation) * lastDeltaTime;
+			dy = speed * Math.sin(baseEntity.rotation) * lastDeltaTime;
+
+			if (dx > 0.1 && dx < 1) {
+				dx = 1;
+			}
+			if (dy > 0 && dy < 1) {
+				dy = 1;
+			}
+
+			characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
+
+			baseEntity.x += Std.int(dx);
+			baseEntity.y += Std.int(dy);
+		}
+	}
+
+	public function aiMeleeAttack() {
+		if (checkLocalActionInput(CharacterActionType.ACTION_MAIN)) {
+			setNextActionToPerform(CharacterActionType.ACTION_MAIN);
+		}
+	}
+
+	// ------------------------------------------------
 	// Getters
 	// ------------------------------------------------
 
@@ -369,25 +389,29 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		return characterEntity.toMinStruct();
 	}
 	
-	public function getCurrentActionRect() {
-		if (actionToPerform == null)
+	public function getCurrentActionRect(debug:Bool = false) {
+		final action = debug ? debugActionToPerform : actionToPerform;
+
+		if (action == null)
 			return null;
-		if (actionToPerform.meleeStruct != null) {
-			final shape = new EntityShape(actionToPerform.meleeStruct.shape);
-			return shape.toRect(
+		if (action.meleeStruct != null) {
+			final shape = new EntityShape(action.meleeStruct.shape);
+			final rect = shape.toRect(
 				getBodyRectangle().getTopLeftPoint().x,
 				getBodyRectangle().getTopLeftPoint().y - (baseEntity.entityShape.height / 4),
 				0, 
 				characterEntity.side
 			);
-		} else if (actionToPerform.projectileStruct != null) {
-			final shape = new EntityShape(actionToPerform.projectileStruct.shape);
-			return shape.toRect(
+			return rect;
+		} else if (action.projectileStruct != null) {
+			final shape = new EntityShape(action.projectileStruct.shape);
+			final rect = shape.toRect(
 				baseEntity.x, 
 				baseEntity.y, 
 				0, 
 				characterEntity.side
 			);
+			return rect;
 		} else {
 			return null;
 		}
@@ -397,8 +421,12 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		return characterEntity.movement.runSpeed;
 	}
 
-	public function getHealth() {
+	public function getCurrentHealth() {
 		return characterEntity.health;
+	}
+
+	public function getMaxHealth() {
+		return maxHealth;
 	}
 
 	public function getSide() {

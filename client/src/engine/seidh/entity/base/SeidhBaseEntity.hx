@@ -20,6 +20,7 @@ class SeidhBaseEntity extends EngineCharacterEntity {
 	// Abstract implementation
 	// ------------------------------------------------
 
+    // canPerformMove and canPerformAction has to be reimplemented due to server input double check 
     public function canPerformMove():Bool {
         return true;
     }

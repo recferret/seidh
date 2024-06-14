@@ -1,13 +1,14 @@
 package engine.seidh;
 
+import engine.base.entity.impl.EngineCoinEntity;
 import js.lib.Date;
 
 import engine.base.BaseTypesAndClasses;
 import engine.base.EngineConfig;
 import engine.base.MathUtils;
 import engine.base.entity.base.EngineBaseEntity;
-import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
+import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.core.BaseEngine;
 import engine.seidh.entity.base.SeidhBaseEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
@@ -15,6 +16,7 @@ import engine.seidh.entity.factory.SeidhEntityFactory;
 enum abstract GameState(Int) {
 	var PLAYING = 1;
 	var WIN = 2;
+    var LOSE = 3;
 }
 
 @:expose
@@ -23,18 +25,20 @@ class SeidhGameEngine extends BaseEngine {
     private var gameState = GameState.PLAYING;
     private var framesPassed = 0;
     private var timePassed = 0.0;
-    
+
     private var allowSpawnMobs = false;
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
     private var mobsLastSpawnTime = 0.0;
-    private final mobsMax = 20;
-
-    // TODO change this value if backend
+    private final mobsMax = 1;
     private final mobSpawnDelayMs = 3.500;
     
+    private final playerZombieKills = new Map<String, Int>();
+
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
     public var gameStateCallback:GameState->Void;
+
+    // TODO add coins here
 
     public static function main() {}
 
@@ -43,7 +47,7 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
-        createCharacterEntity(SeidhEntityFactory.InitiateEntity(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType));
+        createCharacterEntity(SeidhEntityFactory.InitiateCharacter(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType));
     }
 
     public function createCharacterEntityFromFullStruct(struct:CharacterEntityFullStruct) {
@@ -123,8 +127,6 @@ class SeidhGameEngine extends BaseEngine {
                             }
                         }
 
-                        character1.update(dt);
-
                         character1.intersectsWithCharacter = false;
                         character1.canMove = true;
                     }
@@ -133,15 +135,20 @@ class SeidhGameEngine extends BaseEngine {
 
             for (e in characterEntityManager.entities) {
                 final character1 = cast(e, EngineCharacterEntity);
-                if (character1.isAlive) {
-                    character1.update(dt);
-                }
 
                 if (character1.isAlive) {
-                    // if (character1.isPlayer()) {
-                        // character1.update(dt);
-                    // }
-                    
+                    character1.update(dt);
+
+                    if (character1.isPlayer()) {
+                        for (c in coinEntityManager.entities) {
+                            final coin = cast(c, EngineCoinEntity);
+
+                            if (character1.getBodyRectangle().containsRect(coin.getBodyRectangle())) {
+                                deleteCoinEntity(coin.getId());
+                            }
+                        }
+                    }
+
                     // Check projectile collisions against characters
                     for (e in projectileEntityManager.entities) {
                         final projectile = cast(e, EngineProjectileEntity);
@@ -174,18 +181,35 @@ class SeidhGameEngine extends BaseEngine {
 
                         for (e2 in characterEntityManager.entities) {
                             final character2 = cast(e2, EngineCharacterEntity);
+                            // TODO add distance check here
                             if (character2.isAlive && character1.getId() != character2.getId()) {
                                 if (character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
                                     if (allowServerLogic) {
                                         final health = character2.subtractHealth(character1.actionToPerform.damage);
                                         if (health == 0) {
+                                            // Zombie killed
+                                            // Update counter, spawn token
                                             if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
                                                 mobsKilled++;
-                                                mobsSpawned--;
+                                                // mobsSpawned--;
+
+                                                playerZombieKills.set(character1.getOwnerId(), playerZombieKills.get(character1.getOwnerId()) + 1);
+
+                                                final coinX = Std.int(character2.getBodyRectangle().x);
+                                                final coinY = Std.int(character2.getBodyRectangle().y);
+                                                
+                                                createCoinEntity(SeidhEntityFactory.InitiateCoin(coinX, coinY));
                                             }
                                             character2.isAlive = false;
                                             deadEntities.push(character2.getId());
                                             deleteCharacterEntity(character2.getId());
+
+                                            // Game lose condition if single player
+                                            if (engineMode == EngineMode.CLIENT_SINGLEPLAYER && localPlayerId != null) {
+                                                if (localPlayerId == character2.getOwnerId()) {
+                                                    gameState = GameState.LOSE;
+                                                }
+                                            }
                                         } else {
                                             hurtEntities.push(character2.getId());
                                         }
@@ -204,7 +228,7 @@ class SeidhGameEngine extends BaseEngine {
                             deadEntities: deadEntities,
                         });
                     }
-                    
+
                     character1.isActing = false;
                     character1.actionToPerform = null;
                     character1.isRunning = false;
@@ -222,6 +246,12 @@ class SeidhGameEngine extends BaseEngine {
                 // if (gameStateCallback != null) {
                 //     gameStateCallback(gameState);
                 // }
+            }
+
+            if (gameState == GameState.LOSE) {
+                if (gameStateCallback != null) {
+                    gameStateCallback(gameState);
+                }
             }
 
             recentEngineLoopTime = Date.now() - beginTime;
@@ -249,26 +279,26 @@ class SeidhGameEngine extends BaseEngine {
             mobsSpawned++;
             mobsLastSpawnTime = now;
 
-            var positionX = 0;
-            var positionY = 0;
+            var positionX = 1800;
+            var positionY = 1800;
 
-            final rnd = MathUtils.randomIntInRange(1, 4);
-            switch (rnd) {
-                case 1:
-                    positionX = 800;
-                    positionY = 800;
-                case 2:
-                    positionX = 2800;
-                    positionY = 800;
-                case 3:
-                    positionX = 800;
-                    positionY = 2800;
-                case 4:
-                    positionX = 2800;
-                    positionY = 2800;
-            }
+            // final rnd = MathUtils.randomIntInRange(1, 4);
+            // switch (rnd) {
+            //     case 1:
+            //         positionX = 800;
+            //         positionY = 800;
+            //     case 2:
+            //         positionX = 2800;
+            //         positionY = 800;
+            //     case 3:
+            //         positionX = 800;
+            //         positionY = 2800;
+            //     case 4:
+            //         positionX = 2800;
+            //         positionY = 2800;
+            // }
 
-            createCharacterEntity(SeidhEntityFactory.InitiateEntity(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
+            createCharacterEntity(SeidhEntityFactory.InitiateCharacter(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
         }
     }
 
@@ -286,6 +316,18 @@ class SeidhGameEngine extends BaseEngine {
         return 
             characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
             characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
+    }
+
+    public function getPlayerKills(playerId:String) {
+        if (playerZombieKills.exists(playerId)) {
+            return playerZombieKills.get(playerId);
+        } else {
+            return 0;
+        }
+    }
+
+    public function clearPlayerKills(playerId:String) {
+        playerZombieKills.remove(playerId);
     }
 
     private function createProjectileByCharacter(character:EngineCharacterEntity) {

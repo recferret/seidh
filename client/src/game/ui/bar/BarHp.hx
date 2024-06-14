@@ -14,9 +14,13 @@ class BarHp extends h2d.Object {
         customGraphics = new h2d.Graphics(s2d);
     }
 
-    public function update() {
+    public function update(currentHealth:Int, maxHealth:Int) {
         customGraphics.clear();
-        Utils.DrawRectFilled(customGraphics, new engine.base.geometry.Rectangle(40, 16, 153, 19, 0), GameConfig.HpBarColor);
+
+        final maxHealthBarWidthPx = 153;
+        final currentHealthBarWidthPx = maxHealthBarWidthPx / 100 * (currentHealth / maxHealth * 100);
+
+        Utils.DrawRectFilled(customGraphics, new engine.base.geometry.Rectangle(40, 16, currentHealthBarWidthPx, 19, 0), GameConfig.HpBarColor);
     }
 
     public function getBitmapWidth() {

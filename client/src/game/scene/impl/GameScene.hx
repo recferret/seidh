@@ -30,6 +30,7 @@ class GameScene extends BasicScene implements EventListener {
 		} else if (engineMode == EngineMode.CLIENT_SINGLEPLAYER) {
 			createCharacterEntityFromMinimalStruct(Player.instance.playerEntityId, Player.instance.playerId, 2000, 2000, RAGNAR_LOH);
 			seidhGameEngine.allowMobsSpawn(true);
+			seidhGameEngine.setLocalPlayerId(Player.instance.playerId);
 		}
 
 		SceneManager.Sound.playGameplayTheme();
@@ -66,6 +67,14 @@ class GameScene extends BasicScene implements EventListener {
 
 			if (GameConfig.DebugDraw) {
 				character.debugDraw(debugGraphics);
+			}
+		}
+
+		for (coin in clientCoinEntities) {
+			coin.update(dt);
+
+			if (GameConfig.DebugDraw) {
+				coin.debugDraw(debugGraphics);
 			}
 		}
 	}

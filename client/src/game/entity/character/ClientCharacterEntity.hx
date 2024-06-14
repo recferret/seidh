@@ -7,6 +7,8 @@ import engine.base.geometry.Point;
 import engine.base.entity.impl.EngineCharacterEntity;
 import hxd.Math;
 
+// TODO Need client object abstraction
+
 class ClientCharacterEntity extends h2d.Object {
 
     public var animation:CharacterAnimation;
@@ -32,15 +34,16 @@ class ClientCharacterEntity extends h2d.Object {
     // ------------------------------------------------------------
 
 	public function debugDraw(graphics:h2d.Graphics) {
+        // Debug bot movement direction
         if (engineEntity.botForwardLookingLine != null) {
             final p1 = new h2d.col.Point(engineEntity.botForwardLookingLine.x1, engineEntity.botForwardLookingLine.y1);
             final p2 = new h2d.col.Point(engineEntity.botForwardLookingLine.x2, engineEntity.botForwardLookingLine.y2);
             Utils.DrawLine(graphics, p1, p2, engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);    
         }
 
-        // TODO drop debugActionShape
-        if (engineEntity.getCurrentActionRect() != null) {
-            Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(), GameConfig.GreenColor);
+        // DebugActionShape
+        if (engineEntity.getCurrentActionRect(true) != null) {
+            Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(true), GameConfig.GreenColor);
         }
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
@@ -137,8 +140,16 @@ class ClientCharacterEntity extends h2d.Object {
         return engineEntity.getEntityType();
     }
 
-    // public function getDebugActionShape() {
-    //     return debugActionShape;
-    // }
+    public function getSide() {
+        return engineEntity.getSide();
+    }
+
+    public function getCurrentHealth() {
+        return engineEntity.getCurrentHealth();
+    }
+
+    public function getMaxHealth() {
+        return engineEntity.getMaxHealth();
+    }
 
 }

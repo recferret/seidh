@@ -20,7 +20,7 @@ class ZombieGirlEntity extends SeidhBaseEntity {
                 x: x, 
                 y: y,
                 entityType: EntityType.ZOMBIE_GIRL,
-                entityShape: {width: 200, height: 300, rectOffsetX: 0, rectOffsetY: 0},
+                entityShape: {width: 200, height: 260, rectOffsetX: 0, rectOffsetY: 0},
                 id: id,
                 ownerId: ownerId,
                 rotation: 0
@@ -29,7 +29,7 @@ class ZombieGirlEntity extends SeidhBaseEntity {
             movement: {
                 canWalk: true,
                 canRun: true,
-                runSpeed: 50 + MathUtils.randomIntInRange(1, 50),
+                runSpeed: 40 + MathUtils.randomIntInRange(10, 50),
                 movementDelay: 0.100,
                 vitality: 100,
                 vitalityConsumptionPerSec: 20,
@@ -41,7 +41,7 @@ class ZombieGirlEntity extends SeidhBaseEntity {
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: false,
-                    shape: {width: 140, height: 100, rectOffsetX: 80, rectOffsetY: 0},
+                    shape: {width: 300, height: 380, rectOffsetX: 0, rectOffsetY: 0},
                 }
             }
         });

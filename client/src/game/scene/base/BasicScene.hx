@@ -1,16 +1,13 @@
 package game.scene.base;
 
-import game.sound.SoundManager;
-import format.pex.Data.EmitterType;
-import game.ui.dialog.Dialog;
 import hxd.Event.EventKind;
 import h2d.Text;
 import h3d.Engine;
 import hxd.Key in K;
 
 import game.entity.character.ClientCharacterEntity;
-import game.event.EventManager;
-// import game.entity.projectile.ClientProjectileEntity;
+import game.entity.coin.ClientCoinEntity;
+import game.fx.FxManager;
 import game.js.NativeWindowJS;
 import game.network.Networking;
 import game.scene.GameUiScene.ButtonPressed;
@@ -19,8 +16,11 @@ import game.terrain.TerrainManager;
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
 import engine.base.entity.impl.EngineProjectileEntity;
+import engine.base.entity.impl.EngineCoinEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.seidh.SeidhGameEngine;
+
+import motion.Actuate;
 
 typedef BasicSceneClickCallback = {
 	clickX:Float,
@@ -36,6 +36,8 @@ abstract class BasicScene extends h2d.Scene {
 
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
+
+	private final fxManager:FxManager;
 
 	private var gameUiScene:GameUiScene;
 	private var fui:h2d.Flow;
@@ -54,6 +56,7 @@ abstract class BasicScene extends h2d.Scene {
 	// UI
 
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
+	final clientCoinEntities = new Map<String, ClientCoinEntity>();
 	// final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
 	
 	var inputsSent = 0;
@@ -74,7 +77,7 @@ abstract class BasicScene extends h2d.Scene {
 
 		if (seidhGameEngine != null) {
 			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
-
+			fxManager = new FxManager(this);
 			new TerrainManager(this);
 
 			this.seidhGameEngine = seidhGameEngine;
@@ -90,6 +93,7 @@ abstract class BasicScene extends h2d.Scene {
 				}
 			};
 
+			// TODO add delete reason
 			this.seidhGameEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
 				final character = clientCharacterEntities.get(characterEntity.getId());
 				if (character != null) {
@@ -122,6 +126,32 @@ abstract class BasicScene extends h2d.Scene {
 				// }
 			};
 
+			// TODO need better abstraction for client entities
+			this.seidhGameEngine.createCoinCallback = function callback(coinEntity:EngineCoinEntity) {
+				final coin = new ClientCoinEntity(this);
+				coin.initiateEngineEntity(coinEntity);
+				clientCoinEntities.set(coinEntity.getId(), coin);
+			};
+
+			this.seidhGameEngine.deleteCoinCallback = function callback(coinEntity:EngineCoinEntity) {
+				final coin = clientCoinEntities.get(coinEntity.getId());
+				if (coin != null) {
+					clientCoinEntities.remove(coinEntity.getId());
+
+					final point = new h2d.col.Point(600, 0);
+					camera.screenToCamera(point);
+					Actuate.tween(coin, 1, { 
+						x: point.x,
+						y: point.y,
+						scaleX: 0.1,
+						scaleY: 0.1,
+						alpha: 0.2,
+					}).onComplete(function callback() {
+						removeChild(coin);
+					});
+				}
+			};
+
 			this.seidhGameEngine.postLoopCallback = function callback() {
 				for (mainEntity in seidhGameEngine.getCharacterEntitiesMap()) {
 					if (clientCharacterEntities.exists(mainEntity.getId())) {
@@ -152,10 +182,12 @@ abstract class BasicScene extends h2d.Scene {
 							if (clientEntity.getEntityType() == EntityType.RAGNAR_LOH ||
 								clientEntity.getEntityType() == EntityType.RAGNAR_NORM) {
 								SceneManager.Sound.playVikingHit();
+								fxManager.ragnarAttack(clientEntity.x, clientEntity.y, clientEntity.getSide());
 							} else if (
 								clientEntity.getEntityType() == EntityType.ZOMBIE_BOY ||
 								clientEntity.getEntityType() == EntityType.ZOMBIE_GIRL) {
 								SceneManager.Sound.playZombieHit();
+								fxManager.zombieAttack(clientEntity.x, clientEntity.y, clientEntity.getSide());
 							}
 
 							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
@@ -196,6 +228,7 @@ abstract class BasicScene extends h2d.Scene {
 								clientEntity.getEntityType() == EntityType.ZOMBIE_GIRL) {
 								SceneManager.Sound.playZombieDmg();
 							}
+							fxManager.blood(clientEntity.x + clientEntity.getBodyRectangle().w / 3, clientEntity.y, clientEntity.getSide());
 							clientEntity.animation.setAnimationState(HURT);
 						}
 					}
@@ -210,7 +243,9 @@ abstract class BasicScene extends h2d.Scene {
 
 			this.seidhGameEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
-					gameUiScene.showWinDialog();
+					gameUiScene.showWinDialog(this.seidhGameEngine.getPlayerKills(playerEntity.getOwnerId()));
+				} else if (gameState == GameState.LOSE) {
+					gameUiScene.showLoseDialog(this.seidhGameEngine.getPlayerKills(playerEntity.getOwnerId()));
 				} else {
 					trace('Game Over!');
 				}
@@ -317,16 +352,12 @@ abstract class BasicScene extends h2d.Scene {
 	public function update(dt:Float, fps:Float) {
 		debugGraphics.clear();
 
-		if (gameUiScene != null) {
-			gameUiScene.update();
+		if (gameUiScene != null && playerEntity != null) {
+			gameUiScene.update(playerEntity.getCurrentHealth(), playerEntity.getMaxHealth());
 		}
 
 		updateDesktopInput();
 		customUpdate(dt, fps);
-
-		for (character in clientCharacterEntities) {
-			character.update(dt);
-		}
 
 		if (playerEntity != null) {
 			camera.x = playerEntity.x + cameraOffsetX;

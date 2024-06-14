@@ -43,6 +43,8 @@ enum abstract EntityType(Int) {
 	var RAGNAR_NORM = 2;
 	var ZOMBIE_BOY = 3;
 	var ZOMBIE_GIRL = 4;
+
+	var SMALL_COIN = 99;
 }
 
 class EntityShape {

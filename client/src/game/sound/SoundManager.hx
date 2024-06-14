@@ -21,7 +21,7 @@ class SoundManager {
     public function new() {
         if (hxd.res.Sound.supportedFormat(Mp3)) {
             final manager = hxd.snd.Manager.get();
-            manager.masterVolume = 0.5;
+            manager.masterVolume = 0.25;
             manager.masterSoundGroup.maxAudible = 5;
 
             menuTheme = hxd.Res.sound.menu_theme_1;
@@ -43,7 +43,7 @@ class SoundManager {
     }
 
     public function playMenuTheme() {
-        if (menuTheme != null) {
+        if (menuTheme != null && GameConfig.PlayMusic) {
             menuTheme.play(true);
         }
         if (gameplayTheme != null ){
@@ -52,11 +52,11 @@ class SoundManager {
     }
 
     public function playGameplayTheme() {
+        if (gameplayTheme != null && GameConfig.PlayMusic) {
+            gameplayTheme.play(true);
+        }
         if (menuTheme != null) {
             menuTheme.stop();
-        }
-        if (gameplayTheme != null) {
-            gameplayTheme.play(true);
         }
     }
 
@@ -109,7 +109,7 @@ class SoundManager {
     }
 
     private function allowPlaySound(sound:Sound) {
-        return sound != null && haxe.Timer.stamp() - sound.lastPlay > 0.25;
+        return sound != null && GameConfig.PlaySounds && haxe.Timer.stamp() - sound.lastPlay > 0.25;
     }
 
 }

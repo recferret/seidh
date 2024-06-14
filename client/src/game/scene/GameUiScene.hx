@@ -180,9 +180,9 @@ class GameUiScene extends h2d.Scene {
 		buttonB.setPosition(w - (buttonB.tile.width * 1.4), h - (buttonB.tile.height * 1.3));
 	}
 
-    public function update() {
+    public function update(playerCurrentHealth:Int, playerMaxHealth:Int) {
 		movementController.update();
-		barHp.update();
+		barHp.update(playerCurrentHealth, playerMaxHealth);
 		barXp.update();
     }
 
@@ -194,12 +194,24 @@ class GameUiScene extends h2d.Scene {
         movementController.updateCursorPosition(x, y);
     }
 
-	public function showWinDialog() {
+	public function showWinDialog(zombiesKilled:Int) {
 		new Dialog(
 			this, 
 			DialogType.BIG, 
 			"You have won!", 
-			"Zombies killed: 2",
+			"Zombies killed: " + zombiesKilled,
+			function callback() {
+				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+			}
+		);
+	}
+
+	public function showLoseDialog(zombiesKilled:Int) {
+		new Dialog(
+			this, 
+			DialogType.BIG, 
+			"You lose!", 
+			"Zombies killed: " + zombiesKilled,
 			function callback() {
 				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
 			}

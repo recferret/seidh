@@ -1,5 +1,6 @@
 package game.scene;
 
+import game.scene.impl.SpritesSceneTest.SceneSpritesTest;
 import engine.base.BaseTypesAndClasses;
 
 import game.event.EventManager;
@@ -25,9 +26,9 @@ class SceneManager implements EventListener {
 
 		SceneManager.Sound = new SoundManager();
 
-		// currentScene = new GameScene(GameMode.SINGLEPLAYER);
+		currentScene = new GameScene(EngineMode.CLIENT_SINGLEPLAYER);
 
-		currentScene = new HomeScene();
+		// currentScene = new HomeScene();
 		// currentScene = new SceneAiTest();
 		// currentScene = new SceneInputTest();
 		// currentScene = new SceneSpritesTest();

@@ -1,17 +1,19 @@
 package engine.base.core;
 
-import game.Player;
-import engine.base.entity.base.EngineBaseEntity;
-import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.BaseTypesAndClasses;
+import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.core.GameLoop;
 import engine.base.entity.impl.EngineCharacterEntity;
+import engine.base.entity.impl.EngineCoinEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
 
 typedef CreateCharacterEntityTask = {
 	var entity:EngineCharacterEntity;
 }
 
+typedef CreateCoinEntityTask = {
+	var entity:EngineCoinEntity;
+}
 typedef CreateProjectileEntityTask = {
 	var entity:EngineProjectileEntity;
 }
@@ -26,26 +28,34 @@ abstract class BaseEngine {
 	public final okLoopTime:Int;
 	public final engineMode:EngineMode;
 
+	// Callbacks
 	public var postLoopCallback:Void->Void;
 	public var createCharacterCallback:EngineCharacterEntity->Void;
 	public var deleteCharacterCallback:EngineCharacterEntity->Void;
+	public var createCoinCallback:EngineCoinEntity->Void;
+	public var deleteCoinCallback:EngineCoinEntity->Void;
 	public var createProjectileCallback:EngineProjectileEntity->Void;
 	public var deleteProjectileCallback:EngineProjectileEntity->Void;
 
 	public final characterEntityManager = new EngineBaseEntityManager();
 	public final projectileEntityManager = new EngineBaseEntityManager();
+	public final coinEntityManager = new EngineBaseEntityManager();
 
 	public final playerToEntityMap = new Map<String, String>();
 
 	public var validatedInputCommands = new Array<PlayerInputCommand>();
 
+	// Both chars, projectiles and coins has lots of common, need some better abstraction
 	private var createCharacterEntityQueue = new Array<CreateCharacterEntityTask>();
 	private var deleteCharacterEntityQueue = new Array<String>();
+
+	private var createCoinEntityQueue = new Array<CreateCoinEntityTask>();
+	private var deleteCoinEntityQueue = new Array<String>();
 
 	private var createProjectileEntityQueue = new Array<CreateProjectileEntityTask>();
 	private var deleteProjectileEntityQueue = new Array<String>();
 
-	private var localPlayerId:String;
+	var localPlayerId:String;
 
 	// Команды от пользователей, которые будут применены в начале каждого тика
 	private var hotInputCommands = new Array<InputCommandEngineWrapped>();
@@ -70,6 +80,9 @@ abstract class BaseEngine {
 
 			processCreateCharacterQueue();
 			processDeleteCharacterQueue();
+
+			processCreateCoinQueue();
+			processDeleteCoinQueue();
 
 			processCreateProjectileQueue();
 			processDeleteProjectileQueue();
@@ -242,6 +255,43 @@ abstract class BaseEngine {
 			}
 		}
 		deleteProjectileEntityQueue = [];
+	}
+
+	// -----------------------------------
+	// Coins
+	// -----------------------------------
+
+	function createCoinEntity(entity:EngineCoinEntity) {
+		createCoinEntityQueue.push({
+			entity: entity
+		});
+	}
+
+	function deleteCoinEntity(entityId:String) {
+		deleteCoinEntityQueue.push(entityId);
+	}
+
+	function processCreateCoinQueue() {
+		for (queueTask in createCoinEntityQueue) {
+			coinEntityManager.add(queueTask.entity);
+			if (createCoinCallback != null) {
+				createCoinCallback(queueTask.entity);
+			}
+		}
+		createCoinEntityQueue = [];
+	}
+
+	function processDeleteCoinQueue() {
+		for (entityId in deleteCoinEntityQueue) {
+			final entity = cast (coinEntityManager.getEntityById(entityId), EngineCoinEntity);
+			if (entity != null) {
+				if (deleteCoinCallback != null) {
+					deleteCoinCallback(entity);
+				}
+				coinEntityManager.delete(entity.getId());
+			}
+		}
+		deleteCoinEntityQueue = [];
 	}
 
 	// -----------------------------------
