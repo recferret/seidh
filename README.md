@@ -19,7 +19,7 @@ Core parts:
     * https://nats.io for interservice communication
     * Docker compose file that contains everythin
 * ton
-    * Not working ATM
+    * Simple tact NFT contracts
     * Various vikings NFTs
     * Various boosts 
     * Seidh token
