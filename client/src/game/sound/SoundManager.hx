@@ -22,7 +22,7 @@ class SoundManager {
         if (hxd.res.Sound.supportedFormat(Mp3)) {
             final manager = hxd.snd.Manager.get();
             manager.masterVolume = 0.5;
-            manager.masterSoundGroup.maxAudible = 4;
+            manager.masterSoundGroup.maxAudible = 5;
 
             menuTheme = hxd.Res.sound.menu_theme_1;
             gameplayTheme = hxd.Res.sound.gameplay_theme_1;
@@ -61,51 +61,55 @@ class SoundManager {
     }
 
     public function playButton1() {
-        if (button1 != null) {
+        if (allowPlaySound(button1)) {
             button1.play();
         }
     }
 
     public function playButton2() {
-        if (button2 != null) {
+        if (allowPlaySound(button2)) {
             button2.play();
         }
     }
 
     public function playVikingDeath() {
-        if (vikingDeath != null) {
+        if (allowPlaySound(vikingDeath)) {
             vikingDeath.play();
         }
     }
 
     public function playVikingDmg() {
-        if (vikingDmg != null) {
+        if (allowPlaySound(vikingDmg)) {
             vikingDmg.play();
         }
     }
 
     public function playVikingHit() {
-        if (vikingHit != null) {
+        if (allowPlaySound(vikingHit)) {
             vikingHit.play();
         }
     }
 
     public function playZombieDeath() {
-        if (zombieDeath != null) {
+        if (allowPlaySound(zombieDeath)) {
             zombieDeath.play();
         }
     }
 
     public function playZombieDmg() {
-        if (zombieDmg != null) {
+        if (allowPlaySound(zombieDmg)) {
             zombieDmg.play();
         }
     }
 
     public function playZombieHit() {
-        if (zombieHit != null) {
+        if (allowPlaySound(zombieHit)) {
             zombieHit.play();
         }
+    }
+
+    private function allowPlaySound(sound:Sound) {
+        return sound != null && haxe.Timer.stamp() - sound.lastPlay > 0.25;
     }
 
 }

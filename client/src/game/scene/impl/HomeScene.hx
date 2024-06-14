@@ -32,8 +32,11 @@ class HomeScene extends BasicScene {
 
 		setSceneContent(HomeSceneContent.HomePlayContent);
 
+		final heightRatio = BasicScene.ActualScreenHeight / 1280;
+		final heightScale = heightRatio == 1 ? 1 : 1.1;
+
         final homeFrame = new h2d.Bitmap(hxd.Res.ui.home.home_frame.toTile(), this);
-		homeFrame.scaleY = BasicScene.ActualScreenHeight / 1280;
+		homeFrame.scaleY = heightRatio;
 
 		// ---------------------------------------------------
 		// Bottom bar buttons
@@ -41,7 +44,7 @@ class HomeScene extends BasicScene {
 
 		menuButtonSize = Std.int(BasicScene.ActualScreenWidth / 6) + 10;
 		menuButtonSizeHalf = Std.int(menuButtonSize / 2);
-		buttonBottomPosY = BasicScene.ActualScreenHeight - 68;
+		buttonBottomPosY = BasicScene.ActualScreenHeight - (menuButtonSizeHalf / (heightRatio == 1 ? 1.2 : 1));
 
 		final homeTileOn = hxd.Res.ui.home.button_home_on.toTile().center();
 		final homeTileOff = hxd.Res.ui.home.button_home_off.toTile().center();
@@ -63,7 +66,7 @@ class HomeScene extends BasicScene {
 		// Home button
 
 		bottomButtonHome.setPosition(menuButtonSize, buttonBottomPosY);
-		bottomButtonHome.setScale(1.1);
+		bottomButtonHome.setScale(heightScale);
 
 		final interactionHome = new h2d.Interactive(bottomButtonHome.tile.width, bottomButtonHome.tile.height);
 		interactionHome.setPosition(menuButtonSize - bottomButtonHome.tile.width / 2, buttonBottomPosY - bottomButtonHome.tile.height / 2);
@@ -96,7 +99,7 @@ class HomeScene extends BasicScene {
 		// Boost button
 
 		bottomButtonBoost.setPosition(menuButtonSize * 2.2, buttonBottomPosY);
-		bottomButtonBoost.setScale(1.1);
+		bottomButtonBoost.setScale(heightScale);
 
 		final interactionBoost = new h2d.Interactive(bottomButtonBoost.tile.width, bottomButtonBoost.tile.height);
 		interactionBoost.setPosition(menuButtonSize * 2.2 - bottomButtonBoost.tile.width / 2, buttonBottomPosY - bottomButtonBoost.tile.height / 2);
@@ -129,7 +132,7 @@ class HomeScene extends BasicScene {
 		// Collection button
 
 		bottomButtonCollection.setPosition(menuButtonSize * 3.4, buttonBottomPosY);
-		bottomButtonCollection.setScale(1.1);
+		bottomButtonCollection.setScale(heightScale);
 
 		final interactionCollection = new h2d.Interactive(bottomButtonCollection.tile.width, bottomButtonCollection.tile.height);
 		interactionCollection.setPosition(menuButtonSize * 3.4 - bottomButtonCollection.tile.width / 2, buttonBottomPosY - bottomButtonCollection.tile.height / 2);
@@ -162,7 +165,7 @@ class HomeScene extends BasicScene {
 		// Friends button
 
 		bottomButtonFriends.setPosition(menuButtonSize * 4.6, buttonBottomPosY);
-		bottomButtonFriends.setScale(1.1);
+		bottomButtonFriends.setScale(heightScale);
 
 		final interactionFriends = new h2d.Interactive(bottomButtonFriends.tile.width, bottomButtonFriends.tile.height);
 		interactionFriends.setPosition(menuButtonSize * 4.6 - bottomButtonFriends.tile.width / 2, buttonBottomPosY - bottomButtonFriends.tile.height / 2);
