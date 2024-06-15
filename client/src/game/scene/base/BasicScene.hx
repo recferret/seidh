@@ -63,8 +63,6 @@ abstract class BasicScene extends h2d.Scene {
 	public function new(seidhGameEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneClickCallback->Void) {
 		super();
 
-		onResize();
-
 		this.basicSceneCallback = basicSceneCallback;
 
 		// final mobile = NativeWindowJS.getMobile();
@@ -261,6 +259,8 @@ abstract class BasicScene extends h2d.Scene {
 		}
 
 		hxd.Window.getInstance().addEventTarget(onEvent);
+
+		onResize();
 	}
 
 	public abstract function start():Void;
