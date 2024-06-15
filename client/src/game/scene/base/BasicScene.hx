@@ -34,6 +34,7 @@ abstract class BasicScene extends h2d.Scene {
 
 	public static var ActualScreenWidth = 0;
 	public static var ActualScreenHeight = 0;
+	public static var ScreenRatio = 0.0;
 
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
@@ -61,6 +62,8 @@ abstract class BasicScene extends h2d.Scene {
 
 	public function new(seidhGameEngine:SeidhGameEngine, ?basicSceneCallback:BasicSceneClickCallback->Void) {
 		super();
+
+		onResize();
 
 		this.basicSceneCallback = basicSceneCallback;
 
@@ -258,8 +261,6 @@ abstract class BasicScene extends h2d.Scene {
 		}
 
 		hxd.Window.getInstance().addEventTarget(onEvent);
-
-		onResize();
 	}
 
 	public abstract function start():Void;
@@ -279,7 +280,7 @@ abstract class BasicScene extends h2d.Scene {
 	public function onResize() {
 		final jsScreenParams = NativeWindowJS.getScreenParams();
 		final screenOrientation = jsScreenParams.orientation;
-		final ratio = screenOrientation == 'portrait' ? 
+		final ratio = ScreenRatio = screenOrientation == 'portrait' ? 
 			jsScreenParams.pageHeight / jsScreenParams.pageWidth : 
 			jsScreenParams.pageWidth / jsScreenParams.pageHeight;
 		final w = ActualScreenWidth = screenOrientation == 'portrait' ? 720 : Std.int(720 * ratio);
