@@ -19,7 +19,6 @@ class DialogButton extends h2d.Object {
     public function new(parent:Object, text:String) {
         super(parent);
 
-        // TODO replace toTile by center later
         bmp = new h2d.Bitmap(hxd.Res.ui.dialog.dialog_button.toTile(), this);
         h = bmp.tile.height;
         w = bmp.tile.width;
@@ -62,11 +61,12 @@ class Dialog extends h2d.Object {
         super(s2d);
 
         // Backround
-        final background = new h2d.Bitmap(hxd.Res.ui.home.mm_shadow_2.toTile(), this);
+        final background = new h2d.Bitmap(hxd.Res.ui.home.mm_shadow_2.toTile().center(), this);
         final scaleFactor = BasicScene.ActualScreenHeight / 1280;
-        background.scaleX = scaleFactor;
-		background.scaleY = scaleFactor;
-        background.setPosition(-((background.tile.width * (scaleFactor - 1)) / 2), 0);
+        final fixedScale = scaleFactor < 1 ? 1.1 : scaleFactor; 
+        background.scaleX = fixedScale;
+		background.scaleY = fixedScale;
+        background.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 2);
 
         // Dialog 
         var dialogBmp:h2d.Bitmap;

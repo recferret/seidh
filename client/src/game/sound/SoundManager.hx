@@ -4,41 +4,50 @@ import hxd.res.Sound;
 
 class SoundManager {
 
-    private final menuTheme:Sound;
-    private final gameplayTheme:Sound;
+    private var initiated = false;
 
-    private final button1:Sound;
-    private final button2:Sound;
+    private var menuTheme:Sound;
+    private var gameplayTheme:Sound;
 
-    private final vikingDeath:Sound;
-    private final vikingDmg:Sound;
-    private final vikingHit:Sound;
+    private var button1:Sound;
+    private var button2:Sound;
 
-    private final zombieDeath:Sound;
-    private final zombieDmg:Sound;
-    private final zombieHit:Sound;
+    private var vikingDeath:Sound;
+    private var vikingDmg:Sound;
+    private var vikingHit:Sound;
 
-    public function new() {
-        if (hxd.res.Sound.supportedFormat(Mp3)) {
-            final manager = hxd.snd.Manager.get();
-            manager.masterVolume = 0.25;
-            manager.masterSoundGroup.maxAudible = 5;
+    private var zombieDeath:Sound;
+    private var zombieDmg:Sound;
+    private var zombieHit:Sound;
 
-            menuTheme = hxd.Res.sound.menu_theme_1;
-            gameplayTheme = hxd.Res.sound.gameplay_theme_1;
+    public static final instance:SoundManager = new SoundManager();
 
-            button1 = hxd.Res.sound.button_1;
-            button2 = hxd.Res.sound.button_2;
-        
-            vikingDeath = hxd.Res.sound.viking_death;
-            vikingDmg = hxd.Res.sound.viking_dmg;
-            vikingHit = hxd.Res.sound.viking_hit;
-        
-            zombieDeath = hxd.Res.sound.zombie_death;
-            zombieDmg = hxd.Res.sound.zombie_dmg;
-            zombieHit = hxd.Res.sound.zombie_hit;
-        } else {
-            trace('MP3 sound is not available');
+    private function new() {
+    }
+
+    public function initiate() {
+        if (!initiated) {
+            if (hxd.res.Sound.supportedFormat(Mp3)) {
+                final manager = hxd.snd.Manager.get();
+                manager.masterVolume = 0.25;
+                manager.masterSoundGroup.maxAudible = 5;
+    
+                menuTheme = hxd.Res.sound.menu_theme_1;
+                gameplayTheme = hxd.Res.sound.gameplay_theme_1;
+    
+                button1 = hxd.Res.sound.button_1;
+                button2 = hxd.Res.sound.button_2;
+            
+                vikingDeath = hxd.Res.sound.viking_death;
+                vikingDmg = hxd.Res.sound.viking_dmg;
+                vikingHit = hxd.Res.sound.viking_hit;
+            
+                zombieDeath = hxd.Res.sound.zombie_death;
+                zombieDmg = hxd.Res.sound.zombie_dmg;
+                zombieHit = hxd.Res.sound.zombie_hit;
+            } else {
+                trace('MP3 sound is not available');
+            }
         }
     }
 

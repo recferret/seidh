@@ -1,6 +1,7 @@
 package game.scene.home;
 
 import game.js.NativeWindowJS;
+import game.sound.SoundManager;
 import game.scene.base.BasicScene;
 import hxd.res.DefaultFont;
 
@@ -68,7 +69,7 @@ class CollectionContent extends BasicHomeContent {
             }
             interactionWalletConnect.onClick = function(event : hxd.Event) {
                 NativeWindowJS.tonConnect();
-                SceneManager.Sound.playButton2();
+                SoundManager.instance.playButton2();
             }
             addChild(interactionWalletConnect);
 
@@ -92,10 +93,9 @@ class CollectionContent extends BasicHomeContent {
             }
             interactionBuyRagnar.onClick = function(event : hxd.Event) {
                 NativeWindowJS.tonMintRagnar();
-                SceneManager.Sound.playButton2();
+                SoundManager.instance.playButton2();
             }
             addChild(interactionBuyRagnar);
-
 
             final ragnarDudeTile = hxd.Res.ragnar.ragnar_dude.toTile().center();
             final ragnarDudeBitmap = new h2d.Bitmap(ragnarDudeTile, this);

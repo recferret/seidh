@@ -5,8 +5,12 @@ class Main extends hxd.App {
 
 	private var sceneManager:SceneManager;
 
+	private static var _engine:h3d.Engine;
+
 	override function init() {
-		engine.backgroundColor = 0x71664C;
+		_engine = engine;
+
+		Main.SetBackgroundColor(0x71664C);
 
 		this.sceneManager = new SceneManager(function callback(scene:BasicScene) {
 			setScene2D(scene);
@@ -25,6 +29,10 @@ class Main extends hxd.App {
 	static function main() {
 		hxd.Res.initEmbed();
 		new Main();
+	}
+
+	public static function SetBackgroundColor(color:Int) {
+		_engine.backgroundColor = color;
 	}
 
 }

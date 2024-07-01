@@ -73,6 +73,10 @@ abstract class EngineBaseEntity {
 		return baseEntity.entityType == EntityType.RAGNAR_LOH || baseEntity.entityType == EntityType.RAGNAR_NORM;
 	}
 
+	public function isBot() {
+		return baseEntity.entityType == EntityType.ZOMBIE_BOY || baseEntity.entityType == EntityType.ZOMBIE_GIRL;
+	}
+
     // ------------------------------------------------
     // Setters
     // ------------------------------------------------

@@ -23,61 +23,72 @@ class FrameAnimationFx {
 
 class FxManager {
 
-    private final s2d:h2d.Scene;
+    private var initiated = false;
 
-    private final ragnarAttackTilesRight:Array<h2d.Tile>;
-    private final ragnarAttackTilesLeft:Array<h2d.Tile>;
+    private var s2d:h2d.Scene;
 
-    private final zombieAttackTilesRight:Array<h2d.Tile>;
-    private final zombieAttackTilesLeft:Array<h2d.Tile>;
+    private var ragnarAttackTilesRight:Array<h2d.Tile>;
+    private var ragnarAttackTilesLeft:Array<h2d.Tile>;
 
-    private final bloodTilesRight:Array<h2d.Tile>;
-    private final bloodTilesLeft:Array<h2d.Tile>;
+    private var zombieAttackTilesRight:Array<h2d.Tile>;
+    private var zombieAttackTilesLeft:Array<h2d.Tile>;
 
-    public function new(s2d:h2d.Scene) {
+    private var bloodTilesRight:Array<h2d.Tile>;
+    private var bloodTilesLeft:Array<h2d.Tile>;
+
+    public static final instance:FxManager = new FxManager();
+
+    private function new() {
+    }
+
+    public function initiate() {
+        if (!initiated) {
+            ragnarAttackTilesRight = [
+                hxd.Res.fx.ragnar.attack_1.toTile().center(),
+                hxd.Res.fx.ragnar.attack_2.toTile().center(),
+                hxd.Res.fx.ragnar.attack_3.toTile().center(),
+            ];
+            ragnarAttackTilesLeft = [
+                hxd.Res.fx.ragnar.attack_1.toTile().center(),
+                hxd.Res.fx.ragnar.attack_2.toTile().center(),
+                hxd.Res.fx.ragnar.attack_3.toTile().center(),
+            ];
+            ragnarAttackTilesLeft[0].flipX();
+            ragnarAttackTilesLeft[1].flipX();
+            ragnarAttackTilesLeft[2].flipX();
+    
+            zombieAttackTilesRight = [
+                hxd.Res.fx.zombie.attack_1.toTile().center(),
+                hxd.Res.fx.zombie.attack_2.toTile().center(),
+                hxd.Res.fx.zombie.attack_3.toTile().center(),
+            ];
+            zombieAttackTilesLeft = [
+                hxd.Res.fx.zombie.attack_1.toTile().center(),
+                hxd.Res.fx.zombie.attack_2.toTile().center(),
+                hxd.Res.fx.zombie.attack_3.toTile().center(),
+            ];
+            zombieAttackTilesLeft[0].flipX();
+            zombieAttackTilesLeft[1].flipX();
+            zombieAttackTilesLeft[2].flipX();
+    
+            bloodTilesRight = [
+                hxd.Res.fx.blood.blood_1.toTile().center(),
+                hxd.Res.fx.blood.blood_2.toTile().center(),
+                hxd.Res.fx.blood.blood_3.toTile().center(),
+            ];
+            bloodTilesLeft = [
+                hxd.Res.fx.blood.blood_1.toTile().center(),
+                hxd.Res.fx.blood.blood_2.toTile().center(),
+                hxd.Res.fx.blood.blood_3.toTile().center(),
+            ];
+            bloodTilesLeft[0].flipX();
+            bloodTilesLeft[1].flipX();
+            bloodTilesLeft[2].flipX();
+        }
+    }
+
+    public function setScene(s2d:h2d.Scene) {
         this.s2d = s2d;
-
-        ragnarAttackTilesRight = [
-            hxd.Res.fx.ragnar.attack_1.toTile().center(),
-            hxd.Res.fx.ragnar.attack_2.toTile().center(),
-            hxd.Res.fx.ragnar.attack_3.toTile().center(),
-        ];
-        ragnarAttackTilesLeft = [
-            hxd.Res.fx.ragnar.attack_1.toTile().center(),
-            hxd.Res.fx.ragnar.attack_2.toTile().center(),
-            hxd.Res.fx.ragnar.attack_3.toTile().center(),
-        ];
-        ragnarAttackTilesLeft[0].flipX();
-        ragnarAttackTilesLeft[1].flipX();
-        ragnarAttackTilesLeft[2].flipX();
-
-        zombieAttackTilesRight = [
-            hxd.Res.fx.zombie.attack_1.toTile().center(),
-            hxd.Res.fx.zombie.attack_2.toTile().center(),
-            hxd.Res.fx.zombie.attack_3.toTile().center(),
-        ];
-        zombieAttackTilesLeft = [
-            hxd.Res.fx.zombie.attack_1.toTile().center(),
-            hxd.Res.fx.zombie.attack_2.toTile().center(),
-            hxd.Res.fx.zombie.attack_3.toTile().center(),
-        ];
-        zombieAttackTilesLeft[0].flipX();
-        zombieAttackTilesLeft[1].flipX();
-        zombieAttackTilesLeft[2].flipX();
-
-        bloodTilesRight = [
-            hxd.Res.fx.blood.blood_1.toTile().center(),
-            hxd.Res.fx.blood.blood_2.toTile().center(),
-            hxd.Res.fx.blood.blood_3.toTile().center(),
-        ];
-        bloodTilesLeft = [
-            hxd.Res.fx.blood.blood_1.toTile().center(),
-            hxd.Res.fx.blood.blood_2.toTile().center(),
-            hxd.Res.fx.blood.blood_3.toTile().center(),
-        ];
-        bloodTilesLeft[0].flipX();
-        bloodTilesLeft[1].flipX();
-        bloodTilesLeft[2].flipX();
     }
 
     public function ragnarAttack(x:Float, y:Float, side:Side) {

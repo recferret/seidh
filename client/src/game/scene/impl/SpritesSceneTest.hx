@@ -1,5 +1,9 @@
 package game.scene.impl;
 
+import game.sound.SoundManager;
+import engine.base.BaseTypesAndClasses.EntityType;
+import engine.seidh.entity.factory.SeidhEntityFactory;
+import game.entity.character.ClientCharacterEntity;
 import game.fx.FxManager;
 import h2d.Tile;
 import h3d.Vector;
@@ -11,7 +15,7 @@ import h2d.filter.DropShadow;
 import h2d.filter.Mask;
 import game.scene.base.BasicScene;
 
-
+import haxe.Timer;
 
 class SceneSpritesTest extends BasicScene {
 
@@ -40,7 +44,6 @@ class SceneSpritesTest extends BasicScene {
 		ragnar2 = new h2d.Bitmap(hxd.Res.ragnar.ragnar_loh.toTile(), this);
 		ragnar2.adjustColor({ saturation : 0, hue: 2 });
 		ragnar2.setPosition(300 , 100);
-
 
 		final ragnar3 = new h2d.Bitmap(hxd.Res.ragnar.ragnar_loh.toTile(), this);
 		ragnar3.filter = shadowFilter;
@@ -87,7 +90,35 @@ class SceneSpritesTest extends BasicScene {
 
 
 		// FX
+
+		final ragnarRight = new ClientCharacterEntity(this);
+		ragnarRight.initiateEngineEntity(SeidhEntityFactory.InitiateCharacter(null, null, 150, 600, EntityType.RAGNAR_LOH));
+		
+		final ragnarLeft = new ClientCharacterEntity(this);
+		ragnarLeft.initiateEngineEntity(SeidhEntityFactory.InitiateCharacter(null, null, 850, 600, EntityType.RAGNAR_LOH));
+		ragnarLeft.setSideDebug(LEFT);
+
+		final zombieBoyRight = new ClientCharacterEntity(this);
+		zombieBoyRight.initiateEngineEntity(SeidhEntityFactory.InitiateCharacter(null, null, 150, 900, EntityType.ZOMBIE_BOY));
+		
+		final zombieBoyLeft = new ClientCharacterEntity(this);
+		zombieBoyLeft.initiateEngineEntity(SeidhEntityFactory.InitiateCharacter(null, null, 850, 900, EntityType.ZOMBIE_BOY));
+		zombieBoyLeft.setSideDebug(LEFT);
+
+		characterMainAttackAndHurt(ragnarRight);
+		characterMainAttackAndHurt(ragnarLeft);
+
+		characterMainAttackAndHurt(zombieBoyRight);
+		characterMainAttackAndHurt(zombieBoyLeft);
 	}	
+
+	private function characterMainAttackAndHurt(clientCharacterEntity:ClientCharacterEntity) {
+		Timer.delay(function callback() {
+			// clientCharacterEntity.fxActionMain();
+			// clientCharacterEntity.fxHurt();
+			characterMainAttackAndHurt(clientCharacterEntity);
+		}, 1000);
+	}
 
     // --------------------------------------
 	// Impl

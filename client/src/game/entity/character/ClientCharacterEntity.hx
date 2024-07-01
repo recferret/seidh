@@ -1,5 +1,7 @@
 package game.entity.character;
 
+import game.sound.SoundManager;
+import game.fx.FxManager;
 import game.utils.Utils;
 import game.entity.character.animation.CharacterAnimations;
 import engine.base.BaseTypesAndClasses;
@@ -7,13 +9,9 @@ import engine.base.geometry.Point;
 import engine.base.entity.impl.EngineCharacterEntity;
 import hxd.Math;
 
-// TODO Need client object abstraction
-
-class ClientCharacterEntity extends h2d.Object {
+class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 
     public var animation:CharacterAnimation;
-
-    private var engineEntity:EngineCharacterEntity;
 
     var targetServerPosition = new Point();
 
@@ -22,16 +20,12 @@ class ClientCharacterEntity extends h2d.Object {
     }
 
     // ------------------------------------------------------------
-    // General
+    // Abstraction
     // ------------------------------------------------------------
 
     public function update(dt:Float) {
         moveToServerPosition(dt);
     }
-
-    // ------------------------------------------------------------
-    // ABSTRACTION ?
-    // ------------------------------------------------------------
 
 	public function debugDraw(graphics:h2d.Graphics) {
         // Debug bot movement direction
@@ -66,6 +60,10 @@ class ClientCharacterEntity extends h2d.Object {
         }
 	}
  
+    // ------------------------------------------------------------
+    // General
+    // ------------------------------------------------------------
+
     public function setTragetServerPosition(x:Float, y:Float) {
         targetServerPosition.x = x;
         targetServerPosition.y = y;
@@ -73,25 +71,11 @@ class ClientCharacterEntity extends h2d.Object {
 
     public function moveToServerPosition(dt:Float) {
         if (animation.enableMoveAnimation) {
-
-            // if (this.engineEntity.getEntityType() == SKELETON_WARRIOR) {
-            //     final side = targetServerPosition.x > x ? Side.RIGHT : Side.LEFT;
-            //     animation.setSide(side);
-            // } else {
-            //     animation.setSide(isRightSide() ? RIGHT : LEFT);
-            // }
-
             animation.setSide(engineEntity.getSide());
 
             final distance = targetServerPosition.distance(new Point(x, y));
             if (distance > 1) {
-                // TODO пофиксить частый визуальных баг при смене стороны движения
-                // if (distance > 2) {
                 animation.setAnimationState(RUN);
-                // } else {
-                //     animation.setAnimationState(WALK);
-                // }
-                
                 x = Math.lerp(x, targetServerPosition.x, 0.045);
                 y = Math.lerp(y, targetServerPosition.y, 0.045);
             } else {
@@ -100,21 +84,58 @@ class ClientCharacterEntity extends h2d.Object {
         }
     }
 
-    // public function setDebugActionShape(shape:ShapeStruct) {
-    //     debugActionShape = shape;
+    // ------------------------------------------------------------
+    // FX
+    // ------------------------------------------------------------
 
-    //     // if (isRightSide()) {
-    //     //     debugActionShape.rectOffsetX = shape.rectOffsetX;
-    //     // } else {
-    //     //     debugActionShape.rectOffsetX = -15;
-    //     // }
+    public function fxActionMain() {
+        switch (getEntityType()) {
+            case RAGNAR_LOH:
+                final fxPosX = getSide() == RIGHT ? x + getBodyRectangle().w / 1.5 : x - getBodyRectangle().w / 1.5;
+                FxManager.instance.ragnarAttack(fxPosX, y, getSide());
+                SoundManager.instance.playVikingHit();
+            case ZOMBIE_BOY:
+                final fxPosX = getSide() == RIGHT ? x : x;
+                FxManager.instance.zombieAttack(fxPosX, y, getSide());
+                SoundManager.instance.playZombieHit();
+            case ZOMBIE_GIRL:
+                final fxPosX = getSide() == RIGHT ? x : x;
+                FxManager.instance.zombieAttack(fxPosX, y, getSide());
+                SoundManager.instance.playZombieHit();
+            default:
+        }
+    }
 
-    //     Timer.delay(function callback() {
-    //         debugActionShape = null;
-    //     }, 300);
-    // }
+    public function fxHurt() {
+        switch (getEntityType()) {
+            case RAGNAR_LOH:
+                FxManager.instance.blood(getSide() == RIGHT ? x + getBodyRectangle().w / 2 : x - getBodyRectangle().w / 2, y - getBodyRectangle().h / 5, getSide());
+                SoundManager.instance.playVikingDmg();
+            case ZOMBIE_BOY:
+                FxManager.instance.blood(getSide() == RIGHT ? x + getBodyRectangle().w / 3 : x - getBodyRectangle().w / 3, y - getBodyRectangle().h / 5, getSide());
+                SoundManager.instance.playZombieDmg();
+            case ZOMBIE_GIRL:
+                FxManager.instance.blood(getSide() == RIGHT ? x + getBodyRectangle().w / 3 : x - getBodyRectangle().w / 3, y - getBodyRectangle().h / 5, getSide());
+                SoundManager.instance.playZombieDmg();
+            default:
+        }
+    }
 
+    public function fxDeath() {
+        switch (getEntityType()) {
+            case RAGNAR_LOH:
+            case RAGNAR_NORM:
+                SoundManager.instance.playVikingDeath();
+            case ZOMBIE_BOY:
+            case ZOMBIE_GIRL:
+                SoundManager.instance.playZombieDeath();
+            default:
+        }
+    }
+
+    // ------------------------------------------------------------
     // Getters
+    // ------------------------------------------------------------
 
     public function getId() {
         return engineEntity.getId();
@@ -152,4 +173,15 @@ class ClientCharacterEntity extends h2d.Object {
         return engineEntity.getMaxHealth();
     }
 
+    // ------------------------------------------------------------
+    // Setters
+    // ------------------------------------------------------------
+
+
+    public function setSideDebug(side:Side) {
+        if (GameConfig.Debug) {
+            engineEntity.setSide(side);
+            animation.setSide(side);
+        }
+    }
 }

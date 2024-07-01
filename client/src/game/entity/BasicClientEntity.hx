@@ -1,15 +1,13 @@
 package game.entity;
 
-abstract class BasicClientEntity extends h2d.Object {
+abstract class BasicClientEntity<T> extends h2d.Object {
 
-    // Make it abstract
-    // public function update(dt:Float) {
-    // }
+    var engineEntity:T;
 
-    // public function debugDraw(graphics:h2d.Graphics) {
-    // }
+    public abstract function update(dt:Float):Void;
 
-    // public function initiateEngineEntity(engineEntity:EngineCoinEntity) {
-	// }
+    public abstract function debugDraw(graphics:h2d.Graphics):Void;
+
+    public abstract function initiateEngineEntity(engineEntity:T):Void;
 
 }

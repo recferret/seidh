@@ -3,14 +3,17 @@ package game.entity.coin;
 import game.utils.Utils;
 import engine.base.entity.impl.EngineCoinEntity;
 
-class ClientCoinEntity extends h2d.Object {
+class ClientCoinEntity extends BasicClientEntity<EngineCoinEntity> {
 
-    private var engineEntity:EngineCoinEntity;
     private var coinBmp:h2d.Bitmap;
 
     public function new(s2d:h2d.Scene) {
         super(s2d);
     }
+
+    // ------------------------------------------------------------
+    // Abstraction
+    // ------------------------------------------------------------
 
     public function update(dt:Float) {
     }

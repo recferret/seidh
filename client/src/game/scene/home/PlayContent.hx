@@ -1,7 +1,6 @@
 package game.scene.home;
 
-import game.ui.dialog.Dialog;
-import game.ui.dialog.Dialog.DialogType;
+import game.sound.SoundManager;
 import h2d.filter.Displacement;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
@@ -178,15 +177,16 @@ class PlayContent extends BasicHomeContent {
         // Shadow
         // ------------------------------------
 
-        final screenShadow = new h2d.Bitmap(hxd.Res.ui.home.mm_shadow.toTile(), this);
+        final screenShadow = new h2d.Bitmap(hxd.Res.ui.home.mm_shadow.toTile().center(), this);
         final scaleFactor = BasicScene.ActualScreenHeight / 1280;
-
+        final fixedScale = scaleFactor < 1 ? 1.1 : scaleFactor; 
         screenShadowDisplacementTile = hxd.Res.normalmap.toTile();
         screenShadow.filter = new Displacement(screenShadowDisplacementTile, 1, 3);
+        screenShadow.scaleX = fixedScale;
+		screenShadow.scaleY = fixedScale;
+        screenShadow.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 2);
 
-        screenShadow.scaleX = scaleFactor;
-		screenShadow.scaleY = scaleFactor;
-        screenShadow.setPosition(-((screenShadow.tile.width * (scaleFactor - 1)) / 2), 0);
+        // NativeWindowJS.debugAlert('Scale: ' + scaleFactor);
 
         // ------------------------------------
         // Buttons
@@ -211,7 +211,7 @@ class PlayContent extends BasicHomeContent {
         }
         playButtonInteractive.onClick = function(event : hxd.Event) {
             EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
-			SceneManager.Sound.playButton2();
+			SoundManager.instance.playButton2();
         }
 
         // Play button
@@ -279,7 +279,7 @@ class PlayContent extends BasicHomeContent {
     }
 
     private function switchRagner(dir:String) {
-        SceneManager.Sound.playButton2();
+        SoundManager.instance.playButton2();
 
         if (dir == 'right') {
             // Current is left, after one spin

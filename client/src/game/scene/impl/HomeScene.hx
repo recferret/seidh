@@ -1,5 +1,7 @@
 package game.scene.impl;
 
+import game.sound.SoundManager;
+import game.js.NativeWindowJS;
 import engine.base.MathUtils;
 import hxd.res.DefaultFont;
 import h2d.Bitmap;
@@ -23,8 +25,8 @@ class HomeScene extends BasicScene {
 	private var homeSceneContent:HomeSceneContent;
 	private var pageContent:BasicHomeContent;
 
-	private var menuButtonSize = 0.0;
-	private var menuButtonSizeHalf = 0.0;
+	private var menuButtonWidth = 0.0;
+	private var menuButtonWidthHalf = 0.0;
 	private var buttonBottomPosY = 0.0;
 
 	public function new() {
@@ -33,7 +35,6 @@ class HomeScene extends BasicScene {
 		setSceneContent(HomeSceneContent.HomePlayContent);
 
 		final heightRatio = BasicScene.ActualScreenHeight / 1280;
-		final heightScale = heightRatio == 1 ? 1 : 1.1;
 
         final homeFrame = new h2d.Bitmap(hxd.Res.ui.home.home_frame.toTile(), this);
 		homeFrame.scaleY = heightRatio;
@@ -42,9 +43,7 @@ class HomeScene extends BasicScene {
 		// Bottom bar buttons
 		// ---------------------------------------------------
 
-		menuButtonSize = Std.int(BasicScene.ActualScreenWidth / 6) + 10;
-		menuButtonSizeHalf = Std.int(menuButtonSize / 2);
-		buttonBottomPosY = BasicScene.ActualScreenHeight - (menuButtonSizeHalf / (heightRatio == 1 ? 1.2 : 1));
+		menuButtonWidth = Std.int(BasicScene.ActualScreenWidth / 6) + 10;
 
 		final homeTileOn = hxd.Res.ui.home.button_home_on.toTile().center();
 		final homeTileOff = hxd.Res.ui.home.button_home_off.toTile().center();
@@ -63,13 +62,22 @@ class HomeScene extends BasicScene {
 		final bottomButtonCollection = new h2d.Bitmap(collectionTileOff, this);
 		final bottomButtonFriends = new h2d.Bitmap(friendsTileOff, this);
 
+		// WTF ? I dunno
+		if (heightRatio == 1) {
+			buttonBottomPosY = BasicScene.ActualScreenHeight - (homeTileOn.height / 100 * 65);
+		} else if (heightRatio > 1) {
+			buttonBottomPosY = BasicScene.ActualScreenHeight - (homeTileOn.height / 100 * 78);
+		} else {
+			buttonBottomPosY = BasicScene.ActualScreenHeight - (homeTileOn.height / 100 * 57);
+		}
+
 		// Home button
 
-		bottomButtonHome.setPosition(menuButtonSize, buttonBottomPosY);
-		bottomButtonHome.setScale(heightScale);
+		bottomButtonHome.setPosition(menuButtonWidth, buttonBottomPosY);
+		bottomButtonHome.setScale(heightRatio);
 
 		final interactionHome = new h2d.Interactive(bottomButtonHome.tile.width, bottomButtonHome.tile.height);
-		interactionHome.setPosition(menuButtonSize - bottomButtonHome.tile.width / 2, buttonBottomPosY - bottomButtonHome.tile.height / 2);
+		interactionHome.setPosition(menuButtonWidth - bottomButtonHome.tile.width / 2, buttonBottomPosY - bottomButtonHome.tile.height / 2);
 		addChild(interactionHome);
 
 		interactionHome.onPush = function(event : hxd.Event) {
@@ -87,7 +95,7 @@ class HomeScene extends BasicScene {
 			}
 		}
 		interactionHome.onClick = function(event : hxd.Event) {
-			SceneManager.Sound.playButton1();
+			SoundManager.instance.playButton1();
 			if (this.homeSceneContent != HomeSceneContent.HomePlayContent) {
 				bottomButtonBoost.tile = boostTileOff;
 				bottomButtonCollection.tile = collectionTileOff;
@@ -98,11 +106,11 @@ class HomeScene extends BasicScene {
 
 		// Boost button
 
-		bottomButtonBoost.setPosition(menuButtonSize * 2.2, buttonBottomPosY);
-		bottomButtonBoost.setScale(heightScale);
+		bottomButtonBoost.setPosition(menuButtonWidth * 2.2, buttonBottomPosY);
+		bottomButtonBoost.setScale(heightRatio);
 
 		final interactionBoost = new h2d.Interactive(bottomButtonBoost.tile.width, bottomButtonBoost.tile.height);
-		interactionBoost.setPosition(menuButtonSize * 2.2 - bottomButtonBoost.tile.width / 2, buttonBottomPosY - bottomButtonBoost.tile.height / 2);
+		interactionBoost.setPosition(menuButtonWidth * 2.2 - bottomButtonBoost.tile.width / 2, buttonBottomPosY - bottomButtonBoost.tile.height / 2);
 		addChild(interactionBoost);
 
 		interactionBoost.onPush = function(event : hxd.Event) {
@@ -120,7 +128,7 @@ class HomeScene extends BasicScene {
 			}
 		}
 		interactionBoost.onClick = function(event : hxd.Event) {
-			SceneManager.Sound.playButton1();
+			SoundManager.instance.playButton1();
 			if (this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
 				bottomButtonHome.tile = homeTileOff;
 				bottomButtonCollection.tile = collectionTileOff;
@@ -131,11 +139,11 @@ class HomeScene extends BasicScene {
 
 		// Collection button
 
-		bottomButtonCollection.setPosition(menuButtonSize * 3.4, buttonBottomPosY);
-		bottomButtonCollection.setScale(heightScale);
+		bottomButtonCollection.setPosition(menuButtonWidth * 3.4, buttonBottomPosY);
+		bottomButtonCollection.setScale(heightRatio);
 
 		final interactionCollection = new h2d.Interactive(bottomButtonCollection.tile.width, bottomButtonCollection.tile.height);
-		interactionCollection.setPosition(menuButtonSize * 3.4 - bottomButtonCollection.tile.width / 2, buttonBottomPosY - bottomButtonCollection.tile.height / 2);
+		interactionCollection.setPosition(menuButtonWidth * 3.4 - bottomButtonCollection.tile.width / 2, buttonBottomPosY - bottomButtonCollection.tile.height / 2);
 		addChild(interactionCollection);
 
 		interactionCollection.onPush = function(event : hxd.Event) {
@@ -153,7 +161,7 @@ class HomeScene extends BasicScene {
 			}
 		}
 		interactionCollection.onClick = function(event : hxd.Event) {
-			SceneManager.Sound.playButton1();
+			SoundManager.instance.playButton1();
 			if (this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
 				bottomButtonHome.tile = homeTileOff;
 				bottomButtonBoost.tile = boostTileOff;
@@ -164,11 +172,11 @@ class HomeScene extends BasicScene {
 
 		// Friends button
 
-		bottomButtonFriends.setPosition(menuButtonSize * 4.6, buttonBottomPosY);
-		bottomButtonFriends.setScale(heightScale);
+		bottomButtonFriends.setPosition(menuButtonWidth * 4.6, buttonBottomPosY);
+		bottomButtonFriends.setScale(heightRatio);
 
 		final interactionFriends = new h2d.Interactive(bottomButtonFriends.tile.width, bottomButtonFriends.tile.height);
-		interactionFriends.setPosition(menuButtonSize * 4.6 - bottomButtonFriends.tile.width / 2, buttonBottomPosY - bottomButtonFriends.tile.height / 2);
+		interactionFriends.setPosition(menuButtonWidth * 4.6 - bottomButtonFriends.tile.width / 2, buttonBottomPosY - bottomButtonFriends.tile.height / 2);
 		addChild(interactionFriends);
 
 		interactionFriends.onPush = function(event : hxd.Event) {
@@ -186,7 +194,7 @@ class HomeScene extends BasicScene {
 			}
 		}
 		interactionFriends.onClick = function(event : hxd.Event) {
-			SceneManager.Sound.playButton1();
+			SoundManager.instance.playButton1();
 			if (this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
 				bottomButtonHome.tile = homeTileOff;
 				bottomButtonBoost.tile = boostTileOff;
@@ -195,7 +203,7 @@ class HomeScene extends BasicScene {
 			}
 		}
 
-		SceneManager.Sound.playMenuTheme();
+		SoundManager.instance.playMenuTheme();
 	}
 
 	// --------------------------------------

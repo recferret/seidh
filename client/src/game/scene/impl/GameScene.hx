@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import game.sound.SoundManager;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 import haxe.Timer;
 
@@ -36,7 +37,7 @@ class GameScene extends BasicScene implements EventListener {
 			seidhGameEngine.setLocalPlayerId(Player.instance.playerId);
 		}
 
-		SceneManager.Sound.playGameplayTheme();
+		SoundManager.instance.playGameplayTheme();
     }
 
     // --------------------------------------

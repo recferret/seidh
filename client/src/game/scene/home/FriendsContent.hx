@@ -1,5 +1,6 @@
 package game.scene.home;
 
+import game.sound.SoundManager;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
 import hxd.res.DefaultFont;
@@ -102,7 +103,7 @@ class Friend extends h2d.Object {
                 joinGameButton.setScale(0.4);
             }
             interactionJoin.onClick = function(event : hxd.Event) {
-                SceneManager.Sound.playButton2();
+                SoundManager.instance.playButton2();
             }
         }
     }
@@ -221,7 +222,7 @@ class FriendsContent extends BasicHomeContent {
             inviteButton.setScale(0.6);
         }
         interactionInvite.onClick = function(event : hxd.Event) {
-            SceneManager.Sound.playButton2();
+            SoundManager.instance.playButton2();
             EventManager.instance.notify(EventManager.EVENT_REF_SHARE, {});
         }
 

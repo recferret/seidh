@@ -14,5 +14,8 @@ class GameConfig {
 	public static var PlayMusic = true;
 	public static var PlaySounds = true;
 
+	public static var Debug = false;
 	public static var DebugDraw = false;
+
+	public static final TelegramAuth = false;
 }

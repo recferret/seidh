@@ -180,7 +180,10 @@ class SeidhGameEngine extends BaseEngine {
                             final character2 = cast(e2, EngineCharacterEntity);
                             // TODO add distance check here
                             if (character2.isAlive && character1.getId() != character2.getId()) {
-                                if (character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+                                final characterHasActionRect = character1.getCurrentActionRect() != null;
+                                final chatacterHitsAnother = character1.getCurrentActionRect().containsRect(character2.getBodyRectangle()); 
+                                final skipBotToBotAttack = character1.isBot() && character2.isBot();
+                                if (characterHasActionRect && chatacterHitsAnother && !skipBotToBotAttack) {
                                     if (allowServerLogic) {
                                         final health = character2.subtractHealth(character1.actionToPerform.damage);
                                         if (health == 0) {

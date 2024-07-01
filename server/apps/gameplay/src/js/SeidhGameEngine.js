@@ -648,6 +648,13 @@
 				return true;
 			}
 		}
+		isBot() {
+			if(this.baseEntity.entityType != 3) {
+				return this.baseEntity.entityType == 4;
+			} else {
+				return true;
+			}
+		}
 		setX(x) {
 			this.baseEntity.x = x;
 		}
@@ -1451,7 +1458,10 @@
 								let e2 = v;
 								let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
 								if(character2.isAlive && character1.getId() != character2.getId()) {
-									if(character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+									let characterHasActionRect = character1.getCurrentActionRect() != null;
+									let chatacterHitsAnother = character1.getCurrentActionRect().containsRect(character2.getBodyRectangle());
+									let skipBotToBotAttack = character1.isBot() && character2.isBot();
+									if(characterHasActionRect && chatacterHitsAnother && !skipBotToBotAttack) {
 										if(allowServerLogic) {
 											let health = character2.subtractHealth(character1.actionToPerform.damage);
 											if(health == 0) {

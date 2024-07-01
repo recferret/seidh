@@ -1,5 +1,6 @@
 package game.scene.base;
 
+import game.sound.SoundManager;
 import hxd.Event.EventKind;
 import h2d.Text;
 import h3d.Engine;
@@ -39,8 +40,6 @@ abstract class BasicScene extends h2d.Scene {
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
 
-	private final fxManager:FxManager;
-
 	private var gameUiScene:GameUiScene;
 	private var fui:h2d.Flow;
 	private var debugText:h2d.Text;
@@ -76,7 +75,7 @@ abstract class BasicScene extends h2d.Scene {
 
 		if (seidhGameEngine != null) {
 			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
-			fxManager = new FxManager(this);
+			// FxManager.instance.setScene(this);
 			new TerrainManager(this);
 
 			this.seidhGameEngine = seidhGameEngine;
@@ -96,16 +95,6 @@ abstract class BasicScene extends h2d.Scene {
 			this.seidhGameEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
 				final character = clientCharacterEntities.get(characterEntity.getId());
 				if (character != null) {
-					if (character.getEntityType() == EntityType.RAGNAR_LOH || 
-						character.getEntityType() == EntityType.RAGNAR_NORM) {
-						SceneManager.Sound.playVikingDeath();
-					} else if (
-						character.getEntityType() == EntityType.ZOMBIE_BOY || 
-						character.getEntityType() == EntityType.ZOMBIE_GIRL) {
-						SceneManager.Sound.playZombieDeath();
-					}
-
-					character.animation.setAnimationState(DEAD);
 					removeChild(character);
 					clientCharacterEntities.remove(characterEntity.getId());
 				}
@@ -176,20 +165,7 @@ abstract class BasicScene extends h2d.Scene {
 					final clientEntity = clientCharacterEntities.get(value.entityId);
 					switch (value.actionType) {
 						case CharacterActionType.ACTION_MAIN:
-							if (clientEntity.getEntityType() == EntityType.RAGNAR_LOH ||
-								clientEntity.getEntityType() == EntityType.RAGNAR_NORM) {
-								SceneManager.Sound.playVikingHit();
-								fxManager.ragnarAttack(clientEntity.x, clientEntity.y, clientEntity.getSide());
-							} else if (
-								clientEntity.getEntityType() == EntityType.ZOMBIE_BOY ||
-								clientEntity.getEntityType() == EntityType.ZOMBIE_GIRL) {
-								SceneManager.Sound.playZombieHit();
-								fxManager.zombieAttack(clientEntity.x, clientEntity.y, clientEntity.getSide());
-							}
-
-							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_3);
-						case CharacterActionType.ACTION_1:
-							clientEntity.animation.setAnimationState(CharacterAnimationState.ATTACK_1);
+							clientEntity.fxActionMain();		
 						default: 
 					}
 
@@ -197,23 +173,13 @@ abstract class BasicScene extends h2d.Scene {
 					for (value in value.hurtEntities) {
 						final clientEntity = clientCharacterEntities.get(value);
 						if (clientEntity != null) {
-							if (clientEntity.getEntityType() == EntityType.RAGNAR_LOH ||
-								clientEntity.getEntityType() == EntityType.RAGNAR_NORM) {
-								SceneManager.Sound.playVikingDmg();
-								fxManager.blood(clientEntity.x + (clientEntity.getSide() == Side.RIGHT ? 100 : -100), clientEntity.y, clientEntity.getSide());
-							} else if (
-								clientEntity.getEntityType() == EntityType.ZOMBIE_BOY ||
-								clientEntity.getEntityType() == EntityType.ZOMBIE_GIRL) {
-								SceneManager.Sound.playZombieDmg();
-								fxManager.blood(clientEntity.x + (clientEntity.getSide() == Side.RIGHT ? 100 : -80), clientEntity.y, clientEntity.getSide());
-							}
-							clientEntity.animation.setAnimationState(HURT);
+							clientEntity.fxHurt();
 						}
 					}
 					for (value in value.deadEntities) {
 						final clientEntity = clientCharacterEntities.get(value);
 						if (clientEntity != null) {
-							clientEntity.animation.setAnimationState(DEAD);
+							clientEntity.fxDeath();
 						}
 					}
 				}
@@ -257,6 +223,10 @@ abstract class BasicScene extends h2d.Scene {
 				});
 			}
 		}
+
+		SoundManager.instance.initiate();
+		FxManager.instance.initiate();
+		FxManager.instance.setScene(this);
 
 		hxd.Window.getInstance().addEventTarget(onEvent);
 

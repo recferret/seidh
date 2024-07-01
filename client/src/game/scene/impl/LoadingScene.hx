@@ -12,6 +12,7 @@ class LoadingScene extends BasicScene {
 
         final bg = new Bitmap(hxd.Res.seidh_load.toTile().center(), this);
         bg.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 2);
+        bg.scaleX = BasicScene.ActualScreenHeight / 1280;
         bg.scaleY = BasicScene.ActualScreenHeight / 1280;
     }
 
@@ -21,11 +22,8 @@ class LoadingScene extends BasicScene {
 
 	public function start() {
         haxe.Timer.delay(function callback() {
-            final checkTg = true;
-            var tgInitData = null;
-
-            if (checkTg) {
-                tgInitData = NativeWindowJS.tgGetInitData(); 
+            if (GameConfig.TelegramAuth) {
+                final tgInitData = NativeWindowJS.tgGetInitData(); 
                 if (tgInitData == null || tgInitData.length == 0) {
                     trace('TG INIT ERROR');
                     // TODO show some popup about game error
@@ -40,6 +38,8 @@ class LoadingScene extends BasicScene {
                         EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
                     });
                 }
+            } else {
+                EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
             }
         }, 2000);
     }
