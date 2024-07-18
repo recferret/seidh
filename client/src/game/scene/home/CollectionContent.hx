@@ -1,22 +1,28 @@
 package game.scene.home;
 
+import hxd.res.DefaultFont;
+
 import game.js.NativeWindowJS;
 import game.sound.SoundManager;
 import game.scene.base.BasicScene;
-import hxd.res.DefaultFont;
+import game.Res.SeidhResource;
 
-class CollectionButton extends h2d.Object {
+class WalletConnectButton extends h2d.Object {
 
     private final w = 0.0;
     private final h = 0.0;
-    private final bmp:h2d.Bitmap;
+    private final interaction:h2d.Interactive;
 
-    public function new(parent:h2d.Object, boostLabel:String) {
+    public function new(parent:h2d.Object, boostLabel:String, type:String) {
         super(parent);
 
-        bmp = new h2d.Bitmap(hxd.Res.ui.dialog.dialog_small.toTile(), this);
-        h = bmp.tile.height;
-        w = bmp.tile.width;
+        final scaleX = 1.6;
+        final scaleY = 0.5;
+        final bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL), this);
+        bmp.scaleX = scaleX;
+        bmp.scaleY = scaleY;
+        w = bmp.tile.width * scaleX;
+        h = bmp.tile.height * scaleY;
 
         final font : h2d.Font = DefaultFont.get();
         final tf = new h2d.Text(font);
@@ -24,94 +30,90 @@ class CollectionButton extends h2d.Object {
         tf.textColor = GameConfig.FontColor;
         tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         tf.textAlign = Center;
-        tf.setScale(5);
-        tf.setPosition(w / 2, (h - (tf.textHeight * 5)) / 2);
+        tf.setScale(4);
+        tf.setPosition(0, -35);
 
         addChild(tf);
+        
+        interaction = new h2d.Interactive(w, h);
+
+        interaction.onPush = function(event : hxd.Event) {
+            setScale(0.9);
+        }
+        interaction.onRelease = function(event : hxd.Event) {
+            setScale(1);
+        }
+        interaction.onClick = function(event : hxd.Event) {
+            if (type == 'connect_wallet') {
+                NativeWindowJS.trackWalletConnectClick();
+
+                NativeWindowJS.tonConnect(function callback(address:String) {
+                    NativeWindowJS.trackWalletConnected(address);
+                    Player.instance.saveWalletAddress(address);
+                    parent.removeChild(interaction);
+                    parent.removeChild(this);
+                });
+            } else if (type == 'mint_ragnar') {
+                NativeWindowJS.trackMintRagnarClick();
+                NativeWindowJS.tonMintRagnar();
+            }
+
+            SoundManager.instance.playButton2();
+        }
+        parent.addChild(interaction);
     }
 
-    public function getBitmap() {
-        return bmp;
+    public function setPosTop() {
+        setPosition(
+            Main.ActualScreenWidth / 2 ,
+            300
+        );
+        interaction.setPosition(
+            Main.ActualScreenWidth / 2 - w / 2,
+            270 - h / 2
+        );
     }
 
-    public function getHeight() {
-        return h;
-    }
-
-    public function getWidth() {
-        return w;
+    public function setPosBelowTop() {
+        setPosition(
+            Main.ActualScreenWidth / 2 ,
+            470
+        );
+        interaction.setPosition(
+            Main.ActualScreenWidth / 2 - w / 2,
+            470 - h / 2
+        );
     }
 
 }
 
 class CollectionContent extends BasicHomeContent {
 
-    public function new(scene:h2d.Scene) {
-		    super(scene);
+    public function new() {
+		    super();
 
-            final walletConnect = new CollectionButton(this, 'Connect wallet');
-            walletConnect.setScale(0.6);
-            walletConnect.setPosition(
-                BasicScene.ActualScreenWidth / 2 - (walletConnect.getWidth() /2 * 0.6),
-                200
-            );
-    
-            final interactionWalletConnect = new h2d.Interactive(walletConnect.getWidth() * 0.6, walletConnect.getHeight() * 0.6);
-            interactionWalletConnect.setPosition(
-                BasicScene.ActualScreenWidth / 2 - (walletConnect.getWidth() /2 * 0.6),
-                200
-            );
-            interactionWalletConnect.onPush = function(event : hxd.Event) {
-                walletConnect.setScale(0.54);
-            }
-            interactionWalletConnect.onRelease = function(event : hxd.Event) {
-                walletConnect.setScale(0.6);
-            }
-            interactionWalletConnect.onClick = function(event : hxd.Event) {
-                NativeWindowJS.tonConnect();
-                SoundManager.instance.playButton2();
-            }
-            addChild(interactionWalletConnect);
+            final buyRagnar = new WalletConnectButton(this, 'Buy Ragnar', 'mint_ragnar');
 
-            final buyRagnar = new CollectionButton(this, 'Buy Ragnar',);
-            buyRagnar.setScale(0.6);
-            buyRagnar.setPosition(
-                BasicScene.ActualScreenWidth / 2 - (buyRagnar.getWidth() /2 * 0.6),
-                380
-            );
+            if (Player.instance.getWalletAddress() == null) {
+                buyRagnar.setPosBelowTop();
 
-            final interactionBuyRagnar = new h2d.Interactive(buyRagnar.getWidth() * 0.6, buyRagnar.getHeight() * 0.6);
-            interactionBuyRagnar.setPosition(
-                BasicScene.ActualScreenWidth / 2 - (buyRagnar.getWidth() /2 * 0.6),
-                380
-            );
-            interactionBuyRagnar.onPush = function(event : hxd.Event) {
-                buyRagnar.setScale(0.54);
+                final walletConnect = new WalletConnectButton(this, 'Connect wallet', 'connect_wallet');
+                walletConnect.setPosTop();
+            } else {
+                buyRagnar.setPosTop();
             }
-            interactionBuyRagnar.onRelease = function(event : hxd.Event) {
-                buyRagnar.setScale(0.6);
-            }
-            interactionBuyRagnar.onClick = function(event : hxd.Event) {
-                NativeWindowJS.tonMintRagnar();
-                SoundManager.instance.playButton2();
-            }
-            addChild(interactionBuyRagnar);
 
-            final ragnarDudeTile = hxd.Res.ragnar.ragnar_dude.toTile().center();
-            final ragnarDudeBitmap = new h2d.Bitmap(ragnarDudeTile, this);
-
-            ragnarDudeBitmap.setPosition(BasicScene.ActualScreenWidth / 2, 700);
+            final ragnarDudeBitmap = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE), this);
+            ragnarDudeBitmap.setPosition(Main.ActualScreenWidth / 2, 770);
 
             final tf = new h2d.Text(DefaultFont.get());
             tf.text = "2000 / 2000 Ragnars!";
             tf.textColor = GameConfig.FontColor;
             tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
             tf.textAlign = Center;
-            tf.setScale(5);
-            tf.setPosition(BasicScene.ActualScreenWidth / 2, 850);
+            tf.setScale(4);
+            tf.setPosition(Main.ActualScreenWidth / 2, 950);
             addChild(tf);
-
-
     }
 
     public function update(dt:Float) {

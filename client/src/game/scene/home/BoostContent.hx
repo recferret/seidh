@@ -1,7 +1,9 @@
 package game.scene.home;
 
-import game.scene.base.BasicScene;
 import hxd.res.DefaultFont;
+
+import game.scene.base.BasicScene;
+import game.Res.SeidhResource;
 
 class BoostButton extends h2d.Object {
 
@@ -12,9 +14,13 @@ class BoostButton extends h2d.Object {
     public function new(parent:h2d.Object, boostLabel:String, owned:Bool, price:String) {
         super(parent);
 
-        bmp = new h2d.Bitmap(hxd.Res.ui.dialog.dialog_small.toTile(), this);
-        h = bmp.tile.height;
-        w = bmp.tile.width;
+        final scaleX = 1.6;
+        final scaleY = 0.5;
+        bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL), this);
+        bmp.scaleX = scaleX;
+        bmp.scaleY = scaleY;
+        w = bmp.tile.width * scaleX;
+        h = bmp.tile.height * scaleY;
 
         final font : h2d.Font = DefaultFont.get();
         final tf = new h2d.Text(font);
@@ -22,8 +28,8 @@ class BoostButton extends h2d.Object {
         tf.textColor = GameConfig.FontColor;
         tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         tf.textAlign = Center;
-        tf.setScale(5);
-        tf.setPosition(w / 2, (h - (tf.textHeight * 5)) / 2);
+        tf.setScale(4);
+        tf.setPosition(0, -35);
 
         addChild(tf);
     }
@@ -44,21 +50,19 @@ class BoostButton extends h2d.Object {
 
 class BoostContent extends BasicHomeContent {
 
-    public function new(scene:h2d.Scene) {
-	    super(scene);
+    public function new() {
+	    super();
 
         final expBoost = new BoostButton(this, 'Double EXP', false, "300 SDH");
-        expBoost.setScale(0.6);
         expBoost.setPosition(
-            BasicScene.ActualScreenWidth / 2 - (expBoost.getWidth() /2 * 0.6),
-            200
+            Main.ActualScreenWidth / 2 ,
+            300
         );
 
         final lootBoost = new BoostButton(this, '25% more LOOT', false, "300 SDH");
-        lootBoost.setScale(0.6);
         lootBoost.setPosition(
-            BasicScene.ActualScreenWidth / 2 - (expBoost.getWidth() /2 * 0.6),
-            380
+            Main.ActualScreenWidth / 2,
+            470
         );
     }
 

@@ -2,6 +2,8 @@ package game.ui.dialog;
 
 import h2d.Object;
 import hxd.res.DefaultFont;
+
+import game.Res.SeidhResource;
 import game.scene.base.BasicScene;
 
 enum abstract DialogType(Int) {
@@ -19,7 +21,7 @@ class DialogButton extends h2d.Object {
     public function new(parent:Object, text:String) {
         super(parent);
 
-        bmp = new h2d.Bitmap(hxd.Res.ui.dialog.dialog_button.toTile(), this);
+        bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_BUTTON_YAY), this);
         h = bmp.tile.height;
         w = bmp.tile.width;
 
@@ -30,7 +32,7 @@ class DialogButton extends h2d.Object {
         tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         tf.textAlign = Center;
         tf.setScale(3);
-        tf.setPosition(w / 2, (h - (tf.textHeight * 3)) / 2);
+        tf.setPosition(0, -25);
 
         addChild(tf);
     }
@@ -60,25 +62,17 @@ class Dialog extends h2d.Object {
     ) {
         super(s2d);
 
-        // Backround
-        final background = new h2d.Bitmap(hxd.Res.ui.home.mm_shadow_2.toTile().center(), this);
-        final scaleFactor = BasicScene.ActualScreenHeight / 1280;
-        final fixedScale = scaleFactor < 1 ? 1.1 : scaleFactor; 
-        background.scaleX = fixedScale;
-		background.scaleY = fixedScale;
-        background.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 2);
-
         // Dialog 
         var dialogBmp:h2d.Bitmap;
         switch (dialogType) {
             case SMALL:
-                dialogBmp = new h2d.Bitmap(hxd.Res.ui.dialog.dialog_small.toTile().center(), this);
+                dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL), this);
             case MEDIUM:
-                dialogBmp = new h2d.Bitmap(hxd.Res.ui.dialog.dialog_medium.toTile().center(), this);
+                dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL), this);
             case BIG:
-                dialogBmp = new h2d.Bitmap(hxd.Res.ui.dialog.dialog_big.toTile().center(), this);
+                dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL), this);
         }
-        dialogBmp.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 2);
+        dialogBmp.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
 
         // Line by line text
         final fui = new h2d.Flow(this);
@@ -86,8 +80,8 @@ class Dialog extends h2d.Object {
 		fui.verticalSpacing = 5;
 
         fui.setPosition(
-            BasicScene.ActualScreenWidth / 2,
-            BasicScene.ActualScreenHeight / 2.6
+            Main.ActualScreenWidth / 2,
+            Main.ActualScreenHeight / 2 - 100
         );
 
         final font : h2d.Font = DefaultFont.get();
@@ -117,11 +111,15 @@ class Dialog extends h2d.Object {
         // Ok button
         final buttonOk = new DialogButton(this, "OK");
         buttonOk.setPosition(
-            BasicScene.ActualScreenWidth / 2 - (buttonOk.getWidth() / 2), 
-            BasicScene.ActualScreenHeight / 2 + (buttonOk.getHeight() / 2.2)
+            Main.ActualScreenWidth / 2, 
+            Main.ActualScreenHeight / 2 + 50
         );
 
-        final interactionOk = new h2d.Interactive(buttonOk.getWidth(), buttonOk.getHeight(), buttonOk.getBitmap());
+        final interactionOk = new h2d.Interactive(buttonOk.getWidth(), buttonOk.getHeight());
+        interactionOk.setPosition(
+            Main.ActualScreenWidth / 2 - buttonOk.getWidth() / 2,
+            Main.ActualScreenHeight / 2 + 50 - buttonOk.getHeight() / 2
+        );
         interactionOk.onPush = function(event : hxd.Event) {
             buttonOk.setScale(0.9);
         }
@@ -135,6 +133,7 @@ class Dialog extends h2d.Object {
                 okClickCallback();
             }
         }
+        addChild(interactionOk);
     }
 
 }

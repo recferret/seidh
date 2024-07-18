@@ -11,8 +11,9 @@ import {
     CharacterEntityFullStruct,
     GameState,
     EngineMode,
-    EngineCoinEntity,
-    CoinEntityStruct, 
+    EngineConsumableEntity,
+    DeleteConsumableEntityTask,
+    ConsumableEntityStruct, 
 } from "@app/seidh-common/seidh-common.game-types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EventGameCharacterActions } from "../events/event.game.character-actions";
@@ -22,8 +23,8 @@ import { EventGameDeleteCharacter } from "../events/event.game.delete-character"
 import { EventGameDeleteProjectile } from "../events/event.game.delete-projectile";
 import { EventGameLoopState } from "../events/event.game.loop-state";
 import { EventGameGameState } from "../events/event.game.game-state";
-import { EventGameDeleteCoin } from "../events/event.game.delete-coin";
-import { EventGameCreateCoin } from "../events/event.game.create-coin";
+import { EventGameDeleteConsumable } from "../events/event.game.delete-consumable";
+import { EventGameCreateConsumable } from "../events/event.game.create-consumable";
 
 export class GameInstance {
 
@@ -53,12 +54,6 @@ export class GameInstance {
                 EventGameDeleteCharacter.EventName,
                 new EventGameDeleteCharacter(gameId, characterEntity.getEntityMinStruct().id)
             );
-
-            // Stop mobs from spwawning if there is no more players
-            if (this.engine.getPlayersCount() == 0)  {
-                this.engine.allowMobsSpawn(false);
-                this.engine.cleanAllMobs();
-            }
         };
 
         this.engine.createProjectileCallback = (projectileEntity: EngineProjectileEntity) => {
@@ -69,21 +64,21 @@ export class GameInstance {
             this.eventEmitter.emit(EventGameDeleteProjectile.EventName, new EventGameDeleteProjectile(gameId));
         };
 
-        this.engine.createCoinCallback = (coinEntity: EngineCoinEntity) => {
-            const coinEntityStruct: CoinEntityStruct = {
-                baseEntityStruct: coinEntity.getEntityBaseStruct(),
-                amount: coinEntity.amount,
+        this.engine.createConsumableCallback = (consumableEntity: EngineConsumableEntity) => {
+            const consumableEntityStruct: ConsumableEntityStruct = {
+                baseEntityStruct: consumableEntity.getEntityBaseStruct(),
+                amount: consumableEntity.amount,
             };
             this.eventEmitter.emit(
-                EventGameCreateCoin.EventName,
-                new EventGameCreateCoin(gameId, coinEntityStruct)
+                EventGameCreateConsumable.EventName,
+                new EventGameCreateConsumable(gameId, consumableEntityStruct)
             );
         };
 
-        this.engine.deleteCoinCallback = (coinEntity: EngineCoinEntity) => {
+        this.engine.deleteConsumableCallback = (callbackBody: DeleteConsumableEntityTask) => {
             this.eventEmitter.emit(
-                EventGameDeleteCoin.EventName,
-                new EventGameDeleteCoin(gameId, coinEntity.getEntityBaseStruct().id)
+                EventGameDeleteConsumable.EventName,
+                new EventGameDeleteConsumable(gameId, callbackBody.entityId, callbackBody.takenByCharacterId)
             );
         };
 
@@ -129,6 +124,13 @@ export class GameInstance {
                 )
             );
         };
+
+        setInterval(() => {
+            if (this.engine.getPlayersCount() == 0) {
+                this.engine.allowMobsSpawn(false);
+                this.engine.cleanAllMobs();
+            }
+        }, 2500);
     }
 
     // Client commands
@@ -143,8 +145,8 @@ export class GameInstance {
         const struct: CreateCharacterMinStruct = {
             id: 'entity_' + playerId,
             ownerId: playerId,
-            x: 2000,
-            y: 2000,
+            x: this.engine.getPlayersSpawnPoints()[0].x,
+            y: this.engine.getPlayersSpawnPoints()[0].y,
             entityType: EntityType.RAGNAR_LOH,
         };
         this.engine.createCharacterEntityFromMinimalStruct(struct);

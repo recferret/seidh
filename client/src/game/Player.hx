@@ -1,8 +1,11 @@
 package game;
 
+import game.js.NativeWindowJS;
 import uuid.Uuid;
 
 class Player {
+	private final WalletAddressKey = 'WalletAddress';
+
 	public static final instance:Player = new Player();
 
 	public var playerId:String;
@@ -33,5 +36,17 @@ class Player {
 
 	public function getInputIndex() {
 		return inputIndex;
+	}
+
+	// ------------------------------------------------------
+	// Local storage
+	// ------------------------------------------------------
+
+	public function saveWalletAddress(walletAddress:String) {
+		NativeWindowJS.lsSetItem(WalletAddressKey, walletAddress);
+	}
+
+	public function getWalletAddress() {
+		return NativeWindowJS.lsGetItem(WalletAddressKey);
 	}
 }

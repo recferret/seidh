@@ -1,24 +1,25 @@
 package game.scene.base;
 
-import game.sound.SoundManager;
+import engine.base.core.BaseEngine.DeleteConsumableEntityTask;
 import hxd.Event.EventKind;
 import h2d.Text;
 import h3d.Engine;
 import hxd.Key in K;
 
 import game.entity.character.ClientCharacterEntity;
-import game.entity.coin.ClientCoinEntity;
+import game.entity.consumable.ClientConsumableEntity;
 import game.fx.FxManager;
 import game.js.NativeWindowJS;
 import game.network.Networking;
 import game.scene.GameUiScene.ButtonPressed;
+import game.sound.SoundManager;
 import game.terrain.TerrainManager;
 
 import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
 import engine.base.core.BaseEngine.GameState;
 import engine.base.entity.impl.EngineProjectileEntity;
-import engine.base.entity.impl.EngineCoinEntity;
+import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.seidh.SeidhGameEngine;
 
@@ -30,12 +31,11 @@ typedef BasicSceneClickCallback = {
 	eventKind:EventKind,
 } 
 
+// TODO this is not a basic scene, it a game actually
 abstract class BasicScene extends h2d.Scene {
-	public final seidhGameEngine:SeidhGameEngine;
 
-	public static var ActualScreenWidth = 0;
-	public static var ActualScreenHeight = 0;
-	public static var ScreenRatio = 0.0;
+	public final seidhGameEngine:SeidhGameEngine;
+	public final terrainManager:TerrainManager;
 
     public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
@@ -51,11 +51,8 @@ abstract class BasicScene extends h2d.Scene {
 
 	private var basicSceneCallback:BasicSceneClickCallback->Void;
 
-	// UI
-
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
-	final clientCoinEntities = new Map<String, ClientCoinEntity>();
-	// final clientProjectileEntities = new Map<String, ClientProjectileEntity>();
+	final clientConsumableEntities = new Map<String, ClientConsumableEntity>();
 	
 	var inputsSent = 0;
 
@@ -74,9 +71,10 @@ abstract class BasicScene extends h2d.Scene {
 		isMobileDevice = true;
 
 		if (seidhGameEngine != null) {
-			// NativeWindowJS.restPostTelegramInitData(NativeWindowJS.tgGetInitData());
-			// FxManager.instance.setScene(this);
-			new TerrainManager(this);
+			terrainManager = new TerrainManager(this);
+
+			camera.x = seidhGameEngine.getPlayersSpawnPoints()[0].x;
+			camera.y = seidhGameEngine.getPlayersSpawnPoints()[0].y;
 
 			this.seidhGameEngine = seidhGameEngine;
 
@@ -87,11 +85,10 @@ abstract class BasicScene extends h2d.Scene {
 
 				if (character.getOwnerId() == Player.instance.playerId) {
 					playerEntity = character;
-					// targetCursor = new h2d.Bitmap(hxd.Res.input.target.toTile().center(), this);
+					NativeWindowJS.trackGameStarted();
 				}
 			};
 
-			// TODO add delete reason
 			this.seidhGameEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
 				final character = clientCharacterEntities.get(characterEntity.getId());
 				if (character != null) {
@@ -115,29 +112,44 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			// TODO need better abstraction for client entities
-			this.seidhGameEngine.createCoinCallback = function callback(coinEntity:EngineCoinEntity) {
-				final coin = new ClientCoinEntity(this);
-				coin.initiateEngineEntity(coinEntity);
-				clientCoinEntities.set(coinEntity.getId(), coin);
+			this.seidhGameEngine.createConsumableCallback = function callback(consumableEntity:EngineConsumableEntity) {
+				final consumable = new ClientConsumableEntity(this);
+				consumable.initiateEngineEntity(consumableEntity);
+				clientConsumableEntities.set(consumableEntity.getId(), consumable);
 			};
 
-			this.seidhGameEngine.deleteCoinCallback = function callback(coinEntity:EngineCoinEntity) {
-				final coin = clientCoinEntities.get(coinEntity.getId());
-				if (coin != null) {
-					clientCoinEntities.remove(coinEntity.getId());
+			this.seidhGameEngine.deleteConsumableCallback = function callback(callbackBody:DeleteConsumableEntityTask) {
+				final consumable = clientConsumableEntities.get(callbackBody.entityId);
+				clientConsumableEntities.remove(callbackBody.entityId);
 
-					final point = new h2d.col.Point(camera.x + 530, camera.y - BasicScene.ActualScreenHeight);
-					// camera.screenToCamera(point);
-					Actuate.tween(coin, 1, { 
-						x: point.x,
-						y: point.y,
-						scaleX: 0.1,
-						scaleY: 0.1,
-						alpha: 0.2,
-					}).onComplete(function callback() {
-						removeChild(coin);
-					});
-					gameUiScene.addGold();
+				if (consumable != null && callbackBody.takenByCharacterId == playerEntity.getId()) {
+					if (consumable.getEntityType() == EntityType.COIN) {
+						final point = new h2d.col.Point(camera.x + 530, camera.y - Main.ActualScreenHeight);
+						Actuate.tween(consumable, 1, { 
+							x: point.x,
+							y: point.y,
+							scaleX: 0.1,
+							scaleY: 0.1,
+							alpha: 0.2,
+						}).onComplete(function callback() {
+							removeChild(consumable);
+						});
+						gameUiScene.addGold();
+					} else {
+						final point = new h2d.col.Point(camera.x - 330, camera.y - Main.ActualScreenHeight);
+						Actuate.tween(consumable, 1, { 
+							x: point.x,
+							y: point.y,
+							scaleX: 0.1,
+							scaleY: 0.1,
+							alpha: 0.2,
+						}).onComplete(function callback() {
+							removeChild(consumable);
+						});
+						gameUiScene.addHealth();
+					}
+				} else {
+					removeChild(consumable);
 				}
 			};
 
@@ -187,8 +199,10 @@ abstract class BasicScene extends h2d.Scene {
 
 			this.seidhGameEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
+					NativeWindowJS.trackGameWin();
 					gameUiScene.showWinDialog(this.seidhGameEngine.getPlayerKills(playerEntity.getOwnerId()));
 				} else if (gameState == GameState.LOSE) {
+					NativeWindowJS.trackGameLose();
 					gameUiScene.showLoseDialog(this.seidhGameEngine.getPlayerKills(playerEntity.getOwnerId()));
 				} else {
 					trace('Game Over!');
@@ -248,14 +262,9 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	public function onResize() {
-		final jsScreenParams = NativeWindowJS.getScreenParams();
-		final screenOrientation = jsScreenParams.orientation;
-		final ratio = ScreenRatio = screenOrientation == 'portrait' ? 
-			jsScreenParams.pageHeight / jsScreenParams.pageWidth : 
-			jsScreenParams.pageWidth / jsScreenParams.pageHeight;
-		final w = ActualScreenWidth = screenOrientation == 'portrait' ? 720 : Std.int(720 * ratio);
-		final h = ActualScreenHeight = screenOrientation == 'portrait' ? Std.int(720 * ratio) : 720;
-		
+		final w = Main.ActualScreenWidth;
+		final h = Main.ActualScreenHeight;
+
 		if (seidhGameEngine != null) {
 			if (isMobileDevice) {
 				if (gameUiScene == null) {
@@ -265,8 +274,6 @@ abstract class BasicScene extends h2d.Scene {
 							switch (buttonPressed) {
 								case ButtonPressed.A:
 									addInputCommand(CharacterActionType.ACTION_MAIN);
-								// case ButtonPressed.B:
-									// addInputCommand(CharacterActionType.ACTION_1);
 								default:
 							}
 						},
@@ -275,7 +282,7 @@ abstract class BasicScene extends h2d.Scene {
 						}
 					);
 				}
-				gameUiScene.resize(screenOrientation, w, h);
+				gameUiScene.resize(Main.ScreenOrientation, w, h);
 			}
 		}
 

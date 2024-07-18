@@ -4,6 +4,9 @@ import h2d.Anim;
 
 import engine.base.BaseTypesAndClasses;
 
+import game.Res.SeidhResource;
+
+
 // TODO rmk and use objects pool
 class FrameAnimationFx {
     private var animation:Anim;
@@ -44,42 +47,42 @@ class FxManager {
     public function initiate() {
         if (!initiated) {
             ragnarAttackTilesRight = [
-                hxd.Res.fx.ragnar.attack_1.toTile().center(),
-                hxd.Res.fx.ragnar.attack_2.toTile().center(),
-                hxd.Res.fx.ragnar.attack_3.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_1),
+                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_2),
+                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_3),
             ];
             ragnarAttackTilesLeft = [
-                hxd.Res.fx.ragnar.attack_1.toTile().center(),
-                hxd.Res.fx.ragnar.attack_2.toTile().center(),
-                hxd.Res.fx.ragnar.attack_3.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_1),
+                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_2),
+                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_3),
             ];
             ragnarAttackTilesLeft[0].flipX();
             ragnarAttackTilesLeft[1].flipX();
             ragnarAttackTilesLeft[2].flipX();
     
             zombieAttackTilesRight = [
-                hxd.Res.fx.zombie.attack_1.toTile().center(),
-                hxd.Res.fx.zombie.attack_2.toTile().center(),
-                hxd.Res.fx.zombie.attack_3.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_1),
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_2),
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_3),
             ];
             zombieAttackTilesLeft = [
-                hxd.Res.fx.zombie.attack_1.toTile().center(),
-                hxd.Res.fx.zombie.attack_2.toTile().center(),
-                hxd.Res.fx.zombie.attack_3.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_1),
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_2),
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_3),
             ];
             zombieAttackTilesLeft[0].flipX();
             zombieAttackTilesLeft[1].flipX();
             zombieAttackTilesLeft[2].flipX();
     
             bloodTilesRight = [
-                hxd.Res.fx.blood.blood_1.toTile().center(),
-                hxd.Res.fx.blood.blood_2.toTile().center(),
-                hxd.Res.fx.blood.blood_3.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.FX_BLOOD_1),
+                Res.instance.getTileResource(SeidhResource.FX_BLOOD_2),
+                Res.instance.getTileResource(SeidhResource.FX_BLOOD_3),
             ];
             bloodTilesLeft = [
-                hxd.Res.fx.blood.blood_1.toTile().center(),
-                hxd.Res.fx.blood.blood_2.toTile().center(),
-                hxd.Res.fx.blood.blood_3.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.FX_BLOOD_1),
+                Res.instance.getTileResource(SeidhResource.FX_BLOOD_2),
+                Res.instance.getTileResource(SeidhResource.FX_BLOOD_3),
             ];
             bloodTilesLeft[0].flipX();
             bloodTilesLeft[1].flipX();

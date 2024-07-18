@@ -270,13 +270,13 @@ class engine_base_core_BaseEngine {
 		this.hotInputCommands = [];
 		this.deleteProjectileEntityQueue = [];
 		this.createProjectileEntityQueue = [];
-		this.deleteCoinEntityQueue = [];
-		this.createCoinEntityQueue = [];
+		this.deleteConsumableEntityQueue = [];
+		this.createConsumableEntityQueue = [];
 		this.deleteCharacterEntityQueue = [];
 		this.createCharacterEntityQueue = [];
 		this.validatedInputCommands = [];
 		this.playerToEntityMap = new haxe_ds_StringMap();
-		this.coinEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
+		this.consumableEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
 		this.projectileEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
 		this.characterEntityManager = new engine_base_entity_base_EngineBaseEntityManager();
 		this.gameState = 1;
@@ -291,8 +291,8 @@ class engine_base_core_BaseEngine {
 			_gthis.ticksSinceLastPop++;
 			_gthis.processCreateCharacterQueue();
 			_gthis.processDeleteCharacterQueue();
-			_gthis.processCreateCoinQueue();
-			_gthis.processDeleteCoinQueue();
+			_gthis.processCreateConsumableQueue();
+			_gthis.processDeleteConsumableQueue();
 			_gthis.processCreateProjectileQueue();
 			_gthis.processDeleteProjectileQueue();
 			_gthis.engineLoopUpdate(dt);
@@ -459,40 +459,40 @@ class engine_base_core_BaseEngine {
 		}
 		this.deleteProjectileEntityQueue = [];
 	}
-	createCoinEntity(entity) {
-		this.createCoinEntityQueue.push({ entity : entity});
+	createConsumableEntity(entity) {
+		this.createConsumableEntityQueue.push({ entity : entity});
 	}
-	deleteCoinEntity(entityId) {
-		this.deleteCoinEntityQueue.push(entityId);
+	deleteConsumableEntity(entityId,takenByCharacterId) {
+		this.deleteConsumableEntityQueue.push({ entityId : entityId, takenByCharacterId : takenByCharacterId});
 	}
-	processCreateCoinQueue() {
+	processCreateConsumableQueue() {
 		let _g = 0;
-		let _g1 = this.createCoinEntityQueue;
+		let _g1 = this.createConsumableEntityQueue;
 		while(_g < _g1.length) {
 			let queueTask = _g1[_g];
 			++_g;
-			this.coinEntityManager.add(queueTask.entity);
-			if(this.createCoinCallback != null) {
-				this.createCoinCallback(queueTask.entity);
+			this.consumableEntityManager.add(queueTask.entity);
+			if(this.createConsumableCallback != null) {
+				this.createConsumableCallback(queueTask.entity);
 			}
 		}
-		this.createCoinEntityQueue = [];
+		this.createConsumableEntityQueue = [];
 	}
-	processDeleteCoinQueue() {
+	processDeleteConsumableQueue() {
 		let _g = 0;
-		let _g1 = this.deleteCoinEntityQueue;
+		let _g1 = this.deleteConsumableEntityQueue;
 		while(_g < _g1.length) {
-			let entityId = _g1[_g];
+			let task = _g1[_g];
 			++_g;
-			let entity = js_Boot.__cast(this.coinEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCoinEntity);
+			let entity = js_Boot.__cast(this.consumableEntityManager.getEntityById(task.entityId) , engine_base_entity_impl_EngineConsumableEntity);
 			if(entity != null) {
-				if(this.deleteCoinCallback != null) {
-					this.deleteCoinCallback(entity);
+				if(this.deleteConsumableCallback != null) {
+					this.deleteConsumableCallback(task);
 				}
-				this.coinEntityManager.delete(entity.getId());
+				this.consumableEntityManager.delete(task.entityId);
 			}
 		}
-		this.deleteCoinEntityQueue = [];
+		this.deleteConsumableEntityQueue = [];
 	}
 	checkLocalMovementInputAllowance(entityId) {
 		let entity = js_Boot.__cast(this.characterEntityManager.getEntityById(entityId) , engine_base_entity_impl_EngineCharacterEntity);
@@ -648,6 +648,13 @@ class engine_base_entity_base_EngineBaseEntity {
 			return true;
 		}
 	}
+	isBot() {
+		if(this.baseEntity.entityType != 3) {
+			return this.baseEntity.entityType == 4;
+		} else {
+			return true;
+		}
+	}
 	setX(x) {
 		this.baseEntity.x = x;
 	}
@@ -736,6 +743,7 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 		this.isWalking = false;
 		this.botAttackRange = 200;
 		this.botForwardLookingLineLength = 100;
+		this.playerForwardLookingLineLength = 200;
 		this.intersectsWithCharacter = false;
 		this.canMove = true;
 		this.isCollides = true;
@@ -767,10 +775,10 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 			let angleBetweenEntities = engine_base_MathUtils.angleBetweenPoints(this.getBodyRectangle().getCenter(),this.targetObjectEntity.getBodyRectangle().getCenter());
 			this.baseEntity.rotation = angleBetweenEntities;
 			let l = this.getForwardLookingLine(this.botForwardLookingLineLength);
-			this.botForwardLookingLine.x1 = l.p1.x;
-			this.botForwardLookingLine.y1 = l.p1.y;
-			this.botForwardLookingLine.x2 = l.p2.x;
-			this.botForwardLookingLine.y2 = l.p2.y;
+			this.botForwardLookingLine.x1 = l.x1;
+			this.botForwardLookingLine.y1 = l.y1;
+			this.botForwardLookingLine.x2 = l.x2;
+			this.botForwardLookingLine.y2 = l.y2;
 		}
 		if(this.customUpdate != null) {
 			this.customUpdate.onUpdate();
@@ -802,9 +810,12 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 	}
 	getForwardLookingLine(lineLength) {
 		let rect = this.getBodyRectangle();
-		let x = rect.getCenter().x;
-		let y = rect.getCenter().y;
-		return { p1 : rect.getCenter(), p2 : engine_base_MathUtils.rotatePointAroundCenter(x + lineLength,y,x,y,this.baseEntity.rotation)};
+		let x1 = rect.getCenter().x;
+		let y1 = rect.getCenter().y;
+		let p = engine_base_MathUtils.rotatePointAroundCenter(x1 + lineLength,y1,x1,y1,this.baseEntity.rotation);
+		let x2 = p.x;
+		let y2 = p.y;
+		return new engine_base_geometry_Line(x1,y1,x2,y2);
 	}
 	updateHash() {
 		let hash = this.updateHashImpl();
@@ -862,21 +873,23 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 		}
 	}
 	determenisticMove() {
-		let speed = this.characterEntity.movement.runSpeed;
-		if(this.characterEntity.movement.canRun && this.currentVitality > 0) {
-			this.currentVitality -= this.characterEntity.movement.vitalityConsumptionPerSec;
-			speed = this.characterEntity.movement.runSpeed;
-			this.isRunning = true;
-			this.isWalking = false;
-		} else {
-			this.isRunning = false;
-			this.isWalking = true;
+		if(this.canMove) {
+			let speed = this.characterEntity.movement.runSpeed;
+			if(this.characterEntity.movement.canRun && this.currentVitality > 0) {
+				this.currentVitality -= this.characterEntity.movement.vitalityConsumptionPerSec;
+				speed = this.characterEntity.movement.runSpeed;
+				this.isRunning = true;
+				this.isWalking = false;
+			} else {
+				this.isRunning = false;
+				this.isWalking = true;
+			}
+			this.dx = speed * Math.cos(this.baseEntity.rotation);
+			this.dy = speed * Math.sin(this.baseEntity.rotation);
+			this.characterEntity.side = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
+			this.baseEntity.x += this.dx | 0;
+			this.baseEntity.y += this.dy | 0;
 		}
-		this.dx = speed * Math.cos(this.baseEntity.rotation);
-		this.dy = speed * Math.sin(this.baseEntity.rotation);
-		this.characterEntity.side = this.baseEntity.x + this.dx > this.baseEntity.x ? 2 : 1;
-		this.baseEntity.x += this.dx | 0;
-		this.baseEntity.y += this.dy | 0;
 	}
 	checkLocalMovementInput() {
 		let now = HxOverrides.now() / 1000;
@@ -949,6 +962,9 @@ class engine_base_entity_impl_EngineCharacterEntity extends engine_base_entity_b
 	}
 	addHealth(add) {
 		this.characterEntity.health += add;
+		if(this.characterEntity.health > this.maxHealth) {
+			this.characterEntity.health = this.maxHealth;
+		}
 	}
 	subtractHealth(subtract) {
 		this.characterEntity.health -= subtract;
@@ -1031,7 +1047,7 @@ engine_base_entity_impl_EngineCharacterEntity.__super__ = engine_base_entity_bas
 Object.assign(engine_base_entity_impl_EngineCharacterEntity.prototype, {
 	__class__: engine_base_entity_impl_EngineCharacterEntity
 });
-class engine_base_entity_impl_EngineCoinEntity extends engine_base_entity_base_EngineBaseEntity {
+class engine_base_entity_impl_EngineConsumableEntity extends engine_base_entity_base_EngineBaseEntity {
 	constructor(baseEntity,amount) {
 		super(baseEntity);
 		if(baseEntity.id == null) {
@@ -1045,10 +1061,10 @@ class engine_base_entity_impl_EngineCoinEntity extends engine_base_entity_base_E
 		return this.baseEntity.getBaseStruct();
 	}
 }
-engine_base_entity_impl_EngineCoinEntity.__name__ = true;
-engine_base_entity_impl_EngineCoinEntity.__super__ = engine_base_entity_base_EngineBaseEntity;
-Object.assign(engine_base_entity_impl_EngineCoinEntity.prototype, {
-	__class__: engine_base_entity_impl_EngineCoinEntity
+engine_base_entity_impl_EngineConsumableEntity.__name__ = true;
+engine_base_entity_impl_EngineConsumableEntity.__super__ = engine_base_entity_base_EngineBaseEntity;
+Object.assign(engine_base_entity_impl_EngineConsumableEntity.prototype, {
+	__class__: engine_base_entity_impl_EngineConsumableEntity
 });
 class engine_base_entity_impl_EngineProjectileEntity extends engine_base_entity_base_EngineBaseEntity {
 	constructor(projectileEntity) {
@@ -1167,6 +1183,9 @@ class engine_base_geometry_Rectangle {
 			offsetX = 0;
 		}
 		return new engine_base_geometry_Point(this.x + offsetX,this.y + offsetY);
+	}
+	getCenterBottom() {
+		return new engine_base_geometry_Point(this.x,this.getBottom());
 	}
 	getMaxSide() {
 		if(this.w > this.h) {
@@ -1292,16 +1311,127 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 		this._hx_constructor(engineMode);
 	}
 	_hx_constructor(engineMode) {
+		this.mobsSpawnPoints = [];
+		this.playersSpawnPoints = [new engine_base_geometry_Point(2500,2500)];
+		this.lineColliders = [];
 		this.playerZombieKills = new haxe_ds_StringMap();
-		this.mobSpawnDelayMs = 3.500;
-		this.mobsMax = 20;
+		this.mobSpawnDelayMs = 0.500;
 		this.mobsLastSpawnTime = 0.0;
 		this.mobsKilled = 0;
 		this.mobsSpawned = 0;
 		this.allowSpawnMobs = false;
+		this.mobsMax = 200;
 		this.timePassed = 0.0;
 		this.framesPassed = 0;
 		super._hx_constructor(engineMode);
+		this.addLineCollider(0,0,engine_seidh_SeidhGameEngine.GameWorldSize,0);
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(0,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(200,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(400,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(600,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(800,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1000,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1200,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1400,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1600,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1800,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2000,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2200,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2400,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2600,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2800,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3000,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3200,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3400,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3600,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3800,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4000,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4200,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4400,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4600,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4800,-200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5000,-200));
+		this.addLineCollider(0,engine_seidh_SeidhGameEngine.GameWorldSize,engine_seidh_SeidhGameEngine.GameWorldSize,engine_seidh_SeidhGameEngine.GameWorldSize);
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(0,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(200,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(400,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(600,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(800,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1000,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1200,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1400,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1600,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(1800,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2000,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2200,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2400,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2600,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(2800,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3000,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3200,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3400,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3600,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(3800,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4000,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4200,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4400,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4600,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(4800,5200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5000,5200));
+		this.addLineCollider(0,0,0,engine_seidh_SeidhGameEngine.GameWorldSize);
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,0));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,1000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,1200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,1400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,1600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,1800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,2000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,2200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,2400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,2600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,2800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,3000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,3200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,3400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,3600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,3800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,4000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,4200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,4400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,4600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,4800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(-200,5000));
+		this.addLineCollider(engine_seidh_SeidhGameEngine.GameWorldSize,0,engine_seidh_SeidhGameEngine.GameWorldSize,engine_seidh_SeidhGameEngine.GameWorldSize);
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,0));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,1000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,1200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,1400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,1600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,1800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,2000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,2200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,2400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,2600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,2800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,3000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,3200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,3400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,3600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,3800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,4000));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,4200));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,4400));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,4600));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,4800));
+		this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,5000));
 	}
 	createCharacterEntityFromMinimalStruct(struct) {
 		this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCharacter(struct.id,struct.ownerId,struct.x,struct.y,struct.entityType));
@@ -1399,17 +1529,42 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 				if(character1.isAlive) {
 					character1.update(dt);
 					if(character1.isPlayer()) {
-						let jsIterator = this.coinEntityManager.entities.values();
+						let jsIterator = this.consumableEntityManager.entities.values();
 						let _g_jsIterator = jsIterator;
 						let _g_lastStep = jsIterator.next();
 						while(!_g_lastStep.done) {
 							let v = _g_lastStep.value;
 							_g_lastStep = _g_jsIterator.next();
 							let c = v;
-							let coin = js_Boot.__cast(c , engine_base_entity_impl_EngineCoinEntity);
-							if(character1.getBodyRectangle().containsRect(coin.getBodyRectangle())) {
-								this.deleteCoinEntity(coin.getId());
+							let consumable = js_Boot.__cast(c , engine_base_entity_impl_EngineConsumableEntity);
+							let _this = character1.getBodyRectangle().getCenter();
+							let p = consumable.getBodyRectangle().getCenter();
+							let dx = _this.x - p.x;
+							let dy = _this.y - p.y;
+							if(Math.sqrt(dx * dx + dy * dy) < 150) {
+								if(character1.getBodyRectangle().containsRect(consumable.getBodyRectangle())) {
+									if(consumable.getEntityType() != 90) {
+										character1.addHealth(consumable.amount);
+									}
+									this.deleteConsumableEntity(consumable.getId(),character1.getId());
+								}
 							}
+						}
+						let intersectsWithLine = false;
+						let _g = 0;
+						let _g1 = this.lineColliders;
+						while(_g < _g1.length) {
+							let line = _g1[_g];
+							++_g;
+							if(character1.getForwardLookingLine(character1.playerForwardLookingLineLength).intersectsWithLine(line)) {
+								intersectsWithLine = true;
+								break;
+							}
+						}
+						if(intersectsWithLine) {
+							character1.canMove = false;
+						} else {
+							character1.canMove = true;
 						}
 					}
 					let jsIterator = this.projectileEntityManager.entities.values();
@@ -1451,7 +1606,10 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 							let e2 = v;
 							let character2 = js_Boot.__cast(e2 , engine_base_entity_impl_EngineCharacterEntity);
 							if(character2.isAlive && character1.getId() != character2.getId()) {
-								if(character1.getCurrentActionRect() != null && character1.getCurrentActionRect().containsRect(character2.getBodyRectangle())) {
+								let characterHasActionRect = character1.getCurrentActionRect() != null;
+								let chatacterHitsAnother = character1.getCurrentActionRect().containsRect(character2.getBodyRectangle());
+								let skipBotToBotAttack = character1.isBot() && character2.isBot();
+								if(characterHasActionRect && chatacterHitsAnother && !skipBotToBotAttack) {
 									if(allowServerLogic) {
 										let health = character2.subtractHealth(character1.actionToPerform.damage);
 										if(health == 0) {
@@ -1463,9 +1621,7 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 												let this2 = this.playerZombieKills;
 												let key1 = character1.getOwnerId();
 												this1.h[key] = this2.h[key1] + 1;
-												let coinX = character2.getBodyRectangle().x | 0;
-												let coinY = character2.getBodyRectangle().y | 0;
-												this.createCoinEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCoin(null,coinX,coinY,1));
+												this.createConsumable(character2);
 											}
 											character2.isAlive = false;
 											deadEntities.push(character2.getId());
@@ -1490,7 +1646,6 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 			if(this.characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
 				this.characterActionCallbacks(characterActionCallbackParams);
 			}
-			let tmp = this.mobsKilled == this.mobsMax && allowServerLogic;
 			this.recentEngineLoopTime = Date.now() - beginTime;
 			this.spawnMobs();
 		} else if(this.gameState == 3) {
@@ -1500,6 +1655,9 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 	customDestroy() {
 		this.characterActionCallbacks = null;
 	}
+	addLineCollider(x1,y1,x2,y2) {
+		this.lineColliders.push(new engine_base_geometry_Line(x1,y1,x2,y2));
+	}
 	allowMobsSpawn(allowSpawnMobs) {
 		this.allowSpawnMobs = allowSpawnMobs;
 	}
@@ -1508,32 +1666,13 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 		if(this.allowSpawnMobs && this.mobsSpawned < this.mobsMax && (this.mobsLastSpawnTime == 0 || this.mobsLastSpawnTime + this.mobSpawnDelayMs < now)) {
 			this.mobsSpawned++;
 			this.mobsLastSpawnTime = now;
-			let positionX = 0;
-			let positionY = 0;
-			let rnd = engine_base_MathUtils.randomIntInRange(1,4);
-			switch(rnd) {
-			case 1:
-				positionX = 800;
-				positionY = 800;
-				break;
-			case 2:
-				positionX = 2800;
-				positionY = 800;
-				break;
-			case 3:
-				positionX = 800;
-				positionY = 2800;
-				break;
-			case 4:
-				positionX = 2800;
-				positionY = 2800;
-				break;
-			}
+			let mobSpawnPoint = this.mobsSpawnPoints[engine_base_MathUtils.randomIntInRange(1,this.mobsSpawnPoints.length - 1)];
+			let positionX = mobSpawnPoint.x | 0;
+			let positionY = mobSpawnPoint.y | 0;
 			this.createCharacterEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCharacter(null,null,positionX,positionY,engine_base_MathUtils.randomIntInRange(1,2) == 1 ? 3 : 4));
 		}
 	}
 	cleanAllMobs() {
-		this.mobsSpawned = 0;
 		let _g = 0;
 		let _g1 = this.characterEntityManager.getEntitiesByEntityType(3);
 		while(_g < _g1.length) {
@@ -1548,9 +1687,13 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 			++_g2;
 			this.characterEntityManager.delete(entity.getId());
 		}
+		this.mobsSpawned = 0;
 	}
 	getPlayersCount() {
 		return this.characterEntityManager.getEntitiesByEntityType(1).length + this.characterEntityManager.getEntitiesByEntityType(2).length;
+	}
+	getMobsCount() {
+		return this.characterEntityManager.getEntitiesByEntityType(3).length + this.characterEntityManager.getEntitiesByEntityType(4).length;
 	}
 	getPlayerKills(playerId) {
 		if(Object.prototype.hasOwnProperty.call(this.playerZombieKills.h,playerId)) {
@@ -1600,8 +1743,29 @@ class engine_seidh_SeidhGameEngine extends engine_base_core_BaseEngine {
 		}
 		return nearestPlayer;
 	}
+	createConsumable(character) {
+		let x = character.getBodyRectangle().x | 0;
+		let y = character.getBodyRectangle().y | 0;
+		let rnd = engine_base_MathUtils.randomIntInRange(1,40);
+		if(rnd == 1) {
+			this.createConsumableEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCoin(null,x,y,25));
+		} else if(rnd < 6) {
+			this.createConsumableEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateHealthPotion(null,x,y,10));
+		} else {
+			this.createConsumableEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCoin(null,x,y,1));
+		}
+	}
 	getGameState() {
 		return this.gameState;
+	}
+	getLineColliders() {
+		return this.lineColliders;
+	}
+	getPlayersSpawnPoints() {
+		return this.playersSpawnPoints;
+	}
+	getMobsSpawnPoints() {
+		return this.mobsSpawnPoints;
 	}
 	setGameState(gameState) {
 		this.gameState = gameState;
@@ -1687,7 +1851,13 @@ class engine_seidh_entity_factory_SeidhEntityFactory {
 		return entity;
 	}
 	static InitiateCoin(id,x,y,amount) {
-		return new engine_base_entity_impl_EngineCoinEntity(new engine_base_BaseEntity({ id : id, x : x, y : y, entityType : 99, entityShape : { width : 50, height : 50, rectOffsetX : 0, rectOffsetY : 0}}),amount);
+		return new engine_base_entity_impl_EngineConsumableEntity(new engine_base_BaseEntity({ id : id, x : x, y : y, entityType : 90, entityShape : { width : 50, height : 50, rectOffsetX : 0, rectOffsetY : 0}}),amount);
+	}
+	static InitiateHealthPotion(id,x,y,amount) {
+		return new engine_base_entity_impl_EngineConsumableEntity(new engine_base_BaseEntity({ id : id, x : x, y : y, entityType : 91, entityShape : { width : 40, height : 60, rectOffsetX : 0, rectOffsetY : 0}}),amount);
+	}
+	static InitiateLosos(id,x,y,amount) {
+		return new engine_base_entity_impl_EngineConsumableEntity(new engine_base_BaseEntity({ id : id, x : x, y : y, entityType : 92, entityShape : { width : 80, height : 65, rectOffsetX : 0, rectOffsetY : 0}}),amount);
 	}
 	static InitiateProjectile() {
 	}
@@ -3170,6 +3340,7 @@ engine_base_EngineConfig.AI_ENABLED = true;
 engine_base_EngineConfig.TARGET_FPS = 20;
 engine_base_core_BaseEngine._hx_skip_constructor = false;
 engine_base_entity_base_EngineBaseEntity._hx_skip_constructor = false;
+engine_seidh_SeidhGameEngine.GameWorldSize = 5000;
 haxe_Int32._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
 };

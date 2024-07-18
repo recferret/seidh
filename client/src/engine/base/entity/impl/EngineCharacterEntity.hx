@@ -1,6 +1,5 @@
 package engine.base.entity.impl;
 
-import engine.base.geometry.Rectangle;
 import haxe.Int32;
 import uuid.Uuid;
 import engine.base.BaseTypesAndClasses;
@@ -38,8 +37,11 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public var killerId:String;
 
+	public final playerForwardLookingLineLength = 200;
+	public final botForwardLookingLineLength = 100;
+
 	public var botForwardLookingLine:Line;
-	private final botForwardLookingLineLength = 100;
+	
 	private final botAttackRange = 200;
 
 	// ------------------------------------------------
@@ -86,13 +88,12 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		super(characterEntity);
 
 		this.characterEntity = characterEntity;
-		this.maxHealth = characterEntity.health;
+		maxHealth = characterEntity.health;
 
 		if (!isPlayer()) {
 			botForwardLookingLine = new Line();
-		} 
+		}
 
-		// TODO base stuff
 		if (baseEntity.id == null) {
 			baseEntity.id = Uuid.short();
 		}
@@ -133,14 +134,12 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
 			baseEntity.rotation = angleBetweenEntities;
 
-			// Bit line sight for debug
+			// Bot line sight for debug
 			final l = getForwardLookingLine(botForwardLookingLineLength);
-			botForwardLookingLine.x1 = l.p1.x;
-			botForwardLookingLine.y1 = l.p1.y; 
-			botForwardLookingLine.x2 = l.p2.x;
-			botForwardLookingLine.y2 = l.p2.y;
-
-			// baseEntity.rotation = MathUtils.angleBetweenPoints(this.targetObjectEntity.getBodyRectangle().getCenter(), getBodyRectangle().getCenter());
+			botForwardLookingLine.x1 = l.x1;
+			botForwardLookingLine.y1 = l.y1; 
+			botForwardLookingLine.x2 = l.x2;
+			botForwardLookingLine.y2 = l.y2;
 		}
 
 		if (customUpdate != null)
@@ -175,12 +174,14 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function getForwardLookingLine(lineLength:Int) {
 		final rect = getBodyRectangle();
-		final x = rect.getCenter().x;
-		final y = rect.getCenter().y;
-		return {
-			p1: rect.getCenter(),
-			p2: MathUtils.rotatePointAroundCenter(x + lineLength, y, x, y, baseEntity.rotation)
-		}
+		final x1 = rect.getCenter().x;
+		final y1 = rect.getCenter().y;
+
+		final p = MathUtils.rotatePointAroundCenter(x1 + lineLength, y1, x1, y1, baseEntity.rotation);
+		final x2 = p.x;
+		final y2 = p.y;
+
+		return new Line(x1, y1, x2, y2);
 	}
 
 	function updateHash() {
@@ -249,25 +250,27 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	public function determenisticMove() {
-		var speed = characterEntity.movement.runSpeed;
+		if (canMove) {
+			var speed = characterEntity.movement.runSpeed;
 
-		if (characterEntity.movement.canRun && currentVitality > 0) {
-			currentVitality -= characterEntity.movement.vitalityConsumptionPerSec;
-			speed = characterEntity.movement.runSpeed;
-			isRunning = true;
-			isWalking = false;
-		} else {
-			isRunning = false;
-			isWalking = true;
+			if (characterEntity.movement.canRun && currentVitality > 0) {
+				currentVitality -= characterEntity.movement.vitalityConsumptionPerSec;
+				speed = characterEntity.movement.runSpeed;
+				isRunning = true;
+				isWalking = false;
+			} else {
+				isRunning = false;
+				isWalking = true;
+			}
+
+			dx = speed * Math.cos(baseEntity.rotation);
+			dy = speed * Math.sin(baseEntity.rotation);
+
+			characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
+
+			baseEntity.x += Std.int(dx);
+			baseEntity.y += Std.int(dy);
 		}
-
-		dx = speed * Math.cos(baseEntity.rotation);
-		dy = speed * Math.sin(baseEntity.rotation);
-
-		characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
-
-		baseEntity.x += Std.int(dx);
-		baseEntity.y += Std.int(dy);
 	}
 
 	public function checkLocalMovementInput() {
@@ -336,6 +339,9 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function addHealth(add:Int) {
 		characterEntity.health += add;
+		if (characterEntity.health > maxHealth) {
+			characterEntity.health = maxHealth;
+		}
 	}
 
 	public function subtractHealth(subtract:Int) {

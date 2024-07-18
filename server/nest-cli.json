@@ -67,6 +67,51 @@
       "compilerOptions": {
         "tsConfigPath": "apps/users/tsconfig.app.json"
       }
+    },
+    "client": {
+      "type": "application",
+      "root": "apps/client",
+      "entryFile": "main",
+      "sourceRoot": "apps/client/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/client/tsconfig.app.json"
+      }
+    },
+    "boost": {
+      "type": "application",
+      "root": "apps/boost",
+      "entryFile": "main",
+      "sourceRoot": "apps/boost/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/boost/tsconfig.app.json"
+      }
+    },
+    "character": {
+      "type": "application",
+      "root": "apps/character",
+      "entryFile": "main",
+      "sourceRoot": "apps/character/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/character/tsconfig.app.json"
+      }
+    },
+    "referral": {
+      "type": "application",
+      "root": "apps/referral",
+      "entryFile": "main",
+      "sourceRoot": "apps/referral/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/referral/tsconfig.app.json"
+      }
+    },
+    "collection": {
+      "type": "application",
+      "root": "apps/collection",
+      "entryFile": "main",
+      "sourceRoot": "apps/collection/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/collection/tsconfig.app.json"
+      }
     }
   }
 }

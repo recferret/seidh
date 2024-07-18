@@ -28,6 +28,13 @@ class Rectangle {
 		return new Point(x + offsetX, y + offsetY);
 	}
 
+	public function getCenterBottom() {
+		return new Point(
+			x,
+			getBottom()
+		);
+	}
+
 	public function getMaxSide() {
 		return w > h ? w : h;
 	}

@@ -1,12 +1,16 @@
 package game.entity.character;
 
-import game.sound.SoundManager;
-import game.fx.FxManager;
-import game.utils.Utils;
-import game.entity.character.animation.CharacterAnimations;
+import engine.base.geometry.Rectangle;
 import engine.base.BaseTypesAndClasses;
 import engine.base.geometry.Point;
 import engine.base.entity.impl.EngineCharacterEntity;
+
+import game.entity.character.animation.CharacterAnimations;
+import game.fx.FxManager;
+import game.scene.impl.GameScene;
+import game.sound.SoundManager;
+import game.utils.Utils;
+
 import hxd.Math;
 
 class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
@@ -14,28 +18,40 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     public var animation:CharacterAnimation;
 
     var targetServerPosition = new Point();
+	var BaseGameScene(default, null):Int;
 
     public function new(s2d:h2d.Scene) {
-        super(s2d);
+        super();
+
+        s2d.add(this, 0, GameScene.CHARACTER_LAYER);
     }
 
     // ------------------------------------------------------------
     // Abstraction
     // ------------------------------------------------------------
 
-    public function update(dt:Float) {
-        moveToServerPosition(dt);
+    public function update(dt:Float, fps:Float) {
+        moveToServerPosition(dt, fps);
     }
 
 	public function debugDraw(graphics:h2d.Graphics) {
-        // Debug bot movement direction
-        if (engineEntity.botForwardLookingLine != null) {
-            final p1 = new h2d.col.Point(engineEntity.botForwardLookingLine.x1, engineEntity.botForwardLookingLine.y1);
-            final p2 = new h2d.col.Point(engineEntity.botForwardLookingLine.x2, engineEntity.botForwardLookingLine.y2);
-            Utils.DrawLine(graphics, p1, p2, engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);    
+        if (engineEntity.isPlayer()) {
+            final line = getForwardLookingLine(engineEntity.playerForwardLookingLineLength);
+            Utils.DrawLine(graphics, 
+                line.x1,
+                line.y1,
+                line.x2,
+                line.y2,
+                engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);
+        } else if (engineEntity.botForwardLookingLine != null) {
+            Utils.DrawLine(graphics, 
+                engineEntity.botForwardLookingLine.x1,
+                engineEntity.botForwardLookingLine.y1,
+                engineEntity.botForwardLookingLine.x2,
+                engineEntity.botForwardLookingLine.y2,
+                engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);   
         }
 
-        // DebugActionShape
         if (engineEntity.getCurrentActionRect(true) != null) {
             Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(true), GameConfig.GreenColor);
         }
@@ -69,15 +85,15 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
         targetServerPosition.y = y;
     }
 
-    public function moveToServerPosition(dt:Float) {
+    public function moveToServerPosition(dt:Float, fps:Float) {
         if (animation.enableMoveAnimation) {
             animation.setSide(engineEntity.getSide());
 
             final distance = targetServerPosition.distance(new Point(x, y));
             if (distance > 1) {
                 animation.setAnimationState(RUN);
-                x = Math.lerp(x, targetServerPosition.x, 0.045);
-                y = Math.lerp(y, targetServerPosition.y, 0.045);
+                x = Math.lerp(x, targetServerPosition.x, 0.07);
+                y = Math.lerp(y, targetServerPosition.y, 0.07);
             } else {
                 animation.setAnimationState(IDLE);
             }
@@ -124,9 +140,11 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     public function fxDeath() {
         switch (getEntityType()) {
             case RAGNAR_LOH:
+                SoundManager.instance.playVikingDeath();
             case RAGNAR_NORM:
                 SoundManager.instance.playVikingDeath();
             case ZOMBIE_BOY:
+                SoundManager.instance.playZombieDeath();
             case ZOMBIE_GIRL:
                 SoundManager.instance.playZombieDeath();
             default:
@@ -144,6 +162,36 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     public function getOwnerId() {
         return engineEntity.getOwnerId();
     }
+
+    public function getRect() {
+        switch (getEntityType()) {
+            case RAGNAR_LOH:
+        		return new Rectangle(x, y, 221, 285, 0);
+            case RAGNAR_NORM:
+		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+            case ZOMBIE_BOY:
+		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+            case ZOMBIE_GIRL:
+		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+            default:
+                return null;
+        }
+	}
+
+    public function getBottomRect() {
+        switch (getEntityType()) {
+            case RAGNAR_LOH:
+        		return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+            case RAGNAR_NORM:
+		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+            case ZOMBIE_BOY:
+		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+            case ZOMBIE_GIRL:
+		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+            default:
+                return null;
+        }
+	}
 
     public function getBodyRectangle() {
 		return engineEntity.getBodyRectangle();
@@ -173,15 +221,4 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
         return engineEntity.getMaxHealth();
     }
 
-    // ------------------------------------------------------------
-    // Setters
-    // ------------------------------------------------------------
-
-
-    public function setSideDebug(side:Side) {
-        if (GameConfig.Debug) {
-            engineEntity.setSide(side);
-            animation.setSide(side);
-        }
-    }
 }

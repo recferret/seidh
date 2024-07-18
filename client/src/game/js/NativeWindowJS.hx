@@ -11,7 +11,7 @@ enum abstract YandexMetricsGoals(String) {
 extern class NativeWindowJS {
 
     // Networking
-    static function networkInit(playerId:String, wsCallback:Dynamic->Void):Void;
+    static function networkInit(playerId:String, callback:Dynamic->Void):Void;
     static function networkFindAndJoinGame(playerId:String):Void;
     static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;
 
@@ -32,9 +32,27 @@ extern class NativeWindowJS {
     static function tgShareMyRefLink(refLink:String):Void;
 
     // Ton
-    static function tonConnect():Void;
+    static function tonConnect(callback:Dynamic->Void):Void;
     static function tonMintRagnar():String;
 
-    // YandexMetrics
-    static function ymTrackGoal(goal:YandexMetricsGoals):Void;
+    // LocalStorage
+    static function lsSetItem(key:String, value:String):Void;
+    static function lsGetItem(key:String):String;
+
+    // Telemetree
+    static function telemetreeInit(isTelegramContext:Bool):Void;
+    static function trackHomeClick():Void;
+    static function trackBoostsClick():Void;
+    static function trackCollectionClick():Void;
+    static function trackFriendsClick():Void;
+    static function trackPlayClick():Void;
+    static function trackLvlUpClick():Void;
+    static function trackChangeCharacterClick():Void;
+    static function trackWalletConnectClick():Void;
+    static function trackWalletConnected(address:String):Void;
+    static function trackMintRagnarClick():Void;
+    static function trackInviteFriendClick():Void;
+    static function trackGameStarted():Void;
+    static function trackGameWin():Void;
+    static function trackGameLose():Void;
 }

@@ -2,8 +2,12 @@ package game.entity.character.animation;
 
 import h2d.Anim;
 import h2d.Tile;
+
 import engine.base.BaseTypesAndClasses.CharacterAnimationState;
 import engine.base.BaseTypesAndClasses.Side;
+
+import game.Res.SeidhResource;
+
 
 class CharacterAnimation {
     private var idleAnimRight:Array<Tile>;
@@ -206,91 +210,91 @@ class CharacterAnimations {
 
         animation.loadIdle(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadDefend(
             [
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_loh.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
@@ -303,91 +307,91 @@ class CharacterAnimations {
 
         animation.loadIdle(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
         animation.loadDefend(
             [
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ],
             flipTilesLeft([
-                hxd.Res.ragnar.ragnar_norm.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ], leftOffsetX)
         );
 
@@ -400,91 +404,91 @@ class CharacterAnimations {
 
         animation.loadIdle(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
         animation.loadDefend(
             [
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_boy.zombie_boy.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ], leftOffsetX)
         );
 
@@ -497,91 +501,91 @@ class CharacterAnimations {
 
         animation.loadIdle(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadRun(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadWalk(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadDead(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadHurt(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadAttack1(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadAttack2(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadAttack3(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadAttackRun(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 
         animation.loadDefend(
             [
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ],
             flipTilesLeft([
-                hxd.Res.zombie_girl.zombie_girl.toTile().center(),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ], leftOffsetX)
         );
 

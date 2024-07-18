@@ -3,8 +3,10 @@ import {
   UsersAuthenticateMessageRequest, 
   UsersAuthenticateMessageResponse 
 } from '@app/seidh-common/dto/users/users.authenticate.msg';
+import { UsersCheckTokenMessageRequest, UsersCheckTokenMessageResponse } from '@app/seidh-common/dto/users/users.check.token.msg';
 import { UsersGetFriendsMessageRequest, UsersGetFriendsMessageResponse } from '@app/seidh-common/dto/users/users.get.friends.msg';
-import { Character, CharacterType } from '@app/seidh-common/schemas/schema.character';
+import { CharacterBody, UserBody, UsersGetUserMessageRequest, UsersGetUserMessageResponse } from '@app/seidh-common/dto/users/users.get.user.msg';
+import { Character, CharacterDocument, CharacterType } from '@app/seidh-common/schemas/schema.character';
 import { User } from '@app/seidh-common/schemas/schema.user';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,7 +19,6 @@ const crypto = require('crypto');
 export class UsersService implements OnModuleInit {
 
   private readonly botKey = '7109468529:AAHvO4toPIdlBVgEJkDc8Yjozx1uXsM4QV8';
-
 
   private readonly referrerPremiumRewardTokens = 1000;
   private readonly referrerNoPremiumRewardTokens = 200;
@@ -81,6 +82,9 @@ export class UsersService implements OnModuleInit {
           userId: existingUser.id,
           telegramId: telegramParseResult.userInfo.id
         });
+
+        existingUser.authToken = response.authToken;
+        await existingUser.save();
       } else {
         const newCharacter = await this.characterModel.create({
           type: CharacterType.RagnarLoh,
@@ -103,8 +107,14 @@ export class UsersService implements OnModuleInit {
           characters: [newCharacter],
         });
 
+        const authToken = await this.jwtService.signAsync({
+          userId: newUser.id,
+          telegramId: telegramParseResult.userInfo.id
+        });
+        newUser.authToken = authToken;
+
+        // TODO move to referral service
         if (message.startParam) {
-          Logger.log('Have some start param');
           const referrer = await this.userModel.findOne({ id: message.startParam });
           // Referrer exists and referrer is not the same user.
           if (referrer && referrer.telegramId != telegramParseResult.userInfo.id) {
@@ -119,21 +129,67 @@ export class UsersService implements OnModuleInit {
             newUser.invitedBy = referrer._id;
 
             await referrer.save();
-            await newUser.save();
           }
         }
+
+        await newUser.save();
 
         response.userId = newUser.id;
         response.kills = newUser.kills;
         response.tokens = newUser.virtualTokenBalance;
         response.characters = newUser.characters.map(dbCharacterToStruct);
-        response.authToken = await this.jwtService.signAsync({
-          userId: newUser.id,
-          telegramId: telegramParseResult.userInfo.id
-        });
+        response.authToken = authToken;
       }
     }
 
+    return response;
+  }
+
+  async checkToken(message: UsersCheckTokenMessageRequest) {
+    const hasUser = await this.userModel.findOne({authToken: message.authToken});
+    const response: UsersCheckTokenMessageResponse = {
+      success: hasUser !== undefined,
+    };
+    return response;
+  }
+
+  async getUser(message: UsersGetUserMessageRequest) {
+    const user = await this.userModel.findOne({id: message.userId}).populate(['characters']);
+
+    const userBody: UserBody = {
+      telegramName: user.telegramName,
+      telegramPremium: user.telegramPremium,
+  
+      virtualTokenBalance: user.virtualTokenBalance,
+  
+      characters: user.characters.map((c:any) => {
+        const character: CharacterBody = {
+          id: c.id,
+          type: c.type,
+          active: c.active,
+          levelCurrent: c.levelCurrent,
+          levelMax: c.levelMax,
+          expCurrent: c.expCurrent,
+          expTillNewLevel: c.expTillNewLevel,
+          health: c.health,
+          movement: c.movement,
+          actionMain: c.actionMain,
+        };
+        return character;
+      }),
+  
+      hasExpBoost1: user.hasExpBoost1,
+      hasExpBoost2: user.hasExpBoost2,
+      hasPotionDropBoost1: user.hasPotionDropBoost1,
+      hasPotionDropBoost2: user.hasPotionDropBoost2,
+      hasMaxPotionBoost1: user.hasMaxPotionBoost1,
+      hasMaxPotionBoost2: user.hasMaxPotionBoost2,
+      hasMaxPotionBoost3: user.hasMaxPotionBoost3,
+    };
+
+    const response: UsersGetUserMessageResponse = {
+      user: userBody 
+    };
     return response;
   }
 

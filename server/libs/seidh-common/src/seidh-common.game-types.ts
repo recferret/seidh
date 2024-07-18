@@ -44,7 +44,7 @@ export interface BaseEntityStruct {
 	rotation: number;
 }
 
-export interface CoinEntityStruct {
+export interface ConsumableEntityStruct {
 	baseEntityStruct: BaseEntityStruct;
 	amount: number;
 }
@@ -121,9 +121,14 @@ export interface EngineProjectileEntity {
 
 }
 
-export interface EngineCoinEntity {
+export interface EngineConsumableEntity {
 	getEntityBaseStruct(): BaseEntityStruct;
 	amount: number;
+}
+
+export interface DeleteConsumableEntityTask {
+	entityId: string;
+	takenByCharacterId: string;
 }
 
 export interface CharacterActionCallbackParams {

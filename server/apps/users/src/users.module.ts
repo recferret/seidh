@@ -6,6 +6,7 @@ import { User, UserSchema } from '@app/seidh-common/schemas/schema.user';
 import { JwtModule } from '@nestjs/jwt';
 import { Character, CharacterSchema } from '@app/seidh-common/schemas/schema.character';
 import { InternalProtocol } from '@app/seidh-common';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { InternalProtocol } from '@app/seidh-common';
       { name: User.name, schema: UserSchema },
       { name: Character.name, schema: CharacterSchema }
     ]),
+    PrometheusModule.register(),
     JwtModule.register({
       global: true,
       secret: 'MY SUPER SECRET',

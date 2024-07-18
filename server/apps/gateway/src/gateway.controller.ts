@@ -1,34 +1,53 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Session, UseGuards } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
 import { FindGameRequest } from './dto/find.game.dto';
 import { AuthenticateRequest } from './dto/authenticate.dto';
 import { AuthGuard } from './guards/guard.auth';
-import { JwtService } from '@nestjs/jwt';
+
+export interface IUserSession {
+  userId: string;
+}
 
 @Controller()
 export class GatewayController {
   constructor(
-    private readonly gatewayService: GatewayService,
-    private readonly jwtService: JwtService
+    private readonly gatewayService: GatewayService
   ) {
   }
 
-  // TODO add auth guard
+  @Post('authenticate')
+  authenticate(
+    @Body() authenticateRequest: AuthenticateRequest
+  ) {
+    return this.gatewayService.authenticate(authenticateRequest);
+  }
+
   @Post('findGame')
-  findGame(@Body() findGameRequest: FindGameRequest) {
+  @UseGuards(AuthGuard)
+  findGame(
+    @Body() findGameRequest: FindGameRequest,
+    @Session() session: IUserSession,
+  ) {
+    // TODO pass user id here
     return this.gatewayService.findGame(findGameRequest);
   }
 
-  @Post('authenticate')
-  authenticate(@Body() authenticateRequest: AuthenticateRequest) {
-    return this.gatewayService.authenticate(authenticateRequest);
+  @Get('boosts')
+  @UseGuards(AuthGuard)
+  getBoosts(@Session() session: IUserSession) {
+    console.log(session);
+  }
+
+  @Post('boosts')
+  @UseGuards(AuthGuard)
+  buyBoost() {
+
   }
 
   @Get('friends')
   @UseGuards(AuthGuard)
-  getFriends(@Req() request: Request)  {
-    const decodedToken = this.jwtService.decode(request.headers['authorization'].split(' ')[1]);
-    return this.gatewayService.getFriends(decodedToken.userId);
+  getFriends(@Session() session: IUserSession,)  {
+    return this.gatewayService.getFriends(session.userId);
   }
 
 }

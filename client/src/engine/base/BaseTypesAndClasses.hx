@@ -44,7 +44,9 @@ enum abstract EntityType(Int) {
 	var ZOMBIE_BOY = 3;
 	var ZOMBIE_GIRL = 4;
 
-	var SMALL_COIN = 99;
+	var COIN = 90;
+	var HEALTH_POTION = 91;
+	var LOSOS = 92;
 }
 
 class EntityShape {

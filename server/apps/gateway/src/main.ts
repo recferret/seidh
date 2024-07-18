@@ -5,6 +5,7 @@ import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(GatewayModule);
+
   app.enableCors();
   await app.listen(ServicePort.Gateway);
 

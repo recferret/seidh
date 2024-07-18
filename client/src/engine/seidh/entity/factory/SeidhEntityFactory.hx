@@ -1,6 +1,6 @@
 package engine.seidh.entity.factory;
 
-import engine.base.entity.impl.EngineCoinEntity;
+import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.BaseTypesAndClasses;
 import engine.seidh.entity.impl.RagnarLohEntity;
 import engine.seidh.entity.impl.RagnarNormEntity;
@@ -43,14 +43,44 @@ class SeidhEntityFactory {
     }
 
     public static function InitiateCoin(?id:String, x:Int, y:Int, amount:Int) {
-        return new EngineCoinEntity(new BaseEntity({
+        return new EngineConsumableEntity(new BaseEntity({
             id: id,
             x: x,
             y: y,
-            entityType: EntityType.SMALL_COIN,
+            entityType: EntityType.COIN,
             entityShape: {
                 width: 50,
                 height: 50,
+                rectOffsetX: 0,
+                rectOffsetY: 0,
+            },
+        }), amount);
+    }
+
+    public static function InitiateHealthPotion(?id:String, x:Int, y:Int, amount:Int) {
+        return new EngineConsumableEntity(new BaseEntity({
+            id: id,
+            x: x,
+            y: y,
+            entityType: EntityType.HEALTH_POTION,
+            entityShape: {
+                width: 40,
+                height: 60,
+                rectOffsetX: 0,
+                rectOffsetY: 0,
+            },
+        }), amount);
+    }
+
+    public static function InitiateLosos(?id:String, x:Int, y:Int, amount:Int) {
+        return new EngineConsumableEntity(new BaseEntity({
+            id: id,
+            x: x,
+            y: y,
+            entityType: EntityType.LOSOS,
+            entityShape: {
+                width: 80,
+                height: 65,
                 rectOffsetX: 0,
                 rectOffsetY: 0,
             },

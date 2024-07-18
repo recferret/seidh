@@ -4,16 +4,22 @@ import engine.base.BaseTypesAndClasses;
 import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.core.GameLoop;
 import engine.base.entity.impl.EngineCharacterEntity;
-import engine.base.entity.impl.EngineCoinEntity;
+import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
 
 typedef CreateCharacterEntityTask = {
 	var entity:EngineCharacterEntity;
 }
 
-typedef CreateCoinEntityTask = {
-	var entity:EngineCoinEntity;
+typedef CreateConsumableEntityTask = {
+	var entity:EngineConsumableEntity;
 }
+
+typedef DeleteConsumableEntityTask = {
+	var entityId:String;
+	var takenByCharacterId:String;
+}
+
 typedef CreateProjectileEntityTask = {
 	var entity:EngineProjectileEntity;
 }
@@ -41,14 +47,14 @@ abstract class BaseEngine {
 	public var postLoopCallback:Void->Void;
 	public var createCharacterCallback:EngineCharacterEntity->Void;
 	public var deleteCharacterCallback:EngineCharacterEntity->Void;
-	public var createCoinCallback:EngineCoinEntity->Void;
-	public var deleteCoinCallback:EngineCoinEntity->Void;
+	public var createConsumableCallback:EngineConsumableEntity->Void;
+	public var deleteConsumableCallback:DeleteConsumableEntityTask->Void;
 	public var createProjectileCallback:EngineProjectileEntity->Void;
 	public var deleteProjectileCallback:EngineProjectileEntity->Void;
 
 	public final characterEntityManager = new EngineBaseEntityManager();
 	public final projectileEntityManager = new EngineBaseEntityManager();
-	public final coinEntityManager = new EngineBaseEntityManager();
+	public final consumableEntityManager = new EngineBaseEntityManager();
 
 	public final playerToEntityMap = new Map<String, String>();
 
@@ -58,8 +64,8 @@ abstract class BaseEngine {
 	private var createCharacterEntityQueue = new Array<CreateCharacterEntityTask>();
 	private var deleteCharacterEntityQueue = new Array<String>();
 
-	private var createCoinEntityQueue = new Array<CreateCoinEntityTask>();
-	private var deleteCoinEntityQueue = new Array<String>();
+	private var createConsumableEntityQueue = new Array<CreateConsumableEntityTask>();
+	private var deleteConsumableEntityQueue = new Array<DeleteConsumableEntityTask>();
 
 	private var createProjectileEntityQueue = new Array<CreateProjectileEntityTask>();
 	private var deleteProjectileEntityQueue = new Array<String>();
@@ -90,8 +96,8 @@ abstract class BaseEngine {
 			processCreateCharacterQueue();
 			processDeleteCharacterQueue();
 
-			processCreateCoinQueue();
-			processDeleteCoinQueue();
+			processCreateConsumableQueue();
+			processDeleteConsumableQueue();
 
 			processCreateProjectileQueue();
 			processDeleteProjectileQueue();
@@ -276,40 +282,40 @@ abstract class BaseEngine {
 	}
 
 	// -----------------------------------
-	// Coins
+	// Consumables
 	// -----------------------------------
 
-	public function createCoinEntity(entity:EngineCoinEntity) {
-		createCoinEntityQueue.push({
+	public function createConsumableEntity(entity:EngineConsumableEntity) {
+		createConsumableEntityQueue.push({
 			entity: entity
 		});
 	}
 
-	public function deleteCoinEntity(entityId:String) {
-		deleteCoinEntityQueue.push(entityId);
+	public function deleteConsumableEntity(entityId:String, takenByCharacterId:String) {
+		deleteConsumableEntityQueue.push({entityId: entityId, takenByCharacterId: takenByCharacterId});
 	}
 
-	function processCreateCoinQueue() {
-		for (queueTask in createCoinEntityQueue) {
-			coinEntityManager.add(queueTask.entity);
-			if (createCoinCallback != null) {
-				createCoinCallback(queueTask.entity);
+	function processCreateConsumableQueue() {
+		for (queueTask in createConsumableEntityQueue) {
+			consumableEntityManager.add(queueTask.entity);
+			if (createConsumableCallback != null) {
+				createConsumableCallback(queueTask.entity);
 			}
 		}
-		createCoinEntityQueue = [];
+		createConsumableEntityQueue = [];
 	}
 
-	function processDeleteCoinQueue() {
-		for (entityId in deleteCoinEntityQueue) {
-			final entity = cast (coinEntityManager.getEntityById(entityId), EngineCoinEntity);
+	function processDeleteConsumableQueue() {
+		for (task in deleteConsumableEntityQueue) {
+			final entity = cast (consumableEntityManager.getEntityById(task.entityId), EngineConsumableEntity);
 			if (entity != null) {
-				if (deleteCoinCallback != null) {
-					deleteCoinCallback(entity);
+				if (deleteConsumableCallback != null) {
+					deleteConsumableCallback(task);
 				}
-				coinEntityManager.delete(entity.getId());
+				consumableEntityManager.delete(task.entityId);
 			}
 		}
-		deleteCoinEntityQueue = [];
+		deleteConsumableEntityQueue = [];
 	}
 
 	// -----------------------------------

@@ -4,9 +4,15 @@ import { GatewayService } from './gateway.service';
 import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
+    PrometheusModule.register({
+      defaultLabels: {
+        app: "Gateway",
+      }
+    }),
     ClientsModule.register([
       {
         name: ServiceName.GameplayLobby,

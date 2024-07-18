@@ -1,5 +1,6 @@
 package game.scene;
 
+import game.Res.SeidhResource;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
 import game.ui.dialog.Dialog;
@@ -42,8 +43,8 @@ class MovementController extends h2d.Object {
 		camera = s2d.camera;
 		customGraphics = new h2d.Graphics(s2d);
 
-		outerCircle = new h2d.Bitmap(hxd.Res.input.joystick_1.toTile().center(), this);
-		innerCircle = new h2d.Bitmap(hxd.Res.input.joystick_2.toTile().center(), this);
+		outerCircle = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_JOYSTICK_1), this);
+		innerCircle = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_JOYSTICK_2), this);
 		
 		innerCircleDefaultPos();
     }
@@ -121,11 +122,12 @@ class GameUiScene extends h2d.Scene {
 	private var screenWidth:Int = 0;
 	private var screenHeight:Int = 0;
 
-	private final buttonA:h2d.Bitmap;
-	private final buttonB:h2d.Bitmap;
+	private final skillSlot:h2d.Bitmap;
+	private final skillIcon:h2d.Bitmap;
+	private final skillSlotInteraction:h2d.Interactive;
 
 	private final barHp:BarHp;
-	private final barXp:BarXp;
+	// private final barXp:BarXp;
 	private final barGold:BarGold;
     
     public function new(
@@ -137,37 +139,74 @@ class GameUiScene extends h2d.Scene {
 
 		this.isMobileDevice = isMobileDevice;
 
+		// --------------------------------------------
+		// Input
+		// --------------------------------------------
+
         movementController = new MovementController(this, function callback(angle:Float) {
 			if (joystickMovedCallback != null) {
 				joystickMovedCallback(angle);
 			}
         });
 
-		buttonA = new h2d.Bitmap(hxd.Res.input.pad_1.toTile(), this);
-		buttonB = new h2d.Bitmap(hxd.Res.input.pad_2.toTile(), this);
+		skillSlot = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_SKILL_SLOT), this);
+		skillIcon = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.ICON_SKILL), this);
 
-		final interactionButtonA = new h2d.Interactive(buttonA.tile.width, buttonA.tile.height, buttonA);
-		interactionButtonA.onClick = function(event:hxd.Event) {
+		skillSlotInteraction = new h2d.Interactive(skillSlot.tile.width, skillSlot.tile.height);
+		skillSlotInteraction.onClick = function(event:hxd.Event) {
 			if (buttonPressedCallback != null) {
 				buttonPressedCallback(ButtonPressed.A);
 			}
 		}
+		addChild(skillSlotInteraction);
 
-		final interactionButtonB = new h2d.Interactive(buttonB.tile.width, buttonB.tile.height, buttonB);
-		interactionButtonB.onClick = function(event:hxd.Event) {
-			if (buttonPressedCallback != null) {
-				buttonPressedCallback(ButtonPressed.B);
-			}
-		}
+		// --------------------------------------------
+		// Bars
+		// --------------------------------------------
 
 		barHp = new BarHp(this);
-		barHp.setPosition(5, 5);
+		barHp.setPosition(185, 40);
 
-		barXp = new BarXp(this);
-		barXp.setPosition(5, 5 + barHp.getBitmapHeight());
+		// barXp = new BarXp(this);
+		// barXp.setPosition(185, 43 + barHp.getBitmapHeight());
 
 		barGold = new BarGold(this);
-		barGold.setPosition(BasicScene.ActualScreenWidth - barGold.getBitmapWidth() - 5, 5);
+		barGold.setPosition(Main.ActualScreenWidth - barGold.getBitmapWidth() / 1.2, 50);
+
+		// --------------------------------------------
+		// Frame
+		// --------------------------------------------
+
+		final frameHeader = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_HEADER), this);
+        frameHeader.setPosition(Main.ActualScreenWidth / 2, frameHeader.tile.height / 2);
+
+        final frameFooter = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_FOOTER), this);
+        frameFooter.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight - frameFooter.tile.height / 2);
+
+		// Frames left
+		final leftSideFrameTop = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_FRAME), this);
+		leftSideFrameTop.setPosition(leftSideFrameTop.tile.width / 2, frameHeader.tile.height + (leftSideFrameTop.tile.height * 1) / 2);
+
+		for (i in 2...9) {
+			final leftSideFrameMiddle = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_FRAME), this);
+			leftSideFrameMiddle.setPosition(leftSideFrameMiddle.tile.width / 2, frameHeader.tile.height + (leftSideFrameMiddle.tile.height * i) / 2);
+		}
+
+		final leftSideFrameBottom = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_FRAME), this);
+		leftSideFrameBottom.setPosition(leftSideFrameBottom.tile.width / 2, Main.ActualScreenHeight - frameFooter.tile.height + 1 - (leftSideFrameBottom.tile.height * 1) / 2);
+		
+		// Frames right
+		final rightSideFrameTop = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_FRAME_RIGHT), this);
+		rightSideFrameTop.setPosition(Main.ActualScreenWidth - rightSideFrameTop.tile.width / 2, frameHeader.tile.height + (rightSideFrameTop.tile.height * 1) / 2);
+
+		for (i in 2...9) {
+			final rightSideFrameMiddle = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_FRAME_RIGHT), this);
+			rightSideFrameMiddle.setPosition(Main.ActualScreenWidth - rightSideFrameMiddle.tile.width / 2, frameHeader.tile.height + (rightSideFrameMiddle.tile.height * i) / 2);
+		}
+
+		final rightSideFrameBottom = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_FRAME_RIGHT), this);
+		rightSideFrameBottom.setPosition(Main.ActualScreenWidth - rightSideFrameBottom.tile.width / 2, Main.ActualScreenHeight - frameFooter.tile.height + 1 - (rightSideFrameBottom.tile.height * 1) / 2);
+
     }
 
 	public function resize(orientation:String, w:Int, h:Int) {
@@ -176,18 +215,26 @@ class GameUiScene extends h2d.Scene {
 
 		movementController.initiate(rectSize / 2, h - rectSize / 2, rectSize);
 
-		buttonA.setPosition(w - (buttonA.tile.width * 1.4), h - (buttonA.tile.height * 2.8));
-		buttonB.setPosition(w - (buttonB.tile.width * 1.4), h - (buttonB.tile.height * 1.3));
+		skillIcon.setPosition(w - (skillSlot.tile.width * 1.4), h - (skillSlot.tile.height * 2));
+		skillSlot.setPosition(w - (skillSlot.tile.width * 1.4), h - (skillSlot.tile.height * 2));
+		skillSlotInteraction.setPosition(
+			w - (skillSlot.tile.width * 1.4) - skillSlot.tile.width / 2, 
+			h - (skillSlot.tile.height * 2) - skillSlot.tile.height / 2
+		);
 	}
 
     public function update(playerCurrentHealth:Int, playerMaxHealth:Int) {
 		movementController.update();
 		barHp.update(playerCurrentHealth, playerMaxHealth);
-		barXp.update();
+		// barXp.update();
     }
 
 	public function addGold() {
 		barGold.addGold();
+	}
+
+	public function addHealth() {
+		barHp.addHp();
 	}
 
 	public function release() {

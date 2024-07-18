@@ -20,8 +20,8 @@ import { EventGameDeleteProjectile } from './events/event.game.delete-projectile
 import { EventGameLoopState } from './events/event.game.loop-state';
 import { EventGameCharacterActions } from './events/event.game.character-actions';
 import { EventGameGameState } from './events/event.game.game-state';
-import { EventGameCreateCoin } from './events/event.game.create-coin';
-import { EventGameDeleteCoin } from './events/event.game.delete-coin';
+import { EventGameCreateConsumable } from './events/event.game.create-consumable';
+import { EventGameDeleteConsumable } from './events/event.game.delete-consumable';
 import { GameplayInputMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
 import { GameplayDisconnectedMessage } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
 import { WsGatewayGameInitMessage, WsGatewayGameInitPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.init.msg';
@@ -32,8 +32,8 @@ import { WsGatewayGameDeleteCharacterMessage, WsGatewayGameDeleteCharacterPatter
 import { WsGatewayGameDeleteProjectileMessage, WsGatewayGameDeleteProjectilePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.projectile.msg';
 import { WsGatewayGameLoopStateMessage, WsGatewayGameLoopStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.loop.state.msg';
 import { WsGatewayGameGameStateMessage, WsGatewayGameGameStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.game.state';
-import { WsGatewayGameCreateCoinMessage, WsGatewayGameCreateCoinPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.coin.msg';
-import { WsGatewayGameDeleteCoinMessage, WsGatewayGameDeleteCoinPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.coin.msg';
+import { WsGatewayGameCreateConsumableMessage, WsGatewayGameCreateConsumablePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.consumable.msg';
+import { WsGatewayGameDeleteConsumableMessage, WsGatewayGameDeleteConsumablePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
 
 @Injectable()
 export class GameplayService {
@@ -198,24 +198,25 @@ export class GameplayService {
     this.wsGatewayService.emit(WsGatewayGameDeleteCharacterPattern, message);
   }
 
-  // Coin
+  // Consumable
 
-  @OnEvent(EventGameCreateCoin.EventName)
-  handleEventGameCreateCoin(payload: EventGameCreateCoin) {
-    const message: WsGatewayGameCreateCoinMessage = {
+  @OnEvent(EventGameCreateConsumable.EventName)
+  handleEventGameCreateConsumable(payload: EventGameCreateConsumable) {
+    const message: WsGatewayGameCreateConsumableMessage = {
       gameId: payload.gameId,
-      coinEntityStruct: payload.coinEntityStruct,
+      consumableEntityStruct: payload.consumableEntityStruct,
     };
-    this.wsGatewayService.emit(WsGatewayGameCreateCoinPattern, message);
+    this.wsGatewayService.emit(WsGatewayGameCreateConsumablePattern, message);
   }
 
-  @OnEvent(EventGameDeleteCoin.EventName)
-  handleEventGameDeleteCoin(payload: EventGameDeleteCoin) {
-    const message: WsGatewayGameDeleteCoinMessage = {
+  @OnEvent(EventGameDeleteConsumable.EventName)
+  handleEventGameDeleteConsumable(payload: EventGameDeleteConsumable) {
+    const message: WsGatewayGameDeleteConsumableMessage = {
       gameId: payload.gameId,
-      id: payload.id,
+      entityId: payload.entityId,
+      takenByCharacterId: payload.takenByCharacterId,
     };
-    this.wsGatewayService.emit(WsGatewayGameDeleteCoinPattern, message);
+    this.wsGatewayService.emit(WsGatewayGameDeleteConsumablePattern, message);
   }
 
   // Projectile

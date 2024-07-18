@@ -1,12 +1,13 @@
 package engine.seidh;
 
-import engine.base.entity.impl.EngineCoinEntity;
+import engine.base.geometry.Point;
 import js.lib.Date;
 
 import engine.base.BaseTypesAndClasses;
 import engine.base.EngineConfig;
 import engine.base.MathUtils;
 import engine.base.entity.base.EngineBaseEntity;
+import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.core.BaseEngine;
@@ -19,24 +20,54 @@ class SeidhGameEngine extends BaseEngine {
     private var framesPassed = 0;
     private var timePassed = 0.0;
 
+    private final mobsMax = 200;
     private var allowSpawnMobs = false;
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
     private var mobsLastSpawnTime = 0.0;
-    private final mobsMax = 20;
-    private final mobSpawnDelayMs = 3.500;
+    private var mobSpawnDelayMs = 0.500;
     
     private final playerZombieKills = new Map<String, Int>();
+    private final lineColliders = new Array<engine.base.geometry.Line>();
 
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
     public var gameStateCallback:GameState->Void;
 
-    // TODO add coins here
+    public final playersSpawnPoints = [
+        new Point(2500, 2500)
+    ];
+    public final mobsSpawnPoints = new Array<Point>();
+
+    public static final GameWorldSize = 5000;
 
     public static function main() {}
 
     public function new(engineMode:EngineMode) {
 	    super(engineMode);
+
+        // Top
+		addLineCollider(0, 0, GameWorldSize, 0);
+        for (x in 0...26) {
+            mobsSpawnPoints.push(new Point(200 * x, -200));
+        }
+
+        // Bottom
+		addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);
+        for (x in 0...26) {
+            mobsSpawnPoints.push(new Point(200 * x, 5200));
+        }
+
+        // Left
+		addLineCollider(0, 0, 0, GameWorldSize);
+        for (y in 0...26) {
+            mobsSpawnPoints.push(new Point(-200, 200 * y));
+        }
+
+        // Right
+		addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
+        for (y in 0...26) {
+            mobsSpawnPoints.push(new Point(5200, 200 * y));
+        }
     }
 
     // ---------------------------------------------------
@@ -137,12 +168,33 @@ class SeidhGameEngine extends BaseEngine {
                     character1.update(dt);
 
                     if (character1.isPlayer()) {
-                        for (c in coinEntityManager.entities) {
-                            final coin = cast(c, EngineCoinEntity);
+                        for (c in consumableEntityManager.entities) {
+                            final consumable = cast(c, EngineConsumableEntity);
 
-                            if (character1.getBodyRectangle().containsRect(coin.getBodyRectangle())) {
-                                deleteCoinEntity(coin.getId());
+                            if (character1.getBodyRectangle().getCenter().distance(consumable.getBodyRectangle().getCenter()) < 150) {
+                                if (character1.getBodyRectangle().containsRect(consumable.getBodyRectangle())) {
+                                    if (consumable.getEntityType() == EntityType.COIN) {
+                                        // TODO add coins
+                                    } else {
+                                        character1.addHealth(consumable.amount);
+                                    }
+                                    deleteConsumableEntity(consumable.getId(), character1.getId());
+                                }
                             }
+                        }
+
+                        var intersectsWithLine = false;
+                        for (line in lineColliders) {
+                            if (character1.getForwardLookingLine(character1.playerForwardLookingLineLength).intersectsWithLine(line)) {
+                                intersectsWithLine = true;
+                                break;
+                            }
+                        }
+
+                        if (intersectsWithLine) {
+                            character1.canMove = false;
+                        } else {
+                            character1.canMove = true;
                         }
                     }
 
@@ -192,24 +244,12 @@ class SeidhGameEngine extends BaseEngine {
                                             if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
                                                 mobsKilled++;
                                                 mobsSpawned--;
-
                                                 playerZombieKills.set(character1.getOwnerId(), playerZombieKills.get(character1.getOwnerId()) + 1);
-
-                                                final coinX = Std.int(character2.getBodyRectangle().x);
-                                                final coinY = Std.int(character2.getBodyRectangle().y);
-                                                
-                                                createCoinEntity(SeidhEntityFactory.InitiateCoin(null, coinX, coinY, 1));
+                                                createConsumable(character2);
                                             }
                                             character2.isAlive = false;
                                             deadEntities.push(character2.getId());
                                             deleteCharacterEntity(character2.getId());
-
-                                            // // Game lose condition if single player
-                                            // if (engineMode == EngineMode.CLIENT_SINGLEPLAYER && localPlayerId != null) {
-                                            //     if (localPlayerId == character2.getOwnerId()) {
-                                            //         gameState = GameState.LOSE;
-                                            //     }
-                                            // }
                                         } else {
                                             hurtEntities.push(character2.getId());
                                         }
@@ -241,12 +281,12 @@ class SeidhGameEngine extends BaseEngine {
             }
 
             // Infinite play
-            if (mobsKilled == mobsMax && allowServerLogic) {
-                // gameState = GameState.WIN;
-                // if (gameStateCallback != null) {
-                //     gameStateCallback(gameState);
-                // }
-            }
+            // if (mobsKilled == mobsMax && allowServerLogic) {
+            //     gameState = GameState.WIN;
+            //     if (gameStateCallback != null) {
+            //         gameStateCallback(gameState);
+            //     }
+            // }
 
             recentEngineLoopTime = Date.now() - beginTime;
             spawnMobs();
@@ -264,6 +304,10 @@ class SeidhGameEngine extends BaseEngine {
     // Custom logic
     // ---------------------------------------------------
 
+	public function addLineCollider(x1:Int, y1:Int, x2:Int, y2:Int) {
+		lineColliders.push(new engine.base.geometry.Line(x1, y1, x2, y2));
+	}
+
     public function allowMobsSpawn(allowSpawnMobs:Bool) {
         this.allowSpawnMobs = allowSpawnMobs;
     }
@@ -275,43 +319,35 @@ class SeidhGameEngine extends BaseEngine {
             mobsSpawned++;
             mobsLastSpawnTime = now;
 
-            var positionX = 0;
-            var positionY = 0;
-
-            final rnd = MathUtils.randomIntInRange(1, 4);
-            switch (rnd) {
-                case 1:
-                    positionX = 800;
-                    positionY = 800;
-                case 2:
-                    positionX = 2800;
-                    positionY = 800;
-                case 3:
-                    positionX = 800;
-                    positionY = 2800;
-                case 4:
-                    positionX = 2800;
-                    positionY = 2800;
-            }
+            // TODO make sure that it works properly
+            final mobSpawnPoint = mobsSpawnPoints[MathUtils.randomIntInRange(1, mobsSpawnPoints.length - 1)];
+            final positionX = Std.int(mobSpawnPoint.x);
+            final positionY = Std.int(mobSpawnPoint.y);
 
             createCharacterEntity(SeidhEntityFactory.InitiateCharacter(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
         }
     }
 
     public function cleanAllMobs() {
-        mobsSpawned = 0;
         for (entity in characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY)) {
             characterEntityManager.delete(entity.getId());
         };
         for (entity in characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL)) {
             characterEntityManager.delete(entity.getId());
         };
+        mobsSpawned = 0;
     }
 
     public function getPlayersCount() {
         return 
             characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
             characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
+    }
+
+    public function getMobsCount() {
+        return 
+            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY).length +
+            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL).length;
     }
 
     public function getPlayerKills(playerId:String) {
@@ -369,12 +405,38 @@ class SeidhGameEngine extends BaseEngine {
         return nearestPlayer;
     }
 
+    private function createConsumable(character:EngineCharacterEntity) {
+        final x = Std.int(character.getBodyRectangle().x);
+        final y = Std.int(character.getBodyRectangle().y);
+
+        final rnd = MathUtils.randomIntInRange(1, 40);
+        if (rnd == 1) {
+            createConsumableEntity(SeidhEntityFactory.InitiateCoin(x, y, 25));
+        } else if (rnd < 6) {
+            createConsumableEntity(SeidhEntityFactory.InitiateHealthPotion(x, y, 10));
+        } else {
+            createConsumableEntity(SeidhEntityFactory.InitiateCoin(x, y, 1));
+        }
+    }
+
     // ---------------------------------------------------
     // Getters
     // ---------------------------------------------------
 
     public function getGameState() {
         return gameState;
+    }
+
+    public function getLineColliders() {
+        return lineColliders;
+    }
+
+    public function getPlayersSpawnPoints() {
+        return playersSpawnPoints;
+    }
+
+    public function getMobsSpawnPoints() {
+        return mobsSpawnPoints;
     }
 
     // ---------------------------------------------------

@@ -1,5 +1,6 @@
 package game.sound;
 
+import game.Res.SeidhResource;
 import hxd.res.Sound;
 
 class SoundManager {
@@ -30,21 +31,21 @@ class SoundManager {
             if (hxd.res.Sound.supportedFormat(Mp3)) {
                 final manager = hxd.snd.Manager.get();
                 manager.masterVolume = 0.25;
-                manager.masterSoundGroup.maxAudible = 5;
+                manager.masterSoundGroup.maxAudible = 10;
     
-                menuTheme = hxd.Res.sound.menu_theme_1;
-                gameplayTheme = hxd.Res.sound.gameplay_theme_1;
+                menuTheme = Res.instance.getSoundResource(SeidhResource.SOUND_MENU_THEME);
+                gameplayTheme = Res.instance.getSoundResource(SeidhResource.SOUND_GAMEPLAY_THEME);
     
-                button1 = hxd.Res.sound.button_1;
-                button2 = hxd.Res.sound.button_2;
+                button1 = Res.instance.getSoundResource(SeidhResource.SOUND_BUTTON_1);
+                button2 = Res.instance.getSoundResource(SeidhResource.SOUND_BUTTON_2);
             
-                vikingDeath = hxd.Res.sound.viking_death;
-                vikingDmg = hxd.Res.sound.viking_dmg;
-                vikingHit = hxd.Res.sound.viking_hit;
+                vikingDeath = Res.instance.getSoundResource(SeidhResource.SOUND_VIKING_DEATH);
+                vikingDmg = Res.instance.getSoundResource(SeidhResource.SOUND_VIKING_DMG);
+                vikingHit = Res.instance.getSoundResource(SeidhResource.SOUND_VIKING_HIT);
             
-                zombieDeath = hxd.Res.sound.zombie_death;
-                zombieDmg = hxd.Res.sound.zombie_dmg;
-                zombieHit = hxd.Res.sound.zombie_hit;
+                zombieDeath = Res.instance.getSoundResource(SeidhResource.SOUND_ZOMBIE_DEATH);
+                zombieDmg = Res.instance.getSoundResource(SeidhResource.SOUND_ZOMBIE_DMG);
+                zombieHit = Res.instance.getSoundResource(SeidhResource.SOUND_ZOMBIE_HIT);
             } else {
                 trace('MP3 sound is not available');
             }
@@ -118,7 +119,7 @@ class SoundManager {
     }
 
     private function allowPlaySound(sound:Sound) {
-        return sound != null && GameConfig.PlaySounds && haxe.Timer.stamp() - sound.lastPlay > 0.25;
+        return sound != null && GameConfig.PlaySounds && haxe.Timer.stamp() - sound.lastPlay > 0.1;
     }
 
 }

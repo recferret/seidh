@@ -9,8 +9,8 @@ import { WsGatewayGameDeleteCharacterPattern, WsGatewayGameDeleteCharacterMessag
 import { WsGatewayGameDeleteProjectilePattern, WsGatewayGameDeleteProjectileMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.projectile.msg';
 import { WsGatewayGameLoopStateMessage, WsGatewayGameLoopStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.loop.state.msg';
 import { WsGatewayGameGameStatePattern, WsGatewayGameGameStateMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.game.state';
-import { WsGatewayGameCreateCoinPattern, WsGatewayGameCreateCoinMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.coin.msg';
-import { WsGatewayGameDeleteCoinPattern, WsGatewayGameDeleteCoinMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.coin.msg';
+import { WsGatewayGameCreateConsumablePattern, WsGatewayGameCreateConsumableMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.consumable.msg';
+import { WsGatewayGameDeleteConsumablePattern, WsGatewayGameDeleteConsumableMessage } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
 
 @Controller()
 export class WsGatewayController {
@@ -36,16 +36,16 @@ export class WsGatewayController {
     this.wsGatewayWsController.broadcast(WsProtocolMessage.DeleteCharacter, data);
   }
 
-  // Coin
+  // Consumable
 
-  @MessagePattern(WsGatewayGameCreateCoinPattern)
-  createCoin(data: WsGatewayGameCreateCoinMessage) {
-    this.wsGatewayWsController.broadcast(WsProtocolMessage.CreateCoin, data);
+  @MessagePattern(WsGatewayGameCreateConsumablePattern)
+  createConsumable(data: WsGatewayGameCreateConsumableMessage) {
+    this.wsGatewayWsController.broadcast(WsProtocolMessage.CreateConsumable, data);
   }
 
-  @MessagePattern(WsGatewayGameDeleteCoinPattern)
-  deleteCoin(data: WsGatewayGameDeleteCoinMessage) {
-    this.wsGatewayWsController.broadcast(WsProtocolMessage.DeleteCoin, data);
+  @MessagePattern(WsGatewayGameDeleteConsumablePattern)
+  deleteConsumable(data: WsGatewayGameDeleteConsumableMessage) {
+    this.wsGatewayWsController.broadcast(WsProtocolMessage.DeleteConsumable, data);
   }
 
   // Projectile

@@ -1,0 +1,15 @@
+{
+  "name": "seidh-client",
+  "version": "0.0.1",
+  "description": "1) haxe .\\compile.hxml\r 2) copy *.html *.js ans resources to the server and serve static",
+  "main": "common.js",
+  "scripts": {
+    "build:prod": "npx gulp & npx terser ./prod/yandex/bundle.js --compress ecma=2015,computed_props=false -o ./prod/yandex/bundle.min.js"
+  },
+  "author": "Andrey Sokolov",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^5.0.0",
+    "gulp-concat": "^2.6.1"
+  }
+}

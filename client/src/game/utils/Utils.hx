@@ -15,11 +15,11 @@ class Utils {
 		return text.substring(0, 4) + '...' + text.substring(text.length - 4, text.length);
 	}
 
-	public static function DrawLine(graphics:h2d.Graphics, from:h2d.col.Point, to:h2d.col.Point, color:Int) {
+	public static function DrawLine(graphics:h2d.Graphics, x1:Float, y1:Float, x2:Float, y2:Float, color:Int) {
 		graphics.lineStyle(2, color);
 
-		graphics.moveTo(from.x, from.y);
-		graphics.lineTo(to.x, to.y);
+		graphics.moveTo(x1, y1);
+		graphics.lineTo(x2, y2);
 
 		graphics.endFill();
 	}

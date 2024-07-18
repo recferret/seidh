@@ -5,11 +5,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
+    PrometheusModule.register(),
     ClientsModule.register([
       {
         name: ServiceName.WsGateway,

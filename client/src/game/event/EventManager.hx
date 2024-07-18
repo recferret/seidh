@@ -10,8 +10,8 @@ class EventManager {
 	public static final EVENT_GAME_INIT = 'EVENT_GAME_INIT';
 	public static final EVENT_CREATE_CHARACTER = 'EVENT_CREATE_CHARACTER';
 	public static final EVENT_DELETE_CHARACTER = 'EVENT_DELETE_CHARACTER';
-	public static final EVENT_CREATE_COIN = 'EVENT_CREATE_COIN';
-	public static final EVENT_DELETE_COIN = 'EVENT_DELETE_COIN';
+	public static final EVENT_CREATE_CONSUMABLE = 'EVENT_CREATE_CONSUMABLE';
+	public static final EVENT_DELETE_CONSUMABLE = 'EVENT_DELETE_CONSUMABLE';
 	public static final EVENT_LOOP_STATE = 'EVENT_LOOP_STATE';
 	public static final EVENT_GAME_STATE = 'EVENT_GAME_STATE';
 	public static final EVENT_CHARACTER_ACTIONS = 'EVENT_CHARACTER_ACTIONS';

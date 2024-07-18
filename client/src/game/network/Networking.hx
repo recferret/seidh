@@ -18,15 +18,16 @@ typedef DeleteCharacterPayload = {
 	characterId:String,
 }
 
-typedef CreateCoinPayload = {
-    coinEntityStruct: {
+typedef CreateConsumablePayload = {
+    consumableEntityStruct: {
         baseEntityStruct: BaseEntityStruct,
         amount:Int,
     }
 }
 
-typedef DeleteCoinPayload = {
-	id:String,
+typedef DeleteConsumablePayload = {
+	entityId:String,
+    takenByCharacterId:String,
 }
 
 typedef LoopStatePayload = {
@@ -72,10 +73,10 @@ class Networking {
                 EventManager.instance.notify(EventManager.EVENT_CREATE_CHARACTER, data);
             case 'DeleteCharacter':
                 EventManager.instance.notify(EventManager.EVENT_DELETE_CHARACTER, data);
-            case 'CreateCoin':
-                EventManager.instance.notify(EventManager.EVENT_CREATE_COIN, data);
-            case 'DeleteCoin':
-                EventManager.instance.notify(EventManager.EVENT_DELETE_COIN, data);
+            case 'CreateConsumable':
+                EventManager.instance.notify(EventManager.EVENT_CREATE_CONSUMABLE, data);
+            case 'DeleteConsumable':
+                EventManager.instance.notify(EventManager.EVENT_DELETE_CONSUMABLE, data);
             case 'CharacterActions':
                 EventManager.instance.notify(EventManager.EVENT_CHARACTER_ACTIONS, data);
             default:

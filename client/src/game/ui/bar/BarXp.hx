@@ -1,5 +1,6 @@
 package game.ui.bar;
 
+import game.Res.SeidhResource;
 import game.utils.Utils;
 
 class BarXp extends h2d.Object {
@@ -10,7 +11,7 @@ class BarXp extends h2d.Object {
     public function new(s2d:h2d.Scene) {
         super(s2d);
 
-        barBmp = new h2d.Bitmap(hxd.Res.ui.bar_xp_1.toTile(), this);
+        barBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_XP), this);
         customGraphics = new h2d.Graphics(s2d);
     }
 

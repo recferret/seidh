@@ -1,12 +1,15 @@
 package game.scene.impl;
 
+import h2d.col.Point;
+import hxd.Window;
+
 import engine.base.MathUtils;
 import engine.base.geometry.Rectangle;
 import engine.base.geometry.Line;
+
 import game.scene.base.BasicScene;
 import game.utils.Utils;
-import h2d.col.Point;
-import hxd.Window;
+
 
 class SceneGeomTest extends BasicScene {
 	// Two rect collides with each other

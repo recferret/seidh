@@ -4,10 +4,12 @@ import { GameplayLobbyService } from './gameplay-lobby.service';
 import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    PrometheusModule.register(),
     ClientsModule.register([
       {
         name: ServiceName.Gameplay,

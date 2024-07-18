@@ -1,39 +1,44 @@
 package game.scene.home;
 
-import game.sound.SoundManager;
+import game.js.NativeWindowJS;
 import h2d.filter.Displacement;
+
+import engine.base.MathUtils;
+
+import game.Res.SeidhResource;
+import game.sound.SoundManager;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
+
 import motion.Actuate;
 
 class Bunny extends h2d.Object {
 
-    private final tileWidth:Float;
+    private final bunnyBmp:h2d.Bitmap;
+    private final fireBmp:h2d.Bitmap;
     private final displacementTile:h2d.Tile;
 
-    public function new(parent:h2d.Object, flipX:Bool) {
+    public function new(parent:h2d.Object) {
 		super(parent);
 
-        final bunny = new h2d.Bitmap(hxd.Res.ui.home.bnuuy_cold.toTile(), this);
-        final bunnyFire = new h2d.Bitmap(hxd.Res.ui.home.fire.toTile(), this);
+        bunnyBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_BUNNY), this);
+        fireBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_BUNNY_FIRE), this);
 
-        displacementTile = hxd.Res.normalmap.toTile();
-        bunnyFire.filter = new Displacement(displacementTile, 3, 3);
-
-        if (flipX) {
-            bunny.tile.flipX();
-            bunnyFire.tile.flipX();
-        }
-
-        tileWidth = bunny.tile.width;
+        displacementTile = Res.instance.getTileResource(SeidhResource.FX_NORMALMAP);
+        fireBmp.filter = new Displacement(displacementTile, 3, 3);
     }
 
     public function update(dt:Float) {
         displacementTile.scrollDiscrete(5 * dt, 5 * dt);
     }
 
+    public function flipX() {
+        bunnyBmp.tile.flipX();
+        fireBmp.tile.flipX();
+    }
+
     public function getWidth() {
-        return tileWidth;
+        return bunnyBmp.tile.width;
     }
 }
 
@@ -41,7 +46,7 @@ class PlayContent extends BasicHomeContent {
 
     private final leftBunny:Bunny;
     private final rightBunny:Bunny;
-    private final screenShadowDisplacementTile:h2d.Tile;
+    private final screenDarknessDisplacementTile:h2d.Tile;
 
     // 1 - left, 2 - central, 3 - right
     private var leftRagnarPosX = 0.0;
@@ -52,117 +57,107 @@ class PlayContent extends BasicHomeContent {
     private var rightRagnarPosY = 0.0;
 
     private var currentRagnar = 2;
+
     private final leftRagnar:h2d.Bitmap;
     private final rightRagnar:h2d.Bitmap;
     private final centralRagnar:h2d.Bitmap;
 
-    private final ragnarLohTile:h2d.Tile;
+    private final ragnarBaseTile:h2d.Tile;
     private final ragnarNormTile:h2d.Tile;
     private final ragnarDudeTile:h2d.Tile;
 
-    public function new(scene:h2d.Scene) {
-		super(scene);
+    public function new() {
+		super();
 
         // ------------------------------------
         // Grass
         // ------------------------------------
 
-        final grass1Tile =  hxd.Res.terrain.tile_1.toTile().center();
-        final grass2Tile =  hxd.Res.terrain.tile_2.toTile().center();
-        final grass3Tile =  hxd.Res.terrain.tile_3.toTile().center();
-        final grass4Tile =  hxd.Res.terrain.tile_4.toTile().center();
+        for (x in 0...(Std.int(720 / 183) + 1)) {
+            for (y in 0...(Std.int(1280 / 183) + 1)) {
 
-        final grass1 = new h2d.Bitmap(grass1Tile, this);
-        grass1.setPosition(100, 300);
+                var groundTile:h2d.Tile = null; 
+                final groundRnd = MathUtils.randomIntInRange(1, 4);
 
-        final grass2 = new h2d.Bitmap(grass2Tile, this);
-        grass2.setPosition(330, 220);
+                if (groundRnd == 1) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_1);
+                } else if (groundRnd == 2) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_2);
+                } else if (groundRnd == 3) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_3);
+                } else if (groundRnd == 4) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_4);
+                }
 
-        final grass3 = new h2d.Bitmap(grass3Tile, this);
-        grass3.setPosition(600, 300);
-
-        final grass4 = new h2d.Bitmap(grass4Tile, this);
-        grass4.setPosition(600, 900);
-
-        final grass5 = new h2d.Bitmap(grass1Tile, this);
-        grass5.setPosition(100, 800);
-
-        final grass6 = new h2d.Bitmap(grass1Tile, this);
-        grass6.setPosition(500, 400);
-
-        final grass7 = new h2d.Bitmap(grass1Tile, this);
-        grass7.setPosition(200, 400);
-
-        final grass8 = new h2d.Bitmap(grass2Tile, this);
-        grass8.setPosition(100, BasicScene.ActualScreenHeight - grass2Tile.height);
-
-        final grass9 = new h2d.Bitmap(grass3Tile, this);
-        grass9.setPosition(500, BasicScene.ActualScreenHeight - grass2Tile.height);
-
-        final grass10 = new h2d.Bitmap(grass4Tile, this);
-        grass10.setPosition(300, BasicScene.ActualScreenHeight - grass2Tile.height * 2);
-
-        // ------------------------------------
-        // Puddle
-        // ------------------------------------
-
-        final puddleTile =  hxd.Res.terrain.puddle.toTile();
-
-        final puddle1 = new h2d.Bitmap(puddleTile, this);
-        puddle1.setPosition(BasicScene.ActualScreenWidth - puddleTile.width * 0.7, 480);
+                final grass = new h2d.Bitmap(groundTile, this);
+                grass.setPosition(grass.tile.width / 2 + (x * grass.tile.width), grass.tile.height / 2 + (y * grass.tile.height));
+            }
+        }
 
         // ------------------------------------
         // Bunnies
         // ------------------------------------
 
-        leftBunny = new Bunny(this, false);
-        leftBunny.setPosition(leftBunny.getWidth() / 2, BasicScene.ActualScreenHeight / 1.55);
+        leftBunny = new Bunny(this);
+        leftBunny.setPosition(leftBunny.getWidth(), Main.ActualScreenHeight / 1.55);
 
-        rightBunny = new Bunny(this, true);
-        rightBunny.setPosition(BasicScene.ActualScreenWidth - rightBunny.getWidth() / 2, BasicScene.ActualScreenHeight / 1.55);
+        rightBunny = new Bunny(this);
+        rightBunny.setPosition(Main.ActualScreenWidth - rightBunny.getWidth(), Main.ActualScreenHeight / 1.55);
+        rightBunny.flipX();
 
         // ------------------------------------
         // Trees
         // ------------------------------------
 
-        final tree1Tile =  hxd.Res.terrain.tree_1.toTile().center();
-        final tree2Tile =  hxd.Res.terrain.tree_2.toTile().center();
+        function placeTree(x:Float, y:Float) {
+            final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1)) : 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_2));
+            treeBitmap.setPosition(x, y);
+            addChild(treeBitmap);
+        }
 
-        final tree1 = new h2d.Bitmap(tree1Tile, this);
-        tree1.setPosition(100, 150);
+        placeTree(70, 600);
+        placeTree(100, 210);
+        placeTree(160, 320);
+        placeTree(300, 280);
 
-        final tree2 = new h2d.Bitmap(tree2Tile, this);
-        tree2.setPosition(BasicScene.ActualScreenWidth - tree2Tile.width / 3, 200);
-
-        final tree3 = new h2d.Bitmap(tree2Tile, this);
-        tree3.setPosition(70, BasicScene.ActualScreenHeight - tree2Tile.height * 0.7);
-
+        placeTree(500, 300);
+        placeTree(400, 200);
+        placeTree(600, 350);
+        placeTree(660, 550);
+        
         // ------------------------------------
-        // Fence
+        // Weed
         // ------------------------------------
 
-        final fence1Tile =  hxd.Res.terrain.fence_1.toTile();
-        final fence2Tile =  hxd.Res.terrain.fence_2.toTile();
+        function placeWeed(x:Float, y:Float) {
+            final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1)) : 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_2));
+            treeBitmap.setPosition(x, y);
+            addChild(treeBitmap);
+        }
 
-        final fence1 = new h2d.Bitmap(fence1Tile, this);
-        fence1.setPosition(BasicScene.ActualScreenWidth - fence1Tile.width, BasicScene.ActualScreenHeight / 1.44);
-        final fence2 = new h2d.Bitmap(fence2Tile, this);
-        fence2.setPosition(BasicScene.ActualScreenWidth - fence1Tile.width * 2 + 5, BasicScene.ActualScreenHeight / 1.44 + 16);
+        placeWeed(100, 1200);
+        placeWeed(200, 1100);
+
+        placeWeed(600, 1100);
 
         // ------------------------------------
         // Ragnars
         // ------------------------------------
 
-        ragnarLohTile = hxd.Res.ragnar.ragnar_loh.toTile().center();
-        ragnarNormTile = hxd.Res.ragnar.ragnar_norm.toTile().center();
-        ragnarDudeTile = hxd.Res.ragnar.ragnar_dude.toTile().center();
+        ragnarBaseTile = Res.instance.getTileResource(SeidhResource.RAGNAR_BASE);
+        ragnarNormTile = Res.instance.getTileResource(SeidhResource.RAGNAR_NORM);
+        ragnarDudeTile = Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE);
 
         leftRagnarPosX = 100;
-        leftRagnarPosY = BasicScene.ActualScreenHeight / 2.5;
-        centralRagnarPosX = BasicScene.ActualScreenWidth / 2;
-        centralRagnarPosY = BasicScene.ActualScreenHeight / 2;
-        rightRagnarPosX = BasicScene.ActualScreenWidth - ragnarLohTile.width / 2 - 20;
-        rightRagnarPosY = BasicScene.ActualScreenHeight / 2.5;
+        leftRagnarPosY = Main.ActualScreenHeight / 2.5;
+        centralRagnarPosX = Main.ActualScreenWidth / 2;
+        centralRagnarPosY = Main.ActualScreenHeight / 2;
+        rightRagnarPosX = Main.ActualScreenWidth - ragnarBaseTile.width / 2 - 20;
+        rightRagnarPosY = Main.ActualScreenHeight / 2.5;
 
         leftRagnar = new h2d.Bitmap(ragnarNormTile, this);
         leftRagnar.setPosition(leftRagnarPosX, leftRagnarPosY);
@@ -170,39 +165,43 @@ class PlayContent extends BasicHomeContent {
         rightRagnar = new h2d.Bitmap(ragnarDudeTile, this);
         rightRagnar.setPosition(rightRagnarPosX, rightRagnarPosY);
 
-        centralRagnar = new h2d.Bitmap(ragnarLohTile, this);
+        centralRagnar = new h2d.Bitmap(ragnarBaseTile, this);
         centralRagnar.setPosition(centralRagnarPosX, centralRagnarPosY);
 
         // ------------------------------------
         // Shadow
         // ------------------------------------
 
-        final screenShadow = new h2d.Bitmap(hxd.Res.ui.home.mm_shadow.toTile().center(), this);
-        final scaleFactor = BasicScene.ActualScreenHeight / 1280;
-        final fixedScale = scaleFactor < 1 ? 1.1 : scaleFactor; 
-        screenShadowDisplacementTile = hxd.Res.normalmap.toTile();
-        screenShadow.filter = new Displacement(screenShadowDisplacementTile, 1, 3);
-        screenShadow.scaleX = fixedScale;
-		screenShadow.scaleY = fixedScale;
-        screenShadow.setPosition(BasicScene.ActualScreenWidth / 2, BasicScene.ActualScreenHeight / 2);
+        final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), this);
+        screenDarknessDisplacementTile = Res.instance.getTileResource(SeidhResource.FX_NORMALMAP);
+        darkness.filter = new Displacement(screenDarknessDisplacementTile, 3, 7);
+        darkness.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
 
-        // NativeWindowJS.debugAlert('Scale: ' + scaleFactor);
+        final dummyHeaderBlackTile = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, 720, 150, 0.95), this);
+        dummyHeaderBlackTile.setPosition(0, 0);
+
+        final dummyFooterBlackTile = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, 720, 150, 0.95), this);
+        dummyFooterBlackTile.setPosition(0, Main.ActualScreenHeight - 150);
 
         // ------------------------------------
         // Buttons
         // ------------------------------------
 
         // Play button
-        final playButtonInactiveTile = hxd.Res.ui.home.PLAY_nay.toTile();
-        final playButtonActiveTile = hxd.Res.ui.home.PLAY_yay.toTile();
+        final playButtonInactiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_PLAY_NAY);
+        final playButtonActiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_PLAY_YAY);
 
         final playButton = new h2d.Bitmap(playButtonActiveTile, this);
         playButton.setPosition(
-            BasicScene.ActualScreenWidth / 2 - playButtonActiveTile.width / 2, 
-            BasicScene.ActualScreenHeight / 5 - playButtonActiveTile.height / 2
+            Main.ActualScreenWidth / 2, 
+            300
         );
 
-        final playButtonInteractive = new h2d.Interactive(playButtonActiveTile.width, playButtonActiveTile.height, playButton);
+        final playButtonInteractive = new h2d.Interactive(playButtonActiveTile.width, playButtonActiveTile.height);
+        playButtonInteractive.setPosition(
+            Main.ActualScreenWidth / 2 - playButtonActiveTile.width / 2, 
+            Main.ActualScreenHeight / 5 - playButtonActiveTile.height / 2
+        );
         playButtonInteractive.onPush = function(event : hxd.Event) {
             playButton.tile = playButtonInactiveTile;
         }
@@ -210,21 +209,27 @@ class PlayContent extends BasicHomeContent {
             playButton.tile = playButtonActiveTile;
         }
         playButtonInteractive.onClick = function(event : hxd.Event) {
-            EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
 			SoundManager.instance.playButton2();
+            NativeWindowJS.trackPlayClick();
+            EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
         }
+        addChild(playButtonInteractive);
 
         // Play button
-        final lvlButtonInactiveTile = hxd.Res.ui.home.LVL_nay.toTile();
-        final lvlButtonActiveTile = hxd.Res.ui.home.LVL_yay.toTile();
+        final lvlButtonInactiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_LVL_NAY);
+        final lvlButtonActiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_LVL_YAY);
         
         final lvlButton = new h2d.Bitmap(lvlButtonActiveTile, this);
         lvlButton.setPosition(
-            BasicScene.ActualScreenWidth / 2 - lvlButtonActiveTile.width / 2, 
-            BasicScene.ActualScreenHeight * 0.8 - lvlButtonActiveTile.height / 2
+            Main.ActualScreenWidth / 2, 
+            Main.ActualScreenHeight * 0.8
         );
         
-        final lvlButtonInteractive = new h2d.Interactive(lvlButtonActiveTile.width, lvlButtonActiveTile.height, lvlButton);
+        final lvlButtonInteractive = new h2d.Interactive(lvlButtonActiveTile.width, lvlButtonActiveTile.height);
+        lvlButtonInteractive.setPosition(
+            Main.ActualScreenWidth / 2 - lvlButtonActiveTile.width / 2, 
+            Main.ActualScreenHeight * 0.8 - lvlButtonActiveTile.height / 2
+        );
         lvlButtonInteractive.onPush = function(event : hxd.Event) {
             lvlButton.tile = lvlButtonInactiveTile;
         }
@@ -232,54 +237,71 @@ class PlayContent extends BasicHomeContent {
             lvlButton.tile = lvlButtonActiveTile;
         }
         lvlButtonInteractive.onClick = function(event : hxd.Event) {
-            
+            SoundManager.instance.playButton2();
+
+            NativeWindowJS.trackLvlUpClick();
         }
+        addChild(lvlButtonInteractive);
 
         // Prev button
-        final prevRagnarButton = new h2d.Bitmap(hxd.Res.ui.home.arrow_left.toTile(), this);
+        final prevRagnarButton = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_ARROW_LEFT), this);
         prevRagnarButton.setPosition(
-            prevRagnarButton.tile.width / 2, 
-            BasicScene.ActualScreenHeight / 2 - prevRagnarButton.tile.height / 2
+            prevRagnarButton.tile.width * 1.2,
+            Main.ActualScreenHeight / 2
         );
+        prevRagnarButton.setScale(1.2);
 
-        final prevRagnarButtonInteractive = new h2d.Interactive(prevRagnarButton.tile.width, prevRagnarButton.tile.height, prevRagnarButton);
+        final prevRagnarButtonInteractive = new h2d.Interactive(prevRagnarButton.tile.width, prevRagnarButton.tile.height);
+        prevRagnarButtonInteractive.setPosition(
+            prevRagnarButton.tile.width / 2, 
+            Main.ActualScreenHeight / 2 - prevRagnarButton.tile.height / 2
+        );
         prevRagnarButtonInteractive.onPush = function(event : hxd.Event) {
-            prevRagnarButton.setScale(1.2);
+            prevRagnarButton.setScale(1);
         }
         prevRagnarButtonInteractive.onRelease = function(event : hxd.Event) {
-            prevRagnarButton.setScale(1);
+            prevRagnarButton.setScale(1.2);
         }
         prevRagnarButtonInteractive.onClick = function(event : hxd.Event) {
             switchRagner('left');
         }
+        addChild(prevRagnarButtonInteractive);
 
         // Next button
-        final nextRagnarButton = new h2d.Bitmap(hxd.Res.ui.home.arrow_right.toTile(), this);
+        final nextRagnarButton = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_ARROW_RIGHT), this);
         nextRagnarButton.setPosition(
-            BasicScene.ActualScreenWidth - nextRagnarButton.tile.width * 1.5, 
-            BasicScene.ActualScreenHeight / 2 - nextRagnarButton.tile.height / 2
+            Main.ActualScreenWidth - nextRagnarButton.tile.width * 1.2, 
+            Main.ActualScreenHeight / 2
         );
+        nextRagnarButton.setScale(1.2);
 
-        final nextRagnarButtonInteractive = new h2d.Interactive(nextRagnarButton.tile.width, nextRagnarButton.tile.height, nextRagnarButton);
+        final nextRagnarButtonInteractive = new h2d.Interactive(nextRagnarButton.tile.width, nextRagnarButton.tile.height);
+        nextRagnarButtonInteractive.setPosition(
+            Main.ActualScreenWidth - nextRagnarButton.tile.width * 1.5, 
+            Main.ActualScreenHeight / 2 - nextRagnarButton.tile.height / 2
+        );
         nextRagnarButtonInteractive.onPush = function(event : hxd.Event) {
-            nextRagnarButton.setScale(1.2);
+            nextRagnarButton.setScale(1);
         }
         nextRagnarButtonInteractive.onRelease = function(event : hxd.Event) {
-            nextRagnarButton.setScale(1);
+            nextRagnarButton.setScale(1.2);
         }
         nextRagnarButtonInteractive.onClick = function(event : hxd.Event) {
             switchRagner('right');
         }
+        addChild(nextRagnarButtonInteractive);
     }
 
     public function update(dt:Float) {
-        screenShadowDisplacementTile.scrollDiscrete(1 * dt, 7 * dt);
+        screenDarknessDisplacementTile.scrollDiscrete(1 * dt, 7 * dt);
         leftBunny.update(dt);
         rightBunny.update(dt);
     }
 
     private function switchRagner(dir:String) {
         SoundManager.instance.playButton2();
+
+        NativeWindowJS.trackChangeCharacterClick();
 
         if (dir == 'right') {
             // Current is left, after one spin
