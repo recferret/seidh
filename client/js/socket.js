@@ -54,10 +54,6 @@ function wsConnect(playerId, callback) {
         callback({type: 'CreateConsumable', data});
     });
 
-    socket.on('DeleteConsumable', function(data) {
-        callback({type: 'DeleteCoin', data});
-    });
-
     socket.on('CharacterActions', function(data) {
         callback({type: 'CharacterActions', data});
     });

@@ -32,9 +32,9 @@ export class GatewayService implements OnModuleInit {
   }
 
   async authenticate(authenticateRequest: AuthenticateRequest) {
-    Logger.log(authenticateRequest);
     const request: UsersAuthenticateMessageRequest = {
       telegramInitData: authenticateRequest.telegramInitData,
+      email: authenticateRequest.email,
       startParam: authenticateRequest.startParam,
     };
     const result: UsersAuthenticateMessageResponse = await firstValueFrom(this.usersService.send(UsersAuthenticatePattern, request));

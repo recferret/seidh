@@ -15,9 +15,8 @@ export class User {
   @Prop({ default: false })
   online: boolean;
 
-
   // -----------------------
-  // Telegram
+  // Telegram and email auth
   // -----------------------
 
   @Prop()
@@ -28,6 +27,9 @@ export class User {
 
   @Prop()
   telegramPremium: boolean;
+
+  @Prop()
+  email: string;
 
   // -----------------------
   // Boosts

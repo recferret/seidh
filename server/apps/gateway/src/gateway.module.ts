@@ -5,9 +5,11 @@ import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     PrometheusModule.register({
       defaultLabels: {
         app: "Gateway",

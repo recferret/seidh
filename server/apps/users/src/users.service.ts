@@ -6,9 +6,9 @@ import {
 import { UsersCheckTokenMessageRequest, UsersCheckTokenMessageResponse } from '@app/seidh-common/dto/users/users.check.token.msg';
 import { UsersGetFriendsMessageRequest, UsersGetFriendsMessageResponse } from '@app/seidh-common/dto/users/users.get.friends.msg';
 import { CharacterBody, UserBody, UsersGetUserMessageRequest, UsersGetUserMessageResponse } from '@app/seidh-common/dto/users/users.get.user.msg';
-import { Character, CharacterDocument, CharacterType } from '@app/seidh-common/schemas/schema.character';
-import { User } from '@app/seidh-common/schemas/schema.user';
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Character, CharacterType } from '@app/seidh-common/schemas/schema.character';
+import { User, UserDocument } from '@app/seidh-common/schemas/schema.user';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,9 +16,10 @@ import { Model } from 'mongoose';
 const crypto = require('crypto');
 
 @Injectable()
-export class UsersService implements OnModuleInit {
+export class UsersService {
 
-  private readonly botKey = '7109468529:AAHvO4toPIdlBVgEJkDc8Yjozx1uXsM4QV8';
+  private readonly botKey = process.env.TG_BOT_KEY;
+  private readonly isProd = process.env.NODE_ENV == 'production';
 
   private readonly referrerPremiumRewardTokens = 1000;
   private readonly referrerNoPremiumRewardTokens = 200;
@@ -29,117 +30,142 @@ export class UsersService implements OnModuleInit {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Character.name) private characterModel: Model<Character>,
     private jwtService: JwtService
-  ) {}
-
-  async onModuleInit() {
-    // const xxx = this.parseTelegramInitData('query_id=AAEFln8BAAAAAAWWfwH0UjCO&user=%7B%22id%22%3A25138693%2C%22first_name%22%3A%22Andrey%22%2C%22last_name%22%3A%22Sokolov%22%2C%22username%22%3A%22FerretRec%22%2C%22language_code%22%3A%22ru%22%2C%22is_premium%22%3Atrue%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1716481616&hash=6c178e00d76e065a0eb274d65d02e637dbc209151b5c6538738d8c7d649c9e01');
-    // console.log(xxx);
-    // await this.authenticate({
-    //   telegramInitData: 'query_id=AAEFln8BAAAAAAWWfwH0UjCO&user=%7B%22id%22%3A25138693%2C%22first_name%22%3A%22Andrey%22%2C%22last_name%22%3A%22Sokolov%22%2C%22username%22%3A%22FerretRec%22%2C%22language_code%22%3A%22ru%22%2C%22is_premium%22%3Atrue%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1716481616&hash=6c178e00d76e065a0eb274d65d02e637dbc209151b5c6538738d8c7d649c9e01'
-    // });
+  ) {
   }
 
   async authenticate(message: UsersAuthenticateMessageRequest)  {
     const response: UsersAuthenticateMessageResponse = {
       success: false,
     };
-    const telegramParseResult = this.parseTelegramInitData(message.telegramInitData);
 
-    if (telegramParseResult.correctHash) {
-      function dbCharacterToStruct(c: any) {
-        const character = c as Character;
-        const characterStruct:UserCharacterStruct = {
-          id: character.id,
-          active: character.active,
-          type: character.type,
-          levelCurrent: character.levelCurrent,
-          levelMax: character.levelMax,
-          expCurrent: character.expCurrent,
-          expTillNewLevel: character.expTillNewLevel,
-          health: character.health,
-          movement: {
-            runSpeed: character.movement.runSpeed, 
-            walkSpeed: character.movement.walkSpeed,
-          },
-          actionMain: {
-            damage: character.actionMain.damage,
-          }
-        };
-        return characterStruct;
-      }
+    function dbCharacterToStruct(c: any) {
+      const character = c as Character;
+      const characterStruct:UserCharacterStruct = {
+        id: character.id,
+        active: character.active,
+        type: character.type,
+        levelCurrent: character.levelCurrent,
+        levelMax: character.levelMax,
+        expCurrent: character.expCurrent,
+        expTillNewLevel: character.expTillNewLevel,
+        health: character.health,
+        movement: {
+          runSpeed: character.movement.runSpeed, 
+          walkSpeed: character.movement.walkSpeed,
+        },
+        actionMain: {
+          damage: character.actionMain.damage,
+        }
+      };
+      return characterStruct;
+    }
 
-      response.success = true;
-      response.telegramName = telegramParseResult.userInfo.username;
+    let existingUser: UserDocument;
+    let telegramId: string;
+    let telegramName: string;
+    let telegramPremium: string;
+    let email: string;
 
-      const existingUser = await this.userModel.findOne({telegramId: telegramParseResult.userInfo.id}).populate(['characters']);
-
-      if (existingUser) {
-        response.userId = existingUser.id;
-        response.kills = existingUser.kills;
-        response.tokens = existingUser.virtualTokenBalance;
-        response.characters = existingUser.characters.map(dbCharacterToStruct);
-        response.authToken = await this.jwtService.signAsync({
-          userId: existingUser.id,
-          telegramId: telegramParseResult.userInfo.id
-        });
-
-        existingUser.authToken = response.authToken;
-        await existingUser.save();
+    if (this.isProd) {
+      const telegramParseResult = this.parseTelegramInitData(message.telegramInitData);
+      if (telegramParseResult.correctHash) {
+        response.success = true;
+        response.telegramName = telegramParseResult.userInfo.username;
+        telegramId = telegramParseResult.userInfo.id;
+        telegramName = telegramParseResult.userInfo.username;
+        telegramPremium = telegramParseResult.userInfo.is_premium;
+        existingUser = await this.userModel.findOne({telegramId: telegramParseResult.userInfo.id}).populate(['characters']);
       } else {
-        const newCharacter = await this.characterModel.create({
-          type: CharacterType.RagnarLoh,
-          movement: {
-            runSpeed: 20,
-            walkSpeed: 10,
-          },
-          actionMain: {
-            damage: 10
-          }
-        });
+        return response;
+      }
+    } else {
+      response.success = true;
+      email = message.email;
+      existingUser = await this.userModel.findOne({email: message.email}).populate(['characters']);
+    }
 
-        let virtualTokenBalance = 0;
+    if (existingUser) {
+      response.userId = existingUser.id;
+      response.kills = existingUser.kills;
+      response.tokens = existingUser.virtualTokenBalance;
+      response.characters = existingUser.characters.map(dbCharacterToStruct);
+      response.authToken = await this.jwtService.signAsync({
+        userId: existingUser.id,
+        telegramId,
+        email
+      });
 
-        const newUser = await this.userModel.create({
-          telegramId: telegramParseResult.userInfo.id,
-          telegramName: telegramParseResult.userInfo.username,
-          telegramPremium: telegramParseResult.userInfo.is_premium,
-          virtualTokenBalance,
-          characters: [newCharacter],
-        });
+      existingUser.authToken = response.authToken;
+      await existingUser.save();
+    } else {
+      const newCharacter = await this.characterModel.create({
+        type: CharacterType.RagnarLoh,
+        movement: {
+          runSpeed: 20,
+          walkSpeed: 10,
+        },
+        actionMain: {
+          damage: 10
+        }
+      });
 
-        const authToken = await this.jwtService.signAsync({
-          userId: newUser.id,
-          telegramId: telegramParseResult.userInfo.id
-        });
-        newUser.authToken = authToken;
+      let virtualTokenBalance = 0;
 
-        // TODO move to referral service
-        if (message.startParam) {
-          const referrer = await this.userModel.findOne({ id: message.startParam });
-          // Referrer exists and referrer is not the same user.
-          if (referrer && referrer.telegramId != telegramParseResult.userInfo.id) {
+      const newUser = await this.userModel.create({
+        telegramId,
+        telegramName,
+        telegramPremium,
+        email,
+        virtualTokenBalance,
+        characters: [newCharacter],
+      });
+
+      const authToken = await this.jwtService.signAsync({
+        userId: newUser.id,
+        telegramId,
+        email
+      });
+      newUser.authToken = authToken;
+
+      // TODO move to referral service
+      if (message.startParam) {
+        const referrer = await this.userModel.findOne({ id: message.startParam });
+        // Referrer exists and referrer is not the same user.
+        const notTheSameUser = this.isProd ? 
+          referrer.telegramId != telegramId :
+          referrer.email != email;
+
+        if (referrer && notTheSameUser) {
+          referrer.friendsInvited.push(newUser._id);
+
+          if (this.isProd) {
             // Give some bonus to the referrer
-            referrer.virtualTokenBalance += telegramParseResult.userInfo.telegramPremium ? 
+            referrer.virtualTokenBalance += telegramPremium ? 
               this.referrerPremiumRewardTokens : this.referrerNoPremiumRewardTokens;
-            referrer.friendsInvited.push(newUser._id);
 
             // Give some bonus to the referral
-            newUser.virtualTokenBalance = telegramParseResult.userInfo.telegramPremium ? 
+            newUser.virtualTokenBalance = telegramPremium ? 
               this.referralPremiumRewardTokens : this.referralNoPremiumRewardTokens;
-            newUser.invitedBy = referrer._id;
+          } else {
+            // Give some bonus to the referrer
+            referrer.virtualTokenBalance += this.referrerNoPremiumRewardTokens;
 
-            await referrer.save();
+            // Give some bonus to the referral
+            newUser.virtualTokenBalance = this.referralNoPremiumRewardTokens;
           }
+          newUser.invitedBy = referrer._id;
+
+          await referrer.save();
         }
-
-        await newUser.save();
-
-        response.userId = newUser.id;
-        response.kills = newUser.kills;
-        response.tokens = newUser.virtualTokenBalance;
-        response.characters = newUser.characters.map(dbCharacterToStruct);
-        response.authToken = authToken;
       }
+
+      await newUser.save();
+
+      response.userId = newUser.id;
+      response.kills = newUser.kills;
+      response.tokens = newUser.virtualTokenBalance;
+      response.characters = newUser.characters.map(dbCharacterToStruct);
+      response.authToken = authToken;
     }
 
     return response;

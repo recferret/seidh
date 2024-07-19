@@ -7,9 +7,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { Character, CharacterSchema } from '@app/seidh-common/schemas/schema.character';
 import { InternalProtocol } from '@app/seidh-common';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     MongooseModule.forRoot(InternalProtocol.MongoUrl),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
@@ -18,7 +20,7 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
     PrometheusModule.register(),
     JwtModule.register({
       global: true,
-      secret: 'MY SUPER SECRET',
+      secret: process.env.JWT_SECRET,
     }),
   ],
   controllers: [UsersController],
