@@ -4,7 +4,8 @@
   "description": "1) haxe .\\compile.hxml\r 2) copy *.html *.js ans resources to the server and serve static",
   "main": "common.js",
   "scripts": {
-    "build:prod": "npx gulp & npx terser ./prod/yandex/bundle.js --compress ecma=2015,computed_props=false -o ./prod/yandex/bundle.min.js"
+    "build:stage": "npx gulp & npx terser ./build/bundle.js --compress ecma=2015,computed_props=false -o ./build/stage/netlify/bundle.min.js",
+    "build:prod": "npx gulp & npx terser ./build/bundle.js --compress ecma=2015,computed_props=false -o ./build/prod/yandex/bundle.min.js"
   },
   "author": "Andrey Sokolov",
   "license": "ISC",

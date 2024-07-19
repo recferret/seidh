@@ -3,8 +3,6 @@
 -lib heaps
 -lib uuid
 -lib actuate
-# -lib haxeui-core
-# -lib haxeui-heaps
 
 -js game.js
 -main Main

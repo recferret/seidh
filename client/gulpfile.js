@@ -15,7 +15,7 @@ function defaultTask(cb) {
             'game.js',
         ])
         .pipe(concat('bundle.js'))
-        .pipe(gulp.dest('prod/yandex'));
+        .pipe(gulp.dest('build'));
     cb();
 }
   

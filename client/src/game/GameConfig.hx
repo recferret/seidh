@@ -17,10 +17,10 @@ class GameConfig {
 	public static var PlayMusic = true;
 	public static var PlaySounds = true;
 
-	public static var Production = true;
+	public static var Production = false;
 	public static var DebugDraw = false;
 
-	public static final ResProvider = ResourceProvider.YANDEX_S3;
+	public static final ResProvider = ResourceProvider.LOCAL;
 	public static final TelegramAuth = false;
 	public static final Analytics = false;
 }

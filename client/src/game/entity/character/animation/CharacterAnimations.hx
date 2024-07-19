@@ -217,12 +217,23 @@ class CharacterAnimations {
             ], leftOffsetX)
         );
 
+        // Flip on the fly ?
         animation.loadRun(
             [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_1),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_2),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_3),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_4),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_5),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_6),
             ],
             flipTilesLeft([
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_1),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_2),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_3),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_4),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_5),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_6),
             ], leftOffsetX)
         );
 
