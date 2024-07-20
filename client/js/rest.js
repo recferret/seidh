@@ -13,7 +13,7 @@ async function restFindGame(playerId) {
     return findGameData;
 }
 
-async function restPostTelegramInitData(telegramInitData, startParam, callback) {
+async function restAuthenticate(telegramInitData, email, referrerId, callback) {
     const authenticateResult = await fetch(restUrl + 'authenticate', {
         method: 'POST',
         headers: {
@@ -21,7 +21,8 @@ async function restPostTelegramInitData(telegramInitData, startParam, callback) 
         },
         body: JSON.stringify({
             telegramInitData,
-            startParam
+            email,
+            referrerId
         })
     });
     const authenticateData = await authenticateResult.json();

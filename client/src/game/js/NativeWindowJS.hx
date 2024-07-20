@@ -16,7 +16,7 @@ extern class NativeWindowJS {
     static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;
 
     // Rest
-    static function restPostTelegramInitData(telegramInitData:String, startParam:String, callback:Dynamic->Void):Void;
+    static function restAuthenticate(telegramInitData:String, email:String, referrerId:String, callback:Dynamic->Void):Void;
 
     // Common
     static function getGameConfig():Dynamic;

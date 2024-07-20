@@ -252,6 +252,14 @@ class Res {
                 remoteResourceMap.set(RAGNAR_DUDE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_DUDE.png');
                 remoteResourceMap.set(RAGNAR_NORM, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_NORM.png');
                 remoteResourceMap.set(RAGNAR_BASE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_BASE.png');
+
+                remoteResourceMap.set(RAGNAR_RUN_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_1.png');
+                remoteResourceMap.set(RAGNAR_RUN_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_2.png');
+                remoteResourceMap.set(RAGNAR_RUN_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_3.png');
+                remoteResourceMap.set(RAGNAR_RUN_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_4.png');
+                remoteResourceMap.set(RAGNAR_RUN_5, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_5.png');
+                remoteResourceMap.set(RAGNAR_RUN_6, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_6.png');
+
                 remoteResourceMap.set(RAGNAR_BORODA_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_BORODA_1.png');
                 remoteResourceMap.set(RAGNAR_BORODA_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_BORODA_2.png');
                 remoteResourceMap.set(RAGNAR_USI_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_USI_1.png');
@@ -388,7 +396,6 @@ class Res {
                 tileResMap.set(RAGNAR_RUN_5, hxd.Res.ragnar.RAGNAR_RUN_5.toTile().center());
                 tileResMap.set(RAGNAR_RUN_6, hxd.Res.ragnar.RAGNAR_RUN_6.toTile().center());
 
-                
                 tileResMap.set(RAGNAR_BORODA_1, hxd.Res.ragnar.RAGNAR_BORODA_1.toTile().center());
                 tileResMap.set(RAGNAR_BORODA_2, hxd.Res.ragnar.RAGNAR_BORODA_2.toTile().center());
                 tileResMap.set(RAGNAR_USI_1, hxd.Res.ragnar.RAGNAR_USI_1.toTile().center());

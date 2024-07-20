@@ -22,6 +22,9 @@ class GameConfig {
 	public final PlaySounds:Bool;
 	public final TelegramAuth:Bool;
 	public final Analytics:Bool;
+	public final Serverless:Bool;
+	public final TestEmail:String;
+	public final TestReferrerId:String;
 	public final ResProvider = ResourceProvider.LOCAL;
 
 	public static final instance:GameConfig = new GameConfig();
@@ -35,6 +38,9 @@ class GameConfig {
 		PlaySounds = gameConfig.PlaySounds;
 		TelegramAuth = gameConfig.TelegramAuth;
 		Analytics = gameConfig.Analytics;
+		Serverless = gameConfig.Serverless;
+		TestEmail = gameConfig.TestEmail;
+		TestReferrerId = gameConfig.TestReferrerId;
 	}
 
 }

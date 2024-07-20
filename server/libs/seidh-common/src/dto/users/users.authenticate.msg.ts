@@ -18,7 +18,7 @@ export interface UserCharacterStruct {
 export interface UsersAuthenticateMessageRequest {
     telegramInitData?: string;
     email?: string;
-    startParam?: string;
+    referrerId?: string;
 }
 
 export interface UsersAuthenticateMessageResponse {

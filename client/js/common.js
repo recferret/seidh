@@ -1,7 +1,7 @@
-const restUrl = 'https://api.seidh-game.com/';
-// const restUrl = 'http://localhost:3003/';
-const socketUrl = 'wss://api.seidh-game.com/';
-// const socketUrl = 'ws://localhost:3004/';
+// const restUrl = 'https://api.seidh-game.com/';
+const restUrl = 'http://localhost:3003/';
+// const socketUrl = 'wss://api.seidh-game.com/';
+const socketUrl = 'ws://localhost:3004/';
 
 function getGameConfig() {
     return {
@@ -11,6 +11,9 @@ function getGameConfig() {
         PlaySounds: false,
         TelegramAuth: false,
         Analytics: false,
+        Serverless: false,
+        TestEmail: 'test1@gmail.com',
+        TestReferrerId: '1234',
     }
 }
 

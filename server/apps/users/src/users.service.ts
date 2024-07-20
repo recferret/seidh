@@ -6,11 +6,12 @@ import {
 import { UsersCheckTokenMessageRequest, UsersCheckTokenMessageResponse } from '@app/seidh-common/dto/users/users.check.token.msg';
 import { UsersGetFriendsMessageRequest, UsersGetFriendsMessageResponse } from '@app/seidh-common/dto/users/users.get.friends.msg';
 import { CharacterBody, UserBody, UsersGetUserMessageRequest, UsersGetUserMessageResponse } from '@app/seidh-common/dto/users/users.get.user.msg';
-import { Character, CharacterType } from '@app/seidh-common/schemas/schema.character';
+import { Character, CharacterDocument, CharacterType } from '@app/seidh-common/schemas/schema.character';
 import { User, UserDocument } from '@app/seidh-common/schemas/schema.user';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
+import { trace } from 'console';
 import { Model } from 'mongoose';
 
 const crypto = require('crypto');
@@ -39,7 +40,7 @@ export class UsersService {
     };
 
     function dbCharacterToStruct(c: any) {
-      const character = c as Character;
+      const character = c as CharacterDocument;
       const characterStruct:UserCharacterStruct = {
         id: character.id,
         active: character.active,
@@ -63,7 +64,7 @@ export class UsersService {
     let existingUser: UserDocument;
     let telegramId: string;
     let telegramName: string;
-    let telegramPremium: string;
+    let telegramPremium: boolean;
     let email: string;
 
     if (this.isProd) {
@@ -74,14 +75,15 @@ export class UsersService {
         telegramId = telegramParseResult.userInfo.id;
         telegramName = telegramParseResult.userInfo.username;
         telegramPremium = telegramParseResult.userInfo.is_premium;
-        existingUser = await this.userModel.findOne({telegramId: telegramParseResult.userInfo.id}).populate(['characters']);
+        existingUser = await this.userModel.findOne({telegramId}).populate(['characters']);
       } else {
         return response;
       }
     } else {
       response.success = true;
       email = message.email;
-      existingUser = await this.userModel.findOne({email: message.email}).populate(['characters']);
+      existingUser = await this.userModel.findOne({email}).populate(['characters']);
+      Logger.log(email);
     }
 
     if (existingUser) {
@@ -111,25 +113,18 @@ export class UsersService {
 
       let virtualTokenBalance = 0;
 
-      const newUser = await this.userModel.create({
+      const newUser = new this.userModel({
         telegramId,
         telegramName,
         telegramPremium,
         email,
         virtualTokenBalance,
-        characters: [newCharacter],
+        characters: [newCharacter]
       });
-
-      const authToken = await this.jwtService.signAsync({
-        userId: newUser.id,
-        telegramId,
-        email
-      });
-      newUser.authToken = authToken;
 
       // TODO move to referral service
-      if (message.startParam) {
-        const referrer = await this.userModel.findOne({ id: message.startParam });
+      if (message.referrerId) {
+        const referrer = await this.userModel.findById(message.referrerId);
         // Referrer exists and referrer is not the same user.
         const notTheSameUser = this.isProd ? 
           referrer.telegramId != telegramId :
@@ -159,6 +154,12 @@ export class UsersService {
         }
       }
 
+      const authToken = await this.jwtService.signAsync({
+        userId: newUser.id,
+        telegramId,
+        email
+      });
+      newUser.authToken = authToken;
       await newUser.save();
 
       response.userId = newUser.id;
