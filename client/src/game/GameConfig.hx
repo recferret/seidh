@@ -1,5 +1,7 @@
 package game;
 
+import game.js.NativeWindowJS;
+
 enum ResourceProvider {
     LOCAL;
 	YANDEX_S3;
@@ -14,13 +16,25 @@ class GameConfig {
 	public static final XpBarColor = 0xfcff76;
 	public static final FontColor = 0xebddae;
 
-	public static var PlayMusic = true;
-	public static var PlaySounds = true;
+	public final Production:Bool;
+	public final DebugDraw:Bool;
+	public final PlayMusic:Bool;
+	public final PlaySounds:Bool;
+	public final TelegramAuth:Bool;
+	public final Analytics:Bool;
+	public final ResProvider = ResourceProvider.LOCAL;
 
-	public static var Production = false;
-	public static var DebugDraw = false;
+	public static final instance:GameConfig = new GameConfig();
 
-	public static final ResProvider = ResourceProvider.LOCAL;
-	public static final TelegramAuth = false;
-	public static final Analytics = false;
+	private function new() {
+		final gameConfig = NativeWindowJS.getGameConfig();
+
+		Production = gameConfig.Production;
+		DebugDraw = gameConfig.DebugDraw;
+		PlayMusic = gameConfig.PlayMusic;
+		PlaySounds = gameConfig.PlaySounds;
+		TelegramAuth = gameConfig.TelegramAuth;
+		Analytics = gameConfig.Analytics;
+	}
+
 }

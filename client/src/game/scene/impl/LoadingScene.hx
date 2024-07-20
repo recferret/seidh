@@ -15,13 +15,13 @@ class LoadingScene extends BasicScene {
 	// --------------------------------------
 
 	public function start() {
-        if (GameConfig.TelegramAuth) {
+        if (GameConfig.instance.TelegramAuth) {
             final tgInitData = NativeWindowJS.tgGetInitData(); 
             if (tgInitData == null || tgInitData.length == 0) {
-                if (GameConfig.Analytics) 
+                if (GameConfig.instance.Analytics) 
                     NativeWindowJS.telemetreeInit(false);
             } else {
-                if (GameConfig.Analytics) 
+                if (GameConfig.instance.Analytics) 
                     NativeWindowJS.telemetreeInit(true);
 
                 final tgUnsafeData = NativeWindowJS.tgGetInitDataUnsafe();

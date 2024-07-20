@@ -1,6 +1,3 @@
-// const restUrl = 'http://localhost:3003/';
-const restUrl = 'https://api.seidh-game.com/';
-
 async function restFindGame(playerId) {
     const findGameResult = await fetch(restUrl + 'findGame', {
         method: 'POST',

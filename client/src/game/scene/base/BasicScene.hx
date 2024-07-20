@@ -316,7 +316,7 @@ abstract class BasicScene extends h2d.Scene {
 
 	public override function render(e:Engine) {
 		for (character in clientCharacterEntities) {
-			if (GameConfig.DebugDraw) {
+			if (GameConfig.instance.DebugDraw) {
 				character.debugDraw(debugGraphics);
 			}
 		}

@@ -69,10 +69,10 @@ class Main extends hxd.App {
 	}
 
 	static function main() {
-		if (GameConfig.ResProvider == ResourceProvider.LOCAL) {
-			#if debug
+		if (GameConfig.instance.ResProvider == ResourceProvider.LOCAL) {
+			// #if debug
 				hxd.Res.initEmbed();
-			#end
+			// #end
 		}
 		new Main();
 	}

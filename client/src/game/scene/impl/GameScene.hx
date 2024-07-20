@@ -58,7 +58,7 @@ class GameScene extends BasicScene implements EventListener {
 		// Visual borders
 		// -------------------------------------------
 
-		if (GameConfig.Production) {
+		if (GameConfig.instance.Production) {
 			// Top
 			final topBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, Std.int(SeidhGameEngine.GameWorldSize / 2), 1));
 			topBorder.setPosition(0, -topBorder.tile.height);
@@ -147,7 +147,7 @@ class GameScene extends BasicScene implements EventListener {
 		
 		sortObjectsByZOrder();
 
-		if (GameConfig.DebugDraw) {
+		if (GameConfig.instance.DebugDraw) {
 			for (line in seidhGameEngine.getLineColliders()) {
 				Utils.DrawLine(
 					debugGraphics,

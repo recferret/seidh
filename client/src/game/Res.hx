@@ -210,7 +210,7 @@ class Res {
             resCallback = callback;
 
             initialized = true;
-            if (GameConfig.ResProvider == ResourceProvider.YANDEX_S3) { 
+            if (GameConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) { 
                 // ------------------------------------
                 // FX
                 // ------------------------------------
@@ -341,7 +341,7 @@ class Res {
                 remoteResourceMap.set(ZOMBIE_GIRL, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL.png');
 
                 loadRemoteResources();
-            } else if (GameConfig.ResProvider == ResourceProvider.LOCAL) {
+            } else if (GameConfig.instance.ResProvider == ResourceProvider.LOCAL) {
                 // ------------------------------------
                 // FX
                 // ------------------------------------
@@ -491,7 +491,7 @@ class Res {
 	}
 
     public function loadRemoteResources() {
-        if (GameConfig.ResProvider == ResourceProvider.YANDEX_S3) {
+        if (GameConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) {
             var remoteResCount = 0;
             for (key in remoteResourceMap.keys()) {
                 remoteResCount++;

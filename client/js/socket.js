@@ -1,8 +1,5 @@
 let socket = undefined;
 
-// const socketUrl = 'ws://localhost:3004/';
-const socketUrl = 'wss://api.seidh-game.com/';
-
 function wsConnect(playerId, callback) {
     socket = io(socketUrl, {
         transport: [ "websocket" ],

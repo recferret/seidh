@@ -21,7 +21,7 @@ class SceneManager implements EventListener {
 		EventManager.instance.subscribe(EventManager.EVENT_HOME_SCENE, this);
 		EventManager.instance.subscribe(EventManager.EVENT_REF_SHARE, this);
 
-		currentScene = new GameScene(EngineMode.CLIENT_SINGLEPLAYER);
+		// currentScene = new GameScene(EngineMode.CLIENT_SINGLEPLAYER);
 		// currentScene = new GameScene(EngineMode.CLIENT_MULTIPLAYER);
 
 		// currentScene = new HomeScene();
@@ -32,7 +32,7 @@ class SceneManager implements EventListener {
 		// currentScene = new SceneNetworkTest();
 		// currentScene = new SceneUiTest();
 
-		// currentScene = new LoadingScene();
+		currentScene = new LoadingScene();
 		currentScene.start();
 
 		changeSceneCallback();

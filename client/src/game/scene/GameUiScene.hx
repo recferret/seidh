@@ -83,7 +83,7 @@ class MovementController extends h2d.Object {
 	}
 
 	public function update() {
-		if (GameConfig.DebugDraw) {
+		if (GameConfig.instance.DebugDraw) {
 			customGraphics.clear();
 		}
 
@@ -95,7 +95,7 @@ class MovementController extends h2d.Object {
 
 			controlTargetPos = MathUtils.rotatePointAroundCenter(p1.x + 80, p1.y, p1.x, p1.y, angle);
 
-			if (GameConfig.DebugDraw) {
+			if (GameConfig.instance.DebugDraw) {
 				customGraphics.lineStyle(2, 0xEA8220);
 				customGraphics.moveTo(p1.x, p1.y);
 				customGraphics.lineTo(controlTargetPos.x, controlTargetPos.y);
@@ -103,7 +103,7 @@ class MovementController extends h2d.Object {
 			}
 		}
 
-		if (GameConfig.DebugDraw) {
+		if (GameConfig.instance.DebugDraw) {
 			Utils.DrawRect(customGraphics, shapeRect, GameConfig.RedColor);
 		}
 	}

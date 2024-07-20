@@ -53,7 +53,7 @@ class SoundManager {
     }
 
     public function playMenuTheme() {
-        if (menuTheme != null && GameConfig.PlayMusic) {
+        if (menuTheme != null && GameConfig.instance.PlayMusic) {
             menuTheme.play(true);
         }
         if (gameplayTheme != null ){
@@ -62,7 +62,7 @@ class SoundManager {
     }
 
     public function playGameplayTheme() {
-        if (gameplayTheme != null && GameConfig.PlayMusic) {
+        if (gameplayTheme != null && GameConfig.instance.PlayMusic) {
             gameplayTheme.play(true);
         }
         if (menuTheme != null) {
@@ -119,7 +119,7 @@ class SoundManager {
     }
 
     private function allowPlaySound(sound:Sound) {
-        return sound != null && GameConfig.PlaySounds && haxe.Timer.stamp() - sound.lastPlay > 0.1;
+        return sound != null && GameConfig.instance.PlaySounds && haxe.Timer.stamp() - sound.lastPlay > 0.1;
     }
 
 }

@@ -19,6 +19,7 @@ extern class NativeWindowJS {
     static function restPostTelegramInitData(telegramInitData:String, startParam:String, callback:Dynamic->Void):Void;
 
     // Common
+    static function getGameConfig():Dynamic;
     static function getMobile():String;
     static function getScreenParams():Dynamic;
     static function alertScreenParams():Void;

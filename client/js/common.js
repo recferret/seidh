@@ -1,7 +1,21 @@
-const md = new MobileDetect(window.navigator.userAgent);
+const restUrl = 'https://api.seidh-game.com/';
+// const restUrl = 'http://localhost:3003/';
+const socketUrl = 'wss://api.seidh-game.com/';
+// const socketUrl = 'ws://localhost:3004/';
+
+function getGameConfig() {
+    return {
+        Production: false,
+        DebugDraw: true,
+        PlayMusic: false,
+        PlaySounds: false,
+        TelegramAuth: false,
+        Analytics: false,
+    }
+}
 
 function getMobile() {
-    return md.mobile();
+    return new MobileDetect(window.navigator.userAgent).mobile();
 }
 
 function getCanvasAndDpr() {
