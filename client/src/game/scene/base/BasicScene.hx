@@ -34,10 +34,10 @@ typedef BasicSceneClickCallback = {
 // TODO this is not a basic scene, it a game actually
 abstract class BasicScene extends h2d.Scene {
 
+    public static var NetworkingInstance:Networking;
+
 	public final seidhGameEngine:SeidhGameEngine;
 	public final terrainManager:TerrainManager;
-
-    public var networking:Networking;
 	public var debugGraphics:h2d.Graphics;
 
 	private var gameUiScene:GameUiScene;
@@ -83,7 +83,7 @@ abstract class BasicScene extends h2d.Scene {
 				character.initiateEngineEntity(characterEntity);
 				clientCharacterEntities.set(character.getId(), character);
 
-				if (character.getOwnerId() == Player.instance.playerId) {
+				if (character.getOwnerId() == Player.instance.userId) {
 					playerEntity = character;
 					NativeWindowJS.trackGameStarted();
 				}
@@ -161,11 +161,12 @@ abstract class BasicScene extends h2d.Scene {
 					}
 				}
 
-				if (networking != null) {
+				if (BasicScene.NetworkingInstance != null) {
 					for (input in seidhGameEngine.validatedInputCommands) {
-						if (input.playerId == Player.instance.playerId) {
+						trace(input.userId, Player.instance.userId);
+						if (input.userId == Player.instance.userId) {
 							inputsSent++;
-							networking.input(input);
+							BasicScene.NetworkingInstance.input(input);
 						}
 					}
 				}
@@ -200,10 +201,12 @@ abstract class BasicScene extends h2d.Scene {
 			this.seidhGameEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
 					NativeWindowJS.trackGameWin();
-					gameUiScene.showWinDialog(this.seidhGameEngine.getPlayerKills(playerEntity.getOwnerId()));
+					gameUiScene.showWinDialog(0);
 				} else if (gameState == GameState.LOSE) {
 					NativeWindowJS.trackGameLose();
-					gameUiScene.showLoseDialog(this.seidhGameEngine.getPlayerKills(playerEntity.getOwnerId()));
+					gameUiScene.showLoseDialog(0);
+					trace('PLAYER KILLED ?');
+					trace(this.seidhGameEngine.getPlayerGainings(Player.instance.userId));
 				} else {
 					trace('Game Over!');
 				}
@@ -252,8 +255,8 @@ abstract class BasicScene extends h2d.Scene {
 	public abstract function customUpdate(dt:Float, fps:Float):Void;
 
 	public function initNetwork() {
-		if (networking == null) {
-			networking = new Networking();
+		if (BasicScene.NetworkingInstance == null) {
+			BasicScene.NetworkingInstance = new Networking();
 		}
 	}
 
@@ -270,14 +273,14 @@ abstract class BasicScene extends h2d.Scene {
 				if (gameUiScene == null) {
 					gameUiScene = new GameUiScene(
 						isMobileDevice,
-						function callback(buttonPressed:ButtonPressed) {
+						function buttonPressedCallback(buttonPressed:ButtonPressed) {
 							switch (buttonPressed) {
 								case ButtonPressed.A:
 									addInputCommand(CharacterActionType.ACTION_MAIN);
 								default:
 							}
 						},
-						function callback(angle:Float) {
+						function joystickMovedCallback(angle:Float) {
 							addInputCommand(CharacterActionType.MOVE, angle);
 						}
 					);
@@ -368,15 +371,15 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	private function addInputCommand(characterActionType:CharacterActionType, moveAngle:Float = 0) {
-		final playerId = Player.instance.playerId;
-		final playerEntityId = Player.instance.playerEntityId;
+		final userId = Player.instance.userId;
+		final userEntityId = Player.instance.userEntityId;
 
 		final allowInput = characterActionType == CharacterActionType.MOVE ? 
-		seidhGameEngine.checkLocalMovementInputAllowance(playerEntityId) :
-			seidhGameEngine.checkLocalActionInputAllowance(playerEntityId, characterActionType);
-
+			seidhGameEngine.checkLocalMovementInputAllowance(userEntityId) :
+			seidhGameEngine.checkLocalActionInputAllowance(userEntityId, characterActionType);
+		
 		if (allowInput) {
-			seidhGameEngine.addInputCommandClient(new PlayerInputCommand(characterActionType, moveAngle, playerId, Player.instance.incrementAndGetInputIndex()));
+			seidhGameEngine.addInputCommandClient(new PlayerInputCommand(characterActionType, moveAngle, userId, Player.instance.incrementAndGetInputIndex()));
 		}
 	}
 

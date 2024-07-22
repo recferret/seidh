@@ -8,10 +8,9 @@ import { UsersGetFriendsMessageRequest, UsersGetFriendsMessageResponse } from '@
 import { CharacterBody, UserBody, UsersGetUserMessageRequest, UsersGetUserMessageResponse } from '@app/seidh-common/dto/users/users.get.user.msg';
 import { Character, CharacterDocument, CharacterType } from '@app/seidh-common/schemas/schema.character';
 import { User, UserDocument } from '@app/seidh-common/schemas/schema.user';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
-import { trace } from 'console';
 import { Model } from 'mongoose';
 
 const crypto = require('crypto');
@@ -80,13 +79,12 @@ export class UsersService {
         return response;
       }
     } else {
-      response.success = true;
       email = message.email;
       existingUser = await this.userModel.findOne({email}).populate(['characters']);
-      Logger.log(email);
     }
 
     if (existingUser) {
+      response.success = true;
       response.userId = existingUser.id;
       response.kills = existingUser.kills;
       response.tokens = existingUser.virtualTokenBalance;
@@ -162,6 +160,7 @@ export class UsersService {
       newUser.authToken = authToken;
       await newUser.save();
 
+      response.success = true;
       response.userId = newUser.id;
       response.kills = newUser.kills;
       response.tokens = newUser.virtualTokenBalance;

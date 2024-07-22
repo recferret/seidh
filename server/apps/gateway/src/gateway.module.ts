@@ -33,7 +33,7 @@ import { ConfigModule } from '@nestjs/config';
     ]),
     JwtModule.register({
       global: true,
-      secret: 'MY SUPER SECRET',
+      secret: process.env.JWT_SECRET,
     }),
   ],
   controllers: [GatewayController],

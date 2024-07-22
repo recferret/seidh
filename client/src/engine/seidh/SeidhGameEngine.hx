@@ -28,6 +28,8 @@ class SeidhGameEngine extends BaseEngine {
     private var mobSpawnDelayMs = 0.500;
     
     private final playerZombieKills = new Map<String, Int>();
+    private final playerTokensAccquired = new Map<String, Int>();
+    private final playerExpGained = new Map<String, Int>();
     private final lineColliders = new Array<engine.base.geometry.Line>();
 
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
@@ -44,6 +46,10 @@ class SeidhGameEngine extends BaseEngine {
 
     public function new(engineMode:EngineMode) {
 	    super(engineMode);
+
+        // mobsSpawnPoints.push(new Point(2000, 2000));
+        // mobsSpawnPoints.push(new Point(2000, 3000));
+        // mobsSpawnPoints.push(new Point(2000, 2500));
 
         // Top
 		addLineCollider(0, 0, GameWorldSize, 0);
@@ -89,7 +95,7 @@ class SeidhGameEngine extends BaseEngine {
     public function processInputCommands(playerInputCommands:Array<InputCommandEngineWrapped>) {
         for (i in playerInputCommands) {
 			final input = cast(i.playerInputCommand, PlayerInputCommand);
-			final inputInitiator = input.playerId;
+			final inputInitiator = input.userId;
 			final entityId = playerToEntityMap.get(inputInitiator);
 			final entity = cast(characterEntityManager.getEntityById(entityId), SeidhBaseEntity);
 
@@ -163,22 +169,33 @@ class SeidhGameEngine extends BaseEngine {
 
             for (e in characterEntityManager.entities) {
                 final character1 = cast(e, EngineCharacterEntity);
+                final character1Id = character1.getId();
+                final character1OwnerId = character1.getOwnerId();
 
                 if (character1.isAlive) {
                     character1.update(dt);
 
                     if (character1.isPlayer()) {
+
                         for (c in consumableEntityManager.entities) {
                             final consumable = cast(c, EngineConsumableEntity);
 
                             if (character1.getBodyRectangle().getCenter().distance(consumable.getBodyRectangle().getCenter()) < 150) {
                                 if (character1.getBodyRectangle().containsRect(consumable.getBodyRectangle())) {
                                     if (consumable.getEntityType() == EntityType.COIN) {
-                                        // TODO add coins
+                                        // Increase tokens accquired
+                                        final currentBalance = playerTokensAccquired.get(character1OwnerId);
+                                        if (currentBalance != null) {
+                                            playerTokensAccquired.set(character1OwnerId, currentBalance + 1);
+                                        } else {
+                                            playerTokensAccquired.set(character1OwnerId, 1);
+                                        }
                                     } else {
+                                        // Give health
                                         character1.addHealth(consumable.amount);
                                     }
-                                    deleteConsumableEntity(consumable.getId(), character1.getId());
+
+                                    deleteConsumableEntity(consumable.getId(), character1Id);
                                 }
                             }
                         }
@@ -203,7 +220,7 @@ class SeidhGameEngine extends BaseEngine {
                         final projectile = cast(e, EngineProjectileEntity);
 
                         // Skip self collision
-                        if (projectile.getOwnerId() != character1.getOwnerId()) {
+                        if (projectile.getOwnerId() != character1OwnerId) {
                             final projectileRect = projectile.getBodyRectangle();
                             final characterRect = character1.getBodyRectangle();
 
@@ -231,7 +248,7 @@ class SeidhGameEngine extends BaseEngine {
                         for (e2 in characterEntityManager.entities) {
                             final character2 = cast(e2, EngineCharacterEntity);
                             // TODO add distance check here
-                            if (character2.isAlive && character1.getId() != character2.getId()) {
+                            if (character2.isAlive && character1Id != character2.getId()) {
                                 final characterHasActionRect = character1.getCurrentActionRect() != null;
                                 final chatacterHitsAnother = character1.getCurrentActionRect().containsRect(character2.getBodyRectangle()); 
                                 final skipBotToBotAttack = character1.isBot() && character2.isBot();
@@ -240,11 +257,28 @@ class SeidhGameEngine extends BaseEngine {
                                         final health = character2.subtractHealth(character1.actionToPerform.damage);
                                         if (health == 0) {
                                             // Zombie killed
-                                            // Update counter, spawn token
                                             if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
+                                                // Update counters
                                                 mobsKilled++;
                                                 mobsSpawned--;
-                                                playerZombieKills.set(character1.getOwnerId(), playerZombieKills.get(character1.getOwnerId()) + 1);
+
+                                                // Update player kills
+                                                final currentKills = playerZombieKills.get(character1OwnerId);
+                                                if (currentKills != null) {
+                                                    playerZombieKills.set(character1OwnerId, currentKills + 1);
+                                                } else {
+                                                    playerZombieKills.set(character1OwnerId, 1);
+                                                }
+
+                                                // Update current player character exp
+                                                final currentExp = playerExpGained.get(character1OwnerId);
+                                                if (currentExp != null) {
+                                                    playerExpGained.set(character1OwnerId, currentExp + 1);
+                                                } else {
+                                                    playerExpGained.set(character1OwnerId, 1);
+                                                }
+
+                                                // Create a new random consumable
                                                 createConsumable(character2);
                                             }
                                             character2.isAlive = false;
@@ -319,8 +353,7 @@ class SeidhGameEngine extends BaseEngine {
             mobsSpawned++;
             mobsLastSpawnTime = now;
 
-            // TODO make sure that it works properly
-            final mobSpawnPoint = mobsSpawnPoints[MathUtils.randomIntInRange(1, mobsSpawnPoints.length - 1)];
+            final mobSpawnPoint = mobsSpawnPoints[MathUtils.randomIntInRange(0, mobsSpawnPoints.length - 1)];
             final positionX = Std.int(mobSpawnPoint.x);
             final positionY = Std.int(mobSpawnPoint.y);
 
@@ -350,16 +383,18 @@ class SeidhGameEngine extends BaseEngine {
             characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL).length;
     }
 
-    public function getPlayerKills(playerId:String) {
-        if (playerZombieKills.exists(playerId)) {
-            return playerZombieKills.get(playerId);
-        } else {
-            return 0;
-        }
+    public function getPlayerGainings(playerId:String) {
+        return {
+            kills: playerZombieKills.exists(playerId) ? playerZombieKills.get(playerId) : 0,
+            tokens: playerTokensAccquired.exists(playerId) ? playerTokensAccquired.get(playerId) : 0,
+            exp: playerExpGained.exists(playerId) ? playerExpGained.get(playerId) : 0,
+        };
     }
 
-    public function clearPlayerKills(playerId:String) {
+    public function clearPlayerGainings(playerId:String) {
         playerZombieKills.remove(playerId);
+        playerTokensAccquired.remove(playerId);
+        playerExpGained.remove(playerId);
     }
 
     public function lose() {
@@ -393,7 +428,7 @@ class SeidhGameEngine extends BaseEngine {
         var nearestPlayerDistance:Float = 0.0;
 
         for (targetEntity in characterEntityManager.entities) {
-            if (targetEntity.getEntityType() == EntityType.RAGNAR_LOH || targetEntity.getEntityType() == EntityType.RAGNAR_NORM) {
+            if (targetEntity.isPlayer()) {
                 final dist = entity.getBodyRectangle().getCenter().distance(targetEntity.getBodyRectangle().getCenter());
                 if (nearestPlayer == null || dist < nearestPlayerDistance) {
                     nearestPlayer = targetEntity;

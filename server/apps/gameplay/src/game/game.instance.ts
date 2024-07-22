@@ -25,6 +25,8 @@ import { EventGameLoopState } from "../events/event.game.loop-state";
 import { EventGameGameState } from "../events/event.game.game-state";
 import { EventGameDeleteConsumable } from "../events/event.game.delete-consumable";
 import { EventGameCreateConsumable } from "../events/event.game.create-consumable";
+import { Logger } from "@nestjs/common";
+import { EventGameInit } from "../events/event.game.init";
 
 export class GameInstance {
 
@@ -47,9 +49,31 @@ export class GameInstance {
             if (this.engine.getPlayersCount() > 0)  {
                 this.engine.allowMobsSpawn(true);
             }
+
+            // Notify every new player about the game state
+            if (characterEntity.isPlayer()) {
+                const charactersFullStruct: CharacterEntityFullStruct[] = [];
+                for (const entity of this.engine.getCharactersStruct({ changed: false, full: true })) {
+                    charactersFullStruct.push(entity);
+                }
+    
+                if (charactersFullStruct.length > 0) {
+                    this.eventEmitter.emit(
+                        EventGameInit.EventName, 
+                        new EventGameInit(
+                            gameId,
+                            charactersFullStruct
+                        )
+                    );
+                }
+            }
         };
 
         this.engine.deleteCharacterCallback = (characterEntity: EngineCharacterEntity) => {
+            if (characterEntity.isPlayer()) {
+                Logger.log(this.engine.getPlayerGainings(characterEntity.getId()));
+            }
+
             this.eventEmitter.emit(
                 EventGameDeleteCharacter.EventName,
                 new EventGameDeleteCharacter(gameId, characterEntity.getEntityMinStruct().id)
@@ -88,18 +112,12 @@ export class GameInstance {
                 charactersMinStruct.push(entity);
             }
 
-            const charactersFullStruct: CharacterEntityFullStruct[] = [];
-            for (const entity of this.engine.getCharactersStruct({ changed: false, full: true })) {
-                charactersFullStruct.push(entity);
-            }
-
-            if (charactersMinStruct.length > 0 || charactersFullStruct.length > 0) {
+            if (charactersMinStruct.length > 0) {
                 this.eventEmitter.emit(
                     EventGameLoopState.EventName, 
                     new EventGameLoopState(
                         gameId,
-                        charactersMinStruct,
-                        charactersFullStruct
+                        charactersMinStruct
                     )
                 );
             }

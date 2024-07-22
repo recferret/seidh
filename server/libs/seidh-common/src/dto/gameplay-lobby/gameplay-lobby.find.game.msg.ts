@@ -6,7 +6,7 @@ export enum GameType {
 }
 
 export interface GameplayLobbyFindGameMessageRequest {
-    playerId: string;
+    userId: string;
     gameId?: string;
     gameType?: GameType;
 }

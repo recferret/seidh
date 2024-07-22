@@ -1,22 +1,22 @@
 let _currentGameplayServiceId = undefined;
-let _playerId = undefined;
+let _authToken = undefined;
 
-function networkInit(playerId, wsCallback) {
-    _playerId = playerId;
-    wsConnect(_playerId, wsCallback);
+function networkInit(authToken, wsCallback) {
+    _authToken = authToken;
+    wsConnect(_authToken, wsCallback);
 }
 
 async function networkFindAndJoinGame() {
-    const findGameResult = await restFindGame(_playerId);
+    const findGameResult = await restFindGame(_authToken);
 
     if (findGameResult && findGameResult.gameplayServiceId) {
         _currentGameplayServiceId = findGameResult.gameplayServiceId;
-        wsFindGame(_playerId, _currentGameplayServiceId);
+        wsFindGame(_currentGameplayServiceId);
     } else {
         console.error('Failed to find gameplay service');
     }
 }
 
 function networkInput(actionType, movAngle) {
-    wsInput(_playerId, _currentGameplayServiceId, actionType, movAngle);
+    wsInput(_currentGameplayServiceId, actionType, movAngle);
 }

@@ -1,12 +1,10 @@
-async function restFindGame(playerId) {
+async function restFindGame(authToken) {
     const findGameResult = await fetch(restUrl + 'findGame', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-            playerId
-        })
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': authToken
+        }
     });
 
     const findGameData = await findGameResult.json();

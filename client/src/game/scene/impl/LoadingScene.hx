@@ -4,6 +4,9 @@ import game.js.NativeWindowJS;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
 
+import uuid.Uuid;
+
+
 class LoadingScene extends BasicScene {
 
     public function new() {
@@ -28,17 +31,25 @@ class LoadingScene extends BasicScene {
                 final startParam = tgUnsafeData.start_param;
 
                 NativeWindowJS.restAuthenticate(tgInitData, null, startParam, function callback(data:Dynamic) {
-                    Player.instance.setUserData(data);
-                    EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+                    processAuthResponse(data);
                 });
             }
         } else {
             if (GameConfig.instance.Serverless) {
+                final uuid = Uuid.short().toLowerCase();
+                Player.instance.setUserData({
+                    userId: uuid,
+                    characters: [{
+                        id: 'entity_' + uuid
+                    }],
+                    authToken: Uuid.short().toLowerCase(),
+                    tokens: 1000,
+                    kills: 0
+                });
                 EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
             } else {
                 NativeWindowJS.restAuthenticate(null, GameConfig.instance.TestEmail, GameConfig.instance.TestReferrerId, function callback(data:Dynamic) {
-                    Player.instance.setUserData(data);
-                    EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+                    processAuthResponse(data);
                 });
             }
         };
@@ -46,5 +57,15 @@ class LoadingScene extends BasicScene {
 
 	public function customUpdate(dt:Float, fps:Float) {
 	}
+
+    private function processAuthResponse(data:Dynamic) {
+        if (data.success == true) {
+            Player.instance.setUserData(data);
+            initNetwork();
+            EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+        } else {
+            trace('AUTH FAILED');
+        }
+    }
 
 }
