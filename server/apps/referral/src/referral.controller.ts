@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { ReferralService } from './referral.service';
+import { MessagePattern } from '@nestjs/microservices';
+import {
+  ReferralUpdateReferrerMessageRequest,
+  ReferralUpdateReferrerPattern,
+} from '@app/seidh-common/dto/referral/referral.update.referrer.msg';
 
 @Controller()
 export class ReferralController {
   constructor(private readonly referralService: ReferralService) {}
 
-  @Get()
-  getHello(): string {
-    return this.referralService.getHello();
+  @MessagePattern(ReferralUpdateReferrerPattern)
+  async UpdateReferrer(message: ReferralUpdateReferrerMessageRequest) {
+    return this.referralService.UpdateReferrer(message);
   }
 }
