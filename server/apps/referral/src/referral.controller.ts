@@ -12,6 +12,6 @@ export class ReferralController {
 
   @MessagePattern(ReferralUpdateReferrerPattern)
   async UpdateReferrer(message: ReferralUpdateReferrerMessageRequest) {
-    return this.referralService.UpdateReferrer(message);
+    return await this.referralService.updateReferrer(message);
   }
 }

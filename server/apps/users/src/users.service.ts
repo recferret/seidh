@@ -89,26 +89,24 @@ export class UsersService {
         telegramId = telegramParseResult.userInfo.id;
         telegramName = telegramParseResult.userInfo.username;
         telegramPremium = telegramParseResult.userInfo.is_premium;
-        existingUser = await this.userModel
-          .findOne({ telegramId })
-          .populate(['characters']);
+        existingUser = await this.userModel.findOne({ telegramId });
+        // .populate(['characters']);
       } else {
         return response;
       }
     } else {
       response.success = true;
       email = message.email;
-      existingUser = await this.userModel
-        .findOne({ email })
-        .populate(['characters']);
+      existingUser = await this.userModel.findOne({ email });
+      // .populate(['characters']);
       Logger.log(email);
     }
 
     if (existingUser) {
-      response.userId = existingUser.id;
-      response.kills = existingUser.kills;
-      response.tokens = existingUser.virtualTokenBalance;
-      response.characters = existingUser.characters.map(dbCharacterToStruct);
+      // response.userId = existingUser.id;
+      // response.kills = existingUser.kills;
+      // response.tokens = existingUser.virtualTokenBalance;
+      // response.characters = existingUser.characters.map(dbCharacterToStruct);
       response.authToken = await this.jwtService.signAsync({
         userId: existingUser.id,
         telegramId,
@@ -139,32 +137,6 @@ export class UsersService {
         virtualTokenBalance,
         characters: [newCharacter],
       });
-
-      if (message.referrerId) {
-        const referrer = await this.userModel.findById(message.referrerId);
-        const notTheSameUser = this.isProd
-          ? referrer.telegramId != telegramId
-          : referrer.email != email;
-
-        if (referrer && notTheSameUser) {
-          const { referrer: updatedReferrer, newUser: updatedNewUser } =
-            await firstValueFrom(
-              this.referralService.send(ReferralUpdateReferrerPattern, {
-                referrer,
-                newUser,
-              }),
-            );
-          Object.keys(updatedReferrer).forEach((key) => {
-            referrer[key] = updatedReferrer[key];
-          });
-
-          await referrer.save();
-          Object.keys(updatedNewUser).forEach((key) => {
-            if (key != 'characters') newUser[key] = updatedNewUser[key];
-          });
-        }
-      }
-
       const authToken = await this.jwtService.signAsync({
         userId: newUser.id,
         telegramId,
@@ -172,15 +144,48 @@ export class UsersService {
       });
       newUser.authToken = authToken;
       await newUser.save();
+      if (message.referrerId)
+        this.referralCalculation({
+          referrerId: message.referrerId,
+          telegramId,
+          email,
+          newUser,
+        });
 
-      response.userId = newUser.id;
-      response.kills = newUser.kills;
-      response.tokens = newUser.virtualTokenBalance;
-      response.characters = newUser.characters.map(dbCharacterToStruct);
+      // response.userId = newUser.id;
+      // response.kills = newUser.kills;
+      // response.tokens = newUser.virtualTokenBalance;
+      // response.characters = newUser.characters.map(dbCharacterToStruct);
       response.authToken = authToken;
     }
 
     return response;
+  }
+
+  async referralCalculation({ referrerId, telegramId, email, newUser }) {
+    const referrer = await this.userModel.findById(referrerId);
+    const notTheSameUser = this.isProd
+      ? referrer.telegramId != telegramId
+      : referrer.email != email;
+
+    if (referrer && notTheSameUser) {
+      const { referrer: updatedReferrer, newUser: updatedNewUser } =
+        await firstValueFrom(
+          this.referralService.send(ReferralUpdateReferrerPattern, {
+            referrer,
+            newUser,
+          }),
+        );
+      Object.keys(updatedReferrer).forEach((key) => {
+        referrer[key] = updatedReferrer[key];
+      });
+      await Promise.all([
+        referrer.save(),
+        this.userModel.findByIdAndUpdate(newUser._id, {
+          virtualTokenBalance: updatedNewUser.virtualTokenBalance,
+        }),
+      ]);
+    }
   }
 
   async checkToken(message: UsersCheckTokenMessageRequest) {
