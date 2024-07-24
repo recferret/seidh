@@ -11,8 +11,8 @@ enum abstract YandexMetricsGoals(String) {
 extern class NativeWindowJS {
 
     // Networking
-    static function networkInit(playerId:String, callback:Dynamic->Void):Void;
-    static function networkFindAndJoinGame(playerId:String):Void;
+    static function networkInit(authToken:String, callback:Dynamic->Void):Void;
+    static function networkFindAndJoinGame():Void;
     static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;
 
     // Rest

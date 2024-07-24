@@ -1,6 +1,5 @@
 import { Body, CanActivate, Controller, ExecutionContext, Get, Injectable, Post, Session, UseGuards } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
-import { FindGameRequest } from './dto/find.game.dto';
 import { AuthenticateRequest } from './dto/authenticate.dto';
 import { AuthGuard } from './guards/guard.auth';
 import { Observable } from 'rxjs';
@@ -41,11 +40,9 @@ export class GatewayController {
   @Post('findGame')
   @UseGuards(AuthGuard)
   findGame(
-    @Body() findGameRequest: FindGameRequest,
     @Session() session: IUserSession,
   ) {
-    // TODO pass user id here
-    return this.gatewayService.findGame(findGameRequest);
+    return this.gatewayService.findGame(session.userId);
   }
 
   @Get('boosts')

@@ -34,18 +34,19 @@ import { WsGatewayGameLoopStateMessage, WsGatewayGameLoopStatePattern } from '@a
 import { WsGatewayGameGameStateMessage, WsGatewayGameGameStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.game.state';
 import { WsGatewayGameCreateConsumableMessage, WsGatewayGameCreateConsumablePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.consumable.msg';
 import { WsGatewayGameDeleteConsumableMessage, WsGatewayGameDeleteConsumablePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
+import { EventGameInit } from './events/event.game.init';
 
 @Injectable()
 export class GameplayService {
 
-  public static readonly ConnectedPlayers = new Set<string>();
-
-  private readonly playerLastRequestTime = new Map<string, number>();
-  private readonly playerDisconnectTimeout = 5 * 1000;
+  public static readonly ConnectedUsers = new Set<string>();
 
   private readonly gameInstances = new Map<string, GameInstance>();
-  private readonly playerGameInstance = new Map<string, string>();
-  private readonly playersToInit = new Set<string>();
+
+  private readonly userLastRequestTime = new Map<string, number>();
+  private readonly userDisconnectTimeout = 5 * 1000;
+  private readonly userGameInstance = new Map<string, string>();
+  private readonly usersToInit = new Set<string>();
 
   private readonly gameInstance: GameInstance;
 
@@ -54,7 +55,7 @@ export class GameplayService {
     @Inject(ServiceName.WsGateway) private wsGatewayService: ClientProxy,
     @Inject(ServiceName.GameplayLobby) private gameplayLobbyService: ClientProxy
   ) {
-    // Notify lobby service about current players and games
+    // Notify lobby service about current users and games
     setInterval(async () => {
       const games: GameplayLobbyGameInfo[] = [];
 
@@ -62,7 +63,7 @@ export class GameplayService {
         games.push({
           gameId: gameInstance.gameId,
           gameType: gameInstance.gameType,
-          playersOnline: 0
+          usersOnline: 0
         })
       });
 
@@ -85,16 +86,18 @@ export class GameplayService {
   // ---------------------------------------------- 
 
   public disconnected(message: GameplayDisconnectedMessage) {
-    this.deletePlayer(message.playerId, 'disconnected');
+    this.deleteUser(message.userId, 'disconnected');
   }
 
   public joinGame(message: GameplayJoinGameMessage) {
-    this.playerLastRequestTime.set(message.playerId, Date.now());
-    this.playerGameInstance.set(message.playerId, this.gameInstance.gameId);
-    this.playersToInit.add(message.playerId);
-    this.gameInstance.addPlayer(message.playerId);
+    this.userLastRequestTime.set(message.userId, Date.now());
+    this.userGameInstance.set(message.userId, this.gameInstance.gameId);
+    this.usersToInit.add(message.userId);
+    this.gameInstance.addPlayer(message.userId);
 
-    GameplayService.ConnectedPlayers.add(message.playerId);
+    Logger.log('joinGame', message.userId);
+
+    GameplayService.ConnectedUsers.add(message.userId);
 
     // let gameInstance: GameInstance = undefined;
 
@@ -122,20 +125,20 @@ export class GameplayService {
   }
 
   public input(message: GameplayInputMessage) {
-    this.playerLastRequestTime.set(message.playerId, Date.now());
-    this.checkPlayerConnected(message.playerId);
+    this.userLastRequestTime.set(message.userId, Date.now());
+    this.checkUserConnected(message.userId);
     const gameInstance = this.checkAndGetGameInstance(message.gameId);
     gameInstance.input({
-      playerId: message.playerId,
+      userId: message.userId,
       index: message.index,
       actionType: message.actionType,
       movAngle: message.movAngle
     });
   }
 
-  private checkPlayerConnected(playerId: string) {
-    if(!GameplayService.ConnectedPlayers.has(playerId)) {
-      throw new Error('Player '+ playerId +' is not connected');
+  private checkUserConnected(userId: string) {
+    if(!GameplayService.ConnectedUsers.has(userId)) {
+      throw new Error('User '+ userId +' is not connected');
     }
   }
 
@@ -151,29 +154,21 @@ export class GameplayService {
   // Server -> Client
   // ----------------------------------------------
 
-  @OnEvent(EventGameLoopState.EventName)
-  handleEventGameLoopState(payload: EventGameLoopState) {
-    // Notify new players about full game state
+  // Input
+
+  @OnEvent(EventGameInit.EventName)
+  handleEventGameInit(payload: EventGameInit) {
+    // Notify new users about full game state
     if (payload.charactersFullStruct.length > 0) {
-      this.playersToInit.forEach(playerId => {
+      this.usersToInit.forEach(userId => {
         const message: WsGatewayGameInitMessage = {
-          targetPlayerId : playerId,
+          targetUserId : userId,
           gameId: payload.gameId,
           charactersFullStruct: payload.charactersFullStruct
         };
         this.wsGatewayService.emit(WsGatewayGameInitPattern, message);
       });
-      this.playersToInit.clear();
-    }
-
-    // Notify all players about changed game state
-    if (payload.charactersMinStruct.length > 0) {
-      
-      const message: WsGatewayGameLoopStateMessage = {
-        gameId: payload.gameId,
-        charactersMinStruct: payload.charactersMinStruct
-      }
-      this.wsGatewayService.emit(WsGatewayGameLoopStatePattern, message);
+      this.usersToInit.clear();
     }
   }
 
@@ -184,7 +179,7 @@ export class GameplayService {
     const message: WsGatewayGameCreateCharacterMessage = {
       gameId: payload.gameId,
       characterEntityFullStruct: payload.characterEntityFullStruct,
-      excludePlayerId: payload.characterEntityFullStruct.base.ownerId,
+      excludeUserId: payload.characterEntityFullStruct.base.ownerId,
     };
     this.wsGatewayService.emit(WsGatewayGameCreateCharacterPattern, message);
   }
@@ -237,6 +232,8 @@ export class GameplayService {
     this.wsGatewayService.emit(WsGatewayGameDeleteProjectilePattern, message);
   }
 
+  // Actions
+
   @OnEvent(EventGameCharacterActions.EventName)
   handleEventGameCharacterActions(payload: EventGameCharacterActions) {
     const message: WsGatewayGameCharacterActionsMessage = {
@@ -244,6 +241,20 @@ export class GameplayService {
       actions: payload.actions
     }
     this.wsGatewayService.emit(WsGatewayGameCharacterActionsPattern, message);
+  }
+
+  // States
+
+  @OnEvent(EventGameLoopState.EventName)
+  handleEventGameLoopState(payload: EventGameLoopState) {
+    // Notify all users about changed game state
+    if (payload.charactersMinStruct.length > 0) {
+      const message: WsGatewayGameLoopStateMessage = {
+        gameId: payload.gameId,
+        charactersMinStruct: payload.charactersMinStruct
+      }
+      this.wsGatewayService.emit(WsGatewayGameLoopStatePattern, message);
+    }
   }
 
   @OnEvent(EventGameGameState.EventName)
@@ -260,34 +271,34 @@ export class GameplayService {
   // ----------------------------------------------
 
   // @Cron(CronExpression.EVERY_5_SECONDS)
-  dropDisconnectedPlayers() {
+  dropDisconnectedUsers() {
     const now = Date.now();
-    const playersToDrop = [];
+    const usersToDrop = [];
 
-    this.playerLastRequestTime.forEach((value, key) => {
-      if (now - value > this.playerDisconnectTimeout) {
-        playersToDrop.push(key);
+    this.userLastRequestTime.forEach((value, key) => {
+      if (now - value > this.userDisconnectTimeout) {
+        usersToDrop.push(key);
       }
     });
   
-    playersToDrop.forEach(key => {
-      this.playerLastRequestTime.delete(key);
-      this.deletePlayer(key, 'drop');
+    usersToDrop.forEach(key => {
+      this.userLastRequestTime.delete(key);
+      this.deleteUser(key, 'drop');
     });
   }
 
-  private deletePlayer(playerId: string, deleteType: string) {
-    if (GameplayService.ConnectedPlayers.has(playerId)) {
-      GameplayService.ConnectedPlayers.delete(playerId);
-      const gameInstance = this.checkAndGetGameInstance(this.playerGameInstance.get(playerId), `${deleteType} ${playerId}`);
+  private deleteUser(userId: string, deleteType: string) {
+    if (GameplayService.ConnectedUsers.has(userId)) {
+      GameplayService.ConnectedUsers.delete(userId);
+      const gameInstance = this.checkAndGetGameInstance(this.userGameInstance.get(userId), `${deleteType} ${userId}`);
       if (gameInstance) {
-        gameInstance.deletePlayer(playerId);
-        this.playerGameInstance.delete(playerId);
+        gameInstance.deletePlayer(userId);
+        this.userGameInstance.delete(userId);
       } else {
-        Logger.error('Player '+ playerId +' is not in the game, unable to drop');
+        Logger.error('User '+ userId +' is not in the game, unable to drop');
       }
     } else {
-      Logger.error('Player '+ playerId +' is not connected, unable to drop');
+      Logger.error('User '+ userId +' is not connected, unable to drop');
     }
   }
 

@@ -1,0 +1,4 @@
+-cp src
+-lib uuid
+-js SeidhGameEngine.js
+-main engine.seidh.SeidhGameEngine

@@ -95,7 +95,6 @@ export class UsersService {
         return response;
       }
     } else {
-      response.success = true;
       email = message.email;
       existingUser = await this.userModel.findOne({ email });
       // .populate(['characters']);

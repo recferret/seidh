@@ -1,14 +1,11 @@
 package game.scene.impl;
 
-
-import game.entity.terrain.ClientTerrainEntity;
 import engine.base.geometry.Rectangle;
-import haxe.Timer;
-
 import engine.base.BaseTypesAndClasses;
 import engine.seidh.SeidhGameEngine;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
+import game.entity.terrain.ClientTerrainEntity;
 import game.event.EventManager;
 import game.event.EventManager.EventListener;
 import game.network.Networking;
@@ -35,21 +32,17 @@ class GameScene extends BasicScene implements EventListener {
 			EventManager.instance.subscribe(EventManager.EVENT_DELETE_CONSUMABLE, this);
 			EventManager.instance.subscribe(EventManager.EVENT_CHARACTER_ACTIONS, this);
 
-			initNetwork();
-
-			Timer.delay(function callback() {
-                networking.findAndJoinGame();
-            }, 1000);
+            BasicScene.NetworkingInstance.findAndJoinGame();
 		} else if (engineMode == EngineMode.CLIENT_SINGLEPLAYER) {
 			createCharacterEntityFromMinimalStruct(
-				Player.instance.playerEntityId, 
-				Player.instance.playerId, 
+				Player.instance.userEntityId, 
+				Player.instance.userId, 
 				Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].x), 
 				Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].y), 
 				RAGNAR_LOH
 			);
 			seidhGameEngine.allowMobsSpawn(true);
-			seidhGameEngine.setLocalPlayerId(Player.instance.playerId);
+			seidhGameEngine.setLocalPlayerId(Player.instance.userId);
 		}
 
 		SoundManager.instance.playGameplayTheme();
@@ -185,7 +178,7 @@ class GameScene extends BasicScene implements EventListener {
 		for (characterStruct in payload.charactersFullStruct ) {
 			seidhGameEngine.createCharacterEntityFromFullStruct(characterStruct);
 		}
-		seidhGameEngine.setLocalPlayerId(Player.instance.playerId);
+		seidhGameEngine.setLocalPlayerId(Player.instance.userId);
 	}
 
 	private function processLoopStateEvent(payload:LoopStatePayload) {
@@ -223,7 +216,7 @@ class GameScene extends BasicScene implements EventListener {
 
 	private function processCharacterActions(payload:ActionsPayload) {
 		for (action in payload.actions) {
-			if (action.entityId != Player.instance.playerEntityId) {
+			if (action.entityId != Player.instance.userEntityId) {
 				seidhGameEngine.setCharacterNextActionToPerform(action.entityId, action.actionType);
 			}
 		}

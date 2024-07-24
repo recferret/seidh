@@ -115,6 +115,9 @@ export interface BaseEntityStruct {
 export interface EngineCharacterEntity {
 	getEntityFullStruct(): CharacterEntityFullStruct;
 	getEntityMinStruct(): CharacterEntityMinStruct;
+	getId(): string;
+	isPlayer(): boolean;
+	isBot(): boolean;
 }
 
 export interface EngineProjectileEntity {
@@ -151,7 +154,7 @@ export interface PlayerInputCommand {
 	index?: number;
 	actionType: CharacterActionType;
 	movAngle: number;
-	playerId: string;
+	userId: string;
 }
 
 export enum GameState {

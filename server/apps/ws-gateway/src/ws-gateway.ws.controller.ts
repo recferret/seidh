@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Inject, Logger, OnModuleInit } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
 import { ServiceName } from '@app/seidh-common';
 import { FindGameDto } from './dto/find.game.dto';
@@ -39,43 +40,44 @@ export class WsGatewayWsController implements OnModuleInit {
   @WebSocketServer()
   server: Server;
 
-  // TODO single entity for each player socket
-  private readonly playerSockets = new Map<string, Socket>();
-  private readonly playerIdToGameId = new Map<string, string>();
-  private readonly playerIdToGameplayService = new Map<string, string>();
-  private readonly socketIdToPlayerId = new Map<string, string>();
+  private readonly userSockets = new Map<string, Socket>();
+  private readonly userIdToGameId = new Map<string, string>();
+  private readonly userIdToGameplayService = new Map<string, string>();
+  private readonly socketIdToUserId = new Map<string, string>();
 
-  constructor(@Inject(ServiceName.Gameplay) private gameplayService: ClientProxy) {
+  constructor(
+    private readonly jwtService: JwtService,
+    @Inject(ServiceName.Gameplay) private gameplayService: ClientProxy
+  ) {
   }
 
   async onModuleInit() {
-    this.server.on('connection', (socket: Socket) => {
-      Logger.log('Socket connected');
-
-      const playerId = socket.handshake.auth.playerId;
-
-      if (playerId) {
-        this.socketIdToPlayerId.set(socket.id, playerId);
-        this.playerSockets.set(playerId, socket);
-
+    this.server.on('connection', async (socket: Socket) => {
+      try {
+        const decodedToken = await this.jwtService.verifyAsync(socket.handshake.auth.authToken);
+        const userId = decodedToken.userId;
+  
+        this.socketIdToUserId.set(socket.id, userId);
+        this.userSockets.set(userId, socket);
+  
         socket.on('disconnect', () => {
-          Logger.log('Socket disconnected, playerId:', this.socketIdToPlayerId.get(socket.id));
-
-          const playerId = this.socketIdToPlayerId.get(socket.id);
-
-          if (playerId) {
+          Logger.log('Socket disconnected, userId:', this.socketIdToUserId.get(socket.id));
+  
+          const userId = this.socketIdToUserId.get(socket.id);
+  
+          if (userId) {
             const request: GameplayDisconnectedMessage = {
-              playerId
+              userId
             };
             this.gameplayService.emit(GameplayDisconnectedPattern, request);
-
-            this.playerSockets.delete(this.socketIdToPlayerId.get(socket.id));
-            this.socketIdToPlayerId.delete(socket.id);
-            this.playerIdToGameId.delete(playerId);
-            this.playerIdToGameplayService.delete(playerId);
+  
+            this.userSockets.delete(this.socketIdToUserId.get(socket.id));
+            this.socketIdToUserId.delete(socket.id);
+            this.userIdToGameId.delete(userId);
+            this.userIdToGameplayService.delete(userId);
           }
         });
-      } else {
+      } catch {
         Logger.error('Bad handshake', socket.handshake.auth);
         socket.disconnect();
       }
@@ -87,21 +89,29 @@ export class WsGatewayWsController implements OnModuleInit {
   // ----------------------------------------------
 
   @SubscribeMessage(WsProtocolMessage.FindGame)
-  async handleFindGame(@MessageBody() data: FindGameDto) {
+  async handleFindGame(
+    @ConnectedSocket() client: Socket, 
+    @MessageBody() data: FindGameDto
+  ) {
+    const userId = this.socketIdToUserId.get(client.id);
     const request: GameplayJoinGameMessage = {
-      playerId: data.playerId,
+      userId,
       gameplayServiceId: data.gameplayServiceId,
     };
     this.gameplayService.emit(GameplayJoinGamePattern, request);
-    this.playerIdToGameplayService.set(data.playerId, data.gameplayServiceId);
+    this.userIdToGameplayService.set(userId, data.gameplayServiceId);
   }
 
   @SubscribeMessage(WsProtocolMessage.Input)
-  async handleInput(@MessageBody() data: InputDto) {
+  async handleInput(
+    @ConnectedSocket() client: Socket, 
+    @MessageBody() data: InputDto
+  ) {
+    const userId = this.socketIdToUserId.get(client.id);
     const request: GameplayInputMessage = {
-      playerId: data.playerId,
-      gameId: this.playerIdToGameId.get(data.playerId),
-      gameplayServiceId: this.playerIdToGameplayService.get(data.playerId),
+      userId,
+      gameId: this.userIdToGameId.get(userId),
+      gameplayServiceId: this.userIdToGameplayService.get(userId),
       actionType: data.actionType,
       movAngle: data.movAngle,
     };
@@ -113,16 +123,16 @@ export class WsGatewayWsController implements OnModuleInit {
   // ----------------------------------------------
 
   broadcast(wsProtocolMessage: WsProtocolMessage, data: WsGatewayGameBaseMsg) {
-    if (data.targetPlayerId) {
-      const socket = this.playerSockets.get(data.targetPlayerId);
+    if (data.targetUserId) {
+      const socket = this.userSockets.get(data.targetUserId);
       if (socket && socket.connected) {
-        // Connect player and game for the first time
+        // Connect user and game for the first time
         if (wsProtocolMessage == WsProtocolMessage.GameInit) {
-          this.playerIdToGameId.set(data.targetPlayerId, data.gameId);
+          this.userIdToGameId.set(data.targetUserId, data.gameId);
         }
 
         // Drop extra fields
-        delete data.targetPlayerId;
+        delete data.targetUserId;
         delete data.gameId;
 
         socket.emit(wsProtocolMessage, data);
@@ -130,15 +140,15 @@ export class WsGatewayWsController implements OnModuleInit {
         Logger.error('Socket is not connected', wsProtocolMessage, data);
       }
     } else {
-      for (const [playerId, socket] of this.playerSockets) {
+      for (const [userId, socket] of this.userSockets) {
         if (socket && socket.connected) {
-          // Skip excluded players and players that are not in the game
-          if (data.excludePlayerId && data.excludePlayerId == playerId || !this.playerIdToGameId.has(playerId)) {
+          // Skip excluded users and users that are not in the game
+          if (data.excludeUserId && data.excludeUserId == userId || !this.userIdToGameId.has(userId)) {
             continue;
           }
 
           // Drop extra fields
-          delete data.excludePlayerId;
+          delete data.excludeUserId;
           delete data.gameId;
           socket.emit(wsProtocolMessage, data);
         } else {

@@ -1,10 +1,10 @@
 let socket = undefined;
 
-function wsConnect(playerId, callback) {
+function wsConnect(authToken, callback) {
     socket = io(socketUrl, {
         transport: [ "websocket" ],
         auth: {
-            playerId
+            authToken
         }
     });
         
@@ -56,16 +56,14 @@ function wsConnect(playerId, callback) {
     });
 }
 
-function wsFindGame(playerId, gameplayServiceId) {
+function wsFindGame(gameplayServiceId) {
     socket.emit('FindGame', {
-        playerId,
         gameplayServiceId
     });
 }
 
-function wsInput(playerId, gameplayServiceId, actionType, movAngle) {
+function wsInput(gameplayServiceId, actionType, movAngle) {
     socket.emit('Input', {
-        playerId,
         gameplayServiceId,
         actionType, 
         movAngle

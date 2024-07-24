@@ -1,8 +1,8 @@
 package engine.base.core;
 
 import engine.base.BaseTypesAndClasses;
-import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.core.GameLoop;
+import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
@@ -353,12 +353,12 @@ abstract class BaseEngine {
 		// }
 
 		// if (allow) {
-		addInputCommandClient(new PlayerInputCommand(input.actionType, input.movAngle, input.playerId));
+		addInputCommandClient(new PlayerInputCommand(input.actionType, input.movAngle, input.userId));
 		// }
 	}
 
 	public function addInputCommandClient(input:PlayerInputCommand) {
-		if (input.actionType != null && input.playerId != null) {
+		if (input.actionType != null && input.userId != null) {
 			final wrappedCommand = new InputCommandEngineWrapped(input, tick);
 			hotInputCommands.push(wrappedCommand);
 			coldInputCommands.push(wrappedCommand);

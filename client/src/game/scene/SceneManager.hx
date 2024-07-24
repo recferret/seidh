@@ -48,7 +48,11 @@ class SceneManager implements EventListener {
 				if (currentScene != null) {
 					currentScene.destroy();
 				}
-				currentScene = new GameScene(EngineMode.CLIENT_MULTIPLAYER);
+				if (GameConfig.instance.Serverless) {
+					currentScene = new GameScene(EngineMode.CLIENT_SINGLEPLAYER);
+				} else {
+					currentScene = new GameScene(EngineMode.CLIENT_MULTIPLAYER);
+				}
 				changeSceneCallback();
 			case EventManager.EVENT_HOME_SCENE:
 				if (currentScene != null) {

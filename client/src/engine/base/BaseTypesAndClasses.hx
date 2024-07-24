@@ -272,12 +272,12 @@ class PlayerInputCommand {
 	public var index:Int;
 	public var actionType:CharacterActionType;
 	public var movAngle:Float;
-	public var playerId:String;
+	public var userId:String;
 
-	public function new(actionType:CharacterActionType, movAngle:Float, playerId:String, ?index:Int) {
+	public function new(actionType:CharacterActionType, movAngle:Float, userId:String, ?index:Int) {
 		this.actionType = actionType;
 		this.movAngle = movAngle;
-		this.playerId = playerId;
+		this.userId = userId;
 		this.index = index;
 	}
 }

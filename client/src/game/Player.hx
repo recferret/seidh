@@ -1,17 +1,14 @@
 package game;
 
 import game.js.NativeWindowJS;
-import uuid.Uuid;
 
 class Player {
 	private final WalletAddressKey = 'WalletAddress';
 
 	public static final instance:Player = new Player();
 
-	public var playerId:String;
-	public var playerEntityId:String;
-
 	public var userId:String;
+	public var userEntityId:String;
 	public var authToken:String;
 	public var tokens:Int;
 	public var kills:Int;
@@ -19,15 +16,16 @@ class Player {
 	private var inputIndex = 0;
 
 	private function new() {
-		playerId = Uuid.short().toLowerCase();
-		playerEntityId = "entity_" + playerId;
 	}
 
 	public function setUserData(userData:Dynamic) {
 		userId = userData.userId;
-		authToken = userData.userId;
+		userEntityId = 'entity_' + userData.userId;
+		authToken = userData.authToken;
 		tokens = userData.tokens;
-		kills = userData.userId;
+		kills = userData.kills;
+
+		trace(userData);
 	}
 
 	public function incrementAndGetInputIndex() {

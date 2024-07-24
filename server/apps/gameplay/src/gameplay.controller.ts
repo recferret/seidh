@@ -1,4 +1,4 @@
-import { CanActivate, Controller, ExecutionContext, Injectable, Logger, UseGuards } from '@nestjs/common';
+import { CanActivate, Controller, ExecutionContext, Injectable, UseGuards } from '@nestjs/common';
 import { GameplayService } from './gameplay.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
@@ -24,7 +24,7 @@ class PlayerGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request:WsGameEvent = context.switchToRpc().getData();
-    return request.playerId && GameplayService.ConnectedPlayers.has(request.playerId);
+    return request.userId && GameplayService.ConnectedUsers.has(request.userId);
   }
 }
 

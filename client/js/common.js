@@ -5,15 +5,15 @@ const socketUrl = 'ws://localhost:3004/';
 
 function getGameConfig() {
     return {
-        Production: false,
-        DebugDraw: true,
+        Production: true,
+        DebugDraw: false,
         PlayMusic: false,
         PlaySounds: false,
         TelegramAuth: false,
         Analytics: false,
         Serverless: false,
         TestEmail: 'test1@gmail.com',
-        TestReferrerId: '1234',
+        TestReferrerId: '',
     }
 }
 
