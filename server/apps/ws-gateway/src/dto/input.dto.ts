@@ -1,6 +1,6 @@
-import { CharacterActionType } from "@app/seidh-common/seidh-common.game-types";
+import { CharacterActionType } from '@app/seidh-common/seidh-common.game-types';
 
 export class InputDto {
-    actionType: CharacterActionType;
-    movAngle?: number;
+  actionType: CharacterActionType;
+  movAngle?: number;
 }

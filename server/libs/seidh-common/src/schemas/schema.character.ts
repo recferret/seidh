@@ -4,23 +4,22 @@ import { HydratedDocument } from 'mongoose';
 export type CharacterDocument = HydratedDocument<Character>;
 
 export enum CharacterType {
-  RagnarLoh =  'RagnarLoh'
+  RagnarLoh = 'RagnarLoh',
 }
 
-export type CharacterMovementStruct =  {
+export type CharacterMovementStruct = {
   runSpeed: number;
   walkSpeed: number;
-}
+};
 
-export type CharacterActionStruct =  {
+export type CharacterActionStruct = {
   damage: number;
-}
+};
 
 @Schema()
 export class Character {
-
   @Prop({ type: String, enum: CharacterType })
-  type: CharacterType
+  type: CharacterType;
 
   @Prop({ default: true })
   active: boolean;
@@ -45,7 +44,6 @@ export class Character {
 
   @Prop({ type: { damage: Number } })
   actionMain: CharacterActionStruct;
-
 }
 
 export const CharacterSchema = SchemaFactory.createForClass(Character);

@@ -1,7 +1,9 @@
-import { WsGatewayGameBaseMsg } from "./ws-gateway.game.base.msg";
+import { WsGatewayGameBaseMsg } from './ws-gateway.game.base.msg';
 
-export const WsGatewayGameDeleteCharacterPattern = 'ws-gateway.game.delete.character';
+export const WsGatewayGameDeleteCharacterPattern =
+  'ws-gateway.game.delete.character';
 
-export interface WsGatewayGameDeleteCharacterMessage extends WsGatewayGameBaseMsg {
-    characterId: string;
+export interface WsGatewayGameDeleteCharacterMessage
+  extends WsGatewayGameBaseMsg {
+  characterId: string;
 }

@@ -1,4 +1,14 @@
-import { Body, CanActivate, Controller, ExecutionContext, Get, Injectable, Post, Session, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  CanActivate,
+  Controller,
+  ExecutionContext,
+  Get,
+  Injectable,
+  Post,
+  Session,
+  UseGuards,
+} from '@nestjs/common';
 import { GatewayService } from './gateway.service';
 import { AuthenticateRequest } from './dto/authenticate.dto';
 import { AuthGuard } from './guards/guard.auth';
@@ -10,8 +20,11 @@ class ProductionGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    if (process.env.NODE_ENV == 'production' && !request.body.hasOwnProperty('telegramInitData')) {
-      return false
+    if (
+      process.env.NODE_ENV == 'production' &&
+      !request.body.hasOwnProperty('telegramInitData')
+    ) {
+      return false;
     }
     return true;
   }
@@ -23,25 +36,17 @@ export interface IUserSession {
 
 @Controller()
 export class GatewayController {
-
-  constructor(
-    private readonly gatewayService: GatewayService
-  ) {
-  }
+  constructor(private readonly gatewayService: GatewayService) {}
 
   @Post('authenticate')
   @UseGuards(ProductionGuard)
-  authenticate(
-    @Body() authenticateRequest: AuthenticateRequest
-  ) {
+  authenticate(@Body() authenticateRequest: AuthenticateRequest) {
     return this.gatewayService.authenticate(authenticateRequest);
   }
 
   @Post('findGame')
   @UseGuards(AuthGuard)
-  findGame(
-    @Session() session: IUserSession,
-  ) {
+  findGame(@Session() session: IUserSession) {
     return this.gatewayService.findGame(session.userId);
   }
 
@@ -53,14 +58,11 @@ export class GatewayController {
 
   @Post('boosts')
   @UseGuards(AuthGuard)
-  buyBoost() {
-
-  }
+  buyBoost() {}
 
   @Get('friends')
   @UseGuards(AuthGuard)
-  getFriends(@Session() session: IUserSession,)  {
+  getFriends(@Session() session: IUserSession) {
     return this.gatewayService.getFriends(session.userId);
   }
-
 }

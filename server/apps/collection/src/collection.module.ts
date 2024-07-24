@@ -4,9 +4,7 @@ import { CollectionService } from './collection.service';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
-  imports: [
-    PrometheusModule.register(),
-  ],
+  imports: [PrometheusModule.register()],
   controllers: [CollectionController],
   providers: [CollectionService],
 })

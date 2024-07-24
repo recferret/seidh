@@ -1,11 +1,10 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { FindGameRequest, FindGameResponse } from './dto/find.game.dto';
 import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
-import { 
-  GameplayLobbyFindGameMessageRequest, 
-  GameplayLobbyFindGameMessageResponse, 
-  GameplayLobbyFindGamePattern 
+import {
+  GameplayLobbyFindGameMessageRequest,
+  GameplayLobbyFindGameMessageResponse,
+  GameplayLobbyFindGamePattern,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -38,7 +37,9 @@ export class GatewayService implements OnModuleInit {
     const request: GameplayLobbyFindGameMessageRequest = {
       userId,
     };
-    const response: GameplayLobbyFindGameMessageResponse = await firstValueFrom(this.gameplayLobbyService.send(GameplayLobbyFindGamePattern, request));
+    const response: GameplayLobbyFindGameMessageResponse = await firstValueFrom(
+      this.gameplayLobbyService.send(GameplayLobbyFindGamePattern, request),
+    );
     return response;
   }
 

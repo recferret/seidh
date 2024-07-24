@@ -7,7 +7,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(GameplayLobbyModule);
+  const app =
+    await NestFactory.create<NestExpressApplication>(GameplayLobbyModule);
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,

@@ -26,6 +26,8 @@ async function bootstrap() {
   await app.startAllMicroservices();
   await app.listen(ServicePort.Gameplay);
 
-  Logger.log(`Gameplay ${Config.GAMEPLAY_INSTANCE_ID} listening on port ${ServicePort.Gameplay}`);
+  Logger.log(
+    `Gameplay ${Config.GAMEPLAY_INSTANCE_ID} listening on port ${ServicePort.Gameplay}`,
+  );
 }
 bootstrap();

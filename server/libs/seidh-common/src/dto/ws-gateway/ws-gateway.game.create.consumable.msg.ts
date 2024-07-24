@@ -1,8 +1,10 @@
-import { ConsumableEntityStruct } from "@app/seidh-common/seidh-common.game-types";
-import { WsGatewayGameBaseMsg } from "./ws-gateway.game.base.msg";
+import { ConsumableEntityStruct } from '@app/seidh-common/seidh-common.game-types';
+import { WsGatewayGameBaseMsg } from './ws-gateway.game.base.msg';
 
-export const WsGatewayGameCreateConsumablePattern = 'ws-gateway.game.create.consumable';
+export const WsGatewayGameCreateConsumablePattern =
+  'ws-gateway.game.create.consumable';
 
-export interface WsGatewayGameCreateConsumableMessage extends WsGatewayGameBaseMsg {
-    consumableEntityStruct: ConsumableEntityStruct;
+export interface WsGatewayGameCreateConsumableMessage
+  extends WsGatewayGameBaseMsg {
+  consumableEntityStruct: ConsumableEntityStruct;
 }

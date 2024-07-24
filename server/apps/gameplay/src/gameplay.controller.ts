@@ -1,12 +1,27 @@
-import { CanActivate, Controller, ExecutionContext, Injectable, UseGuards } from '@nestjs/common';
+import {
+  CanActivate,
+  Controller,
+  ExecutionContext,
+  Injectable,
+  UseGuards,
+} from '@nestjs/common';
 import { GameplayService } from './gameplay.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { WsGameEvent } from '@app/seidh-common';
-import { GameplayJoinGameMessage, GameplayJoinGamePattern } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
-import { GameplayInputPattern, GameplayInputMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
+import {
+  GameplayJoinGameMessage,
+  GameplayJoinGamePattern,
+} from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
+import {
+  GameplayInputPattern,
+  GameplayInputMessage,
+} from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
 import { Config } from './main';
-import { GameplayDisconnectedPattern, GameplayDisconnectedMessage } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+import {
+  GameplayDisconnectedPattern,
+  GameplayDisconnectedMessage,
+} from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
 
 @Injectable()
 class InstanceIdGuard implements CanActivate {
@@ -23,7 +38,7 @@ class PlayerGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const request:WsGameEvent = context.switchToRpc().getData();
+    const request: WsGameEvent = context.switchToRpc().getData();
     return request.userId && GameplayService.ConnectedUsers.has(request.userId);
   }
 }

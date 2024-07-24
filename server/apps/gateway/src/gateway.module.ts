@@ -12,8 +12,8 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot(),
     PrometheusModule.register({
       defaultLabels: {
-        app: "Gateway",
-      }
+        app: 'Gateway',
+      },
     }),
     ClientsModule.register([
       {
@@ -21,14 +21,14 @@ import { ConfigModule } from '@nestjs/config';
         transport: Transport.NATS,
         options: {
           servers: [InternalProtocol.NatsUrl],
-        }
+        },
       },
       {
         name: ServiceName.Users,
         transport: Transport.NATS,
         options: {
           servers: [InternalProtocol.NatsUrl],
-        }
+        },
       },
     ]),
     JwtModule.register({

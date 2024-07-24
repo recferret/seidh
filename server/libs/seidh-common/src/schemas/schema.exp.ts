@@ -6,7 +6,6 @@ export type ExpSettingsDocument = HydratedDocument<ExpSettings>;
 
 @Schema()
 export class ExpSettings {
-
   @Prop({ default: uuidv4() })
   id: string;
 
@@ -42,7 +41,6 @@ export class ExpSettings {
 
   @Prop({ default: 5500 })
   expTillLevel10: number;
-
 }
 
 export const ExpSettingsSchema = SchemaFactory.createForClass(ExpSettings);

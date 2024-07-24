@@ -5,7 +5,6 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-
   @Prop()
   authToken: string;
 
@@ -54,7 +53,7 @@ export class User {
   hasMaxPotionBoost3: boolean;
 
   // -----------------------
-  // Stats 
+  // Stats
   // -----------------------
 
   @Prop({ default: 0 })
@@ -64,7 +63,7 @@ export class User {
   kills: number;
 
   // -----------------------
-  // Referral 
+  // Referral
   // -----------------------
 
   @Prop([{ type: SchemaTypes.ObjectId, ref: 'User' }])
@@ -77,7 +76,7 @@ export class User {
   totalReferralRewards: number;
 
   // -----------------------
-  // Entities 
+  // Entities
   // -----------------------
 
   @Prop([{ type: SchemaTypes.ObjectId, ref: 'Character' }])

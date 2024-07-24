@@ -18,14 +18,14 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
         transport: Transport.NATS,
         options: {
           servers: [InternalProtocol.NatsUrl],
-        }
+        },
       },
       {
         name: ServiceName.GameplayLobby,
         transport: Transport.NATS,
         options: {
           servers: [InternalProtocol.NatsUrl],
-        }
+        },
       },
     ]),
   ],

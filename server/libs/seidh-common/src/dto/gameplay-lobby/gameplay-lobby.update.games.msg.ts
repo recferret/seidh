@@ -1,18 +1,18 @@
-import { GameType } from "./gameplay-lobby.find.game.msg";
+import { GameType } from './gameplay-lobby.find.game.msg';
 
 export const GameplayLobbyUpdateGamesPattern = 'gameplay-lobby.update.games';
 
 export interface GameplayLobbyGameInfo {
-    gameId: string;
-    gameType: GameType;
-    usersOnline: number;
+  gameId: string;
+  gameType: GameType;
+  usersOnline: number;
 }
 
 export interface GameplayLobbyGameplayInstanceInfo {
-    gameplayServiceId: string;
-    games: GameplayLobbyGameInfo[];
-    lastUpdateTime?: number;
+  gameplayServiceId: string;
+  games: GameplayLobbyGameInfo[];
+  lastUpdateTime?: number;
 }
 
-export interface GameplayLobbyUpdateGamesMessage extends GameplayLobbyGameplayInstanceInfo {
-}
+export interface GameplayLobbyUpdateGamesMessage
+  extends GameplayLobbyGameplayInstanceInfo {}

@@ -1,13 +1,13 @@
-import { CharacterEntityMinStruct } from "@app/seidh-common/seidh-common.game-types";
-import { EventGameBase } from "./event.game.base";
+import { CharacterEntityMinStruct } from '@app/seidh-common/seidh-common.game-types';
+import { EventGameBase } from './event.game.base';
 
 export class EventGameLoopState implements EventGameBase {
-    public static readonly EventName = 'game.loop-state'
-    gameId: string;
-    charactersMinStruct: CharacterEntityMinStruct[];
+  public static readonly EventName = 'game.loop-state';
+  gameId: string;
+  charactersMinStruct: CharacterEntityMinStruct[];
 
-    constructor(gameId: string, charactersMinStruct: CharacterEntityMinStruct[]) {
-        this.gameId = gameId;
-        this.charactersMinStruct = charactersMinStruct;
-    }
+  constructor(gameId: string, charactersMinStruct: CharacterEntityMinStruct[]) {
+    this.gameId = gameId;
+    this.charactersMinStruct = charactersMinStruct;
+  }
 }

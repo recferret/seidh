@@ -5,10 +5,10 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Config } from './main';
 import { GameInstance } from './game/game.instance';
 import { ServiceName } from '@app/seidh-common';
-import { 
-  GameplayLobbyGameInfo, 
-  GameplayLobbyUpdateGamesMessage, 
-  GameplayLobbyUpdateGamesPattern 
+import {
+  GameplayLobbyGameInfo,
+  GameplayLobbyUpdateGamesMessage,
+  GameplayLobbyUpdateGamesPattern,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.update.games.msg';
 import { GameplayJoinGameMessage } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
 import { GameType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
@@ -24,21 +24,50 @@ import { EventGameCreateConsumable } from './events/event.game.create-consumable
 import { EventGameDeleteConsumable } from './events/event.game.delete-consumable';
 import { GameplayInputMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
 import { GameplayDisconnectedMessage } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
-import { WsGatewayGameInitMessage, WsGatewayGameInitPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.init.msg';
-import { WsGatewayGameCharacterActionsMessage, WsGatewayGameCharacterActionsPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.character.actions.msg';
-import { WsGatewayGameCreateCharacterMessage, WsGatewayGameCreateCharacterPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.character.msg';
-import { WsGatewayGameCreateProjectileMessage, WsGatewayGameCreateProjectilePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.projectile.msg';
-import { WsGatewayGameDeleteCharacterMessage, WsGatewayGameDeleteCharacterPattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.character.msg';
-import { WsGatewayGameDeleteProjectileMessage, WsGatewayGameDeleteProjectilePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.projectile.msg';
-import { WsGatewayGameLoopStateMessage, WsGatewayGameLoopStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.loop.state.msg';
-import { WsGatewayGameGameStateMessage, WsGatewayGameGameStatePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.game.state';
-import { WsGatewayGameCreateConsumableMessage, WsGatewayGameCreateConsumablePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.consumable.msg';
-import { WsGatewayGameDeleteConsumableMessage, WsGatewayGameDeleteConsumablePattern } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
+import {
+  WsGatewayGameInitMessage,
+  WsGatewayGameInitPattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.init.msg';
+import {
+  WsGatewayGameCharacterActionsMessage,
+  WsGatewayGameCharacterActionsPattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.character.actions.msg';
+import {
+  WsGatewayGameCreateCharacterMessage,
+  WsGatewayGameCreateCharacterPattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.character.msg';
+import {
+  WsGatewayGameCreateProjectileMessage,
+  WsGatewayGameCreateProjectilePattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.projectile.msg';
+import {
+  WsGatewayGameDeleteCharacterMessage,
+  WsGatewayGameDeleteCharacterPattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.character.msg';
+import {
+  WsGatewayGameDeleteProjectileMessage,
+  WsGatewayGameDeleteProjectilePattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.projectile.msg';
+import {
+  WsGatewayGameLoopStateMessage,
+  WsGatewayGameLoopStatePattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.loop.state.msg';
+import {
+  WsGatewayGameGameStateMessage,
+  WsGatewayGameGameStatePattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.game.state';
+import {
+  WsGatewayGameCreateConsumableMessage,
+  WsGatewayGameCreateConsumablePattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.create.consumable.msg';
+import {
+  WsGatewayGameDeleteConsumableMessage,
+  WsGatewayGameDeleteConsumablePattern,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
 import { EventGameInit } from './events/event.game.init';
 
 @Injectable()
 export class GameplayService {
-
   public static readonly ConnectedUsers = new Set<string>();
 
   private readonly gameInstances = new Map<string, GameInstance>();
@@ -53,29 +82,34 @@ export class GameplayService {
   constructor(
     private eventEmitter: EventEmitter2,
     @Inject(ServiceName.WsGateway) private wsGatewayService: ClientProxy,
-    @Inject(ServiceName.GameplayLobby) private gameplayLobbyService: ClientProxy
+    @Inject(ServiceName.GameplayLobby)
+    private gameplayLobbyService: ClientProxy,
   ) {
     // Notify lobby service about current users and games
     setInterval(async () => {
       const games: GameplayLobbyGameInfo[] = [];
 
-      this.gameInstances.forEach(gameInstance => {
+      this.gameInstances.forEach((gameInstance) => {
         games.push({
           gameId: gameInstance.gameId,
           gameType: gameInstance.gameType,
-          usersOnline: 0
-        })
+          usersOnline: 0,
+        });
       });
 
       const message: GameplayLobbyUpdateGamesMessage = {
         gameplayServiceId: Config.GAMEPLAY_INSTANCE_ID,
         games,
-      }
+      };
       this.gameplayLobbyService.emit(GameplayLobbyUpdateGamesPattern, message);
     }, 1000);
 
     // Dummy game for testing
-    this.gameInstance = new GameInstance(this.eventEmitter, uuidv4(), GameType.PublicGame);
+    this.gameInstance = new GameInstance(
+      this.eventEmitter,
+      uuidv4(),
+      GameType.PublicGame,
+    );
     this.gameInstances.set(this.gameInstance.gameId, this.gameInstance);
 
     Logger.log('GameplayService initialized', Config.GAMEPLAY_INSTANCE_ID);
@@ -83,7 +117,7 @@ export class GameplayService {
 
   // ----------------------------------------------
   // Client -> Server
-  // ---------------------------------------------- 
+  // ----------------------------------------------
 
   public disconnected(message: GameplayDisconnectedMessage) {
     this.deleteUser(message.userId, 'disconnected');
@@ -132,21 +166,23 @@ export class GameplayService {
       userId: message.userId,
       index: message.index,
       actionType: message.actionType,
-      movAngle: message.movAngle
+      movAngle: message.movAngle,
     });
   }
 
   private checkUserConnected(userId: string) {
-    if(!GameplayService.ConnectedUsers.has(userId)) {
-      throw new Error('User '+ userId +' is not connected');
+    if (!GameplayService.ConnectedUsers.has(userId)) {
+      throw new Error('User ' + userId + ' is not connected');
     }
   }
 
   private checkAndGetGameInstance(gameId: string, description?: string) {
     const gameInstance = this.gameInstances.get(gameId);
     if (!gameInstance) {
-      throw new Error(`Game '+ gameId +' does not exist.${description && description.length > 0 ? ` (${description})` : ''}`);
-    } 
+      throw new Error(
+        `Game '+ gameId +' does not exist.${description && description.length > 0 ? ` (${description})` : ''}`,
+      );
+    }
     return gameInstance;
   }
 
@@ -160,11 +196,11 @@ export class GameplayService {
   handleEventGameInit(payload: EventGameInit) {
     // Notify new users about full game state
     if (payload.charactersFullStruct.length > 0) {
-      this.usersToInit.forEach(userId => {
+      this.usersToInit.forEach((userId) => {
         const message: WsGatewayGameInitMessage = {
-          targetUserId : userId,
+          targetUserId: userId,
           gameId: payload.gameId,
-          charactersFullStruct: payload.charactersFullStruct
+          charactersFullStruct: payload.charactersFullStruct,
         };
         this.wsGatewayService.emit(WsGatewayGameInitPattern, message);
       });
@@ -220,7 +256,7 @@ export class GameplayService {
   handleEventGameCreateProjectile(payload: EventGameCreateProjectile) {
     const message: WsGatewayGameCreateProjectileMessage = {
       gameId: payload.gameId,
-    }
+    };
     this.wsGatewayService.emit(WsGatewayGameCreateProjectilePattern, message);
   }
 
@@ -228,7 +264,7 @@ export class GameplayService {
   handleEventGameDeleteProjectile(payload: EventGameDeleteProjectile) {
     const message: WsGatewayGameDeleteProjectileMessage = {
       gameId: payload.gameId,
-    }
+    };
     this.wsGatewayService.emit(WsGatewayGameDeleteProjectilePattern, message);
   }
 
@@ -238,8 +274,8 @@ export class GameplayService {
   handleEventGameCharacterActions(payload: EventGameCharacterActions) {
     const message: WsGatewayGameCharacterActionsMessage = {
       gameId: payload.gameId,
-      actions: payload.actions
-    }
+      actions: payload.actions,
+    };
     this.wsGatewayService.emit(WsGatewayGameCharacterActionsPattern, message);
   }
 
@@ -251,8 +287,8 @@ export class GameplayService {
     if (payload.charactersMinStruct.length > 0) {
       const message: WsGatewayGameLoopStateMessage = {
         gameId: payload.gameId,
-        charactersMinStruct: payload.charactersMinStruct
-      }
+        charactersMinStruct: payload.charactersMinStruct,
+      };
       this.wsGatewayService.emit(WsGatewayGameLoopStatePattern, message);
     }
   }
@@ -261,8 +297,8 @@ export class GameplayService {
   handleEventGameGameState(payload: EventGameGameState) {
     const message: WsGatewayGameGameStateMessage = {
       gameId: payload.gameId,
-      gameState: payload.gameState
-    }
+      gameState: payload.gameState,
+    };
     this.wsGatewayService.emit(WsGatewayGameGameStatePattern, message);
   }
 
@@ -280,8 +316,8 @@ export class GameplayService {
         usersToDrop.push(key);
       }
     });
-  
-    usersToDrop.forEach(key => {
+
+    usersToDrop.forEach((key) => {
       this.userLastRequestTime.delete(key);
       this.deleteUser(key, 'drop');
     });
@@ -290,16 +326,18 @@ export class GameplayService {
   private deleteUser(userId: string, deleteType: string) {
     if (GameplayService.ConnectedUsers.has(userId)) {
       GameplayService.ConnectedUsers.delete(userId);
-      const gameInstance = this.checkAndGetGameInstance(this.userGameInstance.get(userId), `${deleteType} ${userId}`);
+      const gameInstance = this.checkAndGetGameInstance(
+        this.userGameInstance.get(userId),
+        `${deleteType} ${userId}`,
+      );
       if (gameInstance) {
         gameInstance.deletePlayer(userId);
         this.userGameInstance.delete(userId);
       } else {
-        Logger.error('User '+ userId +' is not in the game, unable to drop');
+        Logger.error('User ' + userId + ' is not in the game, unable to drop');
       }
     } else {
-      Logger.error('User '+ userId +' is not connected, unable to drop');
+      Logger.error('User ' + userId + ' is not connected, unable to drop');
     }
   }
-
 }

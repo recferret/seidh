@@ -13,7 +13,7 @@ import { Boost, BoostSchema } from '@app/seidh-common/schemas/schema.boost';
     MongooseModule.forRoot(InternalProtocol.MongoUrl),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      { name: Boost.name, schema: BoostSchema }
+      { name: Boost.name, schema: BoostSchema },
     ]),
   ],
   controllers: [BoostController],

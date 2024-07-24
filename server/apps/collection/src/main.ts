@@ -6,7 +6,8 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(CollectionModule);
+  const app =
+    await NestFactory.create<NestExpressApplication>(CollectionModule);
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,

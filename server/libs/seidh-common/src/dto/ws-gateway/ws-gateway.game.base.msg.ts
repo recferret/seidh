@@ -1,5 +1,5 @@
-import { WsGatewayBaseMsg } from "./ws-gateway.base.msg";
+import { WsGatewayBaseMsg } from './ws-gateway.base.msg';
 
 export interface WsGatewayGameBaseMsg extends WsGatewayBaseMsg {
-    gameId: string;
+  gameId: string;
 }

@@ -1,7 +1,13 @@
 import { Controller } from '@nestjs/common';
 import { BoostService } from './boost.service';
-import { BoostsGetPattern, BoostsGetMessageRequest } from '@app/seidh-common/dto/boost/boost.buy.boosts.msg';
-import { BoostsBuyBoostPattern, BoostsBuyBoostMessageRequest } from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
+import {
+  BoostsGetPattern,
+  BoostsGetMessageRequest,
+} from '@app/seidh-common/dto/boost/boost.buy.boosts.msg';
+import {
+  BoostsBuyBoostPattern,
+  BoostsBuyBoostMessageRequest,
+} from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
 import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
@@ -17,5 +23,4 @@ export class BoostController {
   async buyBoost(message: BoostsBuyBoostMessageRequest) {
     return this.boostService.buyBoost(message);
   }
-
 }

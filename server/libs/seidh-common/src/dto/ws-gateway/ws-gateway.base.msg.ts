@@ -1,4 +1,4 @@
 export interface WsGatewayBaseMsg {
-    targetUserId?: string;
-    excludeUserId?: string;
+  targetUserId?: string;
+  excludeUserId?: string;
 }

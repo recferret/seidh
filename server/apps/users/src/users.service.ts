@@ -1,5 +1,4 @@
 import {
-  UserCharacterStruct,
   UsersAuthenticateMessageRequest,
   UsersAuthenticateMessageResponse,
 } from '@app/seidh-common/dto/users/users.authenticate.msg';
@@ -19,7 +18,6 @@ import {
 } from '@app/seidh-common/dto/users/users.get.user.msg';
 import {
   Character,
-  CharacterDocument,
   CharacterType,
 } from '@app/seidh-common/schemas/schema.character';
 import { User, UserDocument } from '@app/seidh-common/schemas/schema.user';
@@ -32,7 +30,7 @@ import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ReferralUpdateReferrerPattern } from '@app/seidh-common/dto/referral/referral.update.referrer.msg';
 
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -51,27 +49,27 @@ export class UsersService {
       success: false,
     };
 
-    function dbCharacterToStruct(c: any) {
-      const character = c as CharacterDocument;
-      const characterStruct: UserCharacterStruct = {
-        id: character.id,
-        active: character.active,
-        type: character.type,
-        levelCurrent: character.levelCurrent,
-        levelMax: character.levelMax,
-        expCurrent: character.expCurrent,
-        expTillNewLevel: character.expTillNewLevel,
-        health: character.health,
-        movement: {
-          runSpeed: character.movement.runSpeed,
-          walkSpeed: character.movement.walkSpeed,
-        },
-        actionMain: {
-          damage: character.actionMain.damage,
-        },
-      };
-      return characterStruct;
-    }
+    // function dbCharacterToStruct(c: any) {
+    //   const character = c as CharacterDocument;
+    //   const characterStruct: UserCharacterStruct = {
+    //     id: character.id,
+    //     active: character.active,
+    //     type: character.type,
+    //     levelCurrent: character.levelCurrent,
+    //     levelMax: character.levelMax,
+    //     expCurrent: character.expCurrent,
+    //     expTillNewLevel: character.expTillNewLevel,
+    //     health: character.health,
+    //     movement: {
+    //       runSpeed: character.movement.runSpeed,
+    //       walkSpeed: character.movement.walkSpeed,
+    //     },
+    //     actionMain: {
+    //       damage: character.actionMain.damage,
+    //     },
+    //   };
+    //   return characterStruct;
+    // }
 
     let existingUser: UserDocument;
     let telegramId: string;

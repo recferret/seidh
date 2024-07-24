@@ -1,3 +1,3 @@
 export class FindGameDto {
-    gameplayServiceId: string;
+  gameplayServiceId: string;
 }

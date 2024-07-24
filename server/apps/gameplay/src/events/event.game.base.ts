@@ -1,3 +1,3 @@
 export interface EventGameBase {
-    gameId: string;
+  gameId: string;
 }

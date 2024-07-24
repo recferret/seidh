@@ -17,7 +17,7 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
         transport: Transport.NATS,
         options: {
           servers: [InternalProtocol.NatsUrl],
-        }
+        },
       },
     ]),
     JwtModule.register({

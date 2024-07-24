@@ -4,9 +4,7 @@ import { TgService } from './tg.service';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
-  imports: [
-    PrometheusModule.register(),
-  ],
+  imports: [PrometheusModule.register()],
   controllers: [TgController],
   providers: [TgService],
 })
