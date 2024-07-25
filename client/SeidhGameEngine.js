@@ -1226,7 +1226,10 @@ engine_base_geometry_Rectangle.prototype = {
 	}
 	,__class__: engine_base_geometry_Rectangle
 };
-var engine_seidh_SeidhGameEngine = $hx_exports["engine"]["seidh"]["SeidhGameEngine"] = function(engineMode) {
+var engine_seidh_SeidhGameEngine = $hx_exports["engine"]["seidh"]["SeidhGameEngine"] = function(engineMode,winCondition) {
+	if(winCondition == null) {
+		winCondition = 2;
+	}
 	this.mobsSpawnPoints = [];
 	this.playersSpawnPoints = [new engine_base_geometry_Point(2500,2500)];
 	this.lineColliders = [];
@@ -1242,6 +1245,7 @@ var engine_seidh_SeidhGameEngine = $hx_exports["engine"]["seidh"]["SeidhGameEngi
 	this.timePassed = 0.0;
 	this.framesPassed = 0;
 	engine_base_core_BaseEngine.call(this,engineMode);
+	this.winCondition = winCondition;
 	this.addLineCollider(0,0,engine_seidh_SeidhGameEngine.GameWorldSize,0);
 	this.mobsSpawnPoints.push(new engine_base_geometry_Point(0,-200));
 	this.mobsSpawnPoints.push(new engine_base_geometry_Point(200,-200));
@@ -1585,6 +1589,14 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 			if(this.characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
 				this.characterActionCallbacks(characterActionCallbackParams);
 			}
+			if(this.winCondition != 2) {
+				if(this.winCondition == 1 && this.mobsKilled == this.mobsMax && allowServerLogic) {
+					this.gameState = 2;
+					if(this.gameStateCallback != null) {
+						this.gameStateCallback(this.gameState);
+					}
+				}
+			}
 			this.recentEngineLoopTime = Date.now() - beginTime;
 			this.spawnMobs();
 		} else if(this.gameState == 3) {
@@ -1627,12 +1639,6 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 			this.characterEntityManager.delete(entity.getId());
 		}
 		this.mobsSpawned = 0;
-	}
-	,getPlayersCount: function() {
-		return this.characterEntityManager.getEntitiesByEntityType(1).length + this.characterEntityManager.getEntitiesByEntityType(2).length;
-	}
-	,getMobsCount: function() {
-		return this.characterEntityManager.getEntitiesByEntityType(3).length + this.characterEntityManager.getEntitiesByEntityType(4).length;
 	}
 	,getPlayerGainings: function(playerId) {
 		return { kills : Object.prototype.hasOwnProperty.call(this.playerZombieKills.h,playerId) ? this.playerZombieKills.h[playerId] : 0, tokens : Object.prototype.hasOwnProperty.call(this.playerTokensAccquired.h,playerId) ? this.playerTokensAccquired.h[playerId] : 0, exp : Object.prototype.hasOwnProperty.call(this.playerExpGained.h,playerId) ? this.playerExpGained.h[playerId] : 0};
@@ -1710,11 +1716,29 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 	,getMobsSpawnPoints: function() {
 		return this.mobsSpawnPoints;
 	}
+	,getMobsMax: function() {
+		return this.mobsMax;
+	}
+	,getPlayersCount: function() {
+		return this.characterEntityManager.getEntitiesByEntityType(1).length + this.characterEntityManager.getEntitiesByEntityType(2).length;
+	}
+	,getMobsCount: function() {
+		return this.characterEntityManager.getEntitiesByEntityType(3).length + this.characterEntityManager.getEntitiesByEntityType(4).length;
+	}
+	,getWinCondition: function() {
+		return this.winCondition;
+	}
 	,setGameState: function(gameState) {
 		this.gameState = gameState;
 		if(this.gameStateCallback != null) {
 			this.gameStateCallback(gameState);
 		}
+	}
+	,setMobsMax: function(mobsMax) {
+		this.mobsMax = mobsMax;
+	}
+	,setWinCondition: function(winCondition) {
+		this.winCondition = winCondition;
 	}
 	,__class__: engine_seidh_SeidhGameEngine
 });

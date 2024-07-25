@@ -35,6 +35,9 @@ export class GameInstance {
     public gameId: string,
     public gameType: GameType,
   ) {
+    // By default winCondition is WinCondition.INFINITE
+    // this.engine = new Engine.engine.seidh.SeidhGameEngine(EngineMode.SERVER, WinCondition.KILL_MOBS);
+    // this.engine = new Engine.engine.seidh.SeidhGameEngine(EngineMode.SERVER, WinCondition.INFINITE);
     this.engine = new Engine.engine.seidh.SeidhGameEngine(EngineMode.SERVER);
 
     // -----------------------------------

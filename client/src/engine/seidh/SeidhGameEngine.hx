@@ -20,7 +20,9 @@ class SeidhGameEngine extends BaseEngine {
     private var framesPassed = 0;
     private var timePassed = 0.0;
 
-    private final mobsMax = 200;
+    private var winCondition:WinCondition;
+
+    private var mobsMax = 200;
     private var allowSpawnMobs = false;
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
@@ -44,8 +46,10 @@ class SeidhGameEngine extends BaseEngine {
 
     public static function main() {}
 
-    public function new(engineMode:EngineMode) {
+    public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.INFINITE) {
 	    super(engineMode);
+
+        this.winCondition = winCondition;
 
         // mobsSpawnPoints.push(new Point(2000, 2000));
         // mobsSpawnPoints.push(new Point(2000, 3000));
@@ -314,13 +318,14 @@ class SeidhGameEngine extends BaseEngine {
                 characterActionCallbacks(characterActionCallbackParams);
             }
 
-            // Infinite play
-            // if (mobsKilled == mobsMax && allowServerLogic) {
-            //     gameState = GameState.WIN;
-            //     if (gameStateCallback != null) {
-            //         gameStateCallback(gameState);
-            //     }
-            // }
+            if (winCondition != WinCondition.INFINITE) {
+                if (winCondition == WinCondition.KILL_MOBS && mobsKilled == mobsMax && allowServerLogic) {
+                    gameState = GameState.WIN;
+                    if (gameStateCallback != null) {
+                        gameStateCallback(gameState);
+                    }
+                }
+            }
 
             recentEngineLoopTime = Date.now() - beginTime;
             spawnMobs();
@@ -369,18 +374,6 @@ class SeidhGameEngine extends BaseEngine {
             characterEntityManager.delete(entity.getId());
         };
         mobsSpawned = 0;
-    }
-
-    public function getPlayersCount() {
-        return 
-            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
-            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
-    }
-
-    public function getMobsCount() {
-        return 
-            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY).length +
-            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL).length;
     }
 
     public function getPlayerGainings(playerId:String) {
@@ -474,6 +467,26 @@ class SeidhGameEngine extends BaseEngine {
         return mobsSpawnPoints;
     }
 
+    public function getMobsMax() {
+        return mobsMax;
+    }
+
+    public function getPlayersCount() {
+        return 
+            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
+            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
+    }
+
+    public function getMobsCount() {
+        return 
+            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY).length +
+            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL).length;
+    }
+
+    public function getWinCondition() {
+        return winCondition;
+    }
+
     // ---------------------------------------------------
     // Setters
     // ---------------------------------------------------
@@ -483,5 +496,13 @@ class SeidhGameEngine extends BaseEngine {
         if (gameStateCallback != null) {
             gameStateCallback(gameState);
         }
+    }
+
+    public function setMobsMax(mobsMax:Int) {
+        this.mobsMax = mobsMax;
+    }
+
+    public function setWinCondition(winCondition:WinCondition) {
+        this.winCondition = winCondition;
     }
 }
