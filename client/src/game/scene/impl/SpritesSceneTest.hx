@@ -96,8 +96,7 @@ class SceneSpritesTest extends BasicScene {
 
 		// FX
 
-		ragnar = new ClientCharacterEntity(this);
-		ragnar.initiateEngineEntity(SeidhEntityFactory.InitiateCharacter(null, null, 200, 200, EntityType.RAGNAR_LOH));
+		ragnar = new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 200, 200, EntityType.RAGNAR_LOH));
 
         rock = new ClientTerrainEntity(this, TerrainType.ROCK, Res.instance.getTileResource(SeidhResource.TERRAIN_ROCK));
         rock.setPosition(300, 200);

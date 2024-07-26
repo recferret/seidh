@@ -20,7 +20,9 @@ class SeidhGameEngine extends BaseEngine {
     private var framesPassed = 0;
     private var timePassed = 0.0;
 
-    private final mobsMax = 200;
+    private var winCondition:WinCondition;
+
+    private var mobsMax = 1;
     private var allowSpawnMobs = false;
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
@@ -47,33 +49,35 @@ class SeidhGameEngine extends BaseEngine {
     public function new(engineMode:EngineMode) {
 	    super(engineMode);
 
-        // mobsSpawnPoints.push(new Point(2000, 2000));
-        // mobsSpawnPoints.push(new Point(2000, 3000));
-        // mobsSpawnPoints.push(new Point(2000, 2500));
+        this.winCondition = winCondition;
+
+        mobsSpawnPoints.push(new Point(2000, 2000));
+        mobsSpawnPoints.push(new Point(2000, 3000));
+        mobsSpawnPoints.push(new Point(2000, 2500));
 
         // Top
-		addLineCollider(0, 0, GameWorldSize, 0);
-        for (x in 0...26) {
-            mobsSpawnPoints.push(new Point(200 * x, -200));
-        }
+		// addLineCollider(0, 0, GameWorldSize, 0);
+        // for (x in 0...26) {
+        //     mobsSpawnPoints.push(new Point(200 * x, -200));
+        // }
 
-        // Bottom
-		addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);
-        for (x in 0...26) {
-            mobsSpawnPoints.push(new Point(200 * x, 5200));
-        }
+        // // Bottom
+		// addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);
+        // for (x in 0...26) {
+        //     mobsSpawnPoints.push(new Point(200 * x, 5200));
+        // }
 
-        // Left
-		addLineCollider(0, 0, 0, GameWorldSize);
-        for (y in 0...26) {
-            mobsSpawnPoints.push(new Point(-200, 200 * y));
-        }
+        // // Left
+		// addLineCollider(0, 0, 0, GameWorldSize);
+        // for (y in 0...26) {
+        //     mobsSpawnPoints.push(new Point(-200, 200 * y));
+        // }
 
-        // Right
-		addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
-        for (y in 0...26) {
-            mobsSpawnPoints.push(new Point(5200, 200 * y));
-        }
+        // // Right
+		// addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
+        // for (y in 0...26) {
+        //     mobsSpawnPoints.push(new Point(5200, 200 * y));
+        // }
     }
 
     // ---------------------------------------------------

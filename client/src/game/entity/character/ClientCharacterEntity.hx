@@ -20,10 +20,25 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     var targetServerPosition = new Point();
 	var BaseGameScene(default, null):Int;
 
-    public function new(s2d:h2d.Scene) {
+    public function new(s2d:h2d.Scene, engineEntity:EngineCharacterEntity) {
         super();
 
-        s2d.add(this, 0, GameScene.CHARACTER_LAYER);
+        s2d.add(this, 0, engineEntity.isPlayer() ? GameScene.RAGNAR_CHARACTER_LAYER : GameScene.ZOMBIE_CHARACTER_LAYER);
+
+		this.engineEntity = engineEntity;
+		setPosition(engineEntity.getX(), engineEntity.getY());
+
+        switch (engineEntity.getEntityType()) {
+            case EntityType.RAGNAR_LOH:
+                animation = CharacterAnimations.LoadRagnarLohAnimation(this);
+            case EntityType.RAGNAR_NORM:
+                animation = CharacterAnimations.LoadRagnarNormAnimation(this);
+            case EntityType.ZOMBIE_BOY:
+                animation = CharacterAnimations.LoadZombieBoyAnimation(this);
+            case EntityType.ZOMBIE_GIRL:
+                animation = CharacterAnimations.LoadZombieGirlAnimation(this);
+            default:
+        }
     }
 
     // ------------------------------------------------------------
@@ -58,23 +73,6 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
     }
-
-    public function initiateEngineEntity(engineEntity:EngineCharacterEntity) {
-		this.engineEntity = engineEntity;
-		setPosition(engineEntity.getX(), engineEntity.getY());
-
-        switch (engineEntity.getEntityType()) {
-            case EntityType.RAGNAR_LOH:
-                animation = CharacterAnimations.LoadRagnarLohAnimation(this);
-            case EntityType.RAGNAR_NORM:
-                animation = CharacterAnimations.LoadRagnarNormAnimation(this);
-            case EntityType.ZOMBIE_BOY:
-                animation = CharacterAnimations.LoadZombieBoyAnimation(this);
-            case EntityType.ZOMBIE_GIRL:
-                animation = CharacterAnimations.LoadZombieGirlAnimation(this);
-            default:
-        }
-	}
  
     // ------------------------------------------------------------
     // General
@@ -91,9 +89,12 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 
             final distance = targetServerPosition.distance(new Point(x, y));
             if (distance > 1) {
-                animation.setAnimationState(RUN);
                 x = Math.lerp(x, targetServerPosition.x, 0.07);
                 y = Math.lerp(y, targetServerPosition.y, 0.07);
+            }
+
+            if (distance > 10) {
+                animation.setAnimationState(RUN);
             } else {
                 animation.setAnimationState(IDLE);
             }

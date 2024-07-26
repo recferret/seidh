@@ -17,7 +17,8 @@ class GameScene extends BasicScene implements EventListener {
 
 	public static final TERRAIN_LAYER = 1;
 	public static final ITEM_LAYER = 1;
-	public static final CHARACTER_LAYER = 0;
+	public static final ZOMBIE_CHARACTER_LAYER = 0;
+	public static final RAGNAR_CHARACTER_LAYER = 0;
 
     public function new(engineMode:EngineMode) {
 		super(new SeidhGameEngine(engineMode));

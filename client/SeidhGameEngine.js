@@ -728,8 +728,10 @@ engine_base_entity_impl_EngineCharacterEntity.prototype = $extend(engine_base_en
 		}
 		if(this.hasTargetObject() && !this.isPlayer()) {
 			this.aiMoveToTarget();
-			if(this.ifTargetInAttackRange()) {
-				this.aiMeleeAttack();
+			if(engine_base_EngineConfig.AI_ATTACK_ENABLED) {
+				if(this.ifTargetInAttackRange()) {
+					this.aiMeleeAttack();
+				}
 			}
 		}
 		if(this.customUpdate != null) {
@@ -1238,10 +1240,11 @@ var engine_seidh_SeidhGameEngine = $hx_exports["engine"]["seidh"]["SeidhGameEngi
 	this.mobsKilled = 0;
 	this.mobsSpawned = 0;
 	this.allowSpawnMobs = false;
-	this.mobsMax = 200;
+	this.mobsMax = 1;
 	this.timePassed = 0.0;
 	this.framesPassed = 0;
 	engine_base_core_BaseEngine.call(this,engineMode);
+<<<<<<< Updated upstream
 	this.addLineCollider(0,0,engine_seidh_SeidhGameEngine.GameWorldSize,0);
 	this.mobsSpawnPoints.push(new engine_base_geometry_Point(0,-200));
 	this.mobsSpawnPoints.push(new engine_base_geometry_Point(200,-200));
@@ -1350,6 +1353,12 @@ var engine_seidh_SeidhGameEngine = $hx_exports["engine"]["seidh"]["SeidhGameEngi
 	this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,4600));
 	this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,4800));
 	this.mobsSpawnPoints.push(new engine_base_geometry_Point(5200,5000));
+=======
+	this.winCondition = winCondition;
+	this.mobsSpawnPoints.push(new engine_base_geometry_Point(2000,2000));
+	this.mobsSpawnPoints.push(new engine_base_geometry_Point(2000,3000));
+	this.mobsSpawnPoints.push(new engine_base_geometry_Point(2000,2500));
+>>>>>>> Stashed changes
 };
 engine_seidh_SeidhGameEngine.__name__ = true;
 engine_seidh_SeidhGameEngine.main = function() {
@@ -3235,6 +3244,7 @@ var Class = { };
 var Enum = { };
 js_Boot.__toStr = ({ }).toString;
 engine_base_EngineConfig.AI_ENABLED = true;
+engine_base_EngineConfig.AI_ATTACK_ENABLED = false;
 engine_base_EngineConfig.TARGET_FPS = 20;
 engine_seidh_SeidhGameEngine.GameWorldSize = 5000;
 haxe_Int32._mul = Math.imul != null ? Math.imul : function(a,b) {

@@ -11,7 +11,7 @@ function getGameConfig() {
         PlaySounds: false,
         TelegramAuth: false,
         Analytics: false,
-        Serverless: false,
+        Serverless: true,
         TestEmail: 'test1@gmail.com',
         TestReferrerId: '',
     }

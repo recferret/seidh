@@ -148,8 +148,10 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		// Ai
 		if (hasTargetObject() && !isPlayer()) {
 			aiMoveToTarget();
-			if (ifTargetInAttackRange()) {
-				aiMeleeAttack();
+			if (EngineConfig.AI_ATTACK_ENABLED) {
+				if (ifTargetInAttackRange()) {
+					aiMeleeAttack();
+				}
 			}
 		}
 

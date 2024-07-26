@@ -79,8 +79,7 @@ abstract class BasicScene extends h2d.Scene {
 			this.seidhGameEngine = seidhGameEngine;
 
 			this.seidhGameEngine.createCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
-				final character = new ClientCharacterEntity(this);
-				character.initiateEngineEntity(characterEntity);
+				final character = new ClientCharacterEntity(this, characterEntity);
 				clientCharacterEntities.set(character.getId(), character);
 
 				if (character.getOwnerId() == Player.instance.userId) {
@@ -113,8 +112,7 @@ abstract class BasicScene extends h2d.Scene {
 
 			// TODO need better abstraction for client entities
 			this.seidhGameEngine.createConsumableCallback = function callback(consumableEntity:EngineConsumableEntity) {
-				final consumable = new ClientConsumableEntity(this);
-				consumable.initiateEngineEntity(consumableEntity);
+				final consumable = new ClientConsumableEntity(this, consumableEntity);
 				clientConsumableEntities.set(consumableEntity.getId(), consumable);
 			};
 
@@ -202,13 +200,9 @@ abstract class BasicScene extends h2d.Scene {
 				if (gameState == GameState.WIN) {
 					NativeWindowJS.trackGameWin();
 					gameUiScene.showWinDialog(0);
-				} else if (gameState == GameState.LOSE) {
+				} else {
 					NativeWindowJS.trackGameLose();
 					gameUiScene.showLoseDialog(0);
-					trace('PLAYER KILLED ?');
-					trace(this.seidhGameEngine.getPlayerGainings(Player.instance.userId));
-				} else {
-					trace('Game Over!');
 				}
 			};
 		}
