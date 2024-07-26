@@ -1,5 +1,7 @@
 package game.scene.home;
 
+import game.ui.bar.BarUserName;
+import game.ui.bar.BarGold;
 import game.js.NativeWindowJS;
 import h2d.filter.Displacement;
 
@@ -290,6 +292,16 @@ class PlayContent extends BasicHomeContent {
             switchRagner('right');
         }
         addChild(nextRagnarButtonInteractive);
+
+        // Balance
+        final barGold = new BarGold(this);
+        barGold.setPosition(playButton.x, playButton.y + 110);
+        barGold.setScale(1.3);
+
+        // User name
+        final barUserName = new BarUserName(this);
+        barUserName.setPosition(lvlButton.x, lvlButton.y - 120);
+        barUserName.setScale(1.3);
     }
 
     public function update(dt:Float) {

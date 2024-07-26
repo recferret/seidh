@@ -14,8 +14,8 @@ class BarGold extends h2d.Object {
 
     private var goldAmount = 0;
 
-    public function new(s2d:h2d.Scene) {
-        super(s2d);
+    public function new(parent:h2d.Object) {
+        super(parent);
 
         barBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_MONEY), this);
 

@@ -4,6 +4,11 @@ export enum EngineMode {
   SERVER = 3,
 }
 
+export enum WinCondition {
+  KILL_MOBS = 1,
+  INFINITE = 2,
+}
+
 export enum Side {
   LEFT = 1,
   RIGHT = 2,

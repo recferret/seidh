@@ -13,6 +13,11 @@ enum abstract EngineMode(Int) {
 	var SERVER = 3;
 }
 
+enum abstract WinCondition(Int) {
+	var KILL_MOBS = 1;
+	var INFINITE = 2;
+}
+
 enum abstract Side(Int) {
 	var LEFT = 1;
 	var RIGHT = 2;

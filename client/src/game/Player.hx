@@ -9,6 +9,7 @@ class Player {
 
 	public var userId:String;
 	public var userEntityId:String;
+	public var userName:String;
 	public var authToken:String;
 	public var tokens:Int;
 	public var kills:Int;
@@ -21,6 +22,7 @@ class Player {
 	public function setUserData(userData:Dynamic) {
 		userId = userData.userId;
 		userEntityId = 'entity_' + userData.userId;
+		userName = 'USER 1';
 		authToken = userData.authToken;
 		tokens = userData.tokens;
 		kills = userData.kills;

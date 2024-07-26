@@ -46,7 +46,7 @@ class SeidhGameEngine extends BaseEngine {
 
     public static function main() {}
 
-    public function new(engineMode:EngineMode) {
+    public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.INFINITE) {
 	    super(engineMode);
 
         this.winCondition = winCondition;
