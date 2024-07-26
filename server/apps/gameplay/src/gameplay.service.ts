@@ -65,6 +65,10 @@ import {
   WsGatewayGameDeleteConsumablePattern,
 } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
 import { EventGameInit } from './events/event.game.init';
+import {
+  GameplayCreatedRoomMsg,
+  GameplayCreateNewRoomMsg,
+} from '@app/seidh-common/dto/gameplay/gameplay.createNewRoom.msg';
 
 @Injectable()
 export class GameplayService {
@@ -90,10 +94,11 @@ export class GameplayService {
       const games: GameplayLobbyGameInfo[] = [];
 
       this.gameInstances.forEach((gameInstance) => {
+        console.log('gameInstance', gameInstance.gameId);
         games.push({
           gameId: gameInstance.gameId,
           gameType: gameInstance.gameType,
-          usersOnline: 0,
+          usersOnline: 6, // Testing purpose
         });
       });
 
@@ -105,13 +110,16 @@ export class GameplayService {
     }, 1000);
 
     // Dummy game for testing
-    this.gameInstance = new GameInstance(
-      this.eventEmitter,
-      uuidv4(),
-      GameType.PublicGame,
+    let id = uuidv4();
+    this.gameInstances.set(
+      id,
+      new GameInstance(this.eventEmitter, id, GameType.PublicGame),
     );
-    this.gameInstances.set(this.gameInstance.gameId, this.gameInstance);
-
+    id = uuidv4();
+    this.gameInstances.set(
+      id,
+      new GameInstance(this.eventEmitter, id, GameType.TestGame),
+    );
     Logger.log('GameplayService initialized', Config.GAMEPLAY_INSTANCE_ID);
   }
 
@@ -168,6 +176,19 @@ export class GameplayService {
       actionType: message.actionType,
       movAngle: message.movAngle,
     });
+  }
+
+  public createNewGameRoom(message: GameplayCreateNewRoomMsg) {
+    const instanceId = uuidv4();
+    this.gameInstances.set(
+      instanceId,
+      new GameInstance(this.eventEmitter, instanceId, message.gameType),
+    );
+
+    return {
+      gameInstance: instanceId,
+      gamePlayInstance: Config.GAMEPLAY_INSTANCE_ID,
+    } as GameplayCreatedRoomMsg;
   }
 
   private checkUserConnected(userId: string) {

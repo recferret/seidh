@@ -5,10 +5,12 @@ import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    ConfigModule.forRoot(),
     PrometheusModule.register(),
     ClientsModule.register([
       {

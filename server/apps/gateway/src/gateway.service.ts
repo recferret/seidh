@@ -5,6 +5,7 @@ import {
   GameplayLobbyFindGameMessageRequest,
   GameplayLobbyFindGameMessageResponse,
   GameplayLobbyFindGamePattern,
+  GameType,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -33,14 +34,14 @@ export class GatewayService implements OnModuleInit {
 
   async onModuleInit() {}
 
-  async findGame(userId: string) {
+  async findGame(userId: string, gameType: GameType) {
     const request: GameplayLobbyFindGameMessageRequest = {
       userId,
+      gameType,
     };
-    const response: GameplayLobbyFindGameMessageResponse = await firstValueFrom(
+    return (await firstValueFrom(
       this.gameplayLobbyService.send(GameplayLobbyFindGamePattern, request),
-    );
-    return response;
+    )) as GameplayLobbyFindGameMessageResponse;
   }
 
   async authenticate(authenticateRequest: AuthenticateRequest) {

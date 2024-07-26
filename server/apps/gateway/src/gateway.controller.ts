@@ -13,6 +13,7 @@ import { GatewayService } from './gateway.service';
 import { AuthenticateRequest } from './dto/authenticate.dto';
 import { AuthGuard } from './guards/guard.auth';
 import { Observable } from 'rxjs';
+import { GameType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 
 @Injectable()
 class ProductionGuard implements CanActivate {
@@ -46,8 +47,11 @@ export class GatewayController {
 
   @Post('findGame')
   @UseGuards(AuthGuard)
-  findGame(@Session() session: IUserSession) {
-    return this.gatewayService.findGame(session.userId);
+  findGame(
+    @Session() session: IUserSession,
+    @Body() body: { gameType: GameType },
+  ) {
+    return this.gatewayService.findGame(session.userId, body.gameType);
   }
 
   @Get('boosts')
