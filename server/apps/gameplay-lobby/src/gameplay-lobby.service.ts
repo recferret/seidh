@@ -1,27 +1,38 @@
 import { ServiceName } from '@app/seidh-common';
-import { 
-  GameplayLobbyFindGameMessageRequest, 
-  GameplayLobbyFindGameMessageResponse 
+import {
+  GameplayLobbyFindGameMessageRequest,
+  GameplayLobbyFindGameMessageResponse,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
-import { 
-  GameplayLobbyGameplayInstanceInfo, 
-  GameplayLobbyUpdateGamesMessage 
+import {
+  GameplayLobbyGameplayInstanceInfo,
+  GameplayLobbyUpdateGamesMessage,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.update.games.msg';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { firstValueFrom } from 'rxjs';
+import {
+  GameplayCreatedRoomMsg,
+  GameplayCreateNewGamePattern,
+  GameplayCreateNewRoomMsg,
+} from '@app/seidh-common/dto/gameplay/gameplay.createNewRoom.msg';
 
 @Injectable()
 export class GameplayLobbyService {
- 
-  private readonly gameplayServices = new Map<string, GameplayLobbyGameplayInstanceInfo>();
+  private readonly maxUserAllowedTest = Number(
+    process.env.MAX_ALLOWED_USER_TEST,
+  );
+  private readonly gameplayServices = new Map<
+    string,
+    GameplayLobbyGameplayInstanceInfo
+  >();
 
   constructor(
-    @Inject(ServiceName.Gameplay) private gameplayService: ClientProxy
+    @Inject(ServiceName.Gameplay) private gameplayService: ClientProxy,
   ) {}
 
   updateGames(data: GameplayLobbyUpdateGamesMessage) {
-    this.gameplayServices.set(data.gameplayServiceId, { 
+    this.gameplayServices.set(data.gameplayServiceId, {
       gameplayServiceId: data.gameplayServiceId,
       games: data.games,
       lastUpdateTime: Date.now(),
@@ -29,20 +40,40 @@ export class GameplayLobbyService {
   }
 
   async findGame(data: GameplayLobbyFindGameMessageRequest) {
-      if (this.gameplayServices.size > 0) {
-        let gameplayServiceId: string = undefined;
+    const response: GameplayLobbyFindGameMessageResponse = {
+      gameplayId: '',
+      gameplayServiceId: '',
+    };
 
-        // Need to get an instance id to communicate with
-        this.gameplayServices.forEach((service, id) => {
-          // Pick the first game instance for testing purposes
-          gameplayServiceId = id;
-        });
-  
-        const response: GameplayLobbyFindGameMessageResponse = {
-          gameplayServiceId
+    if (this.gameplayServices.size > 0) {
+      this.gameplayServices.forEach((service) => {
+        const filteredGames = service.games.filter(
+          (game) =>
+            game.gameType === data.gameType &&
+            game.usersOnline <= this.maxUserAllowedTest,
+        );
+        console.log(filteredGames);
+        if (filteredGames.length > 0) {
+          const sortedGames = filteredGames.sort(
+            (a, b) => a.usersOnline - b.usersOnline,
+          );
+          response.gameplayServiceId = service.gameplayServiceId;
+          response.gameplayId = sortedGames[0].gameId;
+        }
+      });
+      if (response.gameplayId == '') {
+        const responseFromService: GameplayCreatedRoomMsg =
+          await firstValueFrom(
+            this.gameplayService.send(GameplayCreateNewGamePattern, {
+              gameType: data.gameType,
+            } as GameplayCreateNewRoomMsg),
+          );
+        return {
+          gameplayId: responseFromService.gameInstance,
+          gameplayServiceId: responseFromService.gamePlayInstance,
         };
-        
-        return response;
+      }
+      return response;
     } else {
       throw new Error('no gameplay services available');
     }
@@ -52,14 +83,15 @@ export class GameplayLobbyService {
   dropOutdatedGameplaySerives() {
     const now = Date.now();
     const gameplayServicesToDrop = [];
-  
+
     this.gameplayServices.forEach((service, serviceId) => {
       if (now - service.lastUpdateTime > 2000) {
         gameplayServicesToDrop.push(serviceId);
       }
     });
-  
-    gameplayServicesToDrop.forEach(serviceId => this.gameplayServices.delete(serviceId));
-  }
 
+    gameplayServicesToDrop.forEach((serviceId) =>
+      this.gameplayServices.delete(serviceId),
+    );
+  }
 }
