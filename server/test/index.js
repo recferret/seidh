@@ -1,48 +1,86 @@
-const playerId = 'player_1';
+import { io } from 'socket.io-client';
 
-async function init() {
-    const findGameResult = await fetch('http://localhost:3003/findGame', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-            playerId
-        })
+const restUrl = 'http://localhost:3003/';
+const socketUrl = 'ws://localhost:3004/';
+
+let users = 0;
+const maxUsers = 8;
+
+function makeId() {
+  let result = '';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < 20) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+class SocketInstance {
+  constructor(user) {
+    this.init(user);
+  }
+
+  async init(user) {
+    const authResponse = await this.restAuthenticate(user);
+    const authToken = 'Bearer ' + authResponse.authToken;
+
+    const findGameResult = await this.restFindGame(authToken);
+
+    const socket = io(socketUrl, {
+      auth: {
+        authToken,
+      },
+    });
+
+    socket.on('connect', () => {
+      socket.emit('FindGame', {
+        gameId: findGameResult.gameId,
+        gameplayServiceId: findGameResult.gameplayServiceId,
+      });
+    });
+  }
+
+  async restAuthenticate(login) {
+    const authenticateResult = await fetch(restUrl + 'authenticate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify({
+        login,
+      }),
+    });
+    const authenticateData = await authenticateResult.json();
+    return authenticateData;
+  }
+
+  async restFindGame(authToken) {
+    const findGameResult = await fetch(restUrl + 'findGame', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        Authorization: authToken,
+      },
+      body: JSON.stringify({
+        gameType: 'PublicGame',
+      }),
     });
 
     const findGameData = await findGameResult.json();
-
-    const socket = io('ws://localhost:3004', {
-        transport: [ "websocket" ],
-        auth: {    
-            playerId: "player_1"
-        }
-    });
-    socket.on('connect', function() {
-        console.log('Connected');
-
-        socket.emit('FindGame', {
-            playerId,
-            gameplayServiceId: findGameData.gameplayServiceId
-        });
-    });
-
-    socket.on('GameInit', function(data) {
-        console.log('GameInit', data);
-    });
-
-    socket.on('GameState', function(data) {
-        console.log('GameState', data);
-    });
-
-    socket.on('exception', function(data) {
-        console.log('Exception', data);
-    });
-    
-    socket.on('disconnect', function() {
-        console.log('Disconnected');
-    });
+    return findGameData;
+  }
 }
 
-init();
+// New connection every second
+const interval = setInterval(() => {
+  new SocketInstance(makeId());
+  console.log(`Users connected ${++users} / ${maxUsers}`);
+
+  if (users == maxUsers) {
+    clearInterval(interval);
+  }
+}, 1000);

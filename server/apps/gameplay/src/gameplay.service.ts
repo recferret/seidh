@@ -289,6 +289,7 @@ export class GameplayService {
       games.push({
         gameId: gameInstance.gameId,
         gameType: gameInstance.gameType,
+        lastDt: gameInstance.getLastDt(),
         users: gameInstance.getPlayersCount(),
         mobs: gameInstance.getMobsCount(),
       });
@@ -299,6 +300,22 @@ export class GameplayService {
       games,
     };
     this.gameplayLobbyService.emit(GameplayLobbyUpdateGamesPattern, message);
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  dropEmptyGames() {
+    const gamesToDrop: string[] = [];
+    this.gameInstances.forEach((gameInstance) => {
+      if (
+        gameInstance.getPlayersCount() == 0 &&
+        gameInstance.gameType != GameType.TestGame
+      ) {
+        gamesToDrop.push(gameInstance.gameId);
+      }
+    });
+    gamesToDrop.forEach((gameId) => {
+      this.gameInstances.delete(gameId);
+    });
   }
 
   // TODO implement pings and uncomment

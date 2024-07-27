@@ -5,6 +5,7 @@ export const GameplayLobbyUpdateGamesPattern = 'gameplay-lobby.update.games';
 export interface GameplayLobbyGameInfo {
   gameId: string;
   gameType: GameType;
+  lastDt: number;
   users: number;
   mobs: number;
 }

@@ -43,6 +43,9 @@ export class GameInstance {
         : WinCondition.KILL_MOBS,
     );
 
+    // TODO move to config
+    this.engine.setZombieDamage(0);
+
     // -----------------------------------
     // Engine callbacks
     // -----------------------------------
@@ -209,6 +212,10 @@ export class GameInstance {
   // ---------------------
   // Getters
   // ---------------------
+
+  getLastDt() {
+    return this.engine.getLastDt();
+  }
 
   getPlayersCount() {
     return this.engine.getPlayersCount();

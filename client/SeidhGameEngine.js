@@ -1244,6 +1244,7 @@ var engine_seidh_SeidhGameEngine = $hx_exports["engine"]["seidh"]["SeidhGameEngi
 	this.mobsMax = 200;
 	this.timePassed = 0.0;
 	this.framesPassed = 0;
+	this.lastDt = 0.0;
 	engine_base_core_BaseEngine.call(this,engineMode);
 	this.winCondition = winCondition;
 	this.addLineCollider(0,0,engine_seidh_SeidhGameEngine.GameWorldSize,0);
@@ -1387,6 +1388,7 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 		}
 	}
 	,engineLoopUpdate: function(dt) {
+		this.lastDt = dt;
 		if(this.gameState == 1) {
 			var beginTime = Date.now();
 			this.framesPassed++;
@@ -1549,7 +1551,7 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 									if(allowServerLogic) {
 										var health = character2.subtractHealth(character1.actionToPerform.damage);
 										if(health == 0) {
-											if(character2.getEntityType() == 3 || character2.getEntityType() == 4) {
+											if(character2.isBot()) {
 												this.mobsKilled++;
 												this.mobsSpawned--;
 												var currentKills = this.playerZombieKills.h[character1OwnerId];
@@ -1704,6 +1706,9 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 			this.createConsumableEntity(engine_seidh_entity_factory_SeidhEntityFactory.InitiateCoin(null,x,y,1));
 		}
 	}
+	,getLastDt: function() {
+		return this.lastDt;
+	}
 	,getGameState: function() {
 		return this.gameState;
 	}
@@ -1727,6 +1732,9 @@ engine_seidh_SeidhGameEngine.prototype = $extend(engine_base_core_BaseEngine.pro
 	}
 	,getWinCondition: function() {
 		return this.winCondition;
+	}
+	,setZombieDamage: function(damage) {
+		engine_seidh_SeidhGameEngine.ZOMBIE_DAMAGE = damage;
 	}
 	,setGameState: function(gameState) {
 		this.gameState = gameState;
@@ -1848,7 +1856,7 @@ var engine_seidh_entity_impl_ZombieBoyEntity = function(characterEntity) {
 engine_seidh_entity_impl_ZombieBoyEntity.__name__ = true;
 engine_seidh_entity_impl_ZombieBoyEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
 	var tmp = 60 + engine_base_MathUtils.randomIntInRange(10,60);
-	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 3, entityShape : { width : 200, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 10, movement : { canWalk : true, canRun : true, runSpeed : tmp, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : { width : 300, height : 400, rectOffsetX : 0, rectOffsetY : 0}}}});
+	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 3, entityShape : { width : 200, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 10, movement : { canWalk : true, canRun : true, runSpeed : tmp, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : engine_seidh_SeidhGameEngine.ZOMBIE_DAMAGE, inputDelay : 1, meleeStruct : { aoe : false, shape : { width : 300, height : 400, rectOffsetX : 0, rectOffsetY : 0}}}});
 };
 engine_seidh_entity_impl_ZombieBoyEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
 engine_seidh_entity_impl_ZombieBoyEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{
@@ -1860,7 +1868,7 @@ var engine_seidh_entity_impl_ZombieGirlEntity = function(characterEntity) {
 engine_seidh_entity_impl_ZombieGirlEntity.__name__ = true;
 engine_seidh_entity_impl_ZombieGirlEntity.GenerateObjectEntity = function(id,ownerId,x,y) {
 	var tmp = 60 + engine_base_MathUtils.randomIntInRange(10,50);
-	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : { width : 200, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 10, movement : { canWalk : true, canRun : true, runSpeed : tmp, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : 10, inputDelay : 1, meleeStruct : { aoe : false, shape : { width : 300, height : 380, rectOffsetX : 0, rectOffsetY : 0}}}});
+	return new engine_base_CharacterEntity({ base : { x : x, y : y, entityType : 4, entityShape : { width : 200, height : 260, rectOffsetX : 0, rectOffsetY : 0}, id : id, ownerId : ownerId, rotation : 0}, health : 10, movement : { canWalk : true, canRun : true, runSpeed : tmp, movementDelay : 0.100, vitality : 100, vitalityConsumptionPerSec : 20, vitalityRegenPerSec : 10}, actionMain : { actionType : 2, damage : engine_seidh_SeidhGameEngine.ZOMBIE_DAMAGE, inputDelay : 1, meleeStruct : { aoe : false, shape : { width : 300, height : 380, rectOffsetX : 0, rectOffsetY : 0}}}});
 };
 engine_seidh_entity_impl_ZombieGirlEntity.__super__ = engine_seidh_entity_base_SeidhBaseEntity;
 engine_seidh_entity_impl_ZombieGirlEntity.prototype = $extend(engine_seidh_entity_base_SeidhBaseEntity.prototype,{
@@ -3260,6 +3268,7 @@ var Enum = { };
 js_Boot.__toStr = ({ }).toString;
 engine_base_EngineConfig.AI_ENABLED = true;
 engine_base_EngineConfig.TARGET_FPS = 20;
+engine_seidh_SeidhGameEngine.ZOMBIE_DAMAGE = 10;
 engine_seidh_SeidhGameEngine.GameWorldSize = 5000;
 haxe_Int32._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;

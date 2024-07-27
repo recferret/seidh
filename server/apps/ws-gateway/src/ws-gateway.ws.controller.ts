@@ -134,7 +134,6 @@ export class WsGatewayWsController implements OnModuleInit {
       actionType: data.actionType,
       movAngle: data.movAngle,
     };
-    Logger.log(request);
     this.gameplayService.emit(GameplayInputPattern, request);
   }
 

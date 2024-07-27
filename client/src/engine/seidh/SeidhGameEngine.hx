@@ -17,6 +17,10 @@ import engine.seidh.entity.factory.SeidhEntityFactory;
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
+    // TODO move to config
+    public static var ZOMBIE_DAMAGE = 10;
+
+    private var lastDt = 0.0;
     private var framesPassed = 0;
     private var timePassed = 0.0;
 
@@ -119,6 +123,8 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function engineLoopUpdate(dt:Float) {
+        lastDt = dt;
+
         if (gameState == GameState.PLAYING) {
             final beginTime = Date.now();
 
@@ -261,7 +267,7 @@ class SeidhGameEngine extends BaseEngine {
                                         final health = character2.subtractHealth(character1.actionToPerform.damage);
                                         if (health == 0) {
                                             // Zombie killed
-                                            if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
+                                            if (character2.isBot()) {
                                                 // Update counters
                                                 mobsKilled++;
                                                 mobsSpawned--;
@@ -451,6 +457,10 @@ class SeidhGameEngine extends BaseEngine {
     // Getters
     // ---------------------------------------------------
 
+    public function getLastDt() {
+        return lastDt;
+    }
+
     public function getGameState() {
         return gameState;
     }
@@ -490,6 +500,10 @@ class SeidhGameEngine extends BaseEngine {
     // ---------------------------------------------------
     // Setters
     // ---------------------------------------------------
+
+    public function setZombieDamage(damage:Int) {
+        SeidhGameEngine.ZOMBIE_DAMAGE = damage;
+    }
 
     public function setGameState(gameState:GameState) {
         this.gameState = gameState;

@@ -37,7 +37,7 @@ class ZombieGirlEntity extends SeidhBaseEntity {
             },
             actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,
-                damage: 10,
+                damage: SeidhGameEngine.ZOMBIE_DAMAGE,
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: false,

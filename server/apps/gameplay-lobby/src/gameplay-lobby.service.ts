@@ -62,7 +62,7 @@ export class GameplayLobbyService {
 
       this.gameplayServices.forEach((service) => {
         const filteredGames = service.games.filter(
-          (game) => game.gameType === data.gameType && game.users <= maxUsers,
+          (game) => game.gameType === data.gameType && game.users < maxUsers,
         );
         if (filteredGames.length == 1) {
           response.success = true;
@@ -122,13 +122,25 @@ export class GameplayLobbyService {
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   gameServicesInfo() {
-    const logObj = [];
-    this.gameplayServices.forEach((service, serviceId) => {
-      logObj.push({
-        serviceId,
-        games: service.games,
+    let games = 0;
+    let users = 0;
+    let mobs = 0;
+    let avgDt = 0;
+
+    this.gameplayServices.forEach((service) => {
+      service.games.forEach((game) => {
+        games++;
+        users += game.users;
+        mobs += game.mobs;
+        avgDt += game.lastDt;
       });
+      avgDt /= games;
     });
-    Logger.log(JSON.stringify(logObj));
+    Logger.log({
+      games,
+      users,
+      mobs,
+      avgDt,
+    });
   }
 }

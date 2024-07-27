@@ -1,0 +1,13 @@
+{
+  "name": "ws-loadtest",
+  "type": "module",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "socket.io-client": "^4.7.5"
+  }
+}

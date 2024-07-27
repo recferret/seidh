@@ -15,7 +15,7 @@ function getGameConfig() {
         TestLogin: _makeId(),
         // TestLogin: 'User1',
         TestReferrerId: '',
-        JoinGameType: 'TestGame', 
+        JoinGameType: 'PublicGame', 
     }
 }
 
