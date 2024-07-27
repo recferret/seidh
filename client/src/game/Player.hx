@@ -24,8 +24,6 @@ class Player {
 		authToken = userData.authToken;
 		tokens = userData.tokens;
 		kills = userData.kills;
-
-		trace(userData);
 	}
 
 	public function incrementAndGetInputIndex() {

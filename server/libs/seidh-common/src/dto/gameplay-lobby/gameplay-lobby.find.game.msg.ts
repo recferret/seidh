@@ -4,16 +4,17 @@ export enum GameType {
   PrivateGame = 'PrivateGame',
   PublicGame = 'PublicGame',
   TestGame = 'TestGame',
-  //GroupGame = 'GroupGame',
 }
 
 export interface GameplayLobbyFindGameMessageRequest {
   userId: string;
+  gameType: GameType;
   gameId?: string;
-  gameType?: GameType;
 }
 
 export interface GameplayLobbyFindGameMessageResponse {
-  gameplayServiceId: string;
-  gameplayId?: string;
+  success: boolean;
+  reason?: string;
+  gameplayServiceId?: string;
+  gameId?: string;
 }

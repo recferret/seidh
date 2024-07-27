@@ -23,8 +23,9 @@ class GameConfig {
 	public final TelegramAuth:Bool;
 	public final Analytics:Bool;
 	public final Serverless:Bool;
-	public final TestEmail:String;
+	public final TestLogin:String;
 	public final TestReferrerId:String;
+	public final JoinGameType:String;
 	public final ResProvider = ResourceProvider.LOCAL;
 
 	public static final instance:GameConfig = new GameConfig();
@@ -39,8 +40,9 @@ class GameConfig {
 		TelegramAuth = gameConfig.TelegramAuth;
 		Analytics = gameConfig.Analytics;
 		Serverless = gameConfig.Serverless;
-		TestEmail = gameConfig.TestEmail;
+		TestLogin = gameConfig.TestLogin;
 		TestReferrerId = gameConfig.TestReferrerId;
+		JoinGameType = gameConfig.JoinGameType;
 	}
 
 }

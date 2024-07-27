@@ -2,26 +2,28 @@ import { ServiceName } from '@app/seidh-common';
 import {
   GameplayLobbyFindGameMessageRequest,
   GameplayLobbyFindGameMessageResponse,
+  GameType,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import {
   GameplayLobbyGameplayInstanceInfo,
   GameplayLobbyUpdateGamesMessage,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.update.games.msg';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { firstValueFrom } from 'rxjs';
 import {
-  GameplayCreatedRoomMsg,
-  GameplayCreateNewGamePattern,
-  GameplayCreateNewRoomMsg,
-} from '@app/seidh-common/dto/gameplay/gameplay.createNewRoom.msg';
+  GameplayCreateGamePattern,
+  GameplayCreateGameMessageRequest,
+  GameplayCreateGameMessageResponse,
+} from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
 
 @Injectable()
 export class GameplayLobbyService {
-  private readonly maxUserAllowedTest = Number(
-    process.env.MAX_ALLOWED_USER_TEST,
-  );
+  private readonly privateGameMaxUsers: number;
+  private readonly publicGameMaxUsers: number;
+  private readonly testGameMaxUsers: number;
+
   private readonly gameplayServices = new Map<
     string,
     GameplayLobbyGameplayInstanceInfo
@@ -29,7 +31,11 @@ export class GameplayLobbyService {
 
   constructor(
     @Inject(ServiceName.Gameplay) private gameplayService: ClientProxy,
-  ) {}
+  ) {
+    this.privateGameMaxUsers = Number(process.env.PRIVATE_GAME_MAX_USERS);
+    this.publicGameMaxUsers = Number(process.env.PUBLIC_GAME_MAX_USERS);
+    this.testGameMaxUsers = Number(process.env.TEST_GAME_MAX_USERS);
+  }
 
   updateGames(data: GameplayLobbyUpdateGamesMessage) {
     this.gameplayServices.set(data.gameplayServiceId, {
@@ -41,45 +47,64 @@ export class GameplayLobbyService {
 
   async findGame(data: GameplayLobbyFindGameMessageRequest) {
     const response: GameplayLobbyFindGameMessageResponse = {
-      gameplayId: '',
-      gameplayServiceId: '',
+      success: false,
     };
 
     if (this.gameplayServices.size > 0) {
+      let maxUsers = this.testGameMaxUsers;
+      if (data.gameType == GameType.PrivateGame) {
+        maxUsers = this.privateGameMaxUsers;
+      } else if (data.gameType == GameType.PublicGame) {
+        maxUsers = this.publicGameMaxUsers;
+      }
+
+      let gameFound = false;
+
       this.gameplayServices.forEach((service) => {
         const filteredGames = service.games.filter(
-          (game) =>
-            game.gameType === data.gameType &&
-            game.usersOnline <= this.maxUserAllowedTest,
+          (game) => game.gameType === data.gameType && game.users <= maxUsers,
         );
-        console.log(filteredGames);
-        if (filteredGames.length > 0) {
-          const sortedGames = filteredGames.sort(
-            (a, b) => a.usersOnline - b.usersOnline,
-          );
+        if (filteredGames.length == 1) {
+          response.success = true;
           response.gameplayServiceId = service.gameplayServiceId;
-          response.gameplayId = sortedGames[0].gameId;
+          response.gameId = filteredGames[0].gameId;
+          gameFound = true;
+        } else if (filteredGames.length > 1) {
+          const sortedGames = filteredGames.sort((a, b) => a.users - b.users);
+          response.success = true;
+          response.gameplayServiceId = service.gameplayServiceId;
+          response.gameId = sortedGames[0].gameId;
+          gameFound = true;
         }
       });
-      if (response.gameplayId == '') {
-        const responseFromService: GameplayCreatedRoomMsg =
-          await firstValueFrom(
-            this.gameplayService.send(GameplayCreateNewGamePattern, {
-              gameType: data.gameType,
-            } as GameplayCreateNewRoomMsg),
-          );
-        return {
-          gameplayId: responseFromService.gameInstance,
-          gameplayServiceId: responseFromService.gamePlayInstance,
+
+      if (!gameFound) {
+        const createGameRequest: GameplayCreateGameMessageRequest = {
+          gameType: data.gameType,
         };
+
+        const createGameResponse: GameplayCreateGameMessageResponse =
+          await firstValueFrom(
+            this.gameplayService.send(
+              GameplayCreateGamePattern,
+              createGameRequest,
+            ),
+          );
+
+        if (createGameResponse.success) {
+          response.success = true;
+          response.gameId = createGameResponse.gameId;
+          response.gameplayServiceId = createGameResponse.gameplayServiceId;
+        }
       }
-      return response;
     } else {
-      throw new Error('no gameplay services available');
+      Logger.error('No gameplay services available');
     }
+
+    return response;
   }
 
-  @Cron(CronExpression.EVERY_SECOND)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   dropOutdatedGameplaySerives() {
     const now = Date.now();
     const gameplayServicesToDrop = [];
@@ -93,5 +118,17 @@ export class GameplayLobbyService {
     gameplayServicesToDrop.forEach((serviceId) =>
       this.gameplayServices.delete(serviceId),
     );
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  gameServicesInfo() {
+    const logObj = [];
+    this.gameplayServices.forEach((service, serviceId) => {
+      logObj.push({
+        serviceId,
+        games: service.games,
+      });
+    });
+    Logger.log(JSON.stringify(logObj));
   }
 }

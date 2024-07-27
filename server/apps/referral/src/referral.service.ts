@@ -13,10 +13,6 @@ export class ReferralService {
     private referralConfigModel: Model<ReferralConfig>,
   ) {}
 
-  // onModuleInit() {
-  //   new this.referralConfigModel().save();
-  // }
-
   async getReferrerConfig() {
     return this.referralConfigModel.findOne();
   }

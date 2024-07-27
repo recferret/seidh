@@ -66,9 +66,10 @@ import {
 } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
 import { EventGameInit } from './events/event.game.init';
 import {
-  GameplayCreatedRoomMsg,
-  GameplayCreateNewRoomMsg,
-} from '@app/seidh-common/dto/gameplay/gameplay.createNewRoom.msg';
+  GameplayCreateGameMessageRequest,
+  GameplayCreateGameMessageResponse,
+} from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class GameplayService {
@@ -81,41 +82,13 @@ export class GameplayService {
   private readonly userGameInstance = new Map<string, string>();
   private readonly usersToInit = new Set<string>();
 
-  private readonly gameInstance: GameInstance;
-
   constructor(
     private eventEmitter: EventEmitter2,
     @Inject(ServiceName.WsGateway) private wsGatewayService: ClientProxy,
     @Inject(ServiceName.GameplayLobby)
     private gameplayLobbyService: ClientProxy,
   ) {
-    // Notify lobby service about current users and games
-    setInterval(async () => {
-      const games: GameplayLobbyGameInfo[] = [];
-
-      this.gameInstances.forEach((gameInstance) => {
-        console.log('gameInstance', gameInstance.gameId);
-        games.push({
-          gameId: gameInstance.gameId,
-          gameType: gameInstance.gameType,
-          usersOnline: 6, // Testing purpose
-        });
-      });
-
-      const message: GameplayLobbyUpdateGamesMessage = {
-        gameplayServiceId: Config.GAMEPLAY_INSTANCE_ID,
-        games,
-      };
-      this.gameplayLobbyService.emit(GameplayLobbyUpdateGamesPattern, message);
-    }, 1000);
-
-    // Dummy game for testing
-    let id = uuidv4();
-    this.gameInstances.set(
-      id,
-      new GameInstance(this.eventEmitter, id, GameType.PublicGame),
-    );
-    id = uuidv4();
+    const id = uuidv4();
     this.gameInstances.set(
       id,
       new GameInstance(this.eventEmitter, id, GameType.TestGame),
@@ -132,38 +105,18 @@ export class GameplayService {
   }
 
   public joinGame(message: GameplayJoinGameMessage) {
-    this.userLastRequestTime.set(message.userId, Date.now());
-    this.userGameInstance.set(message.userId, this.gameInstance.gameId);
-    this.usersToInit.add(message.userId);
-    this.gameInstance.addPlayer(message.userId);
+    const gameInstance = this.gameInstances.get(message.gameId);
+    if (gameInstance) {
+      this.userLastRequestTime.set(message.userId, Date.now());
+      this.userGameInstance.set(message.userId, gameInstance.gameId);
+      this.usersToInit.add(message.userId);
+      gameInstance.addPlayer(message.userId);
+      GameplayService.ConnectedUsers.add(message.userId);
 
-    Logger.log('joinGame', message.userId);
-
-    GameplayService.ConnectedUsers.add(message.userId);
-
-    // let gameInstance: GameInstance = undefined;
-
-    // if (message.gameId) {
-    //   // TODO impl join game
-    //   gameInstance = this.gameInstances.get(message.gameId);
-    //   if (!gameInstance) {
-    //     Logger.log('Join a game');
-    //     this.playerGameInstance.set(message.playerId, gameInstance.gameId);
-    //     this.playersToInit.add(message.playerId);
-    //     gameInstance.addPlayer(message.playerId);
-    //   } else {
-    //     Logger.error('Error while joining the game');
-    //     // TODO impl error while join game
-    //   }
-    // } else {
-    //   // Create a new game
-    //   Logger.log('Create a new game');
-    //   gameInstance = new GameInstance(this.eventEmitter, uuidv4(), GameType.PublicGame);
-    //   gameInstance.addPlayer(message.playerId);
-    //   this.gameInstances.set(gameInstance.gameId, gameInstance);
-    //   this.playerGameInstance.set(message.playerId, gameInstance.gameId);
-    //   this.playersToInit.add(message.playerId);
-    // }
+      Logger.log(`User ${message.userId} has joined ${gameInstance.gameId}`);
+    } else {
+      Logger.error(`Join game failed for user ${message.userId} `);
+    }
   }
 
   public input(message: GameplayInputMessage) {
@@ -178,17 +131,18 @@ export class GameplayService {
     });
   }
 
-  public createNewGameRoom(message: GameplayCreateNewRoomMsg) {
+  public createGame(message: GameplayCreateGameMessageRequest) {
     const instanceId = uuidv4();
     this.gameInstances.set(
       instanceId,
       new GameInstance(this.eventEmitter, instanceId, message.gameType),
     );
-
-    return {
-      gameInstance: instanceId,
-      gamePlayInstance: Config.GAMEPLAY_INSTANCE_ID,
-    } as GameplayCreatedRoomMsg;
+    const response: GameplayCreateGameMessageResponse = {
+      success: true,
+      gameId: instanceId,
+      gameplayServiceId: Config.GAMEPLAY_INSTANCE_ID,
+    };
+    return response;
   }
 
   private checkUserConnected(userId: string) {
@@ -327,6 +281,27 @@ export class GameplayService {
   // Common
   // ----------------------------------------------
 
+  @Cron(CronExpression.EVERY_SECOND)
+  notifyLobbyService() {
+    const games: GameplayLobbyGameInfo[] = [];
+
+    this.gameInstances.forEach((gameInstance) => {
+      games.push({
+        gameId: gameInstance.gameId,
+        gameType: gameInstance.gameType,
+        users: gameInstance.getPlayersCount(),
+        mobs: gameInstance.getMobsCount(),
+      });
+    });
+
+    const message: GameplayLobbyUpdateGamesMessage = {
+      gameplayServiceId: Config.GAMEPLAY_INSTANCE_ID,
+      games,
+    };
+    this.gameplayLobbyService.emit(GameplayLobbyUpdateGamesPattern, message);
+  }
+
+  // TODO implement pings and uncomment
   // @Cron(CronExpression.EVERY_5_SECONDS)
   dropDisconnectedUsers() {
     const now = Date.now();

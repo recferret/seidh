@@ -23,9 +23,9 @@ import {
   GameplayDisconnectedMessage,
 } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
 import {
-  GameplayCreateNewGamePattern,
-  GameplayCreateNewRoomMsg,
-} from '@app/seidh-common/dto/gameplay/gameplay.createNewRoom.msg';
+  GameplayCreateGamePattern,
+  GameplayCreateGameMessageRequest,
+} from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
 
 @Injectable()
 class InstanceIdGuard implements CanActivate {
@@ -57,9 +57,9 @@ export class GameplayController {
     this.gameplayService.input(message);
   }
 
-  @MessagePattern(GameplayCreateNewGamePattern)
-  createNewGameRoom(message: GameplayCreateNewRoomMsg) {
-    return this.gameplayService.createNewGameRoom(message);
+  @MessagePattern(GameplayCreateGamePattern)
+  createGame(message: GameplayCreateGameMessageRequest) {
+    return this.gameplayService.createGame(message);
   }
 
   @MessagePattern(GameplayDisconnectedPattern)

@@ -8,7 +8,6 @@ import engine.base.BaseTypesAndClasses.Side;
 
 import game.Res.SeidhResource;
 
-
 class CharacterAnimation {
     private var idleAnimRight:Array<Tile>;
     private var runAnimRight:Array<Tile>;

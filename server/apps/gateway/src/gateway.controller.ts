@@ -45,6 +45,12 @@ export class GatewayController {
     return this.gatewayService.authenticate(authenticateRequest);
   }
 
+  @Get('user')
+  @UseGuards(AuthGuard)
+  getUser(@Session() session: IUserSession) {
+    return this.gatewayService.getUser(session.userId);
+  }
+
   @Post('findGame')
   @UseGuards(AuthGuard)
   findGame(

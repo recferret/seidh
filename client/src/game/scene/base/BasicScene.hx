@@ -202,13 +202,9 @@ abstract class BasicScene extends h2d.Scene {
 				if (gameState == GameState.WIN) {
 					NativeWindowJS.trackGameWin();
 					gameUiScene.showWinDialog(0);
-				} else if (gameState == GameState.LOSE) {
+				} else {
 					NativeWindowJS.trackGameLose();
 					gameUiScene.showLoseDialog(0);
-					trace('PLAYER KILLED ?');
-					trace(this.seidhGameEngine.getPlayerGainings(Player.instance.userId));
-				} else {
-					trace('Game Over!');
 				}
 			};
 		}

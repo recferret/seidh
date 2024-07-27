@@ -13,6 +13,7 @@ import {
   EngineConsumableEntity,
   DeleteConsumableEntityTask,
   ConsumableEntityStruct,
+  WinCondition,
 } from '@app/seidh-common/seidh-common.game-types';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventGameCharacterActions } from '../events/event.game.character-actions';
@@ -35,10 +36,12 @@ export class GameInstance {
     public gameId: string,
     public gameType: GameType,
   ) {
-    // By default winCondition is WinCondition.INFINITE
-    // this.engine = new Engine.engine.seidh.SeidhGameEngine(EngineMode.SERVER, WinCondition.KILL_MOBS);
-    // this.engine = new Engine.engine.seidh.SeidhGameEngine(EngineMode.SERVER, WinCondition.INFINITE);
-    this.engine = new Engine.engine.seidh.SeidhGameEngine(EngineMode.SERVER);
+    this.engine = new Engine.engine.seidh.SeidhGameEngine(
+      EngineMode.SERVER,
+      gameType == GameType.TestGame
+        ? WinCondition.INFINITE
+        : WinCondition.KILL_MOBS,
+    );
 
     // -----------------------------------
     // Engine callbacks
@@ -176,13 +179,17 @@ export class GameInstance {
     }, 2500);
   }
 
+  // ---------------------
   // Client commands
+  // ---------------------
 
   input(input: PlayerInputCommand) {
     this.engine.addInputCommandServer(input);
   }
 
+  // ---------------------
   // Common
+  // ---------------------
 
   addPlayer(playerId: string) {
     const struct: CreateCharacterMinStruct = {
@@ -197,5 +204,17 @@ export class GameInstance {
 
   deletePlayer(playerId: string) {
     this.engine.deleteCharacterEntityByOwnerId(playerId);
+  }
+
+  // ---------------------
+  // Getters
+  // ---------------------
+
+  getPlayersCount() {
+    return this.engine.getPlayersCount();
+  }
+
+  getMobsCount() {
+    return this.engine.getMobsCount();
   }
 }
