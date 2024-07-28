@@ -2,7 +2,7 @@ import { UserCharacterStruct } from '@app/seidh-common/dto/users/users.authentic
 
 export class AuthenticateRequest {
   telegramInitData?: string; // for production, telegram user data
-  email?: string; // for stage, email
+  login?: string; // for stage, login
   referrerId?: string;
 }
 

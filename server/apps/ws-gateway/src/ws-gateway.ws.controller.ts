@@ -68,7 +68,7 @@ export class WsGatewayWsController implements OnModuleInit {
     this.server.on('connection', async (socket: Socket) => {
       try {
         const decodedToken = await this.jwtService.verifyAsync(
-          socket.handshake.auth.authToken,
+          socket.handshake.auth.authToken.split(' ')[1],
         );
         const userId = decodedToken.userId;
 
@@ -114,6 +114,7 @@ export class WsGatewayWsController implements OnModuleInit {
     const userId = this.socketIdToUserId.get(client.id);
     const request: GameplayJoinGameMessage = {
       userId,
+      gameId: data.gameId,
       gameplayServiceId: data.gameplayServiceId,
     };
     this.gameplayService.emit(GameplayJoinGamePattern, request);

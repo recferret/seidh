@@ -17,12 +17,16 @@ import engine.seidh.entity.factory.SeidhEntityFactory;
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
+    // TODO move to config
+    public static var ZOMBIE_DAMAGE = 10;
+
+    private var lastDt = 0.0;
     private var framesPassed = 0;
     private var timePassed = 0.0;
 
     private var winCondition:WinCondition;
 
-    private var mobsMax = 1;
+    private var mobsMax = 200;
     private var allowSpawnMobs = false;
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
@@ -119,6 +123,8 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function engineLoopUpdate(dt:Float) {
+        lastDt = dt;
+
         if (gameState == GameState.PLAYING) {
             final beginTime = Date.now();
 
@@ -261,7 +267,7 @@ class SeidhGameEngine extends BaseEngine {
                                         final health = character2.subtractHealth(character1.actionToPerform.damage);
                                         if (health == 0) {
                                             // Zombie killed
-                                            if (character2.getEntityType() == ZOMBIE_BOY || character2.getEntityType() == ZOMBIE_GIRL) {
+                                            if (character2.isBot()) {
                                                 // Update counters
                                                 mobsKilled++;
                                                 mobsSpawned--;
@@ -318,13 +324,14 @@ class SeidhGameEngine extends BaseEngine {
                 characterActionCallbacks(characterActionCallbackParams);
             }
 
-            // Infinite play
-            // if (mobsKilled == mobsMax && allowServerLogic) {
-            //     gameState = GameState.WIN;
-            //     if (gameStateCallback != null) {
-            //         gameStateCallback(gameState);
-            //     }
-            // }
+            if (winCondition != WinCondition.INFINITE) {
+                if (winCondition == WinCondition.KILL_MOBS && mobsKilled == mobsMax && allowServerLogic) {
+                    gameState = GameState.WIN;
+                    if (gameStateCallback != null) {
+                        gameStateCallback(gameState);
+                    }
+                }
+            }
 
             recentEngineLoopTime = Date.now() - beginTime;
             spawnMobs();
@@ -373,18 +380,6 @@ class SeidhGameEngine extends BaseEngine {
             characterEntityManager.delete(entity.getId());
         };
         mobsSpawned = 0;
-    }
-
-    public function getPlayersCount() {
-        return 
-            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
-            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
-    }
-
-    public function getMobsCount() {
-        return 
-            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY).length +
-            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL).length;
     }
 
     public function getPlayerGainings(playerId:String) {
@@ -462,6 +457,10 @@ class SeidhGameEngine extends BaseEngine {
     // Getters
     // ---------------------------------------------------
 
+    public function getLastDt() {
+        return lastDt;
+    }
+
     public function getGameState() {
         return gameState;
     }
@@ -478,14 +477,46 @@ class SeidhGameEngine extends BaseEngine {
         return mobsSpawnPoints;
     }
 
+    public function getMobsMax() {
+        return mobsMax;
+    }
+
+    public function getPlayersCount() {
+        return 
+            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
+            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
+    }
+
+    public function getMobsCount() {
+        return 
+            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY).length +
+            characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL).length;
+    }
+
+    public function getWinCondition() {
+        return winCondition;
+    }
+
     // ---------------------------------------------------
     // Setters
     // ---------------------------------------------------
+
+    public function setZombieDamage(damage:Int) {
+        SeidhGameEngine.ZOMBIE_DAMAGE = damage;
+    }
 
     public function setGameState(gameState:GameState) {
         this.gameState = gameState;
         if (gameStateCallback != null) {
             gameStateCallback(gameState);
         }
+    }
+
+    public function setMobsMax(mobsMax:Int) {
+        this.mobsMax = mobsMax;
+    }
+
+    public function setWinCondition(winCondition:WinCondition) {
+        this.winCondition = winCondition;
     }
 }

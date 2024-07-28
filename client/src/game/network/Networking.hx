@@ -47,17 +47,14 @@ class Networking {
     private var joined = false;
 
     public function new() {
-        // TODO need to add telegramId or wallet address
-        NativeWindowJS.networkInit(Player.instance.authToken, callback);
+        NativeWindowJS.networkWsInit(callback);
     }
 
     public function findAndJoinGame() {
-        NativeWindowJS.networkFindAndJoinGame();
+        NativeWindowJS.networkFindAndJoinGame(GameConfig.instance.JoinGameType);
     }
 
     public function input(input:PlayerInputCommand) {
-        trace('input');
-        trace(input);
         NativeWindowJS.networkInput(input.actionType, input.movAngle);
     }
 

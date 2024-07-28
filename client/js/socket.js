@@ -56,15 +56,15 @@ function wsConnect(authToken, callback) {
     });
 }
 
-function wsFindGame(gameplayServiceId) {
+function wsFindGame(gameId, gameplayServiceId) {
     socket.emit('FindGame', {
+        gameId,
         gameplayServiceId
     });
 }
 
-function wsInput(gameplayServiceId, actionType, movAngle) {
+function wsInput(actionType, movAngle) {
     socket.emit('Input', {
-        gameplayServiceId,
         actionType, 
         movAngle
     });

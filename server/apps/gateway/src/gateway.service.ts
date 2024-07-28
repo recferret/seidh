@@ -1,10 +1,11 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
   GameplayLobbyFindGameMessageRequest,
   GameplayLobbyFindGameMessageResponse,
   GameplayLobbyFindGamePattern,
+  GameType,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -22,20 +23,24 @@ import {
   UsersGetFriendsPattern,
 } from '@app/seidh-common/dto/users/users.get.friends.msg';
 import { GetFriendsResponse } from './dto/friends.dto';
+import {
+  UsersGetUserMessageRequest,
+  UsersGetUserMessageResponse,
+  UsersGetUserPattern,
+} from '@app/seidh-common/dto/users/users.get.user.msg';
 
 @Injectable()
-export class GatewayService implements OnModuleInit {
+export class GatewayService {
   constructor(
     @Inject(ServiceName.GameplayLobby)
     private gameplayLobbyService: ClientProxy,
     @Inject(ServiceName.Users) private usersService: ClientProxy,
   ) {}
 
-  async onModuleInit() {}
-
-  async findGame(userId: string) {
+  async findGame(userId: string, gameType: GameType) {
     const request: GameplayLobbyFindGameMessageRequest = {
       userId,
+      gameType,
     };
     const response: GameplayLobbyFindGameMessageResponse = await firstValueFrom(
       this.gameplayLobbyService.send(GameplayLobbyFindGamePattern, request),
@@ -43,10 +48,20 @@ export class GatewayService implements OnModuleInit {
     return response;
   }
 
+  async getUser(userId: string) {
+    const request: UsersGetUserMessageRequest = {
+      userId,
+    };
+    const result: UsersGetUserMessageResponse = await firstValueFrom(
+      this.usersService.send(UsersGetUserPattern, request),
+    );
+    return result;
+  }
+
   async authenticate(authenticateRequest: AuthenticateRequest) {
     const request: UsersAuthenticateMessageRequest = {
       telegramInitData: authenticateRequest.telegramInitData,
-      email: authenticateRequest.email,
+      login: authenticateRequest.login,
       referrerId: authenticateRequest.referrerId,
     };
     const result: UsersAuthenticateMessageResponse = await firstValueFrom(

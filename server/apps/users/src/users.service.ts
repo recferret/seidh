@@ -75,7 +75,7 @@ export class UsersService {
     let telegramId: string;
     let telegramName: string;
     let telegramPremium: boolean;
-    let email: string;
+    let login: string;
 
     if (this.isProd) {
       const telegramParseResult = this.parseTelegramInitData(
@@ -88,26 +88,19 @@ export class UsersService {
         telegramName = telegramParseResult.userInfo.username;
         telegramPremium = telegramParseResult.userInfo.is_premium;
         existingUser = await this.userModel.findOne({ telegramId });
-        // .populate(['characters']);
       } else {
         return response;
       }
     } else {
-      email = message.email;
-      existingUser = await this.userModel.findOne({ email });
-      // .populate(['characters']);
-      Logger.log(email);
+      login = message.login;
+      existingUser = await this.userModel.findOne({ login });
     }
 
     if (existingUser) {
-      // response.userId = existingUser.id;
-      // response.kills = existingUser.kills;
-      // response.tokens = existingUser.virtualTokenBalance;
-      // response.characters = existingUser.characters.map(dbCharacterToStruct);
       response.authToken = await this.jwtService.signAsync({
         userId: existingUser.id,
         telegramId,
-        email,
+        login,
       });
 
       existingUser.authToken = response.authToken;
@@ -130,14 +123,14 @@ export class UsersService {
         telegramId,
         telegramName,
         telegramPremium,
-        email,
+        login,
         virtualTokenBalance,
         characters: [newCharacter],
       });
       const authToken = await this.jwtService.signAsync({
         userId: newUser.id,
         telegramId,
-        email,
+        login,
       });
       newUser.authToken = authToken;
       await newUser.save();
@@ -145,25 +138,23 @@ export class UsersService {
         this.referralCalculation({
           referrerId: message.referrerId,
           telegramId,
-          email,
+          login,
           newUser,
         });
 
-      // response.userId = newUser.id;
-      // response.kills = newUser.kills;
-      // response.tokens = newUser.virtualTokenBalance;
-      // response.characters = newUser.characters.map(dbCharacterToStruct);
       response.authToken = authToken;
     }
+
+    response.success = true;
 
     return response;
   }
 
-  async referralCalculation({ referrerId, telegramId, email, newUser }) {
+  async referralCalculation({ referrerId, telegramId, login, newUser }) {
     const referrer = await this.userModel.findById(referrerId);
     const notTheSameUser = this.isProd
       ? referrer.telegramId != telegramId
-      : referrer.email != email;
+      : referrer.login != login;
 
     if (referrer && notTheSameUser) {
       const { referrer: updatedReferrer, newUser: updatedNewUser } =
@@ -196,44 +187,54 @@ export class UsersService {
   }
 
   async getUser(message: UsersGetUserMessageRequest) {
-    const user = await this.userModel
-      .findOne({ id: message.userId })
-      .populate(['characters']);
-
-    const userBody: UserBody = {
-      telegramName: user.telegramName,
-      telegramPremium: user.telegramPremium,
-
-      virtualTokenBalance: user.virtualTokenBalance,
-
-      characters: user.characters.map((c: any) => {
-        const character: CharacterBody = {
-          id: c.id,
-          type: c.type,
-          active: c.active,
-          levelCurrent: c.levelCurrent,
-          levelMax: c.levelMax,
-          expCurrent: c.expCurrent,
-          expTillNewLevel: c.expTillNewLevel,
-          health: c.health,
-          movement: c.movement,
-          actionMain: c.actionMain,
-        };
-        return character;
-      }),
-
-      hasExpBoost1: user.hasExpBoost1,
-      hasExpBoost2: user.hasExpBoost2,
-      hasPotionDropBoost1: user.hasPotionDropBoost1,
-      hasPotionDropBoost2: user.hasPotionDropBoost2,
-      hasMaxPotionBoost1: user.hasMaxPotionBoost1,
-      hasMaxPotionBoost2: user.hasMaxPotionBoost2,
-      hasMaxPotionBoost3: user.hasMaxPotionBoost3,
-    };
-
     const response: UsersGetUserMessageResponse = {
-      user: userBody,
+      success: false,
     };
+
+    try {
+      const user = await this.userModel
+        .findById(message.userId)
+        .populate(['characters']);
+
+      const userBody: UserBody = {
+        userId: user.id,
+
+        telegramName: user.telegramName,
+        telegramPremium: user.telegramPremium,
+
+        virtualTokenBalance: user.virtualTokenBalance,
+
+        characters: user.characters.map((c: any) => {
+          const character: CharacterBody = {
+            id: c.id,
+            type: c.type,
+            active: c.active,
+            levelCurrent: c.levelCurrent,
+            levelMax: c.levelMax,
+            expCurrent: c.expCurrent,
+            expTillNewLevel: c.expTillNewLevel,
+            health: c.health,
+            movement: c.movement,
+            actionMain: c.actionMain,
+          };
+          return character;
+        }),
+
+        hasExpBoost1: user.hasExpBoost1,
+        hasExpBoost2: user.hasExpBoost2,
+        hasPotionDropBoost1: user.hasPotionDropBoost1,
+        hasPotionDropBoost2: user.hasPotionDropBoost2,
+        hasMaxPotionBoost1: user.hasMaxPotionBoost1,
+        hasMaxPotionBoost2: user.hasMaxPotionBoost2,
+        hasMaxPotionBoost3: user.hasMaxPotionBoost3,
+      };
+
+      response.user = userBody;
+      response.success = true;
+    } catch (e) {
+      Logger.error(e);
+    }
+
     return response;
   }
 

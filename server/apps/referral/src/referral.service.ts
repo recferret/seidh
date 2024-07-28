@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ReferralUpdateReferrerMessageRequest } from '@app/seidh-common/dto/referral/referral.update.referrer.msg';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -12,10 +12,6 @@ export class ReferralService {
     @InjectModel(ReferralConfig.name)
     private referralConfigModel: Model<ReferralConfig>,
   ) {}
-
-  // onModuleInit() {
-  //   new this.referralConfigModel().save();
-  // }
 
   async getReferrerConfig() {
     return this.referralConfigModel.findOne();

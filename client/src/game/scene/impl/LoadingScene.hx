@@ -30,7 +30,7 @@ class LoadingScene extends BasicScene {
                 final tgUnsafeData = NativeWindowJS.tgGetInitDataUnsafe();
                 final startParam = tgUnsafeData.start_param;
 
-                NativeWindowJS.restAuthenticate(tgInitData, null, startParam, function callback(data:Dynamic) {
+                NativeWindowJS.networkAuthAndGetUser(tgInitData, null, startParam, function callback(data:Dynamic) {
                     processAuthResponse(data);
                 });
             }
@@ -48,7 +48,7 @@ class LoadingScene extends BasicScene {
                 });
                 EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
             } else {
-                NativeWindowJS.restAuthenticate(null, GameConfig.instance.TestEmail, GameConfig.instance.TestReferrerId, function callback(data:Dynamic) {
+                NativeWindowJS.networkAuthAndGetUser(null, GameConfig.instance.TestLogin, GameConfig.instance.TestReferrerId, function callback(data:Dynamic) {
                     processAuthResponse(data);
                 });
             }
@@ -59,13 +59,9 @@ class LoadingScene extends BasicScene {
 	}
 
     private function processAuthResponse(data:Dynamic) {
-        if (data.success == true) {
-            Player.instance.setUserData(data);
-            initNetwork();
-            EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
-        } else {
-            trace('AUTH FAILED');
-        }
+        Player.instance.setUserData(data);
+        initNetwork();
+        EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
     }
 
 }

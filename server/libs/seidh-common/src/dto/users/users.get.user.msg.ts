@@ -20,6 +20,7 @@ export interface CharacterBody {
 }
 
 export interface UserBody {
+  userId: string;
   telegramName: string;
   telegramPremium: boolean;
 
@@ -42,5 +43,6 @@ export interface UsersGetUserMessageRequest {
 }
 
 export interface UsersGetUserMessageResponse {
-  user: UserBody;
+  success: boolean;
+  user?: UserBody;
 }

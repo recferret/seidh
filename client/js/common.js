@@ -11,10 +11,24 @@ function getGameConfig() {
         PlaySounds: false,
         TelegramAuth: false,
         Analytics: false,
-        Serverless: true,
-        TestEmail: 'test1@gmail.com',
+        Serverless: false,
+        TestLogin: _makeId(),
+        // TestLogin: 'User1',
         TestReferrerId: '',
+        JoinGameType: 'PublicGame', 
     }
+}
+
+function _makeId() {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < 20) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
 }
 
 function getMobile() {
