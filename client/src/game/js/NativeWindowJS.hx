@@ -32,6 +32,7 @@ extern class NativeWindowJS {
 
     // Ton
     static function tonConnect(callback:Dynamic->Void):Void;
+    static function tonDisconnect(callback:Void->Void):Void;
     static function tonMintRagnar():String;
 
     // LocalStorage

@@ -4,10 +4,9 @@ import hxd.res.DefaultFont;
 
 import game.js.NativeWindowJS;
 import game.sound.SoundManager;
-import game.scene.base.BasicScene;
 import game.Res.SeidhResource;
 
-class WalletConnectButton extends h2d.Object {
+class WalletButton extends h2d.Object {
 
     private final w = 0.0;
     private final h = 0.0;
@@ -56,6 +55,11 @@ class WalletConnectButton extends h2d.Object {
             } else if (type == 'mint_ragnar') {
                 NativeWindowJS.trackMintRagnarClick();
                 NativeWindowJS.tonMintRagnar();
+            } else if (type == 'disconnect_wallet') {
+                // TODO analytics
+                NativeWindowJS.tonDisconnect(function callback() {
+                    trace('Wallet disconnected');
+                });
             }
 
             SoundManager.instance.playButton2();
@@ -92,15 +96,18 @@ class CollectionContent extends BasicHomeContent {
     public function new() {
 		    super();
 
-            final buyRagnar = new WalletConnectButton(this, 'Buy Ragnar', 'mint_ragnar');
+            final buyRagnar = new WalletButton(this, 'Buy Ragnar', 'mint_ragnar');
 
             if (Player.instance.getWalletAddress() == null) {
                 buyRagnar.setPosBelowTop();
 
-                final walletConnect = new WalletConnectButton(this, 'Connect wallet', 'connect_wallet');
+                final walletConnect = new WalletButton(this, 'Connect wallet', 'connect_wallet');
                 walletConnect.setPosTop();
             } else {
-                buyRagnar.setPosTop();
+                final walletDisconnect = new WalletButton(this, 'Disconnect wallet', 'disconnect_wallet');
+                walletDisconnect.setPosTop();
+
+                buyRagnar.setPosBelowTop();
             }
 
             final ragnarDudeBitmap = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE), this);

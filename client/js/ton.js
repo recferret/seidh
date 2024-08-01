@@ -25,6 +25,9 @@ async function tonConnect(callback) {
     }
 }
 
+async function tonDisconnect(callback) {
+}
+
 async function tonMintRagnar() {
     // await initTonConnect();
 
