@@ -31,16 +31,10 @@ enum abstract CharacterAnimationState(Int) {
 	var HURT = 4;
 	var DEAD = 5;
 
-	var ATTACK_1 = 6;
-	var ATTACK_2 = 7;
-	var ATTACK_3 = 8;
-	var ATTACK_RUN = 9;
+	var ACTION_MAIN = 6;
 
-	var SHOT_1 = 10;
-	var SHOT_2 = 11;
-
-	var DEFEND = 12;
-	var DODGE = 13;
+	var DEFEND = 7;
+	var DODGE = 8;
 }
 
 enum abstract EntityType(Int) {

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -59,6 +59,8 @@ export class GatewayService {
   }
 
   async authenticate(authenticateRequest: AuthenticateRequest) {
+    Logger.log(authenticateRequest);
+
     const request: UsersAuthenticateMessageRequest = {
       telegramInitData: authenticateRequest.telegramInitData,
       login: authenticateRequest.login,
@@ -69,12 +71,7 @@ export class GatewayService {
     );
     const response: AuthenticateResponse = {
       success: result.success,
-      userId: result.userId,
-      telegramName: result.telegramName,
       authToken: result.authToken,
-      tokens: result.tokens,
-      kills: result.kills,
-      characters: result.characters,
     };
     return response;
   }

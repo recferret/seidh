@@ -70,6 +70,11 @@ import {
   GameplayCreateGameMessageResponse,
 } from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { EventGameUserGainings } from './events/event.game.user-gainings';
+import {
+  UsersUpdateGainingsMessage,
+  UsersUpdateGainingsPattern,
+} from '@app/seidh-common/dto/users/users.update.gainings';
 
 @Injectable()
 export class GameplayService {
@@ -84,9 +89,12 @@ export class GameplayService {
 
   constructor(
     private eventEmitter: EventEmitter2,
-    @Inject(ServiceName.WsGateway) private wsGatewayService: ClientProxy,
+    @Inject(ServiceName.WsGateway)
+    private wsGatewayService: ClientProxy,
     @Inject(ServiceName.GameplayLobby)
     private gameplayLobbyService: ClientProxy,
+    @Inject(ServiceName.Users)
+    private usersService: ClientProxy,
   ) {
     const id = uuidv4();
     this.gameInstances.set(
@@ -202,6 +210,14 @@ export class GameplayService {
       characterId: payload.characterId,
     };
     this.wsGatewayService.emit(WsGatewayGameDeleteCharacterPattern, message);
+  }
+
+  @OnEvent(EventGameUserGainings.EventName)
+  handleEventGameUserGainings(payload: EventGameUserGainings) {
+    const message: UsersUpdateGainingsMessage = {
+      userGainings: payload.userGainings,
+    };
+    this.usersService.emit(UsersUpdateGainingsPattern, message);
   }
 
   // Consumable

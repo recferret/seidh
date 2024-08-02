@@ -41,6 +41,10 @@ class BarGold extends h2d.Object {
         return barBmp.tile.height;
     }
 
+    public function setGold(goldAmount:Int) {
+        goldText.text = Std.string(goldAmount);
+    }
+
     public function addGold() {
         goldAmount += 1;
         goldText.text = Std.string(goldAmount);

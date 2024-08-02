@@ -21,6 +21,8 @@ class GameConfig {
 	public final PlayMusic:Bool;
 	public final PlaySounds:Bool;
 	public final TelegramAuth:Bool;
+	public final TelegramTestAuth:Bool;
+	public final TelegramInitData:String;
 	public final Analytics:Bool;
 	public final Serverless:Bool;
 	public final TestLogin:String;
@@ -38,6 +40,8 @@ class GameConfig {
 		PlayMusic = gameConfig.PlayMusic;
 		PlaySounds = gameConfig.PlaySounds;
 		TelegramAuth = gameConfig.TelegramAuth;
+		TelegramTestAuth = gameConfig.TelegramTestAuth;
+		TelegramInitData = gameConfig.TelegramInitData;
 		Analytics = gameConfig.Analytics;
 		Serverless = gameConfig.Serverless;
 		TestLogin = gameConfig.TestLogin;

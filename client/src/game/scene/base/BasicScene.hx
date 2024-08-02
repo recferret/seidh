@@ -176,6 +176,7 @@ abstract class BasicScene extends h2d.Scene {
 					final clientEntity = clientCharacterEntities.get(value.entityId);
 					switch (value.actionType) {
 						case CharacterActionType.ACTION_MAIN:
+							clientEntity.actionMain();
 							clientEntity.fxActionMain();		
 						default: 
 					}

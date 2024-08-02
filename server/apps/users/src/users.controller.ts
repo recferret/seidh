@@ -17,6 +17,10 @@ import {
   UsersGetUserMessageRequest,
   UsersGetUserPattern,
 } from '@app/seidh-common/dto/users/users.get.user.msg';
+import {
+  UsersUpdateGainingsPattern,
+  UsersUpdateGainingsMessage,
+} from '@app/seidh-common/dto/users/users.update.gainings';
 
 @Controller()
 export class UsersController {
@@ -40,5 +44,10 @@ export class UsersController {
   @MessagePattern(UsersGetFriendsPattern)
   async getFriends(message: UsersGetFriendsMessageRequest) {
     return this.usersService.getFriends(message);
+  }
+
+  @MessagePattern(UsersUpdateGainingsPattern)
+  async updateGainings(message: UsersUpdateGainingsMessage) {
+    return this.usersService.updateGainings(message);
   }
 }

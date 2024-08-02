@@ -50,6 +50,8 @@ class PlayContent extends BasicHomeContent {
     private final rightBunny:Bunny;
     private final screenDarknessDisplacementTile:h2d.Tile;
 
+    private final barGold:BarGold;
+
     // 1 - left, 2 - central, 3 - right
     private var leftRagnarPosX = 0.0;
     private var leftRagnarPosY = 0.0;
@@ -294,7 +296,7 @@ class PlayContent extends BasicHomeContent {
         addChild(nextRagnarButtonInteractive);
 
         // Balance
-        final barGold = new BarGold(this);
+        barGold = new BarGold(this);
         barGold.setPosition(playButton.x, playButton.y + 110);
         barGold.setScale(1.3);
 
@@ -308,6 +310,8 @@ class PlayContent extends BasicHomeContent {
         screenDarknessDisplacementTile.scrollDiscrete(1 * dt, 7 * dt);
         leftBunny.update(dt);
         rightBunny.update(dt);
+
+        barGold.setGold(Player.instance.tokens);
     }
 
     private function switchRagner(dir:String) {

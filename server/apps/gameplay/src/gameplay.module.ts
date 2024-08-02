@@ -27,6 +27,13 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
           servers: [InternalProtocol.NatsUrl],
         },
       },
+      {
+        name: ServiceName.Users,
+        transport: Transport.NATS,
+        options: {
+          servers: [InternalProtocol.NatsUrl],
+        },
+      },
     ]),
   ],
   controllers: [GameplayController],

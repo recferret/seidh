@@ -18,8 +18,10 @@ class LoadingScene extends BasicScene {
 	// --------------------------------------
 
 	public function start() {
-        if (GameConfig.instance.Production && GameConfig.instance.TelegramAuth) {
-            final tgInitData = NativeWindowJS.tgGetInitData(); 
+        if (GameConfig.instance.Production && (GameConfig.instance.TelegramAuth || GameConfig.instance.TelegramTestAuth)) {
+            final tgInitData = GameConfig.instance.TelegramAuth ? 
+                NativeWindowJS.tgGetInitData() :
+                GameConfig.instance.TelegramInitData;
             if (tgInitData == null || tgInitData.length == 0) {
                 if (GameConfig.instance.Analytics) 
                     NativeWindowJS.telemetreeInit(false);
@@ -43,7 +45,7 @@ class LoadingScene extends BasicScene {
                         id: 'entity_' + uuid
                     }],
                     authToken: Uuid.short().toLowerCase(),
-                    tokens: 1000,
+                    virtualTokenBalance: 1000,
                     kills: 0
                 });
                 EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});

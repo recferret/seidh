@@ -14,21 +14,17 @@ class CharacterAnimation {
 	private var walkAnim:Array<Tile>;
     private var deadAnim:Array<Tile>;
     private var hurtAnim:Array<Tile>;
-    private var attack1Anim:Array<Tile>;
-    private var attack2Anim:Array<Tile>;
-    private var attack3Anim:Array<Tile>;
-    private var attackRunAnim:Array<Tile>;
-    private var shot1Anim:Array<Tile>;
-    private var shot2Anim:Array<Tile>;
+    private var actionMainAnim:Array<Tile>;
     private var defendAnim:Array<Tile>;
     private var dodgeAnim:Array<Tile>;
 
     private var idleAnimSide = Side.RIGHT;
+    private var runAnimSide = Side.RIGHT;
+    private var actionMainAnimSide = Side.RIGHT;
 
     private var animation:Anim;
     private var characterAnimationState:CharacterAnimationState;
     private var side = Side.RIGHT;
-    private var sideChanged = false;
 
     public var enableMoveAnimation = true;
 
@@ -53,120 +49,58 @@ class CharacterAnimation {
     public function setSide(side:Side) {
         if (this.side != side) {
             this.side = side;
-            sideChanged = true;
-        }
-    }
-
-    public function setAnimationState(newState:CharacterAnimationState) {
-        if (newState != characterAnimationState || sideChanged) {
-            characterAnimationState = newState;
-            hideAnimations();
-
-            var animationToPlay:Array<Tile>;
 
             function flipTilesHorizontally(animationToPlay:Array<Tile>) {
-                sideChanged = false;
                 for (index => value in animationToPlay) {
                     value.flipX();
                 }
             }
 
+            flipTilesHorizontally(idleAnim);
+            flipTilesHorizontally(runAnim);
+            flipTilesHorizontally(actionMainAnim);
+        }
+    }
+
+    public function setAnimationState(newState:CharacterAnimationState) {
+        if (newState != characterAnimationState) {
+            characterAnimationState = newState;
+            hideAnimations();
+
+            var animationToPlay:Array<Tile>;
+
             switch (newState) {
                 case IDLE:
-                    if (side != idleAnimSide) {
-                        flipTilesHorizontally(idleAnim);
-                        idleAnimSide = side;
-                    }
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = idleAnim;
                 case RUN:
-                    if (sideChanged) {
-                        flipTilesHorizontally(runAnim);
-                    }
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = runAnim;
                 case WALK:
-                    if (sideChanged) {
-                        flipTilesHorizontally(walkAnim);
-                    }
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = walkAnim;
                 case DEAD:
-                    if (sideChanged) {
-                        flipTilesHorizontally(deadAnim);
-                    }
                     enableMoveAnimation = false;
                     animation.loop = false;
                     animationToPlay = deadAnim;
                 case HURT:
-                    if (sideChanged) {
-                        flipTilesHorizontally(hurtAnim);
-                    }
                     animation.loop = false;
                     animationToPlay = hurtAnim;
-                case ATTACK_1:
-                    if (sideChanged) {
-                        flipTilesHorizontally(attack1Anim);
-                    }
+                case ACTION_MAIN:
                     enableMoveAnimation = false;
                     animation.loop = false;
-                    animationToPlay = attack1Anim;
-                case ATTACK_2:
-                    if (sideChanged) {
-                        flipTilesHorizontally(attack2Anim);
-                    }
-                    enableMoveAnimation = false;
-                    animation.loop = false;
-                    animationToPlay = attack2Anim;
-                case ATTACK_3:
-                    if (sideChanged) {
-                        flipTilesHorizontally(attack3Anim);
-                    }
-                    enableMoveAnimation = false;
-                    animation.loop = false;
-                    animationToPlay = attack3Anim;
-                case ATTACK_RUN:
-                    if (sideChanged) {
-                        flipTilesHorizontally(attackRunAnim);
-                    }
-                    enableMoveAnimation = false;
-                    animation.loop = false;    
-                    animationToPlay = attackRunAnim;
-                case SHOT_1:
-                    if (sideChanged) {
-                        flipTilesHorizontally(shot1Anim);
-                    }
-                    enableMoveAnimation = false;
-                    animation.loop = false;
-                    animationToPlay = shot1Anim;
-                case SHOT_2:
-                    if (sideChanged) {
-                        flipTilesHorizontally(shot2Anim);
-                    }
-                    enableMoveAnimation = false;
-                    animation.loop = false;
-                    animationToPlay = shot2Anim; 
+                    animationToPlay = actionMainAnim;
                 case DEFEND:
-                    if (sideChanged) {
-                        flipTilesHorizontally(defendAnim);
-                    }
                     enableMoveAnimation = false;
                     animation.loop = false;
                     animationToPlay = defendAnim; 
                 case DODGE:
-                    if (sideChanged) {
-                        flipTilesHorizontally(dodgeAnim);
-                    }
                     animation.loop = false;
                     animationToPlay = dodgeAnim; 
                 default:
-                    if (side != idleAnimSide) {
-                        flipTilesHorizontally(idleAnim);
-                        idleAnimSide = side;
-                    }
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = idleAnim;
@@ -198,28 +132,8 @@ class CharacterAnimation {
         hurtAnim = tiles;
     }
 
-    public function loadAttack1(tiles:Array<Tile>) {
-        attack1Anim = tiles;
-    }
-
-    public function loadAttack2(tiles:Array<Tile>) {
-        attack2Anim = tiles;
-    }
-
-    public function loadAttack3(tiles:Array<Tile>) {
-        attack3Anim = tiles;
-    }
-
-    public function loadAttackRun(tiles:Array<Tile>) {
-        attackRunAnim = tiles;
-    }
-
-    public function loadShot1(tiles:Array<Tile>) {
-        shot1Anim = tiles;
-    }
-
-    public function loadShot2(tiles:Array<Tile>) {
-        shot2Anim = tiles;
+    public function loadActionMain(tiles:Array<Tile>) {
+        actionMainAnim = tiles;
     }
 
     public function loadDefend(tiles:Array<Tile>) {
@@ -274,27 +188,12 @@ class CharacterAnimations {
             ],
         );
 
-        animation.loadAttack1(
+        animation.loadActionMain(
             [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
-
-        animation.loadAttack2(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
-
-        animation.loadAttack3(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
-
-        animation.loadAttackRun(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_1),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_2),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_3),
+                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_4),
             ],
         );
 
@@ -340,25 +239,7 @@ class CharacterAnimations {
             ]
         );
 
-        animation.loadAttack1(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ]
-        );
-
-        animation.loadAttack2(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ]
-        );
-
-        animation.loadAttack3(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ]
-        );
-
-        animation.loadAttackRun(
+        animation.loadActionMain(
             [
                 Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ]
@@ -406,25 +287,7 @@ class CharacterAnimations {
             ]
         );
 
-        animation.loadAttack1(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
-            ]
-        );
-
-        animation.loadAttack2(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
-            ]
-        );
-
-        animation.loadAttack3(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
-            ]
-        );
-
-        animation.loadAttackRun(
+        animation.loadActionMain(
             [
                 Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
             ]
@@ -472,25 +335,7 @@ class CharacterAnimations {
             ]
         );
 
-        animation.loadAttack1(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
-            ]
-        );
-
-        animation.loadAttack2(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
-            ]
-        );
-
-        animation.loadAttack3(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
-            ]
-        );
-
-        animation.loadAttackRun(
+        animation.loadActionMain(
             [
                 Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
             ]

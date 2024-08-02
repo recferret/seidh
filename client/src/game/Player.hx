@@ -24,7 +24,7 @@ class Player {
 		userEntityId = 'entity_' + userData.userId;
 		userName = 'USER 1';
 		authToken = userData.authToken;
-		tokens = userData.tokens;
+		tokens = userData.virtualTokenBalance;
 		kills = userData.kills;
 	}
 

@@ -29,8 +29,10 @@ import { firstValueFrom } from 'rxjs';
 import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ReferralUpdateReferrerPattern } from '@app/seidh-common/dto/referral/referral.update.referrer.msg';
+import { UsersUpdateGainingsMessage } from '@app/seidh-common/dto/users/users.update.gainings';
 
-import crypto from 'crypto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const crypto = require('node:crypto');
 
 @Injectable()
 export class UsersService {
@@ -49,28 +51,6 @@ export class UsersService {
       success: false,
     };
 
-    // function dbCharacterToStruct(c: any) {
-    //   const character = c as CharacterDocument;
-    //   const characterStruct: UserCharacterStruct = {
-    //     id: character.id,
-    //     active: character.active,
-    //     type: character.type,
-    //     levelCurrent: character.levelCurrent,
-    //     levelMax: character.levelMax,
-    //     expCurrent: character.expCurrent,
-    //     expTillNewLevel: character.expTillNewLevel,
-    //     health: character.health,
-    //     movement: {
-    //       runSpeed: character.movement.runSpeed,
-    //       walkSpeed: character.movement.walkSpeed,
-    //     },
-    //     actionMain: {
-    //       damage: character.actionMain.damage,
-    //     },
-    //   };
-    //   return characterStruct;
-    // }
-
     let existingUser: UserDocument;
     let telegramId: string;
     let telegramName: string;
@@ -81,12 +61,25 @@ export class UsersService {
       const telegramParseResult = this.parseTelegramInitData(
         message.telegramInitData,
       );
+      Logger.log(telegramParseResult);
+
       if (telegramParseResult.correctHash) {
-        response.success = true;
-        response.telegramName = telegramParseResult.userInfo.username;
         telegramId = telegramParseResult.userInfo.id;
-        telegramName = telegramParseResult.userInfo.username;
+
+        if (telegramParseResult.userInfo.username) {
+          telegramName = telegramParseResult.userInfo.username;
+        } else {
+          telegramName = telegramParseResult.userInfo.first_name;
+
+          if (telegramParseResult.userInfo.last_name) {
+            telegramName += ' ' + telegramParseResult.userInfo.last_name;
+          }
+        }
+
         telegramPremium = telegramParseResult.userInfo.is_premium;
+
+        response.success = true;
+
         existingUser = await this.userModel.findOne({ telegramId });
       } else {
         return response;
@@ -104,6 +97,7 @@ export class UsersService {
       });
 
       existingUser.authToken = response.authToken;
+      existingUser.telegramName = telegramName;
       await existingUser.save();
     } else {
       const newCharacter = await this.characterModel.create({
@@ -264,14 +258,30 @@ export class UsersService {
       }));
       response.friendsInvited = user.friendsInvited.length;
       response.virtualTokenBalance = user.virtualTokenBalance;
+    } else {
+      Logger.error(`getFriends. user ${message.userId} not found`);
     }
 
     return response;
   }
 
+  async updateGainings(message: UsersUpdateGainingsMessage) {
+    const user = await this.userModel.findById(message.userGainings.userId);
+    if (user) {
+      user.virtualTokenBalance += message.userGainings.tokens;
+      user.kills += message.userGainings.kills;
+      await user.save();
+    } else {
+      Logger.error(
+        `updateGainings. user ${message.userGainings.userId} not found`,
+      );
+    }
+  }
+
   async leaderboard() {}
 
   private parseTelegramInitData(telegramInitData: string) {
+    console.log(telegramInitData);
     const encoded = decodeURIComponent(telegramInitData);
 
     const secret = crypto

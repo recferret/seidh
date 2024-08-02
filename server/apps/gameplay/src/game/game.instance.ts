@@ -14,6 +14,7 @@ import {
   DeleteConsumableEntityTask,
   ConsumableEntityStruct,
   WinCondition,
+  UserGainings,
 } from '@app/seidh-common/seidh-common.game-types';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventGameCharacterActions } from '../events/event.game.character-actions';
@@ -25,8 +26,8 @@ import { EventGameLoopState } from '../events/event.game.loop-state';
 import { EventGameGameState } from '../events/event.game.game-state';
 import { EventGameDeleteConsumable } from '../events/event.game.delete-consumable';
 import { EventGameCreateConsumable } from '../events/event.game.create-consumable';
-import { Logger } from '@nestjs/common';
 import { EventGameInit } from '../events/event.game.init';
+import { EventGameUserGainings } from '../events/event.game.user-gainings';
 
 export class GameInstance {
   private readonly engine: Engine.SeidhGameEngine;
@@ -89,7 +90,19 @@ export class GameInstance {
       characterEntity: EngineCharacterEntity,
     ) => {
       if (characterEntity.isPlayer()) {
-        Logger.log(this.engine.getPlayerGainings(characterEntity.getId()));
+        const userId = characterEntity.getOwnerId();
+        const gainings = this.engine.getPlayerGainings(userId);
+        const playerGainings: UserGainings = {
+          userId,
+          kills: gainings.kills,
+          tokens: gainings.tokens,
+          exp: gainings.exp,
+        };
+        this.eventEmitter.emit(
+          EventGameUserGainings.EventName,
+          new EventGameUserGainings(gameId, playerGainings),
+        );
+        this.engine.clearPlayerGainings(userId);
       }
 
       this.eventEmitter.emit(

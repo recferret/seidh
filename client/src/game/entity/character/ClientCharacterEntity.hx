@@ -101,6 +101,11 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
         }
     }
 
+    public function actionMain() {
+        // animation.setSide(engineEntity.getSide());
+        animation.setAnimationState(ACTION_MAIN);
+    }
+
     // ------------------------------------------------------------
     // FX
     // ------------------------------------------------------------
@@ -108,8 +113,8 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     public function fxActionMain() {
         switch (getEntityType()) {
             case RAGNAR_LOH:
-                final fxPosX = getSide() == RIGHT ? x + getBodyRectangle().w / 1.5 : x - getBodyRectangle().w / 1.5;
-                FxManager.instance.ragnarAttack(fxPosX, y, getSide());
+                // final fxPosX = getSide() == RIGHT ? x + getBodyRectangle().w / 1.5 : x - getBodyRectangle().w / 1.5;
+                // FxManager.instance.ragnarAttack(fxPosX, y, getSide());
                 SoundManager.instance.playVikingHit();
             case ZOMBIE_BOY:
                 final fxPosX = getSide() == RIGHT ? x : x;

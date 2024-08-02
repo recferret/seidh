@@ -32,6 +32,13 @@ export enum EntityType {
   SMALL_COIN = 99,
 }
 
+export interface UserGainings {
+  userId: string;
+  kills: number;
+  tokens: number;
+  exp: number;
+}
+
 export interface EntityShape {
   width: number;
   height: number;
@@ -121,6 +128,7 @@ export interface EngineCharacterEntity {
   getEntityFullStruct(): CharacterEntityFullStruct;
   getEntityMinStruct(): CharacterEntityMinStruct;
   getId(): string;
+  getOwnerId(): string;
   isPlayer(): boolean;
   isBot(): boolean;
 }
