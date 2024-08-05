@@ -38,6 +38,12 @@ export class User {
   hasExpBoost2: boolean;
 
   @Prop({ default: false })
+  hasCoinBoost1: boolean;
+
+  @Prop({ default: false })
+  hasCoinBoost2: boolean;
+
+  @Prop({ default: false })
   hasPotionDropBoost1: boolean;
 
   @Prop({ default: false })

@@ -26,7 +26,7 @@ class SeidhGameEngine extends BaseEngine {
 
     private var winCondition:WinCondition;
 
-    private var mobsMax = 200;
+    private var mobsMax = 130;
     private var allowSpawnMobs = false;
     private var mobsSpawned = 0;
     private var mobsKilled = 0;
@@ -55,33 +55,34 @@ class SeidhGameEngine extends BaseEngine {
 
         this.winCondition = winCondition;
 
-        mobsSpawnPoints.push(new Point(2000, 2000));
-        mobsSpawnPoints.push(new Point(2000, 3000));
-        mobsSpawnPoints.push(new Point(2000, 2500));
+        // mobsSpawnPoints.push(new Point(2300, 2500));
+        // mobsSpawnPoints.push(new Point(2000, 3000));
+        // mobsSpawnPoints.push(new Point(2000, 2500));
+
+		addLineCollider(0, 0, GameWorldSize, 0);
+		addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);
+		addLineCollider(0, 0, 0, GameWorldSize);
+		addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
 
         // Top
-		// addLineCollider(0, 0, GameWorldSize, 0);
-        // for (x in 0...26) {
-        //     mobsSpawnPoints.push(new Point(200 * x, -200));
-        // }
+        for (x in 0...26) {
+            mobsSpawnPoints.push(new Point(200 * x, -200));
+        }
 
-        // // Bottom
-		// addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);
-        // for (x in 0...26) {
-        //     mobsSpawnPoints.push(new Point(200 * x, 5200));
-        // }
+        // Bottom
+        for (x in 0...26) {
+            mobsSpawnPoints.push(new Point(200 * x, 5200));
+        }
 
-        // // Left
-		// addLineCollider(0, 0, 0, GameWorldSize);
-        // for (y in 0...26) {
-        //     mobsSpawnPoints.push(new Point(-200, 200 * y));
-        // }
+        // Left
+        for (y in 0...26) {
+            mobsSpawnPoints.push(new Point(-200, 200 * y));
+        }
 
-        // // Right
-		// addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
-        // for (y in 0...26) {
-        //     mobsSpawnPoints.push(new Point(5200, 200 * y));
-        // }
+        // Right
+        for (y in 0...26) {
+            mobsSpawnPoints.push(new Point(5200, 200 * y));
+        }
     }
 
     // ---------------------------------------------------
@@ -146,21 +147,20 @@ class SeidhGameEngine extends BaseEngine {
             // AI
             final allowServerLogic = engineMode == EngineMode.SERVER || engineMode == EngineMode.CLIENT_SINGLEPLAYER;
 
-            if (allowServerLogic) {
+            if (allowServerLogic && EngineConfig.AI_ENABLED) {
                 for (e1 in characterEntityManager.entities) {
                     final character1 = cast(e1, EngineCharacterEntity);
                     
-                    // Ai movement and updates
                     if (character1.isAlive && !character1.isPlayer()) {
-                        if (EngineConfig.AI_ENABLED) {
-                            final targetPlayer = getNearestPlayer(character1);
-                            if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
-                                character1.setTargetObject(targetPlayer, true);
-                            } else {
-                                character1.clearTargetObject();
-                            }
+                        // Find and set nearest player as a target
+                        final targetPlayer = getNearestPlayer(character1);
+                        if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
+                            character1.setTargetObject(targetPlayer, true);
+                        } else {
+                            character1.clearTargetObject();
                         }
 
+                        // Restrict movement through objects
                         for (e2 in characterEntityManager.entities) {
                             final character2 = cast(e2, EngineCharacterEntity);
                             if (!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
@@ -186,10 +186,10 @@ class SeidhGameEngine extends BaseEngine {
                     character1.update(dt);
 
                     if (character1.isPlayer()) {
-
                         for (c in consumableEntityManager.entities) {
                             final consumable = cast(c, EngineConsumableEntity);
 
+                            // Pick up items
                             if (character1.getBodyRectangle().getCenter().distance(consumable.getBodyRectangle().getCenter()) < 150) {
                                 if (character1.getBodyRectangle().containsRect(consumable.getBodyRectangle())) {
                                     if (consumable.getEntityType() == EntityType.COIN) {
@@ -210,6 +210,7 @@ class SeidhGameEngine extends BaseEngine {
                             }
                         }
 
+                        // Restrict border movement
                         var intersectsWithLine = false;
                         for (line in lineColliders) {
                             if (character1.getForwardLookingLine(character1.playerForwardLookingLineLength).intersectsWithLine(line)) {
@@ -243,6 +244,7 @@ class SeidhGameEngine extends BaseEngine {
                         }
                     }
 
+                    // Perform character action
                     if (character1.isActing) {
                         final hurtEntities = new Array<String>();
                         final deadEntities = new Array<String>();
@@ -382,14 +384,6 @@ class SeidhGameEngine extends BaseEngine {
         mobsSpawned = 0;
     }
 
-    public function getPlayerGainings(playerId:String) {
-        return {
-            kills: playerZombieKills.exists(playerId) ? playerZombieKills.get(playerId) : 0,
-            tokens: playerTokensAccquired.exists(playerId) ? playerTokensAccquired.get(playerId) : 0,
-            exp: playerExpGained.exists(playerId) ? playerExpGained.get(playerId) : 0,
-        };
-    }
-
     public function clearPlayerGainings(playerId:String) {
         playerZombieKills.remove(playerId);
         playerTokensAccquired.remove(playerId);
@@ -485,6 +479,14 @@ class SeidhGameEngine extends BaseEngine {
         return 
             characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
             characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
+    }
+
+    public function getPlayerGainings(playerId:String) {
+        return {
+            kills: playerZombieKills.exists(playerId) ? playerZombieKills.get(playerId) : 0,
+            tokens: playerTokensAccquired.exists(playerId) ? playerTokensAccquired.get(playerId) : 0,
+            exp: playerExpGained.exists(playerId) ? playerExpGained.get(playerId) : 0,
+        };
     }
 
     public function getMobsCount() {

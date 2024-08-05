@@ -1,13 +1,13 @@
 import {
-  BoostBody,
-  BoostsGetMessageRequest,
-  BoostsGetMessageResponse,
+  BoostsBuyRequest,
+  BoostsBuyResponse,
 } from '@app/seidh-common/dto/boost/boost.buy.boosts.msg';
 import {
-  BoostsBuyBoostMessageRequest,
-  BoostsBuyBoostMessageResponse,
+  BoostBody,
+  BoostsGetRequest,
+  BoostsGetResponse,
 } from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
-import { Boost } from '@app/seidh-common/schemas/schema.boost';
+import { Boost, BoostDocument } from '@app/seidh-common/schemas/schema.boost';
 import { User } from '@app/seidh-common/schemas/schema.user';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,17 +15,24 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class BoostService implements OnModuleInit {
-  private readonly boosts: Array<Boost> = [];
+  private readonly boosts: Array<BoostDocument> = [];
 
-  private static readonly BOOST_EXP_BOOST_1_NAME = 'Exp boost 1';
+  private static readonly BOOST_EXP_BOOST_1_NAME = 'Exp 1';
   private static readonly BOOST_EXP_BOOST_1_DESCRIPTION = '+50% exp';
-  private static readonly BOOST_EXP_BOOST_2_NAME = 'Exp boost 2';
+  private static readonly BOOST_EXP_BOOST_2_NAME = 'Exp 2';
   private static readonly BOOST_EXP_BOOST_2_DESCRIPTION = '+100% exp';
 
-  private static readonly BOOST_POTION_DROP_1_NAME = 'Potion drop 1';
+  private static readonly BOOST_COIN_BOOST_1_NAME = 'Coins 1';
+  private static readonly BOOST_COIN_BOOST_1_DESCRIPTION =
+    '+100% coins from monsters';
+  private static readonly BOOST_COIN_BOOST_2_NAME = 'Coins 2';
+  private static readonly BOOST_COIN_BOOST_2_DESCRIPTION =
+    '+200% coins from monsters';
+
+  private static readonly BOOST_POTION_DROP_1_NAME = 'Potion 1';
   private static readonly BOOST_POTION_DROP_1_DESCRIPTION =
     'Enable potion drop';
-  private static readonly BOOST_POTION_DROP_2_NAME = 'Potion drop 2';
+  private static readonly BOOST_POTION_DROP_2_NAME = 'Potion 2';
   private static readonly BOOST_POTION_DROP_2_DESCRIPTION =
     'More and better potions drop';
 
@@ -49,7 +56,7 @@ export class BoostService implements OnModuleInit {
 
   async onModuleInit() {
     const boosts = await this.boostModel.find();
-    if (!boosts) {
+    if (!boosts || boosts.length == 0) {
       this.boosts.push(
         await this.boostModel.create({
           name: BoostService.BOOST_EXP_BOOST_1_NAME,
@@ -68,9 +75,25 @@ export class BoostService implements OnModuleInit {
       );
       this.boosts.push(
         await this.boostModel.create({
+          name: BoostService.BOOST_COIN_BOOST_1_NAME,
+          description: BoostService.BOOST_COIN_BOOST_1_DESCRIPTION,
+          order: 3,
+          price: 100,
+        }),
+      );
+      this.boosts.push(
+        await this.boostModel.create({
+          name: BoostService.BOOST_COIN_BOOST_2_NAME,
+          description: BoostService.BOOST_COIN_BOOST_2_DESCRIPTION,
+          order: 4,
+          price: 100,
+        }),
+      );
+      this.boosts.push(
+        await this.boostModel.create({
           name: BoostService.BOOST_POTION_DROP_1_NAME,
           description: BoostService.BOOST_POTION_DROP_1_DESCRIPTION,
-          order: 3,
+          order: 5,
           price: 100,
         }),
       );
@@ -78,53 +101,54 @@ export class BoostService implements OnModuleInit {
         await this.boostModel.create({
           name: BoostService.BOOST_POTION_DROP_2_NAME,
           description: BoostService.BOOST_POTION_DROP_2_DESCRIPTION,
-          order: 4,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_MAX_POTIONS_1_NAME,
-          description: BoostService.BOOST_MAX_POTIONS_1_DESCRIPTION,
-          order: 5,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_MAX_POTIONS_2_NAME,
-          description: BoostService.BOOST_MAX_POTIONS_2_DESCRIPTION,
           order: 6,
           price: 100,
         }),
       );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_MAX_POTIONS_3_NAME,
-          description: BoostService.BOOST_MAX_POTIONS_3_DESCRIPTION,
-          order: 7,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_PRAYER_1_NAME,
-          description: BoostService.BOOST_PRAYER_1_DESCRIPTION,
-          order: 8,
-          price: 100,
-        }),
-      );
+
+      // this.boosts.push(
+      //   await this.boostModel.create({
+      //     name: BoostService.BOOST_MAX_POTIONS_1_NAME,
+      //     description: BoostService.BOOST_MAX_POTIONS_1_DESCRIPTION,
+      //     order: 5,
+      //     price: 100,
+      //   }),
+      // );
+      // this.boosts.push(
+      //   await this.boostModel.create({
+      //     name: BoostService.BOOST_MAX_POTIONS_2_NAME,
+      //     description: BoostService.BOOST_MAX_POTIONS_2_DESCRIPTION,
+      //     order: 6,
+      //     price: 100,
+      //   }),
+      // );
+      // this.boosts.push(
+      //   await this.boostModel.create({
+      //     name: BoostService.BOOST_MAX_POTIONS_3_NAME,
+      //     description: BoostService.BOOST_MAX_POTIONS_3_DESCRIPTION,
+      //     order: 7,
+      //     price: 100,
+      //   }),
+      // );
+      // this.boosts.push(
+      //   await this.boostModel.create({
+      //     name: BoostService.BOOST_PRAYER_1_NAME,
+      //     description: BoostService.BOOST_PRAYER_1_DESCRIPTION,
+      //     order: 8,
+      //     price: 100,
+      //   }),
+      // );
     } else {
       this.boosts.push(...boosts);
     }
   }
 
-  async getBoosts(message: BoostsGetMessageRequest) {
-    const response: BoostsGetMessageResponse = {
+  async getBoosts(message: BoostsGetRequest) {
+    const response: BoostsGetResponse = {
       success: false,
     };
 
-    const user = await this.userModel.findOne({ id: message.userId });
+    const user = await this.userModel.findById(message.userId);
     if (!user) {
       response.message = 'User not found';
       return response;
@@ -150,6 +174,18 @@ export class BoostService implements OnModuleInit {
             break;
 
           case BoostService.BOOST_EXP_BOOST_2_NAME:
+            if (user.hasCoinBoost1) {
+              boostBody.accquired = true;
+            }
+            break;
+
+          case BoostService.BOOST_COIN_BOOST_1_NAME:
+            if (user.hasCoinBoost2) {
+              boostBody.accquired = true;
+            }
+            break;
+
+          case BoostService.BOOST_COIN_BOOST_2_NAME:
             if (user.hasExpBoost2) {
               boostBody.accquired = true;
             }
@@ -195,8 +231,8 @@ export class BoostService implements OnModuleInit {
     return response;
   }
 
-  async buyBoost(message: BoostsBuyBoostMessageRequest) {
-    const response: BoostsBuyBoostMessageResponse = {
+  async buyBoost(message: BoostsBuyRequest) {
+    const response: BoostsBuyResponse = {
       success: false,
     };
     const boost = this.boosts.find((boost) => boost.id == message.boostId);
@@ -230,6 +266,24 @@ export class BoostService implements OnModuleInit {
 
       case BoostService.BOOST_EXP_BOOST_2_NAME:
         if (!user.hasExpBoost2) {
+          user.hasExpBoost2 = true;
+        } else {
+          response.message = 'Already aqquired';
+          return response;
+        }
+        break;
+
+      case BoostService.BOOST_COIN_BOOST_1_NAME:
+        if (!user.hasCoinBoost1) {
+          user.hasExpBoost1 = true;
+        } else {
+          response.message = 'Already aqquired';
+          return response;
+        }
+        break;
+
+      case BoostService.BOOST_COIN_BOOST_2_NAME:
+        if (!user.hasCoinBoost2) {
           user.hasExpBoost2 = true;
         } else {
           response.message = 'Already aqquired';

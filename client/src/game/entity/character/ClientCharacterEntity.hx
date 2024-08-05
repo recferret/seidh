@@ -67,8 +67,8 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
                 engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);   
         }
 
-        if (engineEntity.getCurrentActionRect(true) != null) {
-            Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(true), GameConfig.GreenColor);
+        if (engineEntity.getCurrentActionRect() != null) {
+            Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(), GameConfig.GreenColor);
         }
 
         Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);

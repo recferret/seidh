@@ -98,17 +98,17 @@ class SceneSpritesTest extends BasicScene {
 
 		ragnar = new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 200, 200, EntityType.RAGNAR_LOH));
 
-        rock = new ClientTerrainEntity(this, TerrainType.ROCK, Res.instance.getTileResource(SeidhResource.TERRAIN_ROCK));
+        rock = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_ROCK));
         rock.setPosition(300, 200);
 
-		tree = new ClientTerrainEntity(this, TerrainType.TREE, Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1));
+		tree = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1));
         tree.setPosition(600, 200);
 
-		fence = new ClientTerrainEntity(this, TerrainType.FENCE, Res.instance.getTileResource(SeidhResource.TERRAIN_FENCE));
+		fence = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_FENCE));
         fence.setPosition(900, 200);
 
-		weed = new ClientTerrainEntity(this, TerrainType.WEED, Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1));
-        weed.setPosition(1100, 200);
+		weed = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1));
+        weed.setPosition(650, 400);
 
 		// tree.blendMode = BlendMode;
 		
@@ -196,45 +196,66 @@ class SceneSpritesTest extends BasicScene {
 
 		// .distance(ragnarBottom) < 250
 
+		// if (rockRect.intersectsWithRect(ragnarRect)) {
+		// 	if (rockBottom.y < ragnarBottom.y) {
+		// 		ragnar.oZrder = 2;
+		// 		rock.oZrder = 1;
+		// 	} else {
+		// 		ragnar.oZrder = 1;
+		// 		rock.oZrder = 2;
+		// 	}
+		// }
+
+		// Ragnar 
+
+		// TOMORROW move to the client
+
+		final characterToEnvIntersections = new Array<Dynamic>();
+		characterToEnvIntersections.push(ragnar);
+
 		if (rockRect.intersectsWithRect(ragnarRect)) {
-			if (rockBottom.y < ragnarBottom.y) {
-				ragnar.oZrder = 2;
-				rock.oZrder = 1;
-			} else {
-				ragnar.oZrder = 1;
-				rock.oZrder = 2;
-			}
+			characterToEnvIntersections.push(rock);
 		}
 
 		if (treeRect.intersectsWithRect(ragnarRect)) {
-			if (treeBottom.y < ragnarBottom.y) {
-				ragnar.oZrder = 2;
-				tree.oZrder = 1;
-			} else {
-				ragnar.oZrder = 1;
-				tree.oZrder = 2;
-			}
-		}
-
-		if (fenceRect.intersectsWithRect(ragnarRect)) {
-			if (fenceBottom.y < ragnarBottom.y) {
-				ragnar.oZrder = 2;
-				fence.oZrder = 1;
-			} else {
-				ragnar.oZrder = 1;
-				fence.oZrder = 2;
-			}
+			characterToEnvIntersections.push(tree);
 		}
 
 		if (weedRect.intersectsWithRect(ragnarRect)) {
-			if (weedBottom.y < ragnarBottom.y) {
-				ragnar.oZrder = 2;
-				weed.oZrder = 1;
-			} else {
-				ragnar.oZrder = 1;
-				weed.oZrder = 2;
+			characterToEnvIntersections.push(weed);
+		}
+
+		if (characterToEnvIntersections.length > 1) {
+			characterToEnvIntersections.sort((a, b) -> {
+				final aBottom = a.getBottomRect().getCenter();
+				final bBottom = b.getBottomRect().getCenter();
+				return aBottom.y - bBottom.y;
+			});
+
+			for (index => env in characterToEnvIntersections) {
+				env.oZrder = index;
 			}
 		}
+
+			// if (treeBottom.y < ragnarBottom.y) {
+			// 	ragnar.oZrder = 3;
+			// 	tree.oZrder = 2;
+			// 	trace('RAGNAR ONTOP');
+			// } else {
+			// 	trace('TREE ONTOP');
+			// 	ragnar.oZrder = 2;
+			// 	tree.oZrder = 3;
+			// }
+
+		// if (fenceRect.intersectsWithRect(ragnarRect)) {
+		// 	if (fenceBottom.y < ragnarBottom.y) {
+		// 		ragnar.oZrder = 2;
+		// 		fence.oZrder = 1;
+		// 	} else {
+		// 		ragnar.oZrder = 1;
+		// 		fence.oZrder = 2;
+		// 	}
+		// }
 
 
 		// final fenceBottom = fence.getBottomRect().getCenter();
@@ -261,8 +282,6 @@ class SceneSpritesTest extends BasicScene {
 
 		// TODO impl z order state
 		sortObjectsByZOrder();
-
-
 
 		// if (tree.getRect().getCenter())
 

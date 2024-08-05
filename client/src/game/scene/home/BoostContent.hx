@@ -2,7 +2,6 @@ package game.scene.home;
 
 import hxd.res.DefaultFont;
 
-import game.scene.base.BasicScene;
 import game.Res.SeidhResource;
 
 class BoostButton extends h2d.Object {
@@ -11,11 +10,11 @@ class BoostButton extends h2d.Object {
     private final h = 0.0;
     private final bmp:h2d.Bitmap;
 
-    public function new(parent:h2d.Object, boostLabel:String, owned:Bool, price:String) {
+    public function new(parent:h2d.Object, label:String, description:String, price:Int, owned:Bool) {
         super(parent);
 
-        final scaleX = 1.6;
-        final scaleY = 0.5;
+        final scaleX = 0.7;
+        final scaleY = 0.7;
         bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL), this);
         bmp.scaleX = scaleX;
         bmp.scaleY = scaleY;
@@ -24,7 +23,7 @@ class BoostButton extends h2d.Object {
 
         final font : h2d.Font = DefaultFont.get();
         final tf = new h2d.Text(font);
-        tf.text = boostLabel;
+        tf.text = label;
         tf.textColor = GameConfig.FontColor;
         tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         tf.textAlign = Center;
@@ -53,17 +52,24 @@ class BoostContent extends BasicHomeContent {
     public function new() {
 	    super();
 
-        final expBoost = new BoostButton(this, 'Double EXP', false, "300 SDH");
-        expBoost.setPosition(
-            Main.ActualScreenWidth / 2 ,
-            300
-        );
+        for (index => boost in Player.instance.boosts) {
+            final boostButton = new BoostButton(this, boost.name, boost.description, boost.price, boost.accquired);
 
-        final lootBoost = new BoostButton(this, '25% more LOOT', false, "300 SDH");
-        lootBoost.setPosition(
-            Main.ActualScreenWidth / 2,
-            470
-        );
+            switch (index) {
+                case 0:
+                    boostButton.setPosition(215, 400);
+                case 1:
+                    boostButton.setPosition(Main.ActualScreenWidth - 215, 400);
+                case 2:
+                    boostButton.setPosition(215, 600);
+                case 3:
+                    boostButton.setPosition(Main.ActualScreenWidth - 215, 600);
+                case 4:
+                    boostButton.setPosition(215, 800);
+                case 5:
+                    boostButton.setPosition(Main.ActualScreenWidth - 215, 800);
+            }
+        }
     }
 
     public function update(dt:Float) {

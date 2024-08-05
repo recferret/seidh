@@ -56,22 +56,26 @@ class GameScene extends BasicScene implements EventListener {
 			// Top
 			final topBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, Std.int(SeidhGameEngine.GameWorldSize / 2), 1));
 			topBorder.setPosition(0, -topBorder.tile.height);
-			add(topBorder, 0, 99);
+			topBorder.oZrder = 99;
+			add(topBorder);
 
 			// Bottom
 			final bottomBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, Std.int(SeidhGameEngine.GameWorldSize / 2), 1));
 			bottomBorder.setPosition(0, SeidhGameEngine.GameWorldSize);
-			add(bottomBorder, 0, 99);
+			bottomBorder.oZrder = 99;
+			add(bottomBorder);
 
 			// Left
 			final leftBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, SeidhGameEngine.GameWorldSize * 2, 1));
 			leftBorder.setPosition(-leftBorder.tile.width, -SeidhGameEngine.GameWorldSize / 2);
-			add(leftBorder, 0, 99);
+			leftBorder.oZrder = 99;
+			add(leftBorder);
 
 			// Right
 			final rightBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, SeidhGameEngine.GameWorldSize * 2, 1));
 			rightBorder.setPosition(SeidhGameEngine.GameWorldSize, -SeidhGameEngine.GameWorldSize / 2);
-			add(rightBorder, 0, 99);
+			rightBorder.oZrder = 99;
+			add(rightBorder);
 		}
     }
 
@@ -107,32 +111,37 @@ class GameScene extends BasicScene implements EventListener {
 	public function customUpdate(dt:Float, fps:Float) {
 		for (character in clientCharacterEntities) {
 			character.update(dt, fps);
-
-			final characterBottom = character.getBottomRect().getCenter();
 			final characterRect = character.getRect();
 
-			function zOrderAgainstTerrain(terrainObjects:Array<ClientTerrainEntity>) {
-				for (terrainObject in terrainObjects) {
-					final terrainObjectRect = terrainObject.getRect();
-					if (characterRect.getCenter().distance(terrainObjectRect.getCenter()) < character.getBodyRectangle().h * 2) {
-						final terrainObjectBottom = terrainObject.getBottomRect().getCenter();
-						if (terrainObjectRect.intersectsWithRect(characterRect)) {
-							if (terrainObjectBottom.y < characterBottom.y) {
-								character.oZrder = 2;
-								terrainObject.oZrder = 1;
-							} else {
-								character.oZrder = 1;
-								terrainObject.oZrder = 2;
-							}
-						}
+			// Z order effect
+			final characterToEnvIntersections = new Array<Dynamic>();
+			characterToEnvIntersections.push(character);
+
+			function checkEnvToCharCollision(envs:Array<ClientTerrainEntity>) {
+				for (env in envs) {
+					if (characterRect.getCenter().distance(env.getRect().getCenter()) < character.getBodyRectangle().h * 2 && 
+						env.getRect().intersectsWithRect(characterRect)) {
+						characterToEnvIntersections.push(env);
 					}
 				}
 			}
 
-			zOrderAgainstTerrain(terrainManager.getRocks());
-			zOrderAgainstTerrain(terrainManager.getTrees());
-			zOrderAgainstTerrain(terrainManager.getFences());
-			zOrderAgainstTerrain(terrainManager.getWeeds());
+			checkEnvToCharCollision(terrainManager.getRocks());
+			checkEnvToCharCollision(terrainManager.getTrees());
+			checkEnvToCharCollision(terrainManager.getWeeds());
+			checkEnvToCharCollision(terrainManager.getFences());
+
+			if (characterToEnvIntersections.length > 1) {
+				characterToEnvIntersections.sort((a, b) -> {
+					final aBottom = a.getBottomRect().getCenter();
+					final bBottom = b.getBottomRect().getCenter();
+					return aBottom.y - bBottom.y;
+				});
+	
+				for (index => env in characterToEnvIntersections) {
+					env.oZrder = index;
+				}
+			}
 		}
 
 		for (consumable in clientConsumableEntities) {

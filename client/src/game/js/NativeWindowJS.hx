@@ -11,7 +11,7 @@ enum abstract YandexMetricsGoals(String) {
 extern class NativeWindowJS {
 
     // Networking
-    static function networkAuthAndGetUser(telegramInitData:String, login:String, referrerId:String, callback:Dynamic->Void):Void;
+    static function networkAuthAndGetUser(telegramInitData:String, login:String, referrerId:String, userCallback:Dynamic->Void, boostCallback:Dynamic->Void):Void;
     static function networkWsInit(callback:Dynamic->Void):Void;
     static function networkFindAndJoinGame(gameType:String):Void;
     static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;

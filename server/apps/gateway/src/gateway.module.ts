@@ -24,6 +24,13 @@ import { ConfigModule } from '@nestjs/config';
         },
       },
       {
+        name: ServiceName.Boost,
+        transport: Transport.NATS,
+        options: {
+          servers: [InternalProtocol.NatsUrl],
+        },
+      },
+      {
         name: ServiceName.Users,
         transport: Transport.NATS,
         options: {

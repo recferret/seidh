@@ -2,6 +2,14 @@ package game;
 
 import game.js.NativeWindowJS;
 
+typedef BoostBody = {
+	id:String,
+	name:String,
+	description:String,
+	price:Int,
+	accquired:Bool,
+};
+
 class Player {
 	private final WalletAddressKey = 'WalletAddress';
 
@@ -13,6 +21,8 @@ class Player {
 	public var authToken:String;
 	public var tokens:Int;
 	public var kills:Int;
+
+	public final boosts = new Array<BoostBody>();
 
 	private var inputIndex = 0;
 
@@ -26,6 +36,12 @@ class Player {
 		authToken = userData.authToken;
 		tokens = userData.virtualTokenBalance;
 		kills = userData.kills;
+	}
+
+	public function setBoostData(boostData:Array<Dynamic>) {
+		for (boost in boostData) {
+			boosts.push(boost);
+		}
 	}
 
 	public function incrementAndGetInputIndex() {

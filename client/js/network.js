@@ -2,14 +2,15 @@ let _currentGameId = undefined;
 let _currentGameplayServiceId = undefined;
 let _authToken = undefined;
 
-async function networkAuthAndGetUser(telegramInitData, login, referrerId, callback) {
+async function networkAuthAndGetUser(telegramInitData, login, referrerId, userCallback, boostCallback) {
     const authResponse = await restAuthenticate(telegramInitData, login, referrerId);
     if (authResponse.success) {
         _authToken = 'Bearer ' + authResponse.authToken;
         const userResponse = await restGetUser(_authToken)
         if (userResponse.success) {
-            if (callback) {
-                callback(userResponse.user);
+            await networkGetBoosts(boostCallback);
+            if (userCallback) {
+                userCallback(userResponse.user);
             }
         } else {
             console.error('Failed to get user');
@@ -37,4 +38,15 @@ async function networkFindAndJoinGame(gameType) {
 
 function networkInput(actionType, movAngle) {
     wsInput(actionType, movAngle);
+}
+
+async function networkGetBoosts(callback) {
+    const boostsResult = await restGetBoosts(_authToken);
+    if (boostsResult.success) {
+        if (callback) {
+            callback(boostsResult.boosts);
+        }
+    } else {
+        console.error('Failed to get boosts');
+    }
 }

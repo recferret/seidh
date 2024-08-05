@@ -1,3 +1,5 @@
+// TODO implement rest wrappers
+
 async function restFindGame(authToken, gameType) {
     const findGameResult = await fetch(restUrl + 'findGame', {
         method: 'POST',
@@ -31,14 +33,25 @@ async function restAuthenticate(telegramInitData, login, referrerId) {
 }
 
 async function restGetUser(authToken) {
-    const userProfileResult = await fetch(restUrl + 'user', {
+    const result = await fetch(restUrl + 'user', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': authToken
         }
     });
-    const userProfileData = await userProfileResult.json();
-    return userProfileData;
+    const json = await result.json();
+    return json;
+}
 
+async function restGetBoosts(authToken) {
+    const result = await fetch(restUrl + 'boosts', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': authToken
+        }
+    });
+    const json = await result.json();
+    return json;
 }

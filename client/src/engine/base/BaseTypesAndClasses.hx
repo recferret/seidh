@@ -53,15 +53,10 @@ class EntityShape {
 
 	public function new(shape:ShapeStruct) {
 		this.shape = shape;
-
-		if (shape.rectOffsetX == 0 && shape.rectOffsetY == 0) {
-			this.shape.rectOffsetX = Std.int(shape.width / 2);
-			this.shape.rectOffsetY = Std.int(shape.height / 2);
-		}
 	}
 
 	public function toRect(x:Float, y:Float, rotation:Float, side:Side) {
-		final sideOffset = side == RIGHT ? 0 : -shape.width + 45;
+		final sideOffset = side == RIGHT ? 0 : -shape.width / 2;
 		return new Rectangle(x + this.shape.rectOffsetX + sideOffset, y + this.shape.rectOffsetY, shape.width, shape.height, rotation);
 	}
 

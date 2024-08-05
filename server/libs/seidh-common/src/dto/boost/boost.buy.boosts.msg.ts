@@ -1,19 +1,13 @@
-export const BoostsGetPattern = 'boosts.get';
+import { BoostBody } from './boost.get.boosts.msg';
 
-export interface BoostBody {
-  id: string;
-  order: number;
-  name: string;
-  description: string;
-  price: number;
-  accquired: boolean;
-}
+export const BoostsBuyPattern = 'boosts.buy';
 
-export interface BoostsGetMessageRequest {
+export interface BoostsBuyRequest {
   userId: string;
+  boostId: string;
 }
 
-export interface BoostsGetMessageResponse {
+export interface BoostsBuyResponse {
   success: boolean;
   message?: string;
   boosts?: BoostBody[];

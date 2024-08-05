@@ -244,7 +244,6 @@ class TerrainManager {
     private function generateRock(s2d:h2d.Scene, x:Float, y:Float) {
         final terrainEntity = new ClientTerrainEntity(
             s2d,
-            TerrainType.ROCK,
             Res.instance.getTileResource(SeidhResource.TERRAIN_ROCK)
         );
         terrainEntity.setPosition(x + terrainEntity.tile.width / 2, y - terrainEntity.tile.height / 2);
@@ -260,7 +259,6 @@ class TerrainManager {
     private function generateTree(s2d:h2d.Scene, seidhResource:SeidhResource, x:Float, y:Float) {
         final terrainEntity = new ClientTerrainEntity(
             s2d,
-            TerrainType.TREE,
             Res.instance.getTileResource(seidhResource)
         );
         terrainEntity.setPosition(x + terrainEntity.tile.width / 2, y - terrainEntity.tile.height / 2);
@@ -270,7 +268,6 @@ class TerrainManager {
     private function generateWeed(s2d:h2d.Scene, seidhResource:SeidhResource, x:Float, y:Float) {
         final terrainEntity = new ClientTerrainEntity(
             s2d,
-            TerrainType.WEED,
             Res.instance.getTileResource(seidhResource)
         );
         terrainEntity.setPosition(x + terrainEntity.tile.width / 2, y - terrainEntity.tile.height / 2);
@@ -280,7 +277,6 @@ class TerrainManager {
     private function generateFence(s2d:h2d.Scene, x:Float, y:Float) {
         final terrainEntity = new ClientTerrainEntity(
             s2d,
-            TerrainType.FENCE,
             Res.instance.getTileResource(SeidhResource.TERRAIN_FENCE)
         );
         terrainEntity.setPosition(x + terrainEntity.tile.width / 2, y - terrainEntity.tile.height / 2);

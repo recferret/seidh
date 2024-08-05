@@ -63,7 +63,7 @@ export class GatewayController {
   @Get('boosts')
   @UseGuards(AuthGuard)
   getBoosts(@Session() session: IUserSession) {
-    console.log(session);
+    return this.gatewayService.getBoosts(session.userId);
   }
 
   @Post('boosts')

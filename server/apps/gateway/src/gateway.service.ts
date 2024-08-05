@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -28,12 +28,24 @@ import {
   UsersGetUserMessageResponse,
   UsersGetUserPattern,
 } from '@app/seidh-common/dto/users/users.get.user.msg';
+// import {
+//   BoostsBuyRequest,
+//   BoostsBuyResponse,
+//   BoostsBuyPattern,
+// } from '@app/seidh-common/dto/boost/boost.buy.boosts.msg';
+import {
+  BoostsGetRequest,
+  BoostsGetResponse,
+  BoostsGetPattern,
+} from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
+import { GetBoostsResponse } from './dto/boosts.dto';
 
 @Injectable()
 export class GatewayService {
   constructor(
     @Inject(ServiceName.GameplayLobby)
     private gameplayLobbyService: ClientProxy,
+    @Inject(ServiceName.Boost) private boostsService: ClientProxy,
     @Inject(ServiceName.Users) private usersService: ClientProxy,
   ) {}
 
@@ -59,8 +71,6 @@ export class GatewayService {
   }
 
   async authenticate(authenticateRequest: AuthenticateRequest) {
-    Logger.log(authenticateRequest);
-
     const request: UsersAuthenticateMessageRequest = {
       telegramInitData: authenticateRequest.telegramInitData,
       login: authenticateRequest.login,
@@ -88,6 +98,20 @@ export class GatewayService {
       friends: result.friends,
       friendsInvited: result.friendsInvited,
       virtualTokenBalance: result.virtualTokenBalance,
+    };
+    return response;
+  }
+
+  async getBoosts(userId: string) {
+    const request: BoostsGetRequest = {
+      userId,
+    };
+    const result: BoostsGetResponse = await firstValueFrom(
+      this.boostsService.send(BoostsGetPattern, request),
+    );
+    const response: GetBoostsResponse = {
+      success: result.success,
+      boosts: result.boosts,
     };
     return response;
   }

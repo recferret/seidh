@@ -63,7 +63,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public var isActing = false;
 	public var actionToPerform:CharacterActionStruct;
-	public var debugActionToPerform:CharacterActionStruct;
 
 	private var lastActionMainInputCheck = 0.0;
 	private var lastAction1InputCheck = 0.0;
@@ -126,8 +125,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function update(dt:Float) {
 		lastDeltaTime = dt;
-
-		debugActionToPerform = null;
 
 		if (hasTargetObject() && !isPlayer()) {
 			// Rotate bot in the target direction
@@ -336,7 +333,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 				actionToPerform = actionUltimate;
 			default:
 		}
-		debugActionToPerform = actionToPerform;
 	}
 
 	public function addHealth(add:Int) {
@@ -398,19 +394,21 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		return characterEntity.toMinStruct();
 	}
 	
-	public function getCurrentActionRect(debug:Bool = false) {
-		final action = debug ? debugActionToPerform : actionToPerform;
+	public function getCurrentActionRect() {
+		final action = actionToPerform;
 
 		if (action == null)
 			return null;
 		if (action.meleeStruct != null) {
 			final shape = new EntityShape(action.meleeStruct.shape);
+
 			final rect = shape.toRect(
-				getBodyRectangle().getTopLeftPoint().x,
-				getBodyRectangle().getTopLeftPoint().y - (baseEntity.entityShape.height / 4),
+				getBodyRectangle().getCenter().x,
+				getBodyRectangle().getCenter().y,
 				0, 
 				characterEntity.side
 			);
+
 			return rect;
 		} else if (action.projectileStruct != null) {
 			final shape = new EntityShape(action.projectileStruct.shape);
