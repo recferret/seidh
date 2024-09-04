@@ -84,25 +84,23 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     }
 
     public function moveToServerPosition(dt:Float, fps:Float) {
-        if (animation.enableMoveAnimation) {
-            animation.setSide(engineEntity.getSide());
+        animation.setSide(engineEntity.getSide());
 
-            final distance = targetServerPosition.distance(new Point(x, y));
-            if (distance > 1) {
-                x = Math.lerp(x, targetServerPosition.x, 0.07);
-                y = Math.lerp(y, targetServerPosition.y, 0.07);
-            }
+        final distance = targetServerPosition.distance(new Point(x, y));
+        if (distance > 1) {
+            x = Math.lerp(x, targetServerPosition.x, 0.085);
+            y = Math.lerp(y, targetServerPosition.y, 0.085);
+        }
 
-            if (distance > 10) {
-                animation.setAnimationState(RUN);
-            } else {
-                animation.setAnimationState(IDLE);
-            }
+        if (animation.enableMoveAnimation && distance > 1) {
+            animation.setAnimationState(RUN);
+            // Do not enterrupt attack animation, because of interpolation character may still move 
+        } else if (animation.getAnimationState() != CharacterAnimationState.ACTION_MAIN && distance < 1) {
+            animation.setAnimationState(IDLE);
         }
     }
 
     public function actionMain() {
-        // animation.setSide(engineEntity.getSide());
         animation.setAnimationState(ACTION_MAIN);
     }
 
@@ -174,11 +172,11 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
             case RAGNAR_LOH:
         		return new Rectangle(x, y, 221, 285, 0);
             case RAGNAR_NORM:
-		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+		        return new Rectangle(x, y, 221, 285, 0);
             case ZOMBIE_BOY:
-		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+		        return new Rectangle(x, y, 160, 235, 0);
             case ZOMBIE_GIRL:
-		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+		        return new Rectangle(x, y, 160, 235, 0);
             default:
                 return null;
         }
@@ -191,9 +189,9 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
             case RAGNAR_NORM:
 		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
             case ZOMBIE_BOY:
-		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+		        return new Rectangle(x, y + 190 / 2, 160, 40, 0);
             case ZOMBIE_GIRL:
-		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
+		        return new Rectangle(x, y + 190 / 2, 160, 40, 0);
             default:
                 return null;
         }

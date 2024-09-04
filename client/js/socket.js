@@ -27,6 +27,8 @@ function wsConnect(authToken, callback) {
     // Server -> Client events
     //
 
+    // Game
+
     socket.on('GameInit', function(data) {
         callback({type: 'GameInit', data});
     });
@@ -53,6 +55,12 @@ function wsConnect(authToken, callback) {
 
     socket.on('CharacterActions', function(data) {
         callback({type: 'CharacterActions', data});
+    });
+
+    // User
+
+    socket.on('UserBalance', function(data) {
+        callback({type: 'UserBalance', data});
     });
 }
 

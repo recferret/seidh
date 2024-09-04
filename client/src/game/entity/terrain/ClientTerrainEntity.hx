@@ -11,11 +11,11 @@ class ClientTerrainEntity extends h2d.Bitmap {
     }
 
     public function getRect() {
-        return new Rectangle(x, y, tile.width, tile.height, 0);
+        return new Rectangle(x + tile.width / 2, y + tile.height / 2, tile.width, tile.height, 0);
     }
 
     public function getBottomRect() {
-        return new Rectangle(x, y + tile.height / 2 - 30, tile.width, 40, 0);
+        return new Rectangle(x + tile.width / 2, y + tile.height - 30, tile.width, 40, 0);
     }
 
 }

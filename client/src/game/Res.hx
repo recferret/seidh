@@ -97,6 +97,7 @@ enum SeidhResource {
     TERRAIN_TREE_2;
     TERRAIN_WEED_1;
     TERRAIN_WEED_2;
+    TERRAIN_ENV_TILEMAP;
 
     // ------------------------------------
     // UI
@@ -105,6 +106,7 @@ enum SeidhResource {
     UI_DIALOG_BUTTON_NAY;
     UI_DIALOG_BUTTON_YAY;
     UI_DIALOG_WINDOW_SMALL;
+    UI_DIALOG_WINDOW_MEDIUM;
 
     UI_GAME_JOYSTICK_1;
     UI_GAME_JOYSTICK_2;
@@ -145,13 +147,40 @@ enum SeidhResource {
     // ZOMBIE BOY
     // ------------------------------------
 
-    ZOMBIE_BOY;
+    ZOMBIE_BOY_IDLE_1;
+    ZOMBIE_BOY_IDLE_2;
+    ZOMBIE_BOY_IDLE_3;
+    ZOMBIE_BOY_IDLE_4;
+
+    ZOMBIE_BOY_ATTACK_1;
+    ZOMBIE_BOY_ATTACK_2;
+    ZOMBIE_BOY_ATTACK_3;
+    ZOMBIE_BOY_ATTACK_4;
+
+    ZOMBIE_BOY_RUN_1;
+    ZOMBIE_BOY_RUN_2;
+    ZOMBIE_BOY_RUN_3;
+    ZOMBIE_BOY_RUN_4;
+    ZOMBIE_BOY_RUN_5;
+    ZOMBIE_BOY_RUN_6;
 
     // ------------------------------------
     // ZOMBIE GIRL
     // ------------------------------------
 
-    ZOMBIE_GIRL;
+    ZOMBIE_GIRL_IDLE_1;
+
+    ZOMBIE_GIRL_ATTACK_1;
+    ZOMBIE_GIRL_ATTACK_2;
+    ZOMBIE_GIRL_ATTACK_3;
+    ZOMBIE_GIRL_ATTACK_4;
+
+    ZOMBIE_GIRL_RUN_1;
+    ZOMBIE_GIRL_RUN_2;
+    ZOMBIE_GIRL_RUN_3;
+    ZOMBIE_GIRL_RUN_4;
+    ZOMBIE_GIRL_RUN_5;
+    ZOMBIE_GIRL_RUN_6;
 }
 
 class ResRemoteLoader {
@@ -316,6 +345,8 @@ class Res {
                 remoteResourceMap.set(TERRAIN_TREE_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_TREE_2.png');
                 remoteResourceMap.set(TERRAIN_WEED_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_WEED_1.png');
                 remoteResourceMap.set(TERRAIN_WEED_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_WEED_2.png');
+                remoteResourceMap.set(TERRAIN_ENV_TILEMAP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_ENV_TILEMAP.png');
+                
 
                 // ------------------------------------
                 // UI
@@ -324,6 +355,7 @@ class Res {
                 remoteResourceMap.set(UI_DIALOG_BUTTON_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_BUTTON_NAY.png');
                 remoteResourceMap.set(UI_DIALOG_BUTTON_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_BUTTON_YAY.png');
                 remoteResourceMap.set(UI_DIALOG_WINDOW_SMALL, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_WINDOW_SMALL.png');
+                remoteResourceMap.set(UI_DIALOG_WINDOW_MEDIUM, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_WINDOW_MEDIUM.png');
             
                 remoteResourceMap.set(UI_GAME_JOYSTICK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_1.png');
                 remoteResourceMap.set(UI_GAME_JOYSTICK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_2.png');
@@ -361,13 +393,40 @@ class Res {
                 // ZOMBIE BOY
                 // ------------------------------------
             
-                remoteResourceMap.set(ZOMBIE_BOY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY.png');
-            
+                remoteResourceMap.set(ZOMBIE_BOY_IDLE_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
+                remoteResourceMap.set(ZOMBIE_BOY_IDLE_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
+                remoteResourceMap.set(ZOMBIE_BOY_IDLE_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
+                remoteResourceMap.set(ZOMBIE_BOY_IDLE_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
+
+                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_1.png');
+                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_2.png');
+                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_3.png');
+                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_4.png');
+
+                remoteResourceMap.set(ZOMBIE_BOY_RUN_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_1.png');
+                remoteResourceMap.set(ZOMBIE_BOY_RUN_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_2.png');
+                remoteResourceMap.set(ZOMBIE_BOY_RUN_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_3.png');
+                remoteResourceMap.set(ZOMBIE_BOY_RUN_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_4.png');
+                remoteResourceMap.set(ZOMBIE_BOY_RUN_5, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_5.png');
+                remoteResourceMap.set(ZOMBIE_BOY_RUN_6, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_6.png');
+
                 // ------------------------------------
                 // ZOMBIE GIRL
                 // ------------------------------------
             
-                remoteResourceMap.set(ZOMBIE_GIRL, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_IDLE_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_IDLE_1.png');
+
+                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_1.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_2.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_3.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_4.png');
+
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_1.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_2.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_3.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_4.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN_5, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_5.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN_6, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_6.png');
 
                 loadRemoteResources();
             } else if (GameConfig.instance.ResProvider == ResourceProvider.LOCAL) {
@@ -462,6 +521,7 @@ class Res {
                 tileResMap.set(TERRAIN_TREE_2, hxd.Res.terrain.TERRAIN_TREE_2.toTile().center());
                 tileResMap.set(TERRAIN_WEED_1, hxd.Res.terrain.TERRAIN_WEED_1.toTile().center());
                 tileResMap.set(TERRAIN_WEED_2, hxd.Res.terrain.TERRAIN_WEED_2.toTile().center());
+                tileResMap.set(TERRAIN_ENV_TILEMAP, hxd.Res.terrain.TERRAIN_ENV_TILEMAP.toTile().center());
 
                 // ------------------------------------
                 // UI
@@ -470,6 +530,7 @@ class Res {
                 tileResMap.set(UI_DIALOG_BUTTON_NAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
                 tileResMap.set(UI_DIALOG_BUTTON_YAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
                 tileResMap.set(UI_DIALOG_WINDOW_SMALL, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_SMALL.toTile().center());
+                tileResMap.set(UI_DIALOG_WINDOW_MEDIUM, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_MEDIUM.toTile().center());
             
                 tileResMap.set(UI_GAME_JOYSTICK_1, hxd.Res.ui.game.UI_GAME_JOYSTICK_1.toTile().center());
                 tileResMap.set(UI_GAME_JOYSTICK_2, hxd.Res.ui.game.UI_GAME_JOYSTICK_2.toTile().center());
@@ -510,13 +571,40 @@ class Res {
                 // ZOMBIE BOY
                 // ------------------------------------
             
-                tileResMap.set(ZOMBIE_BOY, hxd.Res.zombie_boy.ZOMBIE_BOY.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_IDLE_1, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_1.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_IDLE_2, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_2.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_IDLE_3, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_3.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_IDLE_4, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_4.toTile().center());
+
+                tileResMap.set(ZOMBIE_BOY_ATTACK_1, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_1.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_ATTACK_2, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_2.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_ATTACK_3, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_3.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_ATTACK_4, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_4.toTile().center());
+
+                tileResMap.set(ZOMBIE_BOY_RUN_1, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_1.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_RUN_2, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_2.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_RUN_3, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_3.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_RUN_4, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_4.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_RUN_5, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_5.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_RUN_6, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_6.toTile().center());
             
                 // ------------------------------------
                 // ZOMBIE GIRL
                 // ------------------------------------
             
-                tileResMap.set(ZOMBIE_GIRL, hxd.Res.zombie_girl.ZOMBIE_GIRL.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_IDLE_1, hxd.Res.zombie_girl.ZOMBIE_GIRL_IDLE_1.toTile().center());
+
+                tileResMap.set(ZOMBIE_GIRL_ATTACK_1, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_1.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_ATTACK_2, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_2.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_ATTACK_3, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_3.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_ATTACK_4, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_4.toTile().center());
+
+                tileResMap.set(ZOMBIE_GIRL_RUN_1, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_1.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_RUN_2, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_2.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_RUN_3, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_3.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_RUN_4, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_4.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_RUN_5, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_5.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_RUN_6, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_6.toTile().center());
 
                 if (resCallback != null) {
                     resCallback({

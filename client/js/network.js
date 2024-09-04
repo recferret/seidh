@@ -50,3 +50,15 @@ async function networkGetBoosts(callback) {
         console.error('Failed to get boosts');
     }
 }
+
+async function networkBuyBoost(boostId, callback) {
+    const buyBoostResult = await restBuyBoost(_authToken, boostId);
+    if (buyBoostResult.success) {
+        if (callback) {
+            callback(buyBoostResult.boosts);
+        }
+    } else {
+        tgShowAlert('Failed to buy boost');
+    }
+
+}

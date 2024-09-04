@@ -42,6 +42,10 @@ typedef ActionsPayload = {
     actions:Array<CharacterActionCallbackParams>,
 }
 
+typedef UserBalancePayload = {
+    balance:Int,
+}
+
 class Networking {
 
     private var joined = false;
@@ -63,22 +67,24 @@ class Networking {
         final data:Dynamic = message.data;
 
         switch (type) {
-            case 'GameInit':
+            case EventManager.EVENT_GAME_INIT:
                 EventManager.instance.notify(EventManager.EVENT_GAME_INIT, data);
-            case 'LoopState':
+            case EventManager.EVENT_LOOP_STATE:
                 EventManager.instance.notify(EventManager.EVENT_LOOP_STATE, data);
-            case 'GameState':
+            case EventManager.EVENT_GAME_STATE:
                 EventManager.instance.notify(EventManager.EVENT_GAME_STATE, data);
-            case 'CreateCharacter':
+            case EventManager.EVENT_CREATE_CHARACTER:
                 EventManager.instance.notify(EventManager.EVENT_CREATE_CHARACTER, data);
-            case 'DeleteCharacter':
+            case EventManager.EVENT_DELETE_CHARACTER:
                 EventManager.instance.notify(EventManager.EVENT_DELETE_CHARACTER, data);
-            case 'CreateConsumable':
+            case EventManager.EVENT_CREATE_CONSUMABLE:
                 EventManager.instance.notify(EventManager.EVENT_CREATE_CONSUMABLE, data);
-            case 'DeleteConsumable':
+            case EventManager.EVENT_DELETE_CONSUMABLE:
                 EventManager.instance.notify(EventManager.EVENT_DELETE_CONSUMABLE, data);
-            case 'CharacterActions':
+            case EventManager.EVENT_CHARACTER_ACTIONS:
                 EventManager.instance.notify(EventManager.EVENT_CHARACTER_ACTIONS, data);
+            case EventManager.EVENT_USER_BALANCE:
+                EventManager.instance.notify(EventManager.EVENT_USER_BALANCE, data);
             default:
                 trace('Unknown message');
         }

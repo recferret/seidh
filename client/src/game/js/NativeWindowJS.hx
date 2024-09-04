@@ -15,6 +15,7 @@ extern class NativeWindowJS {
     static function networkWsInit(callback:Dynamic->Void):Void;
     static function networkFindAndJoinGame(gameType:String):Void;
     static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;
+    static function networkBuyBoost(boostId:String, callback:Dynamic->Void):Void;
 
     // Common
     static function getGameConfig():Dynamic;
@@ -26,9 +27,11 @@ extern class NativeWindowJS {
 
     // Telegram
     static function tgExpand():Void;
+    static function tgShowAlert(text:String):Void;
     static function tgGetInitData():String;
     static function tgGetInitDataUnsafe():Dynamic;
     static function tgShareMyRefLink(refLink:String):Void;
+    static function tgInitAnalytics():Void;
 
     // Ton
     static function tonConnect(callback:Dynamic->Void):Void;

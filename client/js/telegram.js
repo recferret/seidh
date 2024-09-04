@@ -1,6 +1,13 @@
 function tgExpand() {
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    window.Telegram.WebApp.expand();
+}
+
+function tgShowAlert(text) {
+    window.Telegram.WebApp.showAlert(text);
+}
+
+function tgDisableVerticalSwipes() {
+    window.Telegram.WebApp.disableVerticalSwipes();
 }
 
 function tgGetInitData() {
@@ -22,4 +29,11 @@ function tgShareMyRefLink(refLink) {
     window.Telegram.WebApp.openTelegramLink(
         `https://t.me/share/url?url=https://t.me/SeidhGameBot/seidhgame?startapp=${refLink}`
     );
+}
+
+function tgInitAnalytics() {
+    window.telegramAnalytics.init({
+        token: 'eyJhcHBfbmFtZSI6InNlaWRoIiwiYXBwX3VybCI6Imh0dHBzOi8vdC5tZS9TZWlkaEdhbWVCb3QiLCJhcHBfZG9tYWluIjoiaHR0cDovL3NlaWRoLWdhbWUuY29tIn0=!pUv7pZnXbAFxddf3c/+ceFu/sQ3GA9YFJPqwharYGMY=',
+        appName: 'seidh',
+    });
 }

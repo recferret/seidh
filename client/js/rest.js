@@ -1,57 +1,51 @@
-// TODO implement rest wrappers
+async function _getWrapper(url, authToken) {
+    const result = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': authToken
+        }
+    });
+    return await result.json();
+}
 
-async function restFindGame(authToken, gameType) {
-    const findGameResult = await fetch(restUrl + 'findGame', {
+async function _postWrapper(url, authToken, body) {
+    const result = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': authToken
         },
-        body: JSON.stringify({
-            gameType
-        })
+        body: JSON.stringify(body)
     });
 
-    const findGameData = await findGameResult.json();
-    return findGameData;
+    return await result.json();
+}
+
+async function restFindGame(authToken, gameType) {
+    return await _postWrapper(restUrl + 'findGame', authToken, {
+        gameType
+    });
 }
 
 async function restAuthenticate(telegramInitData, login, referrerId) {
-    const authenticateResult = await fetch(restUrl + 'authenticate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-            telegramInitData,
-            login,
-            referrerId
-        })
+    return await _postWrapper(restUrl + 'authenticate', {
+        telegramInitData,
+        login,
+        referrerId
     });
-    const authenticateData = await authenticateResult.json();
-    return authenticateData;
 }
 
 async function restGetUser(authToken) {
-    const result = await fetch(restUrl + 'user', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': authToken
-        }
-    });
-    const json = await result.json();
-    return json;
+    return await _getWrapper(restUrl + 'user', authToken);
 }
 
 async function restGetBoosts(authToken) {
-    const result = await fetch(restUrl + 'boosts', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': authToken
-        }
+    return await _getWrapper(restUrl + 'boosts', authToken);
+}
+
+async function restBuyBoost(authToken, boostId) {
+    return await _postWrapper(restUrl + 'boosts', authToken, {
+        boostId
     });
-    const json = await result.json();
-    return json;
 }

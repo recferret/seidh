@@ -18,7 +18,7 @@ import engine.seidh.entity.factory.SeidhEntityFactory;
 class SeidhGameEngine extends BaseEngine {
 
     // TODO move to config
-    public static var ZOMBIE_DAMAGE = 10;
+    public static var ZOMBIE_DAMAGE = 1;
 
     private var lastDt = 0.0;
     private var framesPassed = 0;
@@ -55,9 +55,9 @@ class SeidhGameEngine extends BaseEngine {
 
         this.winCondition = winCondition;
 
-        // mobsSpawnPoints.push(new Point(2300, 2500));
-        // mobsSpawnPoints.push(new Point(2000, 3000));
-        // mobsSpawnPoints.push(new Point(2000, 2500));
+        // mobsSpawnPoints.push(new Point(1900, 2500));
+        // mobsSpawnPoints.push(new Point(1900, 3000));
+        // mobsSpawnPoints.push(new Point(1900, 3500));
 
 		addLineCollider(0, 0, GameWorldSize, 0);
 		addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);

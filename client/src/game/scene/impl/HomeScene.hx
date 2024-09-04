@@ -1,9 +1,12 @@
 package game.scene.impl;
 
+import game.network.Networking.UserBalancePayload;
+import game.event.EventManager;
 import h2d.Bitmap;
 
 import game.js.NativeWindowJS;
 
+import game.event.EventManager.EventListener;
 import game.scene.home.CollectionContent;
 import game.scene.home.BoostContent;
 import game.scene.home.FriendsContent;
@@ -21,7 +24,7 @@ enum HomeSceneContent {
 	HomeFriendsContent;
 }
 
-class HomeScene extends BasicScene {
+class HomeScene extends BasicScene implements EventListener {
 	private var homeSceneContent:HomeSceneContent;
 	private var pageContent:BasicHomeContent;
 
@@ -223,6 +226,8 @@ class HomeScene extends BasicScene {
 		}
 
 		SoundManager.instance.playMenuTheme();
+
+		EventManager.instance.subscribe(EventManager.EVENT_USER_BALANCE, this);
 	}
 
 	// --------------------------------------
@@ -237,9 +242,20 @@ class HomeScene extends BasicScene {
 		}
 	}
 
+	public function notify(event:String, message:Dynamic) {
+		switch (event) {
+			case EventManager.EVENT_USER_BALANCE:
+				processUserBalanceEvent(message);
+		}
+	}
+
 	// --------------------------------------
 	// Common
 	// --------------------------------------
+
+	private function processUserBalanceEvent(payload:UserBalancePayload) {
+		Player.instance.tokens = payload.balance;
+	}
 
 	private function setSceneContent(homeSceneContent:HomeSceneContent) {
 		if (this.homeSceneContent != homeSceneContent) {

@@ -13,7 +13,7 @@ class SeidhBaseEntity extends EngineCharacterEntity {
 
     public function performMove(playerInput:PlayerInputCommand) {
         setRotation(playerInput.movAngle);
-        determenisticMove();
+        performMoveNextUpdate = true;
     }
 
 	// ------------------------------------------------

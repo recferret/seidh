@@ -46,6 +46,10 @@ class CharacterAnimation {
         animation.pause = true;
     }
 
+    public function getAnimationState() {
+        return characterAnimationState;
+    }
+
     public function setSide(side:Side) {
         if (this.side != side) {
             this.side = side;
@@ -259,43 +263,54 @@ class CharacterAnimations {
 
         animation.loadIdle(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_2),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_3),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_4),
             ]
         );
 
         animation.loadRun(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_1),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_2),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_3),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_4),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_5),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_6),
             ]
         );
 
         animation.loadWalk(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
             ]
         );
 
         animation.loadDead(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
             ]
         );
 
         animation.loadHurt(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
             ]
         );
 
         animation.loadActionMain(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_1),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_2),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_3),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_4),
             ]
         );
 
         animation.loadDefend(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
             ]
         );
 
@@ -307,43 +322,51 @@ class CharacterAnimations {
 
         animation.loadIdle(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
             ]
         );
 
         animation.loadRun(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_1),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_2),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_3),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_4),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_5),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_6),
             ]
         );
 
         animation.loadWalk(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
             ]
         );
 
         animation.loadDead(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
             ]
         );
 
         animation.loadHurt(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
             ]
         );
 
         animation.loadActionMain(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_1),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_2),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_3),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_4),
             ]
         );
 
         animation.loadDefend(
             [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL),
+                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
             ]
         );
 

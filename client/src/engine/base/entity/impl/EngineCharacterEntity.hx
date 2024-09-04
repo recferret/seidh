@@ -32,7 +32,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public var isAlive = true;
 	public var isCollides = true;
-	public var canMove = true;
+	public var canMove = false;
+	public var performMoveNextUpdate = false;
 	public var intersectsWithCharacter = false;
 
 	public var killerId:String;
@@ -126,6 +127,10 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public function update(dt:Float) {
 		lastDeltaTime = dt;
 
+		if (customUpdate != null)
+			customUpdate.onUpdate();
+
+		// Ai
 		if (hasTargetObject() && !isPlayer()) {
 			// Rotate bot in the target direction
 			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
@@ -137,20 +142,18 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			botForwardLookingLine.y1 = l.y1; 
 			botForwardLookingLine.x2 = l.x2;
 			botForwardLookingLine.y2 = l.y2;
-		}
 
-		if (customUpdate != null)
-			customUpdate.onUpdate();
-
-		// Ai
-		if (hasTargetObject() && !isPlayer()) {
-			aiMoveToTarget();
-			if (EngineConfig.AI_ATTACK_ENABLED) {
-				if (ifTargetInAttackRange()) {
+			if (ifTargetInAttackRange()) {
+				performMoveNextUpdate = false;
+				if (EngineConfig.AI_ATTACK_ENABLED) {
 					aiMeleeAttack();
 				}
+			} else {
+				performMoveNextUpdate = true;
 			}
 		}
+
+		move();
 
 		if (customUpdate != null)
 			customUpdate.postUpdate();
@@ -248,20 +251,9 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		}
 	}
 
-	public function determenisticMove() {
-		if (canMove) {
-			var speed = characterEntity.movement.runSpeed;
-
-			if (characterEntity.movement.canRun && currentVitality > 0) {
-				currentVitality -= characterEntity.movement.vitalityConsumptionPerSec;
-				speed = characterEntity.movement.runSpeed;
-				isRunning = true;
-				isWalking = false;
-			} else {
-				isRunning = false;
-				isWalking = true;
-			}
-
+	public function move() {
+		if (canMove && performMoveNextUpdate) {
+			final speed = characterEntity.movement.runSpeed;
 			dx = speed * Math.cos(baseEntity.rotation);
 			dy = speed * Math.sin(baseEntity.rotation);
 
@@ -269,6 +261,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 			baseEntity.x += Std.int(dx);
 			baseEntity.y += Std.int(dy);
+
+			performMoveNextUpdate = false;
 		}
 	}
 
@@ -353,27 +347,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// ------------------------------------------------
 	// AI
 	// ------------------------------------------------
-
-	private function aiMoveToTarget() {
-		if (canMove && !ifTargetInAttackRange()) {
-			final speed = characterEntity.movement.runSpeed;
-
-			dx = speed * Math.cos(baseEntity.rotation) * lastDeltaTime;
-			dy = speed * Math.sin(baseEntity.rotation) * lastDeltaTime;
-
-			if (dx > 0.1 && dx < 1) {
-				dx = 1;
-			}
-			if (dy > 0 && dy < 1) {
-				dy = 1;
-			}
-
-			characterEntity.side = (baseEntity.x + dx) > baseEntity.x ? Side.RIGHT : Side.LEFT;
-
-			baseEntity.x += Std.int(dx);
-			baseEntity.y += Std.int(dy);
-		}
-	}
 
 	public function aiMeleeAttack() {
 		if (checkLocalActionInput(CharacterActionType.ACTION_MAIN)) {

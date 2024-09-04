@@ -7,14 +7,19 @@ interface EventListener {
 class EventManager {
 
 	// Networking events
-	public static final EVENT_GAME_INIT = 'EVENT_GAME_INIT';
-	public static final EVENT_CREATE_CHARACTER = 'EVENT_CREATE_CHARACTER';
-	public static final EVENT_DELETE_CHARACTER = 'EVENT_DELETE_CHARACTER';
-	public static final EVENT_CREATE_CONSUMABLE = 'EVENT_CREATE_CONSUMABLE';
-	public static final EVENT_DELETE_CONSUMABLE = 'EVENT_DELETE_CONSUMABLE';
-	public static final EVENT_LOOP_STATE = 'EVENT_LOOP_STATE';
-	public static final EVENT_GAME_STATE = 'EVENT_GAME_STATE';
-	public static final EVENT_CHARACTER_ACTIONS = 'EVENT_CHARACTER_ACTIONS';
+
+	// Game
+	public static final EVENT_GAME_INIT = 'GameInit';
+	public static final EVENT_LOOP_STATE = 'LoopState';
+	public static final EVENT_GAME_STATE = 'GameState';
+	public static final EVENT_CREATE_CHARACTER = 'CreateCharacter';
+	public static final EVENT_DELETE_CHARACTER = 'DeleteCharacter';
+	public static final EVENT_CREATE_CONSUMABLE = 'CreateConsumable';
+	public static final EVENT_DELETE_CONSUMABLE = 'DeleteConsumable';
+	public static final EVENT_CHARACTER_ACTIONS = 'CharacterActions';
+
+	// User
+	public static final EVENT_USER_BALANCE = 'UserBalance';
 
 	// Internal events
 	public static final EVENT_HOME_PLAY = 'EVENT_HOME_PLAY';

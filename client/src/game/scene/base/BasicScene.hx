@@ -71,7 +71,7 @@ abstract class BasicScene extends h2d.Scene {
 		isMobileDevice = true;
 
 		if (seidhGameEngine != null) {
-			terrainManager = new TerrainManager(this);
+			terrainManager = new TerrainManager2(this);
 
 			camera.x = seidhGameEngine.getPlayersSpawnPoints()[0].x;
 			camera.y = seidhGameEngine.getPlayersSpawnPoints()[0].y;
@@ -161,7 +161,6 @@ abstract class BasicScene extends h2d.Scene {
 
 				if (BasicScene.NetworkingInstance != null) {
 					for (input in seidhGameEngine.validatedInputCommands) {
-						trace(input.userId, Player.instance.userId);
 						if (input.userId == Player.instance.userId) {
 							inputsSent++;
 							BasicScene.NetworkingInstance.input(input);
@@ -303,7 +302,7 @@ abstract class BasicScene extends h2d.Scene {
 			gameUiScene.update(playerEntity.getCurrentHealth(), playerEntity.getMaxHealth());
 		}
 
-		updateDesktopInput();
+		// updateDesktopInput();
 		customUpdate(dt, fps);
 
 		if (playerEntity != null) {

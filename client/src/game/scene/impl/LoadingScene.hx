@@ -26,8 +26,10 @@ class LoadingScene extends BasicScene {
                 if (GameConfig.instance.Analytics) 
                     NativeWindowJS.telemetreeInit(false);
             } else {
-                if (GameConfig.instance.Analytics) 
+                if (GameConfig.instance.Analytics) {
+                    NativeWindowJS.tgInitAnalytics();
                     NativeWindowJS.telemetreeInit(true);
+                }
 
                 final tgUnsafeData = NativeWindowJS.tgGetInitDataUnsafe();
                 final startParam = tgUnsafeData.start_param;

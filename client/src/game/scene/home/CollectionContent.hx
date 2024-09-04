@@ -35,7 +35,6 @@ class WalletButton extends h2d.Object {
         addChild(tf);
         
         interaction = new h2d.Interactive(w, h);
-
         interaction.onPush = function(event : hxd.Event) {
             setScale(0.9);
         }

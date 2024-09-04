@@ -95,11 +95,11 @@ class FxManager {
     }
 
     public function ragnarAttack(x:Float, y:Float, side:Side) {
-        new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? ragnarAttackTilesRight : ragnarAttackTilesLeft);
+        // new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? ragnarAttackTilesRight : ragnarAttackTilesLeft);
     }
 
     public function zombieAttack(x:Float, y:Float, side:Side) {
-        new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? zombieAttackTilesRight : zombieAttackTilesLeft);
+        // new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? zombieAttackTilesRight : zombieAttackTilesLeft);
     }
 
     public function blood(x:Float, y:Float, side:Side) {

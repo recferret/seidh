@@ -248,24 +248,32 @@ class GameUiScene extends h2d.Scene {
 	public function showWinDialog(zombiesKilled:Int) {
 		new Dialog(
 			this, 
-			DialogType.BIG, 
+			DialogType.SMALL,
+			null,
 			"You have won!", 
 			"",// "Zombies killed: " + zombiesKilled,
-			function callback() {
+			"OK",
+			null,
+			function positiveCallback() {
 				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
-			}
+			},
+			null
 		);
 	}
 
 	public function showLoseDialog(zombiesKilled:Int) {
 		new Dialog(
 			this, 
-			DialogType.BIG, 
+			DialogType.SMALL, 
+			null,
 			"You lose!", 
 			"",// "Zombies killed: " + zombiesKilled,
-			function callback() {
+			"OK",
+			null,
+			function positiveCallback() {
 				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
-			}
+			},
+			null
 		);
 	}
 
