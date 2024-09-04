@@ -1,0 +1,155 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/seidh_map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "Все файлы (*)",
+    "fileStates": {
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/background.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/seidh_map.tmx": {
+            "scale": 0.33,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2487.878787878788,
+                "y": 2156.060606060606
+            }
+        },
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/tilemap_env.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/tree_1.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/tree_2.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/tree_3.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/trees_alot.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "TERRAIN_FENCE.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "TERRAIN_GROUND_1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "TERRAIN_GROUND_2.tsx": {
+            "scaleInDock": 1
+        },
+        "TERRAIN_GROUND_3.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "TERRAIN_GROUND_4.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "TERRAIN_PUDDLE.tsx": {
+            "scaleInDock": 1
+        },
+        "TERRAIN_ROCK.tsx": {
+            "scaleInDock": 1
+        },
+        "TERRAIN_TREE_1.tsx": {
+            "scaleInDock": 1
+        },
+        "TERRAIN_TREE_2.tsx": {
+            "scaleInDock": 1
+        },
+        "TERRAIN_WEED_2.tsx": {
+            "scaleInDock": 1
+        },
+        "env_ tileset.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "map1.tmx": {
+            "scale": 0.33242583918813423,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2562.977661666716,
+                "y": 2561.4735667948457
+            }
+        },
+        "map2.tmx": {
+            "scale": 0.33,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 2660.6060606060605,
+                "y": 3450
+            }
+        },
+        "seidh_map_2.json": {
+            "scale": 0.33242583918813423,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2562.977661666716,
+                "y": 2561.4735667948457
+            }
+        },
+        "tree_1.tsx": {
+            "dynamicWrapping": false
+        },
+        "tree_2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tree_3.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "trees_tile.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/AndreySokolov/dev/seidh/git/seidh/tiled",
+    "last.externalTilesetPath": "C:/Users/AndreySokolov/dev/seidh/git/seidh/tiled",
+    "last.imagePath": "C:/Users/AndreySokolov/dev/seidh/git/seidh/tiled/res",
+    "map.height": 28,
+    "map.lastUsedExportFilter": "JSON map-файлы (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 183,
+    "map.tileWidth": 183,
+    "map.width": 28,
+    "openFiles": [
+        "env_ tileset.tsx",
+        "map2.tmx",
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/seidh_map.tmx"
+    ],
+    "project": "seidh2.tiled-project",
+    "recentFiles": [
+        "tree_2.tsx",
+        "tree_3.tsx",
+        "C:/Users/AndreySokolov/Downloads/TILEMAP_tiled-20240814T164906Z-001/TILEMAP_tiled/seidh_map.tmx",
+        "trees_tile.tsx",
+        "env_ tileset.tsx",
+        "seidh_map_2.json",
+        "map2.tmx",
+        "TERRAIN_GROUND_1.tsx",
+        "TERRAIN_FENCE.tsx",
+        "map1.tmx",
+        "TERRAIN_GROUND_4.tsx",
+        "TERRAIN_GROUND_3.tsx"
+    ],
+    "tileset.lastUsedFilter": "Файлы набора тайлов Tiled (*.tsx *.xml)",
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 285,
+        "width": 151
+    }
+}
