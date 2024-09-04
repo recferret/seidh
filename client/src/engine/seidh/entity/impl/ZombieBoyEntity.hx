@@ -29,7 +29,7 @@ class ZombieBoyEntity extends SeidhBaseEntity {
             movement: {
                 canWalk: true,
                 canRun: true,
-                runSpeed: 5 + MathUtils.randomIntInRange(1, 10),
+                runSpeed: 1 + MathUtils.randomIntInRange(1, 10),
                 movementDelay: 0.100,
                 vitality: 100,
                 vitalityConsumptionPerSec: 20,

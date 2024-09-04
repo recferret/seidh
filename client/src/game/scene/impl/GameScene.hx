@@ -109,74 +109,47 @@ class GameScene extends BasicScene implements EventListener {
 
 	// Update client part and visuals
 	public function customUpdate(dt:Float, fps:Float) {
+		final characterToEnvIntersections = new Array<Dynamic>();
+
 		for (character in clientCharacterEntities) {
 			character.update(dt, fps);
 
-			final characterToEnvIntersections = new Array<Dynamic>();
 			characterToEnvIntersections.push(character);
 
-			final ragnarBottom = character.getBottomRect().getCenter();
-			final ragnarRect = character.getRect();
+			// final characterBottom = character.getBottomRect().getCenter();
+			final characterRect = character.getRect();
 
-			for (index => tree in terrainManager.terrainArray) {
-				final treeBottom = tree.getBottomRect().getCenter();
-				final treeRect = tree.getRect();
+			for (terrain in terrainManager.terrainArray) {
+				// final treeBottom = tree.getBottomRect().getCenter();
+				final terrainRect = terrain.getRect();
 	
-				if (treeRect.intersectsWithRect(ragnarRect)) {
-					characterToEnvIntersections.push(tree);
-				}
-	
-				if (characterToEnvIntersections.length > 1) {
-					characterToEnvIntersections.sort((a, b) -> {
-						final aBottom = a.getBottomRect().getCenter();
-						final bBottom = b.getBottomRect().getCenter();
-						return aBottom.y - bBottom.y;
-					});
-	
-					for (index => env in characterToEnvIntersections) {
-						env.oZrder = index;
+				if (terrainRect.getCenter().distance(characterRect.getCenter()) < 200) {
+					if (terrainRect.intersectsWithRect(characterRect)) {
+						characterToEnvIntersections.push(terrain);
+					}
+		
+					if (characterToEnvIntersections.length > 1) {
+						characterToEnvIntersections.sort((a, b) -> {
+							final aBottom = a.getBottomRect().getCenter();
+							final bBottom = b.getBottomRect().getCenter();
+							return aBottom.y - bBottom.y;
+						});
+		
+						for (index => env in characterToEnvIntersections) {
+							env.oZrder = index;
+						}
 					}
 				}
 			}
+		}
 
-			// final characterRect = character.getRect();
-
-			// // Z order effect
-			// final characterToEnvIntersections = new Array<Dynamic>();
-			// characterToEnvIntersections.push(character);
-
-			// function checkEnvToCharCollision(envs:Array<ClientTerrainEntity>) {
-			// 	for (env in envs) {
-			// 		if (characterRect.getCenter().distance(env.getRect().getCenter()) < character.getBodyRectangle().h * 2 && 
-			// 			env.getRect().intersectsWithRect(characterRect)) {
-			// 			characterToEnvIntersections.push(env);
-			// 		}
-			// 	}
-			// }
-
-			// checkEnvToCharCollision(terrainManager.getRocks());
-			// checkEnvToCharCollision(terrainManager.getTrees());
-			// checkEnvToCharCollision(terrainManager.getWeeds());
-			// checkEnvToCharCollision(terrainManager.getFences());
-
-			// if (characterToEnvIntersections.length > 1) {
-			// 	characterToEnvIntersections.sort((a, b) -> {
-			// 		final aBottom = a.getBottomRect().getCenter();
-			// 		final bBottom = b.getBottomRect().getCenter();
-			// 		return aBottom.y - bBottom.y;
-			// 	});
-	
-			// 	for (index => env in characterToEnvIntersections) {
-			// 		env.oZrder = index;
-			// 	}
-			// }
+		if (characterToEnvIntersections.length > 0) {
+			sortObjectsByZOrder();
 		}
 
 		for (consumable in clientConsumableEntities) {
 			consumable.update(dt, fps);
 		}
-		
-		sortObjectsByZOrder();
 
 		if (GameConfig.instance.DebugDraw) {
 			for (line in seidhGameEngine.getLineColliders()) {

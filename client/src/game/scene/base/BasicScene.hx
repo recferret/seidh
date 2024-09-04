@@ -71,7 +71,7 @@ abstract class BasicScene extends h2d.Scene {
 		isMobileDevice = true;
 
 		if (seidhGameEngine != null) {
-			terrainManager = new TerrainManager2(this);
+			terrainManager = new TerrainManager(this);
 
 			camera.x = seidhGameEngine.getPlayersSpawnPoints()[0].x;
 			camera.y = seidhGameEngine.getPlayersSpawnPoints()[0].y;

@@ -5,7 +5,7 @@ import engine.seidh.entity.factory.SeidhEntityFactory;
 import engine.base.BaseTypesAndClasses.EntityType;
 import game.entity.character.ClientCharacterEntity;
 import game.scene.base.BasicScene;
-import game.terrain.TerrainManager2;
+import game.terrain.TerrainManager;
 
 import hxd.Key in K;
 
@@ -13,22 +13,29 @@ class MapSceneTest extends BasicScene {
 
 	private var characters:Array<ClientCharacterEntity> = new Array<ClientCharacterEntity>();
 
-	private var terrainManager2:TerrainManager2;
-
 	private var cameraOffsetX = 0;
 	private var cameraOffsetY = 0;
 
     public function new() {
 		super(null);
 
-		terrainManager2 = new TerrainManager2(this);
+		terrainManager = new TerrainManager(this);
 
 		camera.setScale(0.35, 0.35);
-		camera.setPosition(1200, 2000);
+		camera.setPosition(1200, 1200);
 
-		// characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 2000, 2800, EntityType.RAGNAR_LOH)));
+		// characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 2100, 2650, EntityType.RAGNAR_LOH)));
 
-		characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 1600, 2400, EntityType.ZOMBIE_BOY)));
+		var zombieX = 2500;
+		var zombieY = 1550;
+		// for (x in 1...11) {
+			for (y in 1...11) {
+				characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, zombieX, zombieY, EntityType.ZOMBIE_BOY)));
+				zombieY += 200;
+			}
+			zombieX += 200;
+			zombieY = 2650;
+		// }
 	}	
 
 	// --------------------------------------
@@ -67,17 +74,19 @@ class MapSceneTest extends BasicScene {
 		final charUp = K.isDown(K.W);
 		final charDown = K.isDown(K.S);
 
+		final charIndex = 0;
+
         if (charLeft) {
-            characters[0].x -= 5;
+            characters[charIndex].x -= 5;
         }
         if (charRight) {
-            characters[0].x += 5;
+            characters[charIndex].x += 5;
         }
         if (charUp) {
-            characters[0].y -= 5;
+            characters[charIndex].y -= 5;
         }
         if (charDown) {
-            characters[0].y += 5;
+            characters[charIndex].y += 5;
         }
 
 		final characterToEnvIntersections = new Array<Dynamic>();
@@ -91,23 +100,28 @@ class MapSceneTest extends BasicScene {
 			// final ragnarBottom = character.getBottomRect().getCenter();
 			final characterRect = character.getRect();
 
-			for (index => tree in terrainManager2.terrainArray) {
+			for (index => terrain in terrainManager.terrainArray) {
 				// final treeBottom = tree.getBottomRect().getCenter();
-				final treeRect = tree.getRect();
+				final terrainRect = terrain.getRect();
 
-				if (treeRect.intersectsWithRect(characterRect)) {
-					characterToEnvIntersections.push(tree);
-				}
+				Utils.DrawRect(debugGraphics, terrain.getRect(), GameConfig.BlueColor);
+				Utils.DrawRect(debugGraphics, terrain.getBottomRect(), GameConfig.GreenColor);
 
-				if (characterToEnvIntersections.length > 1) {
-					characterToEnvIntersections.sort((a, b) -> {
-						final aBottom = a.getBottomRect().getCenter();
-						final bBottom = b.getBottomRect().getCenter();
-						return aBottom.y - bBottom.y;
-					});
+				if (terrainRect.getCenter().distance(characterRect.getCenter()) < 200) {
+					if (terrainRect.intersectsWithRect(characterRect)) {
+						characterToEnvIntersections.push(terrain);
+					}
 
-					for (index => env in characterToEnvIntersections) {
-						env.oZrder = index;
+					if (characterToEnvIntersections.length > 1) {
+						characterToEnvIntersections.sort((a, b) -> {
+							final aBottom = a.getBottomRect().getCenter();
+							final bBottom = b.getBottomRect().getCenter();
+							return aBottom.y - bBottom.y;
+						});
+
+						for (index => env in characterToEnvIntersections) {
+							env.oZrder = index;
+						}
 					}
 				}
 			}

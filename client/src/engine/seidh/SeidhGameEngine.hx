@@ -18,7 +18,7 @@ import engine.seidh.entity.factory.SeidhEntityFactory;
 class SeidhGameEngine extends BaseEngine {
 
     // TODO move to config
-    public static var ZOMBIE_DAMAGE = 1;
+    public static var ZOMBIE_DAMAGE = 5;
 
     private var lastDt = 0.0;
     private var framesPassed = 0;
@@ -26,13 +26,8 @@ class SeidhGameEngine extends BaseEngine {
 
     private var winCondition:WinCondition;
 
-    private var mobsMax = 130;
-    private var allowSpawnMobs = false;
-    private var mobsSpawned = 0;
-    private var mobsKilled = 0;
-    private var mobsLastSpawnTime = 0.0;
-    private var mobSpawnDelayMs = 0.500;
-    
+    private final aiManager:AiManager;
+
     private final playerZombieKills = new Map<String, Int>();
     private final playerTokensAccquired = new Map<String, Int>();
     private final playerExpGained = new Map<String, Int>();
@@ -40,11 +35,11 @@ class SeidhGameEngine extends BaseEngine {
 
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
     public var gameStateCallback:GameState->Void;
+    public var oneSecondCallback:Void->Void;
 
     public final playersSpawnPoints = [
         new Point(2500, 2500)
     ];
-    public final mobsSpawnPoints = new Array<Point>();
 
     public static final GameWorldSize = 5000;
 
@@ -53,36 +48,16 @@ class SeidhGameEngine extends BaseEngine {
     public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.INFINITE) {
 	    super(engineMode);
 
-        this.winCondition = winCondition;
+        aiManager = new AiManager();
 
-        // mobsSpawnPoints.push(new Point(1900, 2500));
-        // mobsSpawnPoints.push(new Point(1900, 3000));
-        // mobsSpawnPoints.push(new Point(1900, 3500));
+        this.winCondition = winCondition;
 
 		addLineCollider(0, 0, GameWorldSize, 0);
 		addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);
 		addLineCollider(0, 0, 0, GameWorldSize);
 		addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
 
-        // Top
-        for (x in 0...26) {
-            mobsSpawnPoints.push(new Point(200 * x, -200));
-        }
-
-        // Bottom
-        for (x in 0...26) {
-            mobsSpawnPoints.push(new Point(200 * x, 5200));
-        }
-
-        // Left
-        for (y in 0...26) {
-            mobsSpawnPoints.push(new Point(-200, 200 * y));
-        }
-
-        // Right
-        for (y in 0...26) {
-            mobsSpawnPoints.push(new Point(5200, 200 * y));
-        }
+        oneSecondTimer();
     }
 
     // ---------------------------------------------------
@@ -270,9 +245,7 @@ class SeidhGameEngine extends BaseEngine {
                                         if (health == 0) {
                                             // Zombie killed
                                             if (character2.isBot()) {
-                                                // Update counters
-                                                mobsKilled++;
-                                                mobsSpawned--;
+                                                aiManager.mobKilled();
 
                                                 // Update player kills
                                                 final currentKills = playerZombieKills.get(character1OwnerId);
@@ -327,7 +300,7 @@ class SeidhGameEngine extends BaseEngine {
             }
 
             if (winCondition != WinCondition.INFINITE) {
-                if (winCondition == WinCondition.KILL_MOBS && mobsKilled == mobsMax && allowServerLogic) {
+                if (winCondition == WinCondition.KILL_MOBS && aiManager.allMobsKilled() && allowServerLogic) {
                     gameState = GameState.WIN;
                     if (gameStateCallback != null) {
                         gameStateCallback(gameState);
@@ -336,6 +309,7 @@ class SeidhGameEngine extends BaseEngine {
             }
 
             recentEngineLoopTime = Date.now() - beginTime;
+
             spawnMobs();
         } else if (gameState == GameState.LOSE) {
             lose();
@@ -356,21 +330,22 @@ class SeidhGameEngine extends BaseEngine {
 	}
 
     public function allowMobsSpawn(allowSpawnMobs:Bool) {
-        this.allowSpawnMobs = allowSpawnMobs;
+        aiManager.allowMobsSpawn(allowSpawnMobs);
     }
 
     public function spawnMobs() {
-        final now = haxe.Timer.stamp();
-
-        if (allowSpawnMobs && mobsSpawned < mobsMax && (mobsLastSpawnTime == 0 || mobsLastSpawnTime + mobSpawnDelayMs < now)) {
-            mobsSpawned++;
-            mobsLastSpawnTime = now;
-
-            final mobSpawnPoint = mobsSpawnPoints[MathUtils.randomIntInRange(0, mobsSpawnPoints.length - 1)];
-            final positionX = Std.int(mobSpawnPoint.x);
-            final positionY = Std.int(mobSpawnPoint.y);
-
-            createCharacterEntity(SeidhEntityFactory.InitiateCharacter(null, null, positionX, positionY, MathUtils.randomIntInRange(1, 2) == 1 ? EntityType.ZOMBIE_BOY : EntityType.ZOMBIE_GIRL));
+        final player = characterEntityManager.getEntityById("entity_" + localPlayerId);
+        if (player != null) {
+            final spawnMob = aiManager.spawnMob(player.getX(), player.getY());
+            if (spawnMob.spawn) {
+                createCharacterEntity(SeidhEntityFactory.InitiateCharacter(
+                    null,
+                    null, 
+                    spawnMob.positionX, 
+                    spawnMob.positionY,
+                    spawnMob.entityType
+                ));
+            }
         }
     }
 
@@ -381,7 +356,7 @@ class SeidhGameEngine extends BaseEngine {
         for (entity in characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL)) {
             characterEntityManager.delete(entity.getId());
         };
-        mobsSpawned = 0;
+        aiManager.cleanAllMobs();
     }
 
     public function clearPlayerGainings(playerId:String) {
@@ -447,6 +422,18 @@ class SeidhGameEngine extends BaseEngine {
         }
     }
 
+    private function oneSecondTimer() {
+        haxe.Timer.delay(function delay() {
+            if (gameState == GameState.PLAYING) {
+                if (oneSecondCallback != null) {
+                    oneSecondCallback();
+                }
+                aiManager.secondPassed();
+                oneSecondTimer();
+            }
+        }, 1000);
+    }
+
     // ---------------------------------------------------
     // Getters
     // ---------------------------------------------------
@@ -468,11 +455,11 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function getMobsSpawnPoints() {
-        return mobsSpawnPoints;
+        return aiManager.getMobsSpawnPoints();
     }
 
     public function getMobsMax() {
-        return mobsMax;
+        return aiManager.getMobsMax();
     }
 
     public function getPlayersCount() {
@@ -515,7 +502,7 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function setMobsMax(mobsMax:Int) {
-        this.mobsMax = mobsMax;
+        aiManager.setMobsMax(mobsMax);
     }
 
     public function setWinCondition(winCondition:WinCondition) {
