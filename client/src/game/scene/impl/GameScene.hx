@@ -56,25 +56,25 @@ class GameScene extends BasicScene implements EventListener {
 			// Top
 			final topBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, Std.int(SeidhGameEngine.GameWorldSize / 2), 1));
 			topBorder.setPosition(0, -topBorder.tile.height);
-			topBorder.oZrder = 99;
+			topBorder.zOrder = 99;
 			add(topBorder);
 
 			// Bottom
 			final bottomBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, Std.int(SeidhGameEngine.GameWorldSize / 2), 1));
 			bottomBorder.setPosition(0, SeidhGameEngine.GameWorldSize);
-			bottomBorder.oZrder = 99;
+			bottomBorder.zOrder = 99;
 			add(bottomBorder);
 
 			// Left
 			final leftBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, SeidhGameEngine.GameWorldSize * 2, 1));
 			leftBorder.setPosition(-leftBorder.tile.width, -SeidhGameEngine.GameWorldSize / 2);
-			leftBorder.oZrder = 99;
+			leftBorder.zOrder = 99;
 			add(leftBorder);
 
 			// Right
 			final rightBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, SeidhGameEngine.GameWorldSize * 2, 1));
 			rightBorder.setPosition(SeidhGameEngine.GameWorldSize, -SeidhGameEngine.GameWorldSize / 2);
-			rightBorder.oZrder = 99;
+			rightBorder.zOrder = 99;
 			add(rightBorder);
 		}
     }
@@ -136,7 +136,7 @@ class GameScene extends BasicScene implements EventListener {
 						});
 		
 						for (index => env in characterToEnvIntersections) {
-							env.oZrder = index;
+							env.zOrder = index;
 						}
 					}
 				}

@@ -120,7 +120,7 @@ class MapSceneTest extends BasicScene {
 						});
 
 						for (index => env in characterToEnvIntersections) {
-							env.oZrder = index;
+							env.zOrder = index;
 						}
 					}
 				}
