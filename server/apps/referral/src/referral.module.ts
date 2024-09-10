@@ -7,7 +7,7 @@ import { InternalProtocol } from '@app/seidh-common';
 import {
   ReferralConfig,
   ReferralConfigSchema,
-} from '@app/seidh-common/schemas/schema.referral';
+} from '@app/seidh-common/schemas/user/schema.referral';
 
 @Module({
   imports: [

@@ -1,3 +1,2 @@
-export * from './seidh-common.module';
-export * from './seidh-common.service';
+export * from './seidh-common.broadcasts';
 export * from './seidh-common.internal-protocol';

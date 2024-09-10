@@ -1,6 +1,6 @@
 import { Friend } from '@app/seidh-common/dto/users/users.get.friends.msg';
 
-export class GetFriendsResponse {
+export class GetFriendsResponseDTO {
   success: boolean;
   friends?: Friend[];
   friendsInvited: number;

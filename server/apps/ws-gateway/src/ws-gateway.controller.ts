@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import {
   WsGatewayWsController,
@@ -44,23 +44,31 @@ import {
   WsGatewayGameDeleteConsumablePattern,
   WsGatewayGameDeleteConsumableMessage,
 } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
+import {
+  WsGatewayUserBalancePattern,
+  WsGatewayUserBalanceMsg,
+} from '@app/seidh-common/dto/ws-gateway/ws-gateway.user.balance.msg';
 
 @Controller()
 export class WsGatewayController {
   constructor(private readonly wsGatewayWsController: WsGatewayWsController) {}
 
+  // --------------------------------------
+  // GAME EVENTS
+  // --------------------------------------
+
   // Init
 
   @MessagePattern(WsGatewayGameInitPattern)
   gameInit(data: WsGatewayGameInitMessage) {
-    this.wsGatewayWsController.broadcast(WsProtocolMessage.GameInit, data);
+    this.wsGatewayWsController.gameBroadcast(WsProtocolMessage.GameInit, data);
   }
 
   // Character
 
   @MessagePattern(WsGatewayGameCreateCharacterPattern)
   createCharacter(data: WsGatewayGameCreateCharacterMessage) {
-    this.wsGatewayWsController.broadcast(
+    this.wsGatewayWsController.gameBroadcast(
       WsProtocolMessage.CreateCharacter,
       data,
     );
@@ -68,7 +76,7 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameDeleteCharacterPattern)
   deleteCharacter(data: WsGatewayGameDeleteCharacterMessage) {
-    this.wsGatewayWsController.broadcast(
+    this.wsGatewayWsController.gameBroadcast(
       WsProtocolMessage.DeleteCharacter,
       data,
     );
@@ -78,7 +86,7 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameCreateConsumablePattern)
   createConsumable(data: WsGatewayGameCreateConsumableMessage) {
-    this.wsGatewayWsController.broadcast(
+    this.wsGatewayWsController.gameBroadcast(
       WsProtocolMessage.CreateConsumable,
       data,
     );
@@ -86,7 +94,7 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameDeleteConsumablePattern)
   deleteConsumable(data: WsGatewayGameDeleteConsumableMessage) {
-    this.wsGatewayWsController.broadcast(
+    this.wsGatewayWsController.gameBroadcast(
       WsProtocolMessage.DeleteConsumable,
       data,
     );
@@ -96,7 +104,7 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameCreateProjectilePattern)
   createProjectile(data: WsGatewayGameCreateProjectileMessage) {
-    this.wsGatewayWsController.broadcast(
+    this.wsGatewayWsController.gameBroadcast(
       WsProtocolMessage.CreateProjectile,
       data,
     );
@@ -104,7 +112,7 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameDeleteProjectilePattern)
   deleteProjectile(data: WsGatewayGameDeleteProjectileMessage) {
-    this.wsGatewayWsController.broadcast(
+    this.wsGatewayWsController.gameBroadcast(
       WsProtocolMessage.DeleteProjectile,
       data,
     );
@@ -114,7 +122,7 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameCharacterActionsPattern)
   characterActions(data: WsGatewayGameCharacterActionsMessage) {
-    this.wsGatewayWsController.broadcast(
+    this.wsGatewayWsController.gameBroadcast(
       WsProtocolMessage.CharacterActions,
       data,
     );
@@ -124,11 +132,21 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayGameLoopStatePattern)
   loopState(data: WsGatewayGameLoopStateMessage) {
-    this.wsGatewayWsController.broadcast(WsProtocolMessage.LoopState, data);
+    this.wsGatewayWsController.gameBroadcast(WsProtocolMessage.LoopState, data);
   }
 
   @MessagePattern(WsGatewayGameGameStatePattern)
   gameState(data: WsGatewayGameGameStateMessage) {
-    this.wsGatewayWsController.broadcast(WsProtocolMessage.GameState, data);
+    this.wsGatewayWsController.gameBroadcast(WsProtocolMessage.GameState, data);
+  }
+
+  // --------------------------------------
+  // USER EVENTS
+  // --------------------------------------
+
+  @MessagePattern(WsGatewayUserBalancePattern)
+  userBalance(data: WsGatewayUserBalanceMsg) {
+    Logger.log(data);
+    this.wsGatewayWsController.broadcast(WsProtocolMessage.UserrBalance, data);
   }
 }

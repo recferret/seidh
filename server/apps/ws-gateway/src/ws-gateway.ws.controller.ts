@@ -25,6 +25,7 @@ import {
   GameplayInputMessage,
   GameplayInputPattern,
 } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
+import { WsGatewayBaseMsg } from '@app/seidh-common/dto/ws-gateway/ws-gateway.base.msg';
 
 export enum WsProtocolMessage {
   // Client -> Server
@@ -32,6 +33,8 @@ export enum WsProtocolMessage {
   Input = 'Input',
 
   // Server -> Client
+
+  // Game
   GameInit = 'GameInit',
   CreateCharacter = 'CreateCharacter',
   DeleteCharacter = 'DeleteCharacter',
@@ -42,6 +45,9 @@ export enum WsProtocolMessage {
   CharacterActions = 'CharacterActions',
   LoopState = 'LoopState',
   GameState = 'GameState',
+
+  // User
+  UserrBalance = 'UserBalance',
 }
 
 @WebSocketGateway({
@@ -141,7 +147,10 @@ export class WsGatewayWsController implements OnModuleInit {
   // Server -> Client
   // ----------------------------------------------
 
-  broadcast(wsProtocolMessage: WsProtocolMessage, data: WsGatewayGameBaseMsg) {
+  gameBroadcast(
+    wsProtocolMessage: WsProtocolMessage,
+    data: WsGatewayGameBaseMsg,
+  ) {
     if (data.targetUserId) {
       const socket = this.userSockets.get(data.targetUserId);
       if (socket && socket.connected) {
@@ -176,6 +185,19 @@ export class WsGatewayWsController implements OnModuleInit {
         } else {
           Logger.error('Socket is not connected', wsProtocolMessage, data);
         }
+      }
+    }
+  }
+
+  broadcast(wsProtocolMessage: WsProtocolMessage, data: WsGatewayBaseMsg) {
+    if (data.targetUserId) {
+      const socket = this.userSockets.get(data.targetUserId);
+      if (socket && socket.connected) {
+        // Drop extra fields
+        delete data.targetUserId;
+        socket.emit(wsProtocolMessage, data);
+      } else {
+        Logger.error('Socket is not connected', wsProtocolMessage, data);
       }
     }
   }

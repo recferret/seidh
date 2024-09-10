@@ -1,3 +1,4 @@
+import { SeidhCommonBroadcasts, ServiceName } from '@app/seidh-common';
 import {
   BoostsBuyRequest,
   BoostsBuyResponse,
@@ -7,9 +8,11 @@ import {
   BoostsGetRequest,
   BoostsGetResponse,
 } from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
-import { Boost, BoostDocument } from '@app/seidh-common/schemas/schema.boost';
-import { User } from '@app/seidh-common/schemas/schema.user';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Boost, BoostDocument } from '@app/seidh-common/schemas/boost/schema.boost';
+import { BoostTransaction } from '@app/seidh-common/schemas/boost/schema.boost.transaction';
+import { User } from '@app/seidh-common/schemas/user/schema.user';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -49,10 +52,20 @@ export class BoostService implements OnModuleInit {
   private static readonly BOOST_PRAYER_1_NAME = 'Thor prayer';
   private static readonly BOOST_PRAYER_1_DESCRIPTION = '+100% dmg for 1h';
 
+  private readonly seidhCommonBroadcasts: SeidhCommonBroadcasts;
+
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Boost.name) private boostModel: Model<Boost>,
-  ) {}
+    @InjectModel(BoostTransaction.name)
+    private boostTransactionModel: Model<BoostTransaction>,
+    @Inject(ServiceName.WsGateway) wsGatewayService: ClientProxy,
+  ) {
+    this.seidhCommonBroadcasts = new SeidhCommonBroadcasts(
+      userModel,
+      wsGatewayService,
+    );
+  }
 
   async onModuleInit() {
     const boosts = await this.boostModel.find();
@@ -235,12 +248,13 @@ export class BoostService implements OnModuleInit {
     const response: BoostsBuyResponse = {
       success: false,
     };
+
     const boost = this.boosts.find((boost) => boost.id == message.boostId);
     if (!boost) {
       response.message = 'Boost not found';
       return response;
     }
-    const user = await this.userModel.findOne({ id: message.userId });
+    const user = await this.userModel.findById(message.userId);
     if (!user) {
       response.message = 'User not found';
       return response;
@@ -249,7 +263,6 @@ export class BoostService implements OnModuleInit {
       response.message = 'Not enough coins';
       return response;
     } else {
-      // TODO make sure that balance is a number
       user.virtualTokenBalance -= boost.price;
     }
 
@@ -342,7 +355,15 @@ export class BoostService implements OnModuleInit {
     }
 
     await user.save();
+    await this.boostTransactionModel.create({
+      boost,
+      boostName: boost.name,
+      user,
+    });
+    await this.seidhCommonBroadcasts.notifyBalanceUpdate(user.id);
 
     response.success = true;
+
+    return response;
   }
 }

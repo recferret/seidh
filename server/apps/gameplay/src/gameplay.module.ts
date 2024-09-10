@@ -6,12 +6,22 @@ import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     PrometheusModule.register(),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'gamelog',
+    }),
     ClientsModule.register([
       {
         name: ServiceName.WsGateway,

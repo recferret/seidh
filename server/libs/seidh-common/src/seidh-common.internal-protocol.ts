@@ -8,14 +8,15 @@ export interface WsGameEvent {
 export enum ServicePort {
   Gameplay = 3001,
   GameplayLobby = 3002,
-  Gateway = 3003,
-  WsGateway = 3004,
-  Users = 3005,
-  TG = 3006,
-  Boost = 3007,
-  Character = 3008,
-  Referral = 3009,
-  Collection = 3010,
+  GameplayWorker = 3003,
+  Gateway = 3004,
+  WsGateway = 3005,
+  Users = 3006,
+  TG = 3007,
+  Boost = 3008,
+  Character = 3009,
+  Referral = 3010,
+  Collection = 3011,
 }
 
 export enum ServiceName {
@@ -33,6 +34,8 @@ export enum ServiceName {
 }
 
 export class InternalProtocol {
+  // TODO add redis url
+
   public static readonly NatsUrl = 'nats://0.0.0.0:4222';
   public static readonly MongoUrl = 'mongodb://localhost:27017/seidh';
 

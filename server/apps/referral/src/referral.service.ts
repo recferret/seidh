@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ReferralUpdateReferrerMessageRequest } from '@app/seidh-common/dto/referral/referral.update.referrer.msg';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ReferralConfig } from '@app/seidh-common/schemas/schema.referral';
+import { ReferralConfig } from '@app/seidh-common/schemas/user/schema.referral';
 
 @Injectable()
 export class ReferralService {

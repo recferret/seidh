@@ -112,6 +112,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/collection/tsconfig.app.json"
       }
+    },
+    "gameplay-worker": {
+      "type": "application",
+      "root": "apps/gameplay-worker",
+      "entryFile": "main",
+      "sourceRoot": "apps/gameplay-worker/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gameplay-worker/tsconfig.app.json"
+      }
     }
   }
 }

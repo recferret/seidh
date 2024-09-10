@@ -34,6 +34,7 @@ export enum EntityType {
 
 export interface UserGainings {
   userId: string;
+  gameId: string;
   kills: number;
   tokens: number;
   exp: number;

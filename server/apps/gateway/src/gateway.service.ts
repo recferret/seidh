@@ -9,8 +9,8 @@ import {
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { firstValueFrom } from 'rxjs';
 import {
-  AuthenticateRequest,
-  AuthenticateResponse,
+  AuthenticateRequestDTO,
+  AuthenticateResponseDTO,
 } from './dto/authenticate.dto';
 import {
   UsersAuthenticateMessageRequest,
@@ -22,23 +22,23 @@ import {
   UsersGetFriendsMessageResponse,
   UsersGetFriendsPattern,
 } from '@app/seidh-common/dto/users/users.get.friends.msg';
-import { GetFriendsResponse } from './dto/friends.dto';
+import { GetFriendsResponseDTO } from './dto/friends.dto';
+import { GetBoostsResponseDTO } from './dto/boosts.get.dto';
 import {
   UsersGetUserMessageRequest,
   UsersGetUserMessageResponse,
   UsersGetUserPattern,
 } from '@app/seidh-common/dto/users/users.get.user.msg';
-// import {
-//   BoostsBuyRequest,
-//   BoostsBuyResponse,
-//   BoostsBuyPattern,
-// } from '@app/seidh-common/dto/boost/boost.buy.boosts.msg';
 import {
   BoostsGetRequest,
   BoostsGetResponse,
   BoostsGetPattern,
 } from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
-import { GetBoostsResponse } from './dto/boosts.dto';
+import {
+  BoostsBuyPattern,
+  BoostsBuyRequest,
+  BoostsBuyResponse,
+} from '@app/seidh-common/dto/boost/boost.buy.boosts.msg';
 
 @Injectable()
 export class GatewayService {
@@ -70,7 +70,7 @@ export class GatewayService {
     return result;
   }
 
-  async authenticate(authenticateRequest: AuthenticateRequest) {
+  async authenticate(authenticateRequest: AuthenticateRequestDTO) {
     const request: UsersAuthenticateMessageRequest = {
       telegramInitData: authenticateRequest.telegramInitData,
       login: authenticateRequest.login,
@@ -79,7 +79,7 @@ export class GatewayService {
     const result: UsersAuthenticateMessageResponse = await firstValueFrom(
       this.usersService.send(UsersAuthenticatePattern, request),
     );
-    const response: AuthenticateResponse = {
+    const response: AuthenticateResponseDTO = {
       success: result.success,
       authToken: result.authToken,
     };
@@ -93,7 +93,7 @@ export class GatewayService {
     const result: UsersGetFriendsMessageResponse = await firstValueFrom(
       this.usersService.send(UsersGetFriendsPattern, request),
     );
-    const response: GetFriendsResponse = {
+    const response: GetFriendsResponseDTO = {
       success: result.success,
       friends: result.friends,
       friendsInvited: result.friendsInvited,
@@ -109,8 +109,24 @@ export class GatewayService {
     const result: BoostsGetResponse = await firstValueFrom(
       this.boostsService.send(BoostsGetPattern, request),
     );
-    const response: GetBoostsResponse = {
+    const response: GetBoostsResponseDTO = {
       success: result.success,
+      boosts: result.boosts,
+    };
+    return response;
+  }
+
+  async buyBoost(userId: string, boostId: string) {
+    const request: BoostsBuyRequest = {
+      userId,
+      boostId,
+    };
+    const result: BoostsBuyResponse = await firstValueFrom(
+      this.boostsService.send(BoostsBuyPattern, request),
+    );
+    const response: GetBoostsResponseDTO = {
+      success: result.success,
+      message: result.message,
       boosts: result.boosts,
     };
     return response;

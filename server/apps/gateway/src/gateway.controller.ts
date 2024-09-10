@@ -10,7 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
-import { AuthenticateRequest } from './dto/authenticate.dto';
+import { AuthenticateRequestDTO } from './dto/authenticate.dto';
+import { BuyBoostRequestDTO } from './dto/boost.buy.dto';
 import { AuthGuard } from './guards/guard.auth';
 import { Observable } from 'rxjs';
 import { GameType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
@@ -41,7 +42,7 @@ export class GatewayController {
 
   @Post('authenticate')
   @UseGuards(ProductionGuard)
-  authenticate(@Body() authenticateRequest: AuthenticateRequest) {
+  authenticate(@Body() authenticateRequest: AuthenticateRequestDTO) {
     return this.gatewayService.authenticate(authenticateRequest);
   }
 
@@ -68,7 +69,15 @@ export class GatewayController {
 
   @Post('boosts')
   @UseGuards(AuthGuard)
-  buyBoost() {}
+  buyBoost(
+    @Body() buyBoostRequest: BuyBoostRequestDTO,
+    @Session() session: IUserSession,
+  ) {
+    return this.gatewayService.buyBoost(
+      session.userId,
+      buyBoostRequest.boostId,
+    );
+  }
 
   @Get('friends')
   @UseGuards(AuthGuard)

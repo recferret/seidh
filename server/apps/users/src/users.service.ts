@@ -19,17 +19,18 @@ import {
 import {
   Character,
   CharacterType,
-} from '@app/seidh-common/schemas/schema.character';
-import { User, UserDocument } from '@app/seidh-common/schemas/schema.user';
+} from '@app/seidh-common/schemas/character/schema.character';
+import { User, UserDocument } from '@app/seidh-common/schemas/user/schema.user';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { firstValueFrom } from 'rxjs';
-import { ServiceName } from '@app/seidh-common';
+import { SeidhCommonBroadcasts, ServiceName } from '@app/seidh-common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ReferralUpdateReferrerPattern } from '@app/seidh-common/dto/referral/referral.update.referrer.msg';
 import { UsersUpdateGainingsMessage } from '@app/seidh-common/dto/users/users.update.gainings';
+import { GameGainingTransaction } from '@app/seidh-common/schemas/game/schema.game-gaining.transaction';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const crypto = require('node:crypto');
@@ -39,12 +40,22 @@ export class UsersService {
   private readonly botKey = process.env.TG_BOT_KEY;
   private readonly isProd = process.env.NODE_ENV == 'production';
 
+  private readonly seidhCommonBroadcasts: SeidhCommonBroadcasts;
+
   constructor(
+    private jwtService: JwtService,
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Character.name) private characterModel: Model<Character>,
+    @InjectModel(GameGainingTransaction.name)
+    private gameGainingTransactionModel: Model<GameGainingTransaction>,
     @Inject(ServiceName.Referral) private referralService: ClientProxy,
-    private jwtService: JwtService,
-  ) {}
+    @Inject(ServiceName.WsGateway) wsGatewayService: ClientProxy,
+  ) {
+    this.seidhCommonBroadcasts = new SeidhCommonBroadcasts(
+      userModel,
+      wsGatewayService,
+    );
+  }
 
   async authenticate(message: UsersAuthenticateMessageRequest) {
     const response: UsersAuthenticateMessageResponse = {
@@ -268,9 +279,33 @@ export class UsersService {
   async updateGainings(message: UsersUpdateGainingsMessage) {
     const user = await this.userModel.findById(message.userGainings.userId);
     if (user) {
-      user.virtualTokenBalance += message.userGainings.tokens;
+      let tokensToAdd = message.userGainings.tokens;
+      let expToAdd = message.userGainings.exp;
+
+      if (user.hasCoinBoost1) {
+        tokensToAdd *= 2;
+      } else if (user.hasCoinBoost2) {
+        tokensToAdd *= 3;
+      }
+
+      if (user.hasExpBoost1) {
+        expToAdd *= 1.5;
+      } else if (user.hasExpBoost2) {
+        expToAdd *= 2;
+      }
+
+      user.virtualTokenBalance += tokensToAdd;
       user.kills += message.userGainings.kills;
+
       await user.save();
+      await this.gameGainingTransactionModel.create({
+        user,
+        gameId: message.userGainings.gameId,
+        exp: expToAdd,
+        kills: message.userGainings.kills,
+        tokens: tokensToAdd,
+      });
+      await this.seidhCommonBroadcasts.notifyBalanceUpdate(user.id);
     } else {
       Logger.error(
         `updateGainings. user ${message.userGainings.userId} not found`,
@@ -278,10 +313,7 @@ export class UsersService {
     }
   }
 
-  async leaderboard() {}
-
   private parseTelegramInitData(telegramInitData: string) {
-    console.log(telegramInitData);
     const encoded = decodeURIComponent(telegramInitData);
 
     const secret = crypto

@@ -68,8 +68,6 @@ class AiManager {
             case 89:
                 mobSpawnDelayMs = 0.200;
         }
-
-        trace('secondsPassed: ' + secondsPassed);
     }
 
     public function spawnMob(playerX:Int, playerY:Int) {

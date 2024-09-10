@@ -1,14 +1,15 @@
 package game.scene;
 
-import game.scene.impl.SpritesSceneTest.SceneSpritesTest;
 import engine.base.BaseTypesAndClasses;
 
 import game.event.EventManager;
 import game.js.NativeWindowJS;
-import game.scene.impl.LoadingScene;
 import game.scene.base.BasicScene;
+import game.scene.impl.LoadingScene;
 import game.scene.impl.HomeScene;
 import game.scene.impl.GameScene;
+import game.scene.impl.MapSceneTest;
+import game.scene.impl.SpritesSceneTest.SceneSpritesTest;
 
 class SceneManager implements EventListener {
 	private var sceneChangedCallback:BasicScene->Void;
@@ -31,6 +32,7 @@ class SceneManager implements EventListener {
 		// currentScene = new SceneGeomTest();
 		// currentScene = new SceneNetworkTest();
 		// currentScene = new SceneUiTest();
+		// currentScene = new MapSceneTest();
 
 		currentScene = new LoadingScene();
 		currentScene.start();

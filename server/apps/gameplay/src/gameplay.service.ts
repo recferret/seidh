@@ -75,6 +75,15 @@ import {
   UsersUpdateGainingsMessage,
   UsersUpdateGainingsPattern,
 } from '@app/seidh-common/dto/users/users.update.gainings';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+
+enum GameLogAction {
+  ClientDisconnect = 'ClientDisconnect',
+  ClientJoinGame = 'ClientJoinGame',
+  ClientInput = 'ClientInput',
+  ClientCreateGame = 'ClientCreateGame',
+}
 
 @Injectable()
 export class GameplayService {
@@ -95,6 +104,7 @@ export class GameplayService {
     private gameplayLobbyService: ClientProxy,
     @Inject(ServiceName.Users)
     private usersService: ClientProxy,
+    @InjectQueue('gamelog') private gameLogQueue: Queue,
   ) {
     const id = uuidv4();
     this.gameInstances.set(
@@ -110,6 +120,11 @@ export class GameplayService {
 
   public disconnected(message: GameplayDisconnectedMessage) {
     this.deleteUser(message.userId, 'disconnected');
+
+    // TODO add reason
+    this.gameLog(GameLogAction.ClientDisconnect, {
+      userId: message.userId,
+    });
   }
 
   public joinGame(message: GameplayJoinGameMessage) {
@@ -122,6 +137,8 @@ export class GameplayService {
       GameplayService.ConnectedUsers.add(message.userId);
 
       Logger.log(`User ${message.userId} has joined ${gameInstance.gameId}`);
+
+      this.gameLog(GameLogAction.ClientJoinGame, message);
     } else {
       Logger.error(`Join game failed for user ${message.userId} `);
     }
@@ -137,6 +154,7 @@ export class GameplayService {
       actionType: message.actionType,
       movAngle: message.movAngle,
     });
+    this.gameLog(GameLogAction.ClientInput, message);
   }
 
   public createGame(message: GameplayCreateGameMessageRequest) {
@@ -145,28 +163,13 @@ export class GameplayService {
       instanceId,
       new GameInstance(this.eventEmitter, instanceId, message.gameType),
     );
+    this.gameLog(GameLogAction.ClientCreateGame, message);
     const response: GameplayCreateGameMessageResponse = {
       success: true,
       gameId: instanceId,
       gameplayServiceId: Config.GAMEPLAY_INSTANCE_ID,
     };
     return response;
-  }
-
-  private checkUserConnected(userId: string) {
-    if (!GameplayService.ConnectedUsers.has(userId)) {
-      throw new Error('User ' + userId + ' is not connected');
-    }
-  }
-
-  private checkAndGetGameInstance(gameId: string, description?: string) {
-    const gameInstance = this.gameInstances.get(gameId);
-    if (!gameInstance) {
-      throw new Error(
-        `Game '+ gameId +' does not exist.${description && description.length > 0 ? ` (${description})` : ''}`,
-      );
-    }
-    return gameInstance;
   }
 
   // ----------------------------------------------
@@ -352,6 +355,22 @@ export class GameplayService {
     });
   }
 
+  private checkUserConnected(userId: string) {
+    if (!GameplayService.ConnectedUsers.has(userId)) {
+      throw new Error('User ' + userId + ' is not connected');
+    }
+  }
+
+  private checkAndGetGameInstance(gameId: string, description?: string) {
+    const gameInstance = this.gameInstances.get(gameId);
+    if (!gameInstance) {
+      throw new Error(
+        `Game '+ gameId +' does not exist.${description && description.length > 0 ? ` (${description})` : ''}`,
+      );
+    }
+    return gameInstance;
+  }
+
   private deleteUser(userId: string, deleteType: string) {
     if (GameplayService.ConnectedUsers.has(userId)) {
       GameplayService.ConnectedUsers.delete(userId);
@@ -368,5 +387,12 @@ export class GameplayService {
     } else {
       Logger.error('User ' + userId + ' is not connected, unable to drop');
     }
+  }
+
+  private async gameLog(gameLogAction: GameLogAction, params: any) {
+    await this.gameLogQueue.add({
+      action: gameLogAction,
+      params,
+    });
   }
 }

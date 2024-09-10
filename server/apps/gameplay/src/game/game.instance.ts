@@ -94,6 +94,7 @@ export class GameInstance {
         const gainings = this.engine.getPlayerGainings(userId);
         const playerGainings: UserGainings = {
           userId,
+          gameId,
           kills: gainings.kills,
           tokens: gainings.tokens,
           exp: gainings.exp,
