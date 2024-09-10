@@ -199,7 +199,7 @@ abstract class BasicScene extends h2d.Scene {
 			this.seidhGameEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
 					NativeWindowJS.trackGameWin();
-					gameUiScene.showWinDialog(0);
+					gameUiScene.showWinDialog(this.seidhGameEngine.getPlayerGainings(Player.instance.userId).kills);
 				} else {
 					NativeWindowJS.trackGameLose();
 					gameUiScene.showLoseDialog(0);

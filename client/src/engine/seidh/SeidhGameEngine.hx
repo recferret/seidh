@@ -24,7 +24,7 @@ class SeidhGameEngine extends BaseEngine {
     private var framesPassed = 0;
     private var timePassed = 0.0;
     private var secondsPassed = 0;
-    private final secondsToSurvive = 5;
+    private final secondsToSurvive = 60;
 
     private var winCondition:WinCondition;
 

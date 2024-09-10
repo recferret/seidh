@@ -28,9 +28,12 @@ class CharacterAnimation {
 
     public var enableMoveAnimation = true;
 
+    private var defaultAnimationSpeed = 10;
+    private var runAnimationSpeed = 10;
+
     public function new(parent:h2d.Object) {
         animation = new h2d.Anim(parent);
-        animation.speed = 10;
+        animation.speed = defaultAnimationSpeed;
 
         animation.onAnimEnd = function callback() {
             if (characterAnimationState != DEAD) {
@@ -48,6 +51,14 @@ class CharacterAnimation {
 
     public function getAnimationState() {
         return characterAnimationState;
+    }
+
+    public function setAnimationSpeed(speed:Int) {
+        defaultAnimationSpeed = speed;
+    }
+
+    public function setRunAnimationSpeed(speed:Int) {
+        runAnimationSpeed = speed;
     }
 
     public function setSide(side:Side) {
@@ -78,36 +89,45 @@ class CharacterAnimation {
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = idleAnim;
+                    animation.speed = defaultAnimationSpeed;
                 case RUN:
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = runAnim;
+                    animation.speed = runAnimationSpeed;
                 case WALK:
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = walkAnim;
+                    animation.speed = defaultAnimationSpeed;
                 case DEAD:
                     enableMoveAnimation = false;
                     animation.loop = false;
                     animationToPlay = deadAnim;
+                    animation.speed = defaultAnimationSpeed;
                 case HURT:
                     animation.loop = false;
                     animationToPlay = hurtAnim;
+                    animation.speed = defaultAnimationSpeed;
                 case ACTION_MAIN:
                     enableMoveAnimation = false;
                     animation.loop = false;
                     animationToPlay = actionMainAnim;
+                    animation.speed = defaultAnimationSpeed;
                 case DEFEND:
                     enableMoveAnimation = false;
                     animation.loop = false;
-                    animationToPlay = defendAnim; 
+                    animationToPlay = defendAnim;
+                    animation.speed = defaultAnimationSpeed;
                 case DODGE:
                     animation.loop = false;
-                    animationToPlay = dodgeAnim; 
+                    animationToPlay = dodgeAnim;
+                    animation.speed = defaultAnimationSpeed;
                 default:
                     enableMoveAnimation = true;
                     animation.loop = true;
                     animationToPlay = idleAnim;
+                    animation.speed = defaultAnimationSpeed;
             }
 
             animation.play(animationToPlay);

@@ -15,6 +15,27 @@ class ZombieGirlEntity extends SeidhBaseEntity {
 	// ------------------------------------------------
 
     public static function GenerateObjectEntity(id: String, ownerId: String, x:Int, y:Int) {
+        final defaultSpeed = 3;
+        final additionalRndSpeed = MathUtils.randomIntInRange(0, 7);
+        var speedFactor = 10;
+
+        switch (additionalRndSpeed) {
+            case 0:
+                speedFactor = 6;
+            case 1:
+                speedFactor = 7;
+            case 3:
+                speedFactor = 8;
+            case 4:
+                speedFactor = 9;
+            case 5:
+                speedFactor = 10;
+            case 6:
+                speedFactor = 11;
+            case 7:
+                speedFactor = 12;
+        }
+
         return new CharacterEntity({
             base: {
                 x: x, 
@@ -29,7 +50,8 @@ class ZombieGirlEntity extends SeidhBaseEntity {
             movement: {
                 canWalk: true,
                 canRun: true,
-                runSpeed: 1 + MathUtils.randomIntInRange(1, 10),
+                runSpeed: defaultSpeed + additionalRndSpeed,
+                speedFactor: speedFactor,
                 movementDelay: 0.100,
                 vitality: 100,
                 vitalityConsumptionPerSec: 20,

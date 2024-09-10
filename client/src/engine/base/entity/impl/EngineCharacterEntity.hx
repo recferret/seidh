@@ -401,6 +401,10 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		return characterEntity.movement.runSpeed;
 	}
 
+	public function getMovementSpeedFactor() {
+		return characterEntity.movement.speedFactor;
+	}
+
 	public function getCurrentHealth() {
 		return characterEntity.health;
 	}

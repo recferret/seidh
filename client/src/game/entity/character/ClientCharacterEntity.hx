@@ -35,8 +35,10 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
                 animation = CharacterAnimations.LoadRagnarNormAnimation(this);
             case EntityType.ZOMBIE_BOY:
                 animation = CharacterAnimations.LoadZombieBoyAnimation(this);
+                adjustRunAnimationSpeed();
             case EntityType.ZOMBIE_GIRL:
                 animation = CharacterAnimations.LoadZombieGirlAnimation(this);
+                adjustRunAnimationSpeed();
             default:
         }
     }
@@ -107,6 +109,12 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     // ------------------------------------------------------------
     // FX
     // ------------------------------------------------------------
+
+    private function adjustRunAnimationSpeed() {
+        trace(engineEntity.getMovementSpeed(), engineEntity.getMovementSpeedFactor());
+
+        animation.setRunAnimationSpeed(engineEntity.getMovementSpeedFactor());
+    }
 
     public function fxActionMain() {
         switch (getEntityType()) {

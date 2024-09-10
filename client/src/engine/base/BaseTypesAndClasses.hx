@@ -75,6 +75,7 @@ typedef CharacterMovementStruct = {
 	canWalk:Bool,
 	canRun:Bool,
 	runSpeed:Int,
+	speedFactor:Int,
 	movementDelay:Float,
 	vitality:Int,
 	vitalityConsumptionPerSec:Int,
