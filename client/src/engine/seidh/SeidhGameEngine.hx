@@ -23,6 +23,8 @@ class SeidhGameEngine extends BaseEngine {
     private var lastDt = 0.0;
     private var framesPassed = 0;
     private var timePassed = 0.0;
+    private var secondsPassed = 0;
+    private final secondsToSurvive = 5;
 
     private var winCondition:WinCondition;
 
@@ -45,7 +47,7 @@ class SeidhGameEngine extends BaseEngine {
 
     public static function main() {}
 
-    public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.INFINITE) {
+    public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.SURVIVE) {
 	    super(engineMode);
 
         aiManager = new AiManager();
@@ -425,11 +427,16 @@ class SeidhGameEngine extends BaseEngine {
     private function oneSecondTimer() {
         haxe.Timer.delay(function delay() {
             if (gameState == GameState.PLAYING) {
-                if (oneSecondCallback != null) {
-                    oneSecondCallback();
+                if (winCondition == WinCondition.SURVIVE && secondsPassed >= secondsToSurvive) {
+                    setGameState(GameState.WIN);
+                } else {
+                    secondsPassed++;
+                    if (oneSecondCallback != null) {
+                        oneSecondCallback();
+                    }
+                    aiManager.secondPassed();
+                    oneSecondTimer();
                 }
-                aiManager.secondPassed();
-                oneSecondTimer();
             }
         }, 1000);
     }
@@ -484,6 +491,14 @@ class SeidhGameEngine extends BaseEngine {
 
     public function getWinCondition() {
         return winCondition;
+    }
+
+    public function getSecondsPassed() {
+        return secondsPassed;
+    }
+
+    public function getSecondsToSurvive() {
+        return secondsToSurvive;
     }
 
     // ---------------------------------------------------

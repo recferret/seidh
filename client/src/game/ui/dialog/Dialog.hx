@@ -68,13 +68,16 @@ class Dialog extends h2d.Object {
         final backgroundTile = h2d.Tile.fromColor(0x000000, Main.ActualScreenWidth, Main.ActualScreenHeight, 0.7);
         addChild(new h2d.Bitmap(backgroundTile));
 
-        // Dialog 
+        var positiveButtonOffsetY = 50;
+
+        // Dialog type
         var dialogBmp:h2d.Bitmap;
         switch (dialogType) {
             case SMALL:
                 dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL));
             case MEDIUM:
                 dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_MEDIUM));
+                positiveButtonOffsetY = 100;
         }
         dialogBmp.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
         addChild(dialogBmp);
@@ -108,7 +111,6 @@ class Dialog extends h2d.Object {
             fui.addChild(tfLine2);
         }
 
-        // Positive button
         var buttonPositive:DialogButton = null;
         var interactionPositive:h2d.Interactive = null;
 
@@ -132,10 +134,12 @@ class Dialog extends h2d.Object {
             addChild(interactionPositive);
         }
 
-        // Negitive button
-        if (dialogType != SMALL && textNegative != null) {
-            final buttonNegative = new DialogButton(this, textNegative);
-            final interactionNegative = new h2d.Interactive(buttonNegative.getWidth(), buttonNegative.getHeight());
+        var buttonNegative:DialogButton = null;
+        var interactionNegative:h2d.Interactive = null;
+
+        if (textNegative != null) {
+            buttonNegative = new DialogButton(this, textNegative);
+            interactionNegative = new h2d.Interactive(buttonNegative.getWidth(), buttonNegative.getHeight());
 
             interactionNegative.onPush = function(event : hxd.Event) {
                 buttonNegative.setScale(0.9);
@@ -151,51 +155,9 @@ class Dialog extends h2d.Object {
                 }
             }
             addChild(interactionNegative);
+        }
 
-            // Positions
-            if (textPositive != null) {
-                interactionPositive.setPosition(
-                    (Main.ActualScreenWidth / 2 - 100) - buttonPositive.getWidth() / 2,
-                    (Main.ActualScreenHeight / 2 + 140) - buttonPositive.getHeight() / 2
-                );
-                buttonPositive.setPosition(
-                    Main.ActualScreenWidth / 2 - 100, 
-                    Main.ActualScreenHeight / 2 + 140
-                );
-
-                buttonNegative.setPosition(
-                    Main.ActualScreenWidth / 2 + 100, 
-                    Main.ActualScreenHeight / 2 + 140
-                );
-                interactionNegative.setPosition(
-                    (Main.ActualScreenWidth / 2 + 100) - buttonNegative.getWidth() / 2,
-                    (Main.ActualScreenHeight / 2 + 140) - buttonNegative.getHeight() / 2
-                );
-            } else {
-                buttonNegative.setPosition(
-                    Main.ActualScreenWidth / 2, 
-                    Main.ActualScreenHeight / 2 + 140
-                );
-                interactionNegative.setPosition(
-                    (Main.ActualScreenWidth / 2) - buttonNegative.getWidth() / 2,
-                    (Main.ActualScreenHeight / 2 + 140) - buttonNegative.getHeight() / 2
-                );
-            }
-            
-            // Title
-            final tfTitle = new h2d.Text(font);
-            tfTitle.text = textTitle;
-            tfTitle.textColor = GameConfig.FontColor;
-            tfTitle.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-            tfTitle.textAlign = Center;
-            tfTitle.setScale(4);
-            tfTitle.setPosition(
-                Main.ActualScreenWidth / 2,
-                Main.ActualScreenHeight / 2 - 200
-            );
-            addChild(tfTitle);
-
-        } else if (textPositive != null) {
+        if (dialogType == SMALL) {
             interactionPositive.setPosition(
                 Main.ActualScreenWidth / 2 - buttonPositive.getWidth() / 2,
                 Main.ActualScreenHeight / 2 + 50 - buttonPositive.getHeight() / 2
@@ -204,6 +166,49 @@ class Dialog extends h2d.Object {
                 Main.ActualScreenWidth / 2, 
                 Main.ActualScreenHeight / 2 + 50
             );
+        } else {
+            if (textNegative != null && textPositive != null) {
+                buttonNegative.setPosition(
+                    Main.ActualScreenWidth / 2 + 100, 
+                    Main.ActualScreenHeight / 2 + 140
+                );
+                interactionNegative.setPosition(
+                    (Main.ActualScreenWidth / 2 + 100) - buttonNegative.getWidth() / 2,
+                    (Main.ActualScreenHeight / 2 + 140) - buttonNegative.getHeight() / 2
+                );
+
+                interactionPositive.setPosition(
+                    (Main.ActualScreenWidth / 2 - 100) - buttonPositive.getWidth() / 2,
+                    (Main.ActualScreenHeight / 2 + 140) - buttonPositive.getHeight() / 2
+                );
+                buttonPositive.setPosition(
+                    Main.ActualScreenWidth / 2 - 100, 
+                    Main.ActualScreenHeight / 2 + 140
+                );
+            } else if (textPositive != null) {
+                interactionPositive.setPosition(
+                    Main.ActualScreenWidth / 2 - buttonPositive.getWidth() / 2,
+                    Main.ActualScreenHeight / 2 + positiveButtonOffsetY - buttonPositive.getHeight() / 2
+                );
+                buttonPositive.setPosition(
+                    Main.ActualScreenWidth / 2, 
+                    Main.ActualScreenHeight / 2 + positiveButtonOffsetY
+                );
+            }
+            
+            if (textTitle != null) {
+                final tfTitle = new h2d.Text(font);
+                tfTitle.text = textTitle;
+                tfTitle.textColor = GameConfig.FontColor;
+                tfTitle.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+                tfTitle.textAlign = Center;
+                tfTitle.setScale(4);
+                tfTitle.setPosition(
+                    Main.ActualScreenWidth / 2,
+                    Main.ActualScreenHeight / 2 - 200
+                );
+                addChild(tfTitle);
+            }
         }
     }
 

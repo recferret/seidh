@@ -1,5 +1,6 @@
 package game.scene;
 
+import hxd.res.DefaultFont;
 import game.Res.SeidhResource;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
@@ -129,6 +130,8 @@ class GameUiScene extends h2d.Scene {
 	private final barHp:BarHp;
 	// private final barXp:BarXp;
 	private final barGold:BarGold;
+
+	private final surviveTimer:h2d.Text;
     
     public function new(
 		isMobileDevice:Bool, 
@@ -172,6 +175,19 @@ class GameUiScene extends h2d.Scene {
 
 		barGold = new BarGold(this);
 		barGold.setPosition(Main.ActualScreenWidth - barGold.getBitmapWidth() / 1.2, 50);
+
+		// --------------------------------------------
+		// Survive timer
+		// --------------------------------------------
+
+		final font : h2d.Font = DefaultFont.get();
+        surviveTimer = new h2d.Text(font);
+        surviveTimer.text = 'Survive for .. seconds';
+        surviveTimer.textColor = GameConfig.FontColor;
+        surviveTimer.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        surviveTimer.textAlign = Center;
+        surviveTimer.setScale(3);
+        surviveTimer.setPosition(360, 90);
 
 		// --------------------------------------------
 		// Frame
@@ -245,13 +261,21 @@ class GameUiScene extends h2d.Scene {
         movementController.updateCursorPosition(x, y);
     }
 
+	public function addSurviveTimer() {
+		addChild(surviveTimer);
+	}
+
+	public function updateSurviveTimer(secondsToSurvive:Int, secondsPassed:Int) {
+		surviveTimer.text = 'Survive for ${secondsToSurvive - secondsPassed} seconds';
+	}
+
 	public function showWinDialog(zombiesKilled:Int) {
 		new Dialog(
 			this, 
-			DialogType.SMALL,
+			DialogType.MEDIUM,
 			null,
 			"You have won!", 
-			"",// "Zombies killed: " + zombiesKilled,
+			"Zombies killed: " + zombiesKilled,
 			"OK",
 			null,
 			function positiveCallback() {

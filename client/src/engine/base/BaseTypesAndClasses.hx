@@ -16,6 +16,7 @@ enum abstract EngineMode(Int) {
 enum abstract WinCondition(Int) {
 	var KILL_MOBS = 1;
 	var INFINITE = 2;
+	var SURVIVE = 3;
 }
 
 enum abstract Side(Int) {

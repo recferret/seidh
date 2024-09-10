@@ -25,7 +25,7 @@ class AiManager {
     private var mobsKilled = 0;
 
     private var mobsLastSpawnTime = 0.0;
-    private var mobSpawnDelayMs = 1.500;
+    private var mobSpawnDelayMs = 2.500;
 
     private var secondsPassed = 0;
 
@@ -60,13 +60,13 @@ class AiManager {
 
         switch (secondsPassed) {
             case 13:
-                mobSpawnDelayMs = 1.000;
+                mobSpawnDelayMs = 2.000;
             case 34:
-                mobSpawnDelayMs = 0.700;
+                mobSpawnDelayMs = 1.500;
             case 55:
-                mobSpawnDelayMs = 0.500;
+                mobSpawnDelayMs = 1.000;
             case 89:
-                mobSpawnDelayMs = 0.200;
+                mobSpawnDelayMs = 0.500;
         }
     }
 

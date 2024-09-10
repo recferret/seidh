@@ -205,6 +205,12 @@ abstract class BasicScene extends h2d.Scene {
 					gameUiScene.showLoseDialog(0);
 				}
 			};
+
+			this.seidhGameEngine.oneSecondCallback = function callback() {
+				if (this.seidhGameEngine.getWinCondition() == WinCondition.SURVIVE) {
+					gameUiScene.updateSurviveTimer(this.seidhGameEngine.getSecondsToSurvive(), this.seidhGameEngine.getSecondsPassed());
+				}
+			};
 		}
 
 		debugGraphics = new h2d.Graphics(this);
@@ -278,7 +284,13 @@ abstract class BasicScene extends h2d.Scene {
 							addInputCommand(CharacterActionType.MOVE, angle);
 						}
 					);
+
+					if (seidhGameEngine.getWinCondition() == WinCondition.SURVIVE) {
+						gameUiScene.addSurviveTimer();
+						gameUiScene.updateSurviveTimer(this.seidhGameEngine.getSecondsToSurvive(), this.seidhGameEngine.getSecondsPassed());
+					}
 				}
+
 				gameUiScene.resize(Main.ScreenOrientation, w, h);
 			}
 		}
