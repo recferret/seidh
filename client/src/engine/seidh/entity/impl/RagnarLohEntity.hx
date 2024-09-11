@@ -19,7 +19,7 @@ class RagnarLohEntity extends SeidhBaseEntity {
                 x: x, 
                 y: y,
                 entityType: EntityType.RAGNAR_LOH,
-                entityShape: {width: 180, height: 260, rectOffsetX: 0, rectOffsetY: 0},
+                entityShape: {width: 180, height: 260, rectOffsetX: 50, rectOffsetY: 0},
                 id: id,
                 ownerId: ownerId,
                 rotation: 0

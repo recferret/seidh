@@ -159,6 +159,7 @@ class BaseEntity {
 	public var id:String;
 	public var ownerId:String;
 	public var rotation:Float;
+	public var side = Side.RIGHT;
 
 	public function new(struct:BaseEntityStruct) {
 		this.x = struct.x;
@@ -192,7 +193,6 @@ class CharacterEntity extends BaseEntity {
 	public var action2:CharacterActionStruct;
 	public var action3:CharacterActionStruct;
 	public var actionUltimate:CharacterActionStruct;
-	public var side = Side.RIGHT;
 
 	public function new(struct:CharacterEntityFullStruct) {
 		super(struct.base);

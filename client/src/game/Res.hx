@@ -40,32 +40,13 @@ enum SeidhResource {
     // RAGNAR
     // ------------------------------------
     
+    RAGNAR_IDLE;
+    RAGNAR_RUN;
+    RAGNAR_ATTACK;
+
     RAGNAR_NORM;
     RAGNAR_DUDE;
-    
     RAGNAR_BASE;
-
-    RAGNAR_IDLE_1;
-    RAGNAR_IDLE_2;
-    RAGNAR_IDLE_3;
-    RAGNAR_IDLE_4;
-
-    RAGNAR_RUN_1;
-    RAGNAR_RUN_2;
-    RAGNAR_RUN_3;
-    RAGNAR_RUN_4;
-    RAGNAR_RUN_5;
-    RAGNAR_RUN_6;
-
-    RAGNAR_ATTACK_1;
-    RAGNAR_ATTACK_2;
-    RAGNAR_ATTACK_3;
-    RAGNAR_ATTACK_4;
-
-    RAGNAR_BORODA_1;
-    RAGNAR_BORODA_2;
-    RAGNAR_USI_1;
-    RAGNAR_USI_2;
 
     // ------------------------------------
     // SOUND
@@ -147,40 +128,19 @@ enum SeidhResource {
     // ZOMBIE BOY
     // ------------------------------------
 
-    ZOMBIE_BOY_IDLE_1;
-    ZOMBIE_BOY_IDLE_2;
-    ZOMBIE_BOY_IDLE_3;
-    ZOMBIE_BOY_IDLE_4;
-
-    ZOMBIE_BOY_ATTACK_1;
-    ZOMBIE_BOY_ATTACK_2;
-    ZOMBIE_BOY_ATTACK_3;
-    ZOMBIE_BOY_ATTACK_4;
-
-    ZOMBIE_BOY_RUN_1;
-    ZOMBIE_BOY_RUN_2;
-    ZOMBIE_BOY_RUN_3;
-    ZOMBIE_BOY_RUN_4;
-    ZOMBIE_BOY_RUN_5;
-    ZOMBIE_BOY_RUN_6;
+    ZOMBIE_BOY_IDLE;
+    ZOMBIE_BOY_RUN;
+    ZOMBIE_BOY_ATTACK;
+    ZOMBIE_BOY_DEATH;
 
     // ------------------------------------
     // ZOMBIE GIRL
     // ------------------------------------
 
-    ZOMBIE_GIRL_IDLE_1;
-
-    ZOMBIE_GIRL_ATTACK_1;
-    ZOMBIE_GIRL_ATTACK_2;
-    ZOMBIE_GIRL_ATTACK_3;
-    ZOMBIE_GIRL_ATTACK_4;
-
-    ZOMBIE_GIRL_RUN_1;
-    ZOMBIE_GIRL_RUN_2;
-    ZOMBIE_GIRL_RUN_3;
-    ZOMBIE_GIRL_RUN_4;
-    ZOMBIE_GIRL_RUN_5;
-    ZOMBIE_GIRL_RUN_6;
+    ZOMBIE_GIRL_IDLE;
+    ZOMBIE_GIRL_RUN;
+    ZOMBIE_GIRL_ATTACK;
+    ZOMBIE_GIRL_DEATH;
 }
 
 class ResRemoteLoader {
@@ -289,31 +249,13 @@ class Res {
                 // RAGNAR
                 // ------------------------------------
             
+                remoteResourceMap.set(RAGNAR_IDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_IDLE.png');
+                remoteResourceMap.set(RAGNAR_RUN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN.png');
+                remoteResourceMap.set(RAGNAR_ATTACK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_ATTACK.png');
+
                 remoteResourceMap.set(RAGNAR_DUDE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_DUDE.png');
                 remoteResourceMap.set(RAGNAR_NORM, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_NORM.png');
                 remoteResourceMap.set(RAGNAR_BASE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_BASE.png');
-
-                remoteResourceMap.set(RAGNAR_IDLE_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_IDLE_1.png');
-                remoteResourceMap.set(RAGNAR_IDLE_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_IDLE_2.png');
-                remoteResourceMap.set(RAGNAR_IDLE_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_IDLE_3.png');
-                remoteResourceMap.set(RAGNAR_IDLE_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_IDLE_4.png');
-
-                remoteResourceMap.set(RAGNAR_RUN_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_1.png');
-                remoteResourceMap.set(RAGNAR_RUN_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_2.png');
-                remoteResourceMap.set(RAGNAR_RUN_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_3.png');
-                remoteResourceMap.set(RAGNAR_RUN_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_4.png');
-                remoteResourceMap.set(RAGNAR_RUN_5, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_5.png');
-                remoteResourceMap.set(RAGNAR_RUN_6, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN_6.png');
-
-                remoteResourceMap.set(RAGNAR_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_ATTACK_1.png');
-                remoteResourceMap.set(RAGNAR_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_ATTACK_2.png');
-                remoteResourceMap.set(RAGNAR_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_ATTACK_3.png');
-                remoteResourceMap.set(RAGNAR_ATTACK_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_ATTACK_4.png');
-
-                remoteResourceMap.set(RAGNAR_BORODA_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_BORODA_1.png');
-                remoteResourceMap.set(RAGNAR_BORODA_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_BORODA_2.png');
-                remoteResourceMap.set(RAGNAR_USI_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_USI_1.png');
-                remoteResourceMap.set(RAGNAR_USI_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_USI_2.png');
             
                 // ------------------------------------
                 // SOUND
@@ -393,40 +335,19 @@ class Res {
                 // ZOMBIE BOY
                 // ------------------------------------
             
-                remoteResourceMap.set(ZOMBIE_BOY_IDLE_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
-                remoteResourceMap.set(ZOMBIE_BOY_IDLE_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
-                remoteResourceMap.set(ZOMBIE_BOY_IDLE_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
-                remoteResourceMap.set(ZOMBIE_BOY_IDLE_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE_1.png');
-
-                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_1.png');
-                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_2.png');
-                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_3.png');
-                remoteResourceMap.set(ZOMBIE_BOY_ATTACK_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK_4.png');
-
-                remoteResourceMap.set(ZOMBIE_BOY_RUN_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_1.png');
-                remoteResourceMap.set(ZOMBIE_BOY_RUN_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_2.png');
-                remoteResourceMap.set(ZOMBIE_BOY_RUN_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_3.png');
-                remoteResourceMap.set(ZOMBIE_BOY_RUN_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_4.png');
-                remoteResourceMap.set(ZOMBIE_BOY_RUN_5, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_5.png');
-                remoteResourceMap.set(ZOMBIE_BOY_RUN_6, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN_6.png');
+                remoteResourceMap.set(ZOMBIE_BOY_IDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE.png');
+                remoteResourceMap.set(ZOMBIE_BOY_RUN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN.png');
+                remoteResourceMap.set(ZOMBIE_BOY_ATTACK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK.png');
+                remoteResourceMap.set(ZOMBIE_BOY_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_DEATH.png');
 
                 // ------------------------------------
                 // ZOMBIE GIRL
                 // ------------------------------------
             
-                remoteResourceMap.set(ZOMBIE_GIRL_IDLE_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_IDLE_1.png');
-
-                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_1.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_2.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_3.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK_4.png');
-
-                remoteResourceMap.set(ZOMBIE_GIRL_RUN_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_1.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_RUN_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_2.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_RUN_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_3.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_RUN_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_4.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_RUN_5, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_5.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_RUN_6, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN_6.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_IDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_IDLE.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_DEATH.png');
 
                 loadRemoteResources();
             } else if (GameConfig.instance.ResProvider == ResourceProvider.LOCAL) {
@@ -465,32 +386,14 @@ class Res {
                 // RAGNAR
                 // ------------------------------------
             
+                tileResMap.set(RAGNAR_IDLE, hxd.Res.ragnar.RAGNAR_IDLE.toTile().center());
+                tileResMap.set(RAGNAR_RUN, hxd.Res.ragnar.RAGNAR_RUN.toTile().center());
+                tileResMap.set(RAGNAR_ATTACK, hxd.Res.ragnar.RAGNAR_ATTACK.toTile().center());
+
                 tileResMap.set(RAGNAR_DUDE, hxd.Res.ragnar.RAGNAR_DUDE.toTile().center());
                 tileResMap.set(RAGNAR_NORM, hxd.Res.ragnar.RAGNAR_NORM.toTile().center());
-
                 tileResMap.set(RAGNAR_BASE, hxd.Res.ragnar.RAGNAR_BASE.toTile().center());
-                tileResMap.set(RAGNAR_IDLE_1, hxd.Res.ragnar.RAGNAR_IDLE_1.toTile().center());
-                tileResMap.set(RAGNAR_IDLE_2, hxd.Res.ragnar.RAGNAR_IDLE_2.toTile().center());
-                tileResMap.set(RAGNAR_IDLE_3, hxd.Res.ragnar.RAGNAR_IDLE_3.toTile().center());
-                tileResMap.set(RAGNAR_IDLE_4, hxd.Res.ragnar.RAGNAR_IDLE_4.toTile().center());
 
-                tileResMap.set(RAGNAR_RUN_1, hxd.Res.ragnar.RAGNAR_RUN_1.toTile().center());
-                tileResMap.set(RAGNAR_RUN_2, hxd.Res.ragnar.RAGNAR_RUN_2.toTile().center());
-                tileResMap.set(RAGNAR_RUN_3, hxd.Res.ragnar.RAGNAR_RUN_3.toTile().center());
-                tileResMap.set(RAGNAR_RUN_4, hxd.Res.ragnar.RAGNAR_RUN_4.toTile().center());
-                tileResMap.set(RAGNAR_RUN_5, hxd.Res.ragnar.RAGNAR_RUN_5.toTile().center());
-                tileResMap.set(RAGNAR_RUN_6, hxd.Res.ragnar.RAGNAR_RUN_6.toTile().center());
-
-                tileResMap.set(RAGNAR_ATTACK_1, hxd.Res.ragnar.RAGNAR_ATTACK_1.toTile().center());
-                tileResMap.set(RAGNAR_ATTACK_2, hxd.Res.ragnar.RAGNAR_ATTACK_2.toTile().center());
-                tileResMap.set(RAGNAR_ATTACK_3, hxd.Res.ragnar.RAGNAR_ATTACK_3.toTile().center());
-                tileResMap.set(RAGNAR_ATTACK_4, hxd.Res.ragnar.RAGNAR_ATTACK_4.toTile().center());
-
-                tileResMap.set(RAGNAR_BORODA_1, hxd.Res.ragnar.RAGNAR_BORODA_1.toTile().center());
-                tileResMap.set(RAGNAR_BORODA_2, hxd.Res.ragnar.RAGNAR_BORODA_2.toTile().center());
-                tileResMap.set(RAGNAR_USI_1, hxd.Res.ragnar.RAGNAR_USI_1.toTile().center());
-                tileResMap.set(RAGNAR_USI_2, hxd.Res.ragnar.RAGNAR_USI_2.toTile().center());
-            
                 // ------------------------------------
                 // SOUND
                 // ------------------------------------
@@ -571,40 +474,19 @@ class Res {
                 // ZOMBIE BOY
                 // ------------------------------------
             
-                tileResMap.set(ZOMBIE_BOY_IDLE_1, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_1.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_IDLE_2, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_2.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_IDLE_3, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_3.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_IDLE_4, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE_4.toTile().center());
-
-                tileResMap.set(ZOMBIE_BOY_ATTACK_1, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_1.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_ATTACK_2, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_2.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_ATTACK_3, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_3.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_ATTACK_4, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK_4.toTile().center());
-
-                tileResMap.set(ZOMBIE_BOY_RUN_1, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_1.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_RUN_2, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_2.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_RUN_3, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_3.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_RUN_4, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_4.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_RUN_5, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_5.toTile().center());
-                tileResMap.set(ZOMBIE_BOY_RUN_6, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN_6.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_IDLE, hxd.Res.zombie_boy.ZOMBIE_BOY_IDLE.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_RUN, hxd.Res.zombie_boy.ZOMBIE_BOY_RUN.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_ATTACK, hxd.Res.zombie_boy.ZOMBIE_BOY_ATTACK.toTile().center());
+                tileResMap.set(ZOMBIE_BOY_DEATH, hxd.Res.zombie_boy.ZOMBIE_BOY_DEATH.toTile().center());
             
                 // ------------------------------------
                 // ZOMBIE GIRL
                 // ------------------------------------
             
-                tileResMap.set(ZOMBIE_GIRL_IDLE_1, hxd.Res.zombie_girl.ZOMBIE_GIRL_IDLE_1.toTile().center());
-
-                tileResMap.set(ZOMBIE_GIRL_ATTACK_1, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_1.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_ATTACK_2, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_2.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_ATTACK_3, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_3.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_ATTACK_4, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK_4.toTile().center());
-
-                tileResMap.set(ZOMBIE_GIRL_RUN_1, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_1.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_RUN_2, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_2.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_RUN_3, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_3.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_RUN_4, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_4.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_RUN_5, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_5.toTile().center());
-                tileResMap.set(ZOMBIE_GIRL_RUN_6, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN_6.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_IDLE, hxd.Res.zombie_girl.ZOMBIE_GIRL_IDLE.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_RUN, hxd.Res.zombie_girl.ZOMBIE_GIRL_RUN.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_ATTACK, hxd.Res.zombie_girl.ZOMBIE_GIRL_ATTACK.toTile().center());
+                tileResMap.set(ZOMBIE_GIRL_DEATH, hxd.Res.zombie_girl.ZOMBIE_GIRL_DEATH.toTile().center());
 
                 if (resCallback != null) {
                     resCallback({

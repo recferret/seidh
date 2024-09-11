@@ -174,25 +174,29 @@ class CharacterAnimations {
     public static function LoadRagnarLohAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
 
-        animation.loadIdle(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE_1),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE_2),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE_3),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE_4),
-            ],
-        );
+        final th = 332;
+        final tw = 332;
 
-        animation.loadRun(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_1),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_2),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_3),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_4),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_5),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_RUN_6),
-            ],
-        );
+        final idleTile = Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE);
+        final idleTiles = [
+            for(x in 0 ... Std.int(idleTile.width / tw))
+                idleTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadIdle(idleTiles);
+
+        final runTile = Res.instance.getTileResource(SeidhResource.RAGNAR_RUN);
+        final runTiles = [
+            for(x in 0 ... Std.int(runTile.width / tw))
+                runTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadRun(runTiles);
+
+        final attackTile = Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK);
+        final attackTiles = [
+            for(x in 0 ... Std.int(attackTile.width / tw))
+                attackTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadActionMain(attackTiles);
 
         animation.loadWalk(
             [
@@ -209,15 +213,6 @@ class CharacterAnimations {
         animation.loadHurt(
             [
                 Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
-
-        animation.loadActionMain(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_1),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_2),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_3),
-                Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK_4),
             ],
         );
 
@@ -281,58 +276,36 @@ class CharacterAnimations {
     public static function LoadZombieBoyAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
 
-        animation.loadIdle(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_2),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_3),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_4),
-            ]
-        );
+        final th = 332;
+        final tw = 332;
 
-        animation.loadRun(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_1),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_2),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_3),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_4),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_5),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN_6),
-            ]
-        );
+        final idleTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE);
+        final idleTiles = [
+            for(x in 0 ... Std.int(idleTile.width / tw))
+                idleTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadIdle(idleTiles);
 
-        animation.loadWalk(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
-            ]
-        );
+        final runTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN);
+        final runTiles = [
+            for(x in 0 ... Std.int(runTile.width / tw))
+                runTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadRun(runTiles);
 
-        animation.loadDead(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
-            ]
-        );
+        final attackTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK);
+        final attackTiles = [
+            for(x in 0 ... Std.int(attackTile.width / tw))
+                attackTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadActionMain(attackTiles);
 
-        animation.loadHurt(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
-            ]
-        );
-
-        animation.loadActionMain(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_1),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_2),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_3),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_ATTACK_4),
-            ]
-        );
-
-        animation.loadDefend(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE_1),
-            ]
-        );
+        final deathTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_DEATH);
+        final deathTiles = [
+            for(x in 0 ... Std.int(deathTile.width / tw))
+                deathTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadDead(deathTiles);
 
         return animation;
     }
@@ -340,55 +313,36 @@ class CharacterAnimations {
     public static function LoadZombieGirlAnimation(parent:h2d.Object) {
         final animation = new CharacterAnimation(parent);
 
-        animation.loadIdle(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
-            ]
-        );
+        final th = 332;
+        final tw = 332;
 
-        animation.loadRun(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_1),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_2),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_3),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_4),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_5),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN_6),
-            ]
-        );
+        final idleTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE);
+        final idleTiles = [
+            for(x in 0 ... Std.int(idleTile.width / tw))
+                idleTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadIdle(idleTiles);
 
-        animation.loadWalk(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
-            ]
-        );
+        final runTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_RUN);
+        final runTiles = [
+            for(x in 0 ... Std.int(runTile.width / tw))
+                runTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadRun(runTiles);
 
-        animation.loadDead(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
-            ]
-        );
+        final attackTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK);
+        final attackTiles = [
+            for(x in 0 ... Std.int(attackTile.width / tw))
+                attackTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadActionMain(attackTiles);
 
-        animation.loadHurt(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
-            ]
-        );
-
-        animation.loadActionMain(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_1),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_2),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_3),
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_ATTACK_4),
-            ]
-        );
-
-        animation.loadDefend(
-            [
-                Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_IDLE_1),
-            ]
-        );
+        final deathTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_GIRL_DEATH);
+        final deathTiles = [
+            for(x in 0 ... Std.int(deathTile.width / tw))
+                deathTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadDead(deathTiles);
 
         return animation;
     }

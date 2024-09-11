@@ -42,7 +42,7 @@ abstract class EngineBaseEntity {
 		final rectOffsetY = baseEntity.entityShape.rectOffsetY;
 		final x = baseEntity.x;
 		final y = baseEntity.y;
-		return new Rectangle(x + rectOffsetX, y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
+		return new Rectangle(x + (baseEntity.side == Side.RIGHT ? -rectOffsetX : rectOffsetX), y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
 	}
 
     public function getX() {

@@ -48,7 +48,9 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     // ------------------------------------------------------------
 
     public function update(dt:Float, fps:Float) {
-        moveToServerPosition(dt, fps);
+        if (engineEntity.isAlive) {
+            moveToServerPosition(dt, fps);
+        }
     }
 
 	public function debugDraw(graphics:h2d.Graphics) {
@@ -161,6 +163,7 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
                 SoundManager.instance.playZombieDeath();
             default:
         }
+        animation.setAnimationState(DEAD);
     }
 
     // ------------------------------------------------------------
