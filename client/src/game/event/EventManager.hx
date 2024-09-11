@@ -25,6 +25,7 @@ class EventManager {
 	public static final EVENT_HOME_PLAY = 'EVENT_HOME_PLAY';
 	public static final EVENT_HOME_SCENE = 'EVENT_HOME_SCENE';
 	public static final EVENT_REF_SHARE = 'EVENT_REF_SHARE';
+	public static final EVENT_CHARACTER_DEAD_ANIM_END = 'EVENT_CHARACTER_DEAD_ANIM_END';
 
 	private final listeners = new Map<String, List<EventListener>>();
 

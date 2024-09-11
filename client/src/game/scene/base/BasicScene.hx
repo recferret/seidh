@@ -53,6 +53,8 @@ abstract class BasicScene extends h2d.Scene {
 
 	final clientCharacterEntities = new Map<String, ClientCharacterEntity>();
 	final clientConsumableEntities = new Map<String, ClientConsumableEntity>();
+
+	final charactersToDelete: Array<String> = [];
 	
 	var inputsSent = 0;
 
@@ -89,10 +91,8 @@ abstract class BasicScene extends h2d.Scene {
 			};
 
 			this.seidhGameEngine.deleteCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
-				final character = clientCharacterEntities.get(characterEntity.getId());
-				if (character != null) {
-					removeChild(character);
-					clientCharacterEntities.remove(characterEntity.getId());
+				if (!charactersToDelete.contains(characterEntity.getId())) {
+					charactersToDelete.push(characterEntity.getId());
 				}
 			};
 
@@ -393,7 +393,7 @@ abstract class BasicScene extends h2d.Scene {
 	// Entities
 	// ----------------------------------
 
-	public function createCharacterEntityFromMinimalStruct(id: String, ownerId: String, x:Int, y:Int, entityType:EntityType) {
+	public function createCharacterEntityFromMinimalStruct(id:String, ownerId:String, x:Int, y:Int, entityType:EntityType) {
 		seidhGameEngine.createCharacterEntityFromMinimalStruct({
 			id: id, 
 			ownerId: ownerId, 
@@ -401,6 +401,18 @@ abstract class BasicScene extends h2d.Scene {
 			y: y,
 			entityType: entityType
 		});
+	}
+
+	function deleteCharacterByAnimationEnd(characterId:String) {
+		if (charactersToDelete.contains(characterId)) {
+			charactersToDelete.remove(characterId);
+
+			final character = clientCharacterEntities.get(characterId);
+			if (character != null) {
+				removeChild(character);
+				clientCharacterEntities.remove(characterId);
+			}
+		}
 	}
 
 	// ----------------------------------

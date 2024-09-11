@@ -6,6 +6,8 @@ import h2d.Tile;
 import engine.base.BaseTypesAndClasses.CharacterAnimationState;
 import engine.base.BaseTypesAndClasses.Side;
 
+import game.event.EventManager;
+
 import game.Res.SeidhResource;
 
 class CharacterAnimation {
@@ -31,7 +33,7 @@ class CharacterAnimation {
     private var defaultAnimationSpeed = 10;
     private var runAnimationSpeed = 10;
 
-    public function new(parent:h2d.Object) {
+    public function new(parent:h2d.Object, characterId:String) {
         animation = new h2d.Anim(parent);
         animation.speed = defaultAnimationSpeed;
 
@@ -41,6 +43,8 @@ class CharacterAnimation {
                     enableMoveAnimation = true;
                     setAnimationState(CharacterAnimationState.IDLE);
                 }
+            } else {
+                EventManager.instance.notify(EventManager.EVENT_CHARACTER_DEAD_ANIM_END, characterId);
             }
         }
     }
@@ -66,7 +70,7 @@ class CharacterAnimation {
             this.side = side;
 
             function flipTilesHorizontally(animationToPlay:Array<Tile>) {
-                for (index => value in animationToPlay) {
+                for (value in animationToPlay) {
                     value.flipX();
                 }
             }
@@ -74,6 +78,7 @@ class CharacterAnimation {
             flipTilesHorizontally(idleAnim);
             flipTilesHorizontally(runAnim);
             flipTilesHorizontally(actionMainAnim);
+            flipTilesHorizontally(deadAnim);
         }
     }
 
@@ -171,8 +176,8 @@ class CharacterAnimation {
 
 class CharacterAnimations {
 
-    public static function LoadRagnarLohAnimation(parent:h2d.Object) {
-        final animation = new CharacterAnimation(parent);
+    public static function LoadRagnarLohAnimation(parent:h2d.Object, characterId:String) {
+        final animation = new CharacterAnimation(parent, characterId);
 
         final th = 332;
         final tw = 332;
@@ -225,8 +230,8 @@ class CharacterAnimations {
         return animation;
     }
 
-    public static function LoadRagnarNormAnimation(parent:h2d.Object) {
-        final animation = new CharacterAnimation(parent);
+    public static function LoadRagnarNormAnimation(parent:h2d.Object, characterId:String) {
+        final animation = new CharacterAnimation(parent, characterId);
 
         animation.loadIdle(
             [
@@ -273,8 +278,8 @@ class CharacterAnimations {
         return animation;
     }
     
-    public static function LoadZombieBoyAnimation(parent:h2d.Object) {
-        final animation = new CharacterAnimation(parent);
+    public static function LoadZombieBoyAnimation(parent:h2d.Object, characterId:String) {
+        final animation = new CharacterAnimation(parent, characterId);
 
         final th = 332;
         final tw = 332;
@@ -310,8 +315,8 @@ class CharacterAnimations {
         return animation;
     }
 
-    public static function LoadZombieGirlAnimation(parent:h2d.Object) {
-        final animation = new CharacterAnimation(parent);
+    public static function LoadZombieGirlAnimation(parent:h2d.Object, characterId:String) {
+        final animation = new CharacterAnimation(parent, characterId);
 
         final th = 332;
         final tw = 332;

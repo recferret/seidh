@@ -30,14 +30,14 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 
         switch (engineEntity.getEntityType()) {
             case EntityType.RAGNAR_LOH:
-                animation = CharacterAnimations.LoadRagnarLohAnimation(this);
+                animation = CharacterAnimations.LoadRagnarLohAnimation(this, engineEntity.getId());
             case EntityType.RAGNAR_NORM:
-                animation = CharacterAnimations.LoadRagnarNormAnimation(this);
+                animation = CharacterAnimations.LoadRagnarNormAnimation(this, engineEntity.getId());
             case EntityType.ZOMBIE_BOY:
-                animation = CharacterAnimations.LoadZombieBoyAnimation(this);
+                animation = CharacterAnimations.LoadZombieBoyAnimation(this, engineEntity.getId());
                 adjustRunAnimationSpeed();
             case EntityType.ZOMBIE_GIRL:
-                animation = CharacterAnimations.LoadZombieGirlAnimation(this);
+                animation = CharacterAnimations.LoadZombieGirlAnimation(this, engineEntity.getId());
                 adjustRunAnimationSpeed();
             default:
         }

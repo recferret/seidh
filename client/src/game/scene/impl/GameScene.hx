@@ -23,6 +23,8 @@ class GameScene extends BasicScene implements EventListener {
     public function new(engineMode:EngineMode) {
 		super(new SeidhGameEngine(engineMode));
 
+		EventManager.instance.subscribe(EventManager.EVENT_CHARACTER_DEAD_ANIM_END, this);
+
 		if (engineMode == EngineMode.CLIENT_MULTIPLAYER) {
 			EventManager.instance.subscribe(EventManager.EVENT_GAME_INIT, this);
 			EventManager.instance.subscribe(EventManager.EVENT_LOOP_STATE, this);
@@ -101,6 +103,9 @@ class GameScene extends BasicScene implements EventListener {
 				processDeleteConsumableEntityEvent(message);
 			case EventManager.EVENT_CHARACTER_ACTIONS:
 				processCharacterActions(message);
+
+			case EventManager.EVENT_CHARACTER_DEAD_ANIM_END:
+				processCharacterDeadAnimationEnd(message);
 		}
 	}
 
@@ -233,4 +238,11 @@ class GameScene extends BasicScene implements EventListener {
 		}
 	}
 
+	// ---------------------------------------
+	// Internal events
+	// ---------------------------------------
+
+	private function processCharacterDeadAnimationEnd(characterId:String) {
+		deleteCharacterByAnimationEnd(characterId);
+	}
 }
