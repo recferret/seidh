@@ -187,19 +187,19 @@ export class BoostService implements OnModuleInit {
             break;
 
           case BoostService.BOOST_EXP_BOOST_2_NAME:
-            if (user.hasCoinBoost1) {
+            if (user.hasExpBoost2) {
               boostBody.accquired = true;
             }
             break;
 
           case BoostService.BOOST_COIN_BOOST_1_NAME:
-            if (user.hasCoinBoost2) {
+            if (user.hasCoinBoost1) {
               boostBody.accquired = true;
             }
             break;
 
           case BoostService.BOOST_COIN_BOOST_2_NAME:
-            if (user.hasExpBoost2) {
+            if (user.hasCoinBoost2) {
               boostBody.accquired = true;
             }
             break;

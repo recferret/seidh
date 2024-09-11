@@ -1,4 +1,4 @@
-import { CharacterType } from '@app/seidh-common/schemas/schema.character';
+import { CharacterType } from '@app/seidh-common/schemas/character/schema.character';
 import {
   CharacterMovementStruct,
   CharacterActionStruct,
