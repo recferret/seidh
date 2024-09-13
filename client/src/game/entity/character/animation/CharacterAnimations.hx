@@ -14,7 +14,7 @@ class CharacterAnimation {
     private var idleAnim:Array<Tile>;
     private var runAnim:Array<Tile>;
 	private var walkAnim:Array<Tile>;
-    private var deadAnim:Array<Tile>;
+    private var deathAnim:Array<Tile>;
     private var hurtAnim:Array<Tile>;
     private var actionMainAnim:Array<Tile>;
     private var defendAnim:Array<Tile>;
@@ -38,13 +38,13 @@ class CharacterAnimation {
         animation.speed = defaultAnimationSpeed;
 
         animation.onAnimEnd = function callback() {
-            if (characterAnimationState != DEAD) {
+            if (characterAnimationState != DEATH) {
                 if (characterAnimationState != RUN && characterAnimationState != WALK) {
                     enableMoveAnimation = true;
                     setAnimationState(CharacterAnimationState.IDLE);
                 }
             } else {
-                EventManager.instance.notify(EventManager.EVENT_CHARACTER_DEAD_ANIM_END, characterId);
+                EventManager.instance.notify(EventManager.EVENT_CHARACTER_DEATH_ANIM_END, characterId);
             }
         }
     }
@@ -78,7 +78,7 @@ class CharacterAnimation {
             flipTilesHorizontally(idleAnim);
             flipTilesHorizontally(runAnim);
             flipTilesHorizontally(actionMainAnim);
-            flipTilesHorizontally(deadAnim);
+            flipTilesHorizontally(deathAnim);
         }
     }
 
@@ -105,10 +105,10 @@ class CharacterAnimation {
                     animation.loop = true;
                     animationToPlay = walkAnim;
                     animation.speed = defaultAnimationSpeed;
-                case DEAD:
+                case DEATH:
                     enableMoveAnimation = false;
                     animation.loop = false;
-                    animationToPlay = deadAnim;
+                    animationToPlay = deathAnim;
                     animation.speed = defaultAnimationSpeed;
                 case HURT:
                     animation.loop = false;
@@ -153,8 +153,8 @@ class CharacterAnimation {
         walkAnim = tiles;
     }
 
-    public function loadDead(tiles:Array<Tile>) {
-        deadAnim = tiles;
+    public function loadDeath(tiles:Array<Tile>) {
+        deathAnim = tiles;
     }
 
     public function loadHurt(tiles:Array<Tile>) {
@@ -203,29 +203,12 @@ class CharacterAnimations {
         ];
         animation.loadActionMain(attackTiles);
 
-        animation.loadWalk(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
-
-        animation.loadDead(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
-
-        animation.loadHurt(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
-
-        animation.loadDefend(
-            [
-                Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
-            ],
-        );
+        final deathTile = Res.instance.getTileResource(SeidhResource.RAGNAR_DEATH);
+        final deathTiles = [
+            for(x in 0 ... Std.int(deathTile.width / tw))
+                deathTile.sub(x * tw, 0, tw, th).center()
+        ];
+        animation.loadDeath(deathTiles);
 
         return animation;
     }
@@ -251,7 +234,7 @@ class CharacterAnimations {
             ]
         );
 
-        animation.loadDead(
+        animation.loadDeath(
             [
                 Res.instance.getTileResource(SeidhResource.RAGNAR_BASE),
             ]
@@ -310,7 +293,7 @@ class CharacterAnimations {
             for(x in 0 ... Std.int(deathTile.width / tw))
                 deathTile.sub(x * tw, 0, tw, th).center()
         ];
-        animation.loadDead(deathTiles);
+        animation.loadDeath(deathTiles);
 
         return animation;
     }
@@ -347,7 +330,7 @@ class CharacterAnimations {
             for(x in 0 ... Std.int(deathTile.width / tw))
                 deathTile.sub(x * tw, 0, tw, th).center()
         ];
-        animation.loadDead(deathTiles);
+        animation.loadDeath(deathTiles);
 
         return animation;
     }

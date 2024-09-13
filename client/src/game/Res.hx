@@ -18,6 +18,8 @@ enum SeidhResource {
     FX_ZOMBIE_ATTACK_1;
     FX_ZOMBIE_ATTACK_2;
     FX_ZOMBIE_ATTACK_3;
+    FX_ZOMBIE_BLOOD_1;
+    FX_ZOMBIE_BLOOD_2;
     FX_NORMALMAP;
 
     // ------------------------------------
@@ -43,6 +45,7 @@ enum SeidhResource {
     RAGNAR_IDLE;
     RAGNAR_RUN;
     RAGNAR_ATTACK;
+    RAGNAR_DEATH;
 
     RAGNAR_NORM;
     RAGNAR_DUDE;
@@ -226,6 +229,8 @@ class Res {
                 remoteResourceMap.set(FX_ZOMBIE_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_1.png');
                 remoteResourceMap.set(FX_ZOMBIE_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_2.png');
                 remoteResourceMap.set(FX_ZOMBIE_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_3.png');
+                remoteResourceMap.set(FX_ZOMBIE_BLOOD_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_BLOOD_1.png');
+                remoteResourceMap.set(FX_ZOMBIE_BLOOD_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_3.png');
 
                 remoteResourceMap.set(FX_NORMALMAP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/FX_NORMALMAP.png');
 
@@ -252,6 +257,7 @@ class Res {
                 remoteResourceMap.set(RAGNAR_IDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_IDLE.png');
                 remoteResourceMap.set(RAGNAR_RUN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN.png');
                 remoteResourceMap.set(RAGNAR_ATTACK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_ATTACK.png');
+                remoteResourceMap.set(RAGNAR_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_DEATH.png');
 
                 remoteResourceMap.set(RAGNAR_DUDE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_DUDE.png');
                 remoteResourceMap.set(RAGNAR_NORM, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_NORM.png');
@@ -358,12 +364,17 @@ class Res {
                 tileResMap.set(FX_BLOOD_1, hxd.Res.fx.blood.FX_BLOOD_1.toTile().center());
                 tileResMap.set(FX_BLOOD_2, hxd.Res.fx.blood.FX_BLOOD_2.toTile().center());
                 tileResMap.set(FX_BLOOD_3, hxd.Res.fx.blood.FX_BLOOD_3.toTile().center());
+
                 tileResMap.set(FX_RAGNAR_ATTACK_1, hxd.Res.fx.ragnar.FX_RAGNAR_ATTACK_1.toTile().center());
                 tileResMap.set(FX_RAGNAR_ATTACK_2, hxd.Res.fx.ragnar.FX_RAGNAR_ATTACK_2.toTile().center());
                 tileResMap.set(FX_RAGNAR_ATTACK_3, hxd.Res.fx.ragnar.FX_RAGNAR_ATTACK_3.toTile().center());
+
                 tileResMap.set(FX_ZOMBIE_ATTACK_1, hxd.Res.fx.zombie.FX_ZOMBIE_ATTACK_1.toTile().center());
                 tileResMap.set(FX_ZOMBIE_ATTACK_2, hxd.Res.fx.zombie.FX_ZOMBIE_ATTACK_2.toTile().center());
                 tileResMap.set(FX_ZOMBIE_ATTACK_3, hxd.Res.fx.zombie.FX_ZOMBIE_ATTACK_3.toTile().center());
+                tileResMap.set(FX_ZOMBIE_BLOOD_1, hxd.Res.fx.zombie.FX_ZOMBIE_BLOOD_1.toTile().center());
+                tileResMap.set(FX_ZOMBIE_BLOOD_2, hxd.Res.fx.zombie.FX_ZOMBIE_BLOOD_2.toTile().center());
+
                 tileResMap.set(FX_NORMALMAP, hxd.Res.fx.FX_NORMALMAP.toTile());
             
                 // ------------------------------------
@@ -389,6 +400,7 @@ class Res {
                 tileResMap.set(RAGNAR_IDLE, hxd.Res.ragnar.RAGNAR_IDLE.toTile().center());
                 tileResMap.set(RAGNAR_RUN, hxd.Res.ragnar.RAGNAR_RUN.toTile().center());
                 tileResMap.set(RAGNAR_ATTACK, hxd.Res.ragnar.RAGNAR_ATTACK.toTile().center());
+                tileResMap.set(RAGNAR_DEATH, hxd.Res.ragnar.RAGNAR_DEATH.toTile().center());
 
                 tileResMap.set(RAGNAR_DUDE, hxd.Res.ragnar.RAGNAR_DUDE.toTile().center());
                 tileResMap.set(RAGNAR_NORM, hxd.Res.ragnar.RAGNAR_NORM.toTile().center());

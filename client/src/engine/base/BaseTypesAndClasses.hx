@@ -30,7 +30,7 @@ enum abstract CharacterAnimationState(Int) {
 	var WALK = 3;
 
 	var HURT = 4;
-	var DEAD = 5;
+	var DEATH = 5;
 
 	var ACTION_MAIN = 6;
 

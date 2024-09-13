@@ -50,7 +50,6 @@ class Main extends hxd.App {
 						sevents.addScene(scene.getInputScene());
 					});
 				}, 500);
-			} else {
 			}
 			loadingText.text = 'Loading... ' + params.progress + '%';
 		});

@@ -163,7 +163,7 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
                 SoundManager.instance.playZombieDeath();
             default:
         }
-        animation.setAnimationState(DEAD);
+        animation.setAnimationState(DEATH);
     }
 
     // ------------------------------------------------------------
@@ -226,6 +226,10 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 
     public function getSide() {
         return engineEntity.getSide();
+    }
+
+    public function isPlayer() {
+        return engineEntity.isPlayer();
     }
 
     public function getCurrentHealth() {

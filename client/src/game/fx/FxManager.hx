@@ -1,11 +1,11 @@
 package game.fx;
 
+import engine.base.MathUtils;
 import h2d.Anim;
 
 import engine.base.BaseTypesAndClasses;
 
 import game.Res.SeidhResource;
-
 
 // TODO rmk and use objects pool
 class FrameAnimationFx {
@@ -38,6 +38,8 @@ class FxManager {
 
     private var bloodTilesRight:Array<h2d.Tile>;
     private var bloodTilesLeft:Array<h2d.Tile>;
+
+    private var zombieBloodTiles:Array<h2d.Tile>;
 
     public static final instance:FxManager = new FxManager();
 
@@ -87,6 +89,11 @@ class FxManager {
             bloodTilesLeft[0].flipX();
             bloodTilesLeft[1].flipX();
             bloodTilesLeft[2].flipX();
+
+            zombieBloodTiles = [
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_BLOOD_1).center(),
+                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_BLOOD_2).center(),
+            ];
         }
     }
 
@@ -100,6 +107,16 @@ class FxManager {
 
     public function zombieAttack(x:Float, y:Float, side:Side) {
         // new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? zombieAttackTilesRight : zombieAttackTilesLeft);
+    }
+
+    public function zombieBlood(x:Float, y:Float, side:Side, entityType:EntityType) {
+        final tile = entityType == EntityType.ZOMBIE_BOY ? zombieBloodTiles[1] : zombieBloodTiles[0];
+        if (side == Side.LEFT) {
+            tile.flipX();
+        }
+
+        final bmp = new h2d.Bitmap(tile, s2d);
+        bmp.setPosition(x, y);
     }
 
     public function blood(x:Float, y:Float, side:Side) {

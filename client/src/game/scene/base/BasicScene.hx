@@ -201,8 +201,10 @@ abstract class BasicScene extends h2d.Scene {
 					NativeWindowJS.trackGameWin();
 					gameUiScene.showWinDialog(this.seidhGameEngine.getPlayerGainings(Player.instance.userId).kills);
 				} else {
-					NativeWindowJS.trackGameLose();
-					gameUiScene.showLoseDialog(0);
+					haxe.Timer.delay(function delay() {
+						NativeWindowJS.trackGameLose();
+						gameUiScene.showLoseDialog(0);
+					}, 1500);
 				}
 			};
 
@@ -403,16 +405,19 @@ abstract class BasicScene extends h2d.Scene {
 		});
 	}
 
-	function deleteCharacterByAnimationEnd(characterId:String) {
-		if (charactersToDelete.contains(characterId)) {
-			charactersToDelete.remove(characterId);
+	function deleteCharacterByDeathAnimationEnd(characterId:String) {
+		// if (charactersToDelete.contains(characterId)) {
+		// 	charactersToDelete.remove(characterId);
 
-			final character = clientCharacterEntities.get(characterId);
-			if (character != null) {
-				removeChild(character);
-				clientCharacterEntities.remove(characterId);
-			}
-		}
+		// 	final character = clientCharacterEntities.get(characterId);
+		// 	if (character != null) {
+		// 		clientCharacterEntities.remove(characterId);
+		// 		if (!character.isPlayer()) {
+		// 			FxManager.instance.zombieBlood(character.x, character.y, character.getSide(), character.getEntityType());
+		// 			removeChild(character);
+		// 		}
+		// 	}
+		// }
 	}
 
 	// ----------------------------------
