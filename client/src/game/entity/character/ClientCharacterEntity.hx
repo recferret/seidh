@@ -121,12 +121,10 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
                 FxManager.instance.ragnarAttack(fxPosX, y, getSide());
                 SoundManager.instance.playVikingHit();
             case ZOMBIE_BOY:
-                final fxPosX = getSide() == RIGHT ? x : x;
-                FxManager.instance.zombieAttack(fxPosX, y, getSide());
+                FxManager.instance.zombieAttack(x, y, getSide());
                 SoundManager.instance.playZombieHit();
             case ZOMBIE_GIRL:
-                final fxPosX = getSide() == RIGHT ? x : x;
-                FxManager.instance.zombieAttack(fxPosX, y, getSide());
+                FxManager.instance.zombieAttack(x, y, getSide());
                 SoundManager.instance.playZombieHit();
             default:
         }

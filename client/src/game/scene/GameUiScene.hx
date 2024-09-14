@@ -270,7 +270,7 @@ class GameUiScene extends h2d.Scene {
 	}
 
 	public function showWinDialog(zombiesKilled:Int) {
-		new Dialog(
+		DialogManager.ShowDialog(
 			this, 
 			DialogType.MEDIUM,
 			null,
@@ -286,7 +286,7 @@ class GameUiScene extends h2d.Scene {
 	}
 
 	public function showLoseDialog(zombiesKilled:Int) {
-		new Dialog(
+		DialogManager.ShowDialog(
 			this, 
 			DialogType.SMALL, 
 			null,

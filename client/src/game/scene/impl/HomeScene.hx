@@ -1,12 +1,11 @@
 package game.scene.impl;
 
-import game.network.Networking.UserBalancePayload;
-import game.event.EventManager;
 import h2d.Bitmap;
 
 import game.js.NativeWindowJS;
 
-import game.event.EventManager.EventListener;
+import game.event.EventManager;
+import game.network.Networking.UserBalancePayload;
 import game.scene.home.CollectionContent;
 import game.scene.home.BoostContent;
 import game.scene.home.FriendsContent;
@@ -14,6 +13,7 @@ import game.scene.base.BasicScene;
 import game.scene.home.BasicHomeContent;
 import game.scene.home.PlayContent;
 import game.sound.SoundManager;
+import game.ui.dialog.Dialog.DialogManager;
 import game.Res.SeidhResource;
 
 enum HomeSceneContent {
@@ -114,18 +114,18 @@ class HomeScene extends BasicScene implements EventListener {
 		addChild(interactionHome);
 
 		interactionHome.onPush = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomePlayContent) {
 				bottomButtonHome.tile = homeTileOff;
 			}
 		}
 		interactionHome.onRelease = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomePlayContent) {
 				bottomButtonHome.tile = homeTileOn;
 			}
 		}
 		interactionHome.onClick = function(event : hxd.Event) {
-			SoundManager.instance.playButton1();
-			if (this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+				SoundManager.instance.playButton1();
 				NativeWindowJS.trackHomeClick();
 
 				bottomButtonBoost.tile = boostTileOff;
@@ -144,18 +144,18 @@ class HomeScene extends BasicScene implements EventListener {
 		addChild(interactionBoost);
 
 		interactionBoost.onPush = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
 				bottomButtonBoost.tile = boostTileOff;
 			}
 		}
 		interactionBoost.onRelease = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
 				bottomButtonBoost.tile = boostTileOn;
 			}
 		}
 		interactionBoost.onClick = function(event : hxd.Event) {
-			SoundManager.instance.playButton1();
-			if (this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+				SoundManager.instance.playButton1();
 				NativeWindowJS.trackBoostsClick();
 
 				bottomButtonHome.tile = homeTileOff;
@@ -174,18 +174,18 @@ class HomeScene extends BasicScene implements EventListener {
 		addChild(interactionCollection);
 
 		interactionCollection.onPush = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
 				bottomButtonCollection.tile = collectionTileOff;
 			}
 		}
 		interactionCollection.onRelease = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
 				bottomButtonCollection.tile = collectionTileOn;
 			}
 		}
 		interactionCollection.onClick = function(event : hxd.Event) {
-			SoundManager.instance.playButton1();
-			if (this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+				SoundManager.instance.playButton1();
 				NativeWindowJS.trackCollectionClick();
 
 				bottomButtonHome.tile = homeTileOff;
@@ -204,18 +204,18 @@ class HomeScene extends BasicScene implements EventListener {
 		addChild(interactionFriends);
 
 		interactionFriends.onPush = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
 				bottomButtonFriends.tile = friendsTileOff;
 			}
 		}
 		interactionFriends.onRelease = function(event : hxd.Event) {
-			if (this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
 				bottomButtonFriends.tile = friendsTileOn;
 			}
 		}
 		interactionFriends.onClick = function(event : hxd.Event) {
-			SoundManager.instance.playButton1();
-			if (this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+				SoundManager.instance.playButton1();
 				NativeWindowJS.trackFriendsClick();
 
 				bottomButtonHome.tile = homeTileOff;

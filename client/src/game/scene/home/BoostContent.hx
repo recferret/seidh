@@ -42,36 +42,39 @@ class BoostButton extends h2d.Object {
         interaction.setPosition(px - w / 2, py - h / 2);
 
         interaction.onPush = function(event:hxd.Event) {
-            setScale(0.9);
+            if (!DialogManager.IsDialogActive) {
+                setScale(0.9);
+            }
         }
         interaction.onRelease = function(event:hxd.Event) {
             setScale(1);
         }
         interaction.onClick = function(event:hxd.Event) {
-            SoundManager.instance.playButton2();
+            if (!DialogManager.IsDialogActive) {
+                SoundManager.instance.playButton2();
 
-            new Dialog(
-                parent, 
-                DialogType.MEDIUM, 
-                boost.name,
-                boost.description, 
-                boost.accquired ? "Already accquired" : boost.price + " SDH",
-                boost.accquired ? null : "BUY",
-                boost.accquired ? "OK" : "Cancel",
-                function positiveCallback() {
-                    if (Player.instance.tokens - boost.price >= 0) {
-                        NativeWindowJS.networkBuyBoost(boost.id, function callback(data:Dynamic) {
-                            // TODO show the dialog ok or not ok
-                            trace(data);
-                        });
-                    } else {
-                        NativeWindowJS.tgShowAlert('Not enough balance');
+                DialogManager.ShowDialog(
+                    parent, 
+                    DialogType.MEDIUM, 
+                    boost.name,
+                    boost.description, 
+                    boost.accquired ? "Already accquired" : boost.price + " SDH",
+                    boost.accquired ? null : "BUY",
+                    boost.accquired ? "OK" : "Cancel",
+                    function positiveCallback() {
+                        if (Player.instance.tokens - boost.price >= 0) {
+                            NativeWindowJS.networkBuyBoost(boost.id, function callback(data:Dynamic) {
+                                // TODO show the dialog ok or not ok
+                                trace(data);
+                            });
+                        } else {
+                            NativeWindowJS.tgShowAlert('Not enough balance');
+                        }
+                    },
+                    function negativeCallback() {
                     }
-                },
-                function negativeCallback() {
-                    trace('dialog click');
-                }
-            );
+                );
+            }
         }
         parent.addChild(interaction);
 

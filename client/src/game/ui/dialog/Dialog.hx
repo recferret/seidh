@@ -49,7 +49,41 @@ class DialogButton extends h2d.Object {
 
 }
 
-class Dialog extends h2d.Object {
+class DialogManager {
+
+    public static var IsDialogActive = false;
+
+    public static function ShowDialog(
+        parent:h2d.Object, 
+        dialogType:DialogType,
+        textTitle:String, 
+        textLine1:String,
+        textLine2:String, 
+        textPositive:String,
+        textNegative:String,
+        positiveCallback:Void->Void,
+        negativeCallback:Void->Void,
+    ) {
+        if (!DialogManager.IsDialogActive) {
+            DialogManager.IsDialogActive = true;
+            
+            new Dialog(
+                parent,
+                dialogType,
+                textTitle,
+                textLine1,
+                textLine2,
+                textPositive,
+                textNegative,
+                positiveCallback,
+                negativeCallback,
+            );
+        }
+    }
+
+}
+
+private class Dialog extends h2d.Object {
 
     public function new(
         parent:h2d.Object, 
@@ -130,6 +164,7 @@ class Dialog extends h2d.Object {
                 if (positiveCallback != null) {
                     positiveCallback();
                 }
+                DialogManager.IsDialogActive = false;
             }
             addChild(interactionPositive);
         }
@@ -153,6 +188,7 @@ class Dialog extends h2d.Object {
                 if (negativeCallback != null) {
                     negativeCallback();
                 }
+                DialogManager.IsDialogActive = false;
             }
             addChild(interactionNegative);
         }
