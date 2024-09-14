@@ -28,16 +28,12 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 		this.engineEntity = engineEntity;
 		setPosition(engineEntity.getX(), engineEntity.getY());
 
+        animation = CharacterAnimations.LoadCharacterAnimation(this, engineEntity.getId(), engineEntity.getEntityType());
+
         switch (engineEntity.getEntityType()) {
-            case EntityType.RAGNAR_LOH:
-                animation = CharacterAnimations.LoadRagnarLohAnimation(this, engineEntity.getId());
-            case EntityType.RAGNAR_NORM:
-                animation = CharacterAnimations.LoadRagnarNormAnimation(this, engineEntity.getId());
             case EntityType.ZOMBIE_BOY:
-                animation = CharacterAnimations.LoadZombieBoyAnimation(this, engineEntity.getId());
                 adjustRunAnimationSpeed();
             case EntityType.ZOMBIE_GIRL:
-                animation = CharacterAnimations.LoadZombieGirlAnimation(this, engineEntity.getId());
                 adjustRunAnimationSpeed();
             default:
         }
@@ -121,8 +117,8 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     public function fxActionMain() {
         switch (getEntityType()) {
             case RAGNAR_LOH:
-                // final fxPosX = getSide() == RIGHT ? x + getBodyRectangle().w / 1.5 : x - getBodyRectangle().w / 1.5;
-                // FxManager.instance.ragnarAttack(fxPosX, y, getSide());
+                final fxPosX = getSide() == RIGHT ? x + 50 : x - 50;
+                FxManager.instance.ragnarAttack(fxPosX, y, getSide());
                 SoundManager.instance.playVikingHit();
             case ZOMBIE_BOY:
                 final fxPosX = getSide() == RIGHT ? x : x;

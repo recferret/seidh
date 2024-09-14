@@ -9,17 +9,11 @@ enum SeidhResource {
     // FX
     // ------------------------------------
 
-    FX_BLOOD_1;
-    FX_BLOOD_2;
-    FX_BLOOD_3;
-    FX_RAGNAR_ATTACK_1;
-    FX_RAGNAR_ATTACK_2;
-    FX_RAGNAR_ATTACK_3;
-    FX_ZOMBIE_ATTACK_1;
-    FX_ZOMBIE_ATTACK_2;
-    FX_ZOMBIE_ATTACK_3;
+    FX_IMPACT;
+
     FX_ZOMBIE_BLOOD_1;
     FX_ZOMBIE_BLOOD_2;
+
     FX_NORMALMAP;
 
     // ------------------------------------
@@ -218,17 +212,8 @@ class Res {
                 // FX
                 // ------------------------------------
 
-                remoteResourceMap.set(FX_BLOOD_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/blood/FX_BLOOD_1.png');
-                remoteResourceMap.set(FX_BLOOD_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/blood/FX_BLOOD_2.png');
-                remoteResourceMap.set(FX_BLOOD_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/blood/FX_BLOOD_3.png');
+                remoteResourceMap.set(FX_IMPACT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/ragnar/FX_IMPACT.png');
 
-                remoteResourceMap.set(FX_RAGNAR_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/ragnar/FX_RAGNAR_ATTACK_1.png');
-                remoteResourceMap.set(FX_RAGNAR_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/ragnar/FX_RAGNAR_ATTACK_2.png');
-                remoteResourceMap.set(FX_RAGNAR_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/ragnar/FX_RAGNAR_ATTACK_3.png');
-
-                remoteResourceMap.set(FX_ZOMBIE_ATTACK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_1.png');
-                remoteResourceMap.set(FX_ZOMBIE_ATTACK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_2.png');
-                remoteResourceMap.set(FX_ZOMBIE_ATTACK_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_3.png');
                 remoteResourceMap.set(FX_ZOMBIE_BLOOD_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_BLOOD_1.png');
                 remoteResourceMap.set(FX_ZOMBIE_BLOOD_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_3.png');
 
@@ -361,17 +346,8 @@ class Res {
                 // FX
                 // ------------------------------------
 
-                tileResMap.set(FX_BLOOD_1, hxd.Res.fx.blood.FX_BLOOD_1.toTile().center());
-                tileResMap.set(FX_BLOOD_2, hxd.Res.fx.blood.FX_BLOOD_2.toTile().center());
-                tileResMap.set(FX_BLOOD_3, hxd.Res.fx.blood.FX_BLOOD_3.toTile().center());
+                tileResMap.set(FX_IMPACT, hxd.Res.fx.ragnar.FX_IMPACT.toTile().center());
 
-                tileResMap.set(FX_RAGNAR_ATTACK_1, hxd.Res.fx.ragnar.FX_RAGNAR_ATTACK_1.toTile().center());
-                tileResMap.set(FX_RAGNAR_ATTACK_2, hxd.Res.fx.ragnar.FX_RAGNAR_ATTACK_2.toTile().center());
-                tileResMap.set(FX_RAGNAR_ATTACK_3, hxd.Res.fx.ragnar.FX_RAGNAR_ATTACK_3.toTile().center());
-
-                tileResMap.set(FX_ZOMBIE_ATTACK_1, hxd.Res.fx.zombie.FX_ZOMBIE_ATTACK_1.toTile().center());
-                tileResMap.set(FX_ZOMBIE_ATTACK_2, hxd.Res.fx.zombie.FX_ZOMBIE_ATTACK_2.toTile().center());
-                tileResMap.set(FX_ZOMBIE_ATTACK_3, hxd.Res.fx.zombie.FX_ZOMBIE_ATTACK_3.toTile().center());
                 tileResMap.set(FX_ZOMBIE_BLOOD_1, hxd.Res.fx.zombie.FX_ZOMBIE_BLOOD_1.toTile().center());
                 tileResMap.set(FX_ZOMBIE_BLOOD_2, hxd.Res.fx.zombie.FX_ZOMBIE_BLOOD_2.toTile().center());
 

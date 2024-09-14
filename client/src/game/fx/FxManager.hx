@@ -1,6 +1,5 @@
 package game.fx;
 
-import engine.base.MathUtils;
 import h2d.Anim;
 
 import engine.base.BaseTypesAndClasses;
@@ -11,14 +10,22 @@ import game.Res.SeidhResource;
 class FrameAnimationFx {
     private var animation:Anim;
 
-    public function new(s2d:h2d.Scene, x:Float, y:Float, tiles:Array<h2d.Tile>) {
+    public function new(s2d:h2d.Scene, x:Float, y:Float, tiles:Array<h2d.Tile>, side:Side) {
+        if (side == LEFT) {
+            for (tile in tiles) {
+                tile.flipX();
+            }
+        }
+
         animation = new h2d.Anim(s2d);
+        animation.setScale(1.5);
         animation.setPosition(x, y);
         animation.onAnimEnd = function callback() {
             s2d.removeChild(animation);
         };
         animation.play(tiles);
         animation.loop = false;
+
         s2d.addChild(animation);
     }
         
@@ -30,15 +37,7 @@ class FxManager {
 
     private var s2d:h2d.Scene;
 
-    private var ragnarAttackTilesRight:Array<h2d.Tile>;
-    private var ragnarAttackTilesLeft:Array<h2d.Tile>;
-
-    private var zombieAttackTilesRight:Array<h2d.Tile>;
-    private var zombieAttackTilesLeft:Array<h2d.Tile>;
-
-    private var bloodTilesRight:Array<h2d.Tile>;
-    private var bloodTilesLeft:Array<h2d.Tile>;
-
+    private var impactTiles:Array<h2d.Tile>;
     private var zombieBloodTiles:Array<h2d.Tile>;
 
     public static final instance:FxManager = new FxManager();
@@ -48,47 +47,15 @@ class FxManager {
 
     public function initiate() {
         if (!initiated) {
-            ragnarAttackTilesRight = [
-                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_1),
-                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_2),
-                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_3),
+            final th = 332;
+            final tw = 332;
+
+            final impactTile = Res.instance.getTileResource(SeidhResource.FX_IMPACT);
+
+            impactTiles = [
+                for(x in 0 ... Std.int(impactTile.width / tw))
+                    impactTile.sub(x * tw, 0, tw, th).center()
             ];
-            ragnarAttackTilesLeft = [
-                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_1),
-                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_2),
-                Res.instance.getTileResource(SeidhResource.FX_RAGNAR_ATTACK_3),
-            ];
-            ragnarAttackTilesLeft[0].flipX();
-            ragnarAttackTilesLeft[1].flipX();
-            ragnarAttackTilesLeft[2].flipX();
-    
-            zombieAttackTilesRight = [
-                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_1),
-                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_2),
-                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_3),
-            ];
-            zombieAttackTilesLeft = [
-                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_1),
-                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_2),
-                Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_ATTACK_3),
-            ];
-            zombieAttackTilesLeft[0].flipX();
-            zombieAttackTilesLeft[1].flipX();
-            zombieAttackTilesLeft[2].flipX();
-    
-            bloodTilesRight = [
-                Res.instance.getTileResource(SeidhResource.FX_BLOOD_1),
-                Res.instance.getTileResource(SeidhResource.FX_BLOOD_2),
-                Res.instance.getTileResource(SeidhResource.FX_BLOOD_3),
-            ];
-            bloodTilesLeft = [
-                Res.instance.getTileResource(SeidhResource.FX_BLOOD_1),
-                Res.instance.getTileResource(SeidhResource.FX_BLOOD_2),
-                Res.instance.getTileResource(SeidhResource.FX_BLOOD_3),
-            ];
-            bloodTilesLeft[0].flipX();
-            bloodTilesLeft[1].flipX();
-            bloodTilesLeft[2].flipX();
 
             zombieBloodTiles = [
                 Res.instance.getTileResource(SeidhResource.FX_ZOMBIE_BLOOD_1).center(),
@@ -103,6 +70,7 @@ class FxManager {
 
     public function ragnarAttack(x:Float, y:Float, side:Side) {
         // new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? ragnarAttackTilesRight : ragnarAttackTilesLeft);
+        new FrameAnimationFx(s2d, x, y, impactTiles, side);
     }
 
     public function zombieAttack(x:Float, y:Float, side:Side) {
@@ -120,7 +88,7 @@ class FxManager {
     }
 
     public function blood(x:Float, y:Float, side:Side) {
-        new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? bloodTilesRight : bloodTilesLeft);
+        // new FrameAnimationFx(s2d, x, y, side == Side.RIGHT ? bloodTilesRight : bloodTilesLeft);
     }
 
 }

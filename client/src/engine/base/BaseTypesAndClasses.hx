@@ -27,15 +27,8 @@ enum abstract Side(Int) {
 enum abstract CharacterAnimationState(Int) {
 	var IDLE = 1;
 	var RUN = 2;
-	var WALK = 3;
-
-	var HURT = 4;
-	var DEATH = 5;
-
-	var ACTION_MAIN = 6;
-
-	var DEFEND = 7;
-	var DODGE = 8;
+	var DEATH = 3;
+	var ACTION_MAIN = 4;
 }
 
 enum abstract EntityType(Int) {
