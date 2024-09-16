@@ -26,8 +26,8 @@ import engine.seidh.SeidhGameEngine;
 import motion.Actuate;
 
 typedef BasicSceneClickCallback = {
-	clickX:Float,
-	clickY:Float,
+	x:Float,
+	y:Float,
 	eventKind:EventKind,
 } 
 
@@ -231,13 +231,14 @@ abstract class BasicScene extends h2d.Scene {
 					gameUiScene.release();
 				}
 			}
-			if (event.kind == EPush && this.basicSceneCallback != null) {
+
+			if (this.basicSceneCallback != null) {
 				final clickPos = new h2d.col.Point(event.relX, event.relY);
 				camera.screenToCamera(clickPos);
 
 				this.basicSceneCallback({
-					clickX: clickPos.x,
-					clickY: clickPos.y,
+					x: clickPos.x,
+					y: clickPos.y,
 					eventKind: event.kind
 				});
 			}

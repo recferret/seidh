@@ -1,9 +1,9 @@
 package game.scene.home;
 
 import game.js.NativeWindowJS;
+import game.sound.SoundManager;
 import game.ui.dialog.Dialog;
 import game.Player.BoostBody;
-import game.sound.SoundManager;
 import game.Res.SeidhResource;
 
 import hxd.res.DefaultFont;
@@ -102,21 +102,16 @@ class BoostContent extends BasicHomeContent {
     public function new() {
 	    super();
 
+        var boostY = 200;
         for (index => boost in Player.instance.boosts) {
-            switch (index) {
-                case 0:
-                    new BoostButton(this, 215, 400, boost);
-                case 1:
-                    new BoostButton(this, Main.ActualScreenWidth - 215, 400, boost);
-                case 2:
-                    new BoostButton(this, 215, 600, boost);
-                case 3:
-                    new BoostButton(this, Main.ActualScreenWidth - 215, 600, boost);
-                case 4:
-                    new BoostButton(this,215, 800, boost);
-                case 5:
-                    new BoostButton(this, Main.ActualScreenWidth - 215, 800, boost);
+            var boostX = 215;
+
+            if (index % 2 == 0) {
+                boostX = Main.ActualScreenWidth - 215;
+                boostY += 200;
             }
+
+            new BoostButton(this, boostX, boostY, boost);
         }
     }
 

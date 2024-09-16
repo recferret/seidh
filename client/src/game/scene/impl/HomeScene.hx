@@ -1,9 +1,9 @@
 package game.scene.impl;
 
+import engine.base.geometry.Point;
 import h2d.Bitmap;
 
 import game.js.NativeWindowJS;
-
 import game.event.EventManager;
 import game.network.Networking.UserBalancePayload;
 import game.scene.home.CollectionContent;
@@ -33,8 +33,44 @@ class HomeScene extends BasicScene implements EventListener {
 	private final collectionContent:CollectionContent;
 	private final friendsContent:FriendsContent;
 
+	private var inTouch = false;
+	private var touchStarted = false;
+	private var lastTouchPos = new Point(0, 0);
+	private var timeSinceLastTouch = 0.0;
+	private final touchActivationTime = 0.100; 
+
 	public function new() {
-		super(null);
+		super(null, function callback(params: BasicSceneClickCallback) {
+			if (homeSceneContent == HomeSceneContent.HomeBoostContent) {
+				if (!touchStarted) {
+					touchStarted = true;
+				}
+
+				if (inTouch) {
+					timeSinceLastTouch = 0.0;
+
+					final touchPosDiff = new Point(
+						Math.abs(lastTouchPos.x - params.x),
+						Math.abs(lastTouchPos.y - params.y),
+					);
+
+					if (params.y > lastTouchPos.y) {
+						pageContent.y += touchPosDiff.y;
+					} else if (params.y < lastTouchPos.y) {
+						pageContent.y -= touchPosDiff.y;
+					}
+
+					if (pageContent.y < -120) {
+						pageContent.y = -120;
+					} else if (pageContent.y > 0) {
+						pageContent.y = 0;
+					}
+				}
+
+				lastTouchPos.x = params.x;
+				lastTouchPos.y = params.y;
+			}
+		});
 
 		playContent = new PlayContent();
 		boostContent = new BoostContent();
@@ -239,6 +275,19 @@ class HomeScene extends BasicScene implements EventListener {
 	public function customUpdate(dt:Float, fps:Float) {
 		if (pageContent != null) {
 			pageContent.update(dt);
+
+			if (touchStarted) {
+				if (timeSinceLastTouch == 0.0 || timeSinceLastTouch <= touchActivationTime) {
+					inTouch = true;
+				} else {
+					inTouch = false;
+					touchStarted = false;
+					timeSinceLastTouch = 0.0;
+					lastTouchPos.x = 0;
+					lastTouchPos.y = 0;
+				}
+				timeSinceLastTouch += dt;
+			}
 		}
 	}
 
