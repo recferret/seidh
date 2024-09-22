@@ -10,11 +10,11 @@ export interface Friend {
   possibleToJoinGame?: boolean;
 }
 
-export interface UsersGetFriendsMessageRequest {
+export interface UsersGetFriendsServiceRequest {
   userId: string;
 }
 
-export interface UsersGetFriendsMessageResponse {
+export interface UsersGetFriendsServiceResponse {
   success: boolean;
   friends?: Friend[];
   friendsInvited?: number;

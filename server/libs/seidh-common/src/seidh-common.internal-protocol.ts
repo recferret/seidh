@@ -17,6 +17,7 @@ export enum ServicePort {
   Character = 3009,
   Referral = 3010,
   Collection = 3011,
+  Game = 3012,
 }
 
 export enum ServiceName {
@@ -31,6 +32,7 @@ export enum ServiceName {
   Character = 'CharacterService',
   Referral = 'ReferralService',
   Collection = 'CollectionService',
+  Game = 'GameService',
 }
 
 export class InternalProtocol {

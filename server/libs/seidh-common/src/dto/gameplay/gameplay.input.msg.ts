@@ -2,7 +2,7 @@ import { CharacterActionType } from '@app/seidh-common/seidh-common.game-types';
 
 export const GameplayInputPattern = 'gameplay.input';
 
-export interface GameplayInputMessage {
+export interface GameplayInputServiceMessage {
   userId: string;
   gameId: string;
   gameplayServiceId: string;

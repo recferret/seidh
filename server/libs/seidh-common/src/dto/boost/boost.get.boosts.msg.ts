@@ -9,11 +9,11 @@ export interface BoostBody {
   accquired: boolean;
 }
 
-export interface BoostsGetRequest {
+export interface BoostsGetServiceRequest {
   userId: string;
 }
 
-export interface BoostsGetResponse {
+export interface BoostsGetServiceResponse {
   success: boolean;
   message?: string;
   boosts?: BoostBody[];

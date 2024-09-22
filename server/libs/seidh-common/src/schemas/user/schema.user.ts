@@ -8,6 +8,9 @@ export class User {
   @Prop()
   authToken: string;
 
+  @Prop()
+  privateRsaKey: string;
+
   @Prop({ default: false })
   online: boolean;
 

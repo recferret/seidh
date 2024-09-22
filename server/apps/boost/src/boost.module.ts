@@ -5,7 +5,10 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { User, UserSchema } from '@app/seidh-common/schemas/user/schema.user';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Boost, BoostSchema } from '@app/seidh-common/schemas/boost/schema.boost';
+import {
+  Boost,
+  BoostSchema,
+} from '@app/seidh-common/schemas/boost/schema.boost';
 import {
   BoostTransaction,
   BoostTransactionSchema,

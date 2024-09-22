@@ -1,5 +1,5 @@
 export const GameplayDisconnectedPattern = 'gameplay.disconnected';
 
-export interface GameplayDisconnectedMessage {
+export interface GameplayDisconnectedServiceMessage {
   userId: string;
 }

@@ -38,11 +38,11 @@ export interface UserBody {
   hasMaxPotionBoost3: boolean;
 }
 
-export interface UsersGetUserMessageRequest {
+export interface UsersGetUserServiceRequest {
   userId: string;
 }
 
-export interface UsersGetUserMessageResponse {
+export interface UsersGetUserServiceResponse {
   success: boolean;
   user?: UserBody;
 }

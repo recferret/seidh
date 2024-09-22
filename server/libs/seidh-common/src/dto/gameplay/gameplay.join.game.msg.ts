@@ -1,6 +1,6 @@
 export const GameplayJoinGamePattern = 'gameplay.join.game';
 
-export interface GameplayJoinGameMessage {
+export interface GameplayJoinGameServiceMessage {
   userId: string;
   gameplayServiceId: string;
   gameId?: string;

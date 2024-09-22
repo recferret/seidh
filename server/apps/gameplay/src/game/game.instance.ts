@@ -1,4 +1,4 @@
-import { GameType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
+import { GameplayType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import * as Engine from '../js/SeidhGameEngine';
 import {
   EngineCharacterEntity,
@@ -35,11 +35,11 @@ export class GameInstance {
   constructor(
     private eventEmitter: EventEmitter2,
     public gameId: string,
-    public gameType: GameType,
+    public gameplayType: GameplayType,
   ) {
     this.engine = new Engine.engine.seidh.SeidhGameEngine(
       EngineMode.SERVER,
-      gameType == GameType.TestGame
+      gameplayType == GameplayType.TestGame
         ? WinCondition.INFINITE
         : WinCondition.KILL_MOBS,
     );
@@ -97,7 +97,6 @@ export class GameInstance {
           gameId,
           kills: gainings.kills,
           tokens: gainings.tokens,
-          exp: gainings.exp,
         };
         this.eventEmitter.emit(
           EventGameUserGainings.EventName,

@@ -7,11 +7,11 @@ import { GameInstance } from './game/game.instance';
 import { ServiceName } from '@app/seidh-common';
 import {
   GameplayLobbyGameInfo,
-  GameplayLobbyUpdateGamesMessage,
   GameplayLobbyUpdateGamesPattern,
+  GameplayLobbyUpdateGamesServiceMessage,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.update.games.msg';
-import { GameplayJoinGameMessage } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
-import { GameType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
+import { GameplayJoinGameServiceMessage } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
+import { GameplayType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { EventGameCreateCharacter } from './events/event.game.create-character';
 import { EventGameDeleteCharacter } from './events/event.game.delete-character';
@@ -22,8 +22,8 @@ import { EventGameCharacterActions } from './events/event.game.character-actions
 import { EventGameGameState } from './events/event.game.game-state';
 import { EventGameCreateConsumable } from './events/event.game.create-consumable';
 import { EventGameDeleteConsumable } from './events/event.game.delete-consumable';
-import { GameplayInputMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
-import { GameplayDisconnectedMessage } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+import { GameplayInputServiceMessage } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
+import { GameplayDisconnectedServiceMessage } from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
 import {
   WsGatewayGameInitMessage,
   WsGatewayGameInitPattern,
@@ -66,13 +66,13 @@ import {
 } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.delete.consumable.msg';
 import { EventGameInit } from './events/event.game.init';
 import {
-  GameplayCreateGameMessageRequest,
-  GameplayCreateGameMessageResponse,
+  GameplayCreateGameServiceRequest,
+  GameplayCreateGameServiceResponse,
 } from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EventGameUserGainings } from './events/event.game.user-gainings';
 import {
-  UsersUpdateGainingsMessage,
+  UsersUpdateGainingsServiceMessage,
   UsersUpdateGainingsPattern,
 } from '@app/seidh-common/dto/users/users.update.gainings';
 import { InjectQueue } from '@nestjs/bull';
@@ -109,7 +109,7 @@ export class GameplayService {
     const id = uuidv4();
     this.gameInstances.set(
       id,
-      new GameInstance(this.eventEmitter, id, GameType.TestGame),
+      new GameInstance(this.eventEmitter, id, GameplayType.TestGame),
     );
     Logger.log('GameplayService initialized', Config.GAMEPLAY_INSTANCE_ID);
   }
@@ -118,7 +118,7 @@ export class GameplayService {
   // Client -> Server
   // ----------------------------------------------
 
-  public disconnected(message: GameplayDisconnectedMessage) {
+  public disconnected(message: GameplayDisconnectedServiceMessage) {
     this.deleteUser(message.userId, 'disconnected');
 
     // TODO add reason
@@ -127,7 +127,7 @@ export class GameplayService {
     });
   }
 
-  public joinGame(message: GameplayJoinGameMessage) {
+  public joinGame(message: GameplayJoinGameServiceMessage) {
     const gameInstance = this.gameInstances.get(message.gameId);
     if (gameInstance) {
       this.userLastRequestTime.set(message.userId, Date.now());
@@ -144,7 +144,7 @@ export class GameplayService {
     }
   }
 
-  public input(message: GameplayInputMessage) {
+  public input(message: GameplayInputServiceMessage) {
     this.userLastRequestTime.set(message.userId, Date.now());
     this.checkUserConnected(message.userId);
     const gameInstance = this.checkAndGetGameInstance(message.gameId);
@@ -157,14 +157,14 @@ export class GameplayService {
     this.gameLog(GameLogAction.ClientInput, message);
   }
 
-  public createGame(message: GameplayCreateGameMessageRequest) {
+  public createGame(message: GameplayCreateGameServiceRequest) {
     const instanceId = uuidv4();
     this.gameInstances.set(
       instanceId,
-      new GameInstance(this.eventEmitter, instanceId, message.gameType),
+      new GameInstance(this.eventEmitter, instanceId, message.gameplayType),
     );
     this.gameLog(GameLogAction.ClientCreateGame, message);
-    const response: GameplayCreateGameMessageResponse = {
+    const response: GameplayCreateGameServiceResponse = {
       success: true,
       gameId: instanceId,
       gameplayServiceId: Config.GAMEPLAY_INSTANCE_ID,
@@ -217,7 +217,7 @@ export class GameplayService {
 
   @OnEvent(EventGameUserGainings.EventName)
   handleEventGameUserGainings(payload: EventGameUserGainings) {
-    const message: UsersUpdateGainingsMessage = {
+    const message: UsersUpdateGainingsServiceMessage = {
       userGainings: payload.userGainings,
     };
     this.usersService.emit(UsersUpdateGainingsPattern, message);
@@ -307,14 +307,14 @@ export class GameplayService {
     this.gameInstances.forEach((gameInstance) => {
       games.push({
         gameId: gameInstance.gameId,
-        gameType: gameInstance.gameType,
+        gameplayType: gameInstance.gameplayType,
         lastDt: gameInstance.getLastDt(),
         users: gameInstance.getPlayersCount(),
         mobs: gameInstance.getMobsCount(),
       });
     });
 
-    const message: GameplayLobbyUpdateGamesMessage = {
+    const message: GameplayLobbyUpdateGamesServiceMessage = {
       gameplayServiceId: Config.GAMEPLAY_INSTANCE_ID,
       games,
     };
@@ -327,7 +327,7 @@ export class GameplayService {
     this.gameInstances.forEach((gameInstance) => {
       if (
         gameInstance.getPlayersCount() == 0 &&
-        gameInstance.gameType != GameType.TestGame
+        gameInstance.gameplayType != GameplayType.TestGame
       ) {
         gamesToDrop.push(gameInstance.gameId);
       }

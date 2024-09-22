@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 
 export const ReferralUpdateReferrerPattern = 'referral.update.referrer';
 
-export interface ReferralUpdateReferrerMessageRequest {
+export interface ReferralUpdateReferrerServiceRequest {
   referrer: {
     _id: Types.ObjectId;
     virtualTokenBalance: number;
@@ -16,7 +16,7 @@ export interface ReferralUpdateReferrerMessageRequest {
   };
 }
 
-export interface BoostsBuyBoostMessageResponse {
+export interface BoostsBuyBoostMessageServiceResponse {
   success: boolean;
   message?: string;
 }

@@ -37,7 +37,6 @@ export interface UserGainings {
   gameId: string;
   kills: number;
   tokens: number;
-  exp: number;
 }
 
 export interface EntityShape {

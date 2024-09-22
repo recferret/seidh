@@ -1,9 +1,9 @@
 export const UsersCheckTokenPattern = 'users.check.token';
 
-export interface UsersCheckTokenMessageRequest {
+export interface UsersCheckTokenServiceRequest {
   authToken: string;
 }
 
-export interface UsersCheckTokenMessageResponse {
+export interface UsersCheckTokenServiceResponse {
   success: boolean;
 }

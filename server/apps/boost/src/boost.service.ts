@@ -1,14 +1,17 @@
 import { SeidhCommonBroadcasts, ServiceName } from '@app/seidh-common';
 import {
-  BoostsBuyRequest,
-  BoostsBuyResponse,
+  BoostsBuyBoostServiceRequest,
+  BoostsBuyBoostServiceResponse,
 } from '@app/seidh-common/dto/boost/boost.buy.boosts.msg';
 import {
   BoostBody,
-  BoostsGetRequest,
-  BoostsGetResponse,
+  BoostsGetServiceRequest,
+  BoostsGetServiceResponse,
 } from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
-import { Boost, BoostDocument } from '@app/seidh-common/schemas/boost/schema.boost';
+import {
+  Boost,
+  BoostDocument,
+} from '@app/seidh-common/schemas/boost/schema.boost';
 import { BoostTransaction } from '@app/seidh-common/schemas/boost/schema.boost.transaction';
 import { User } from '@app/seidh-common/schemas/user/schema.user';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
@@ -156,12 +159,12 @@ export class BoostService implements OnModuleInit {
     }
   }
 
-  async getBoosts(message: BoostsGetRequest) {
-    const response: BoostsGetResponse = {
+  async getBoosts(request: BoostsGetServiceRequest) {
+    const response: BoostsGetServiceResponse = {
       success: false,
     };
 
-    const user = await this.userModel.findById(message.userId);
+    const user = await this.userModel.findById(request.userId);
     if (!user) {
       response.message = 'User not found';
       return response;
@@ -244,17 +247,17 @@ export class BoostService implements OnModuleInit {
     return response;
   }
 
-  async buyBoost(message: BoostsBuyRequest) {
-    const response: BoostsBuyResponse = {
+  async buyBoost(request: BoostsBuyBoostServiceRequest) {
+    const response: BoostsBuyBoostServiceResponse = {
       success: false,
     };
 
-    const boost = this.boosts.find((boost) => boost.id == message.boostId);
+    const boost = this.boosts.find((boost) => boost.id == request.boostId);
     if (!boost) {
       response.message = 'Boost not found';
       return response;
     }
-    const user = await this.userModel.findById(message.userId);
+    const user = await this.userModel.findById(request.userId);
     if (!user) {
       response.message = 'User not found';
       return response;

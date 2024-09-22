@@ -1,18 +1,18 @@
 export const GameplayLobbyFindGamePattern = 'gameplay-lobby.find.game';
 
-export enum GameType {
+export enum GameplayType {
   PrivateGame = 'PrivateGame',
   PublicGame = 'PublicGame',
   TestGame = 'TestGame',
 }
 
-export interface GameplayLobbyFindGameMessageRequest {
+export interface GameplayLobbyFindGameServiceRequest {
   userId: string;
-  gameType: GameType;
+  gameplayType: GameplayType;
   gameId?: string;
 }
 
-export interface GameplayLobbyFindGameMessageResponse {
+export interface GameplayLobbyFindGameServiceResponse {
   success: boolean;
   reason?: string;
   gameplayServiceId?: string;

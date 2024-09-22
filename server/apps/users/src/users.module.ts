@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '@app/seidh-common/schemas/user/schema.user';
 import { JwtModule } from '@nestjs/jwt';
@@ -16,6 +14,13 @@ import {
   GameGainingTransaction,
   GameGainingTransactionSchema,
 } from '@app/seidh-common/schemas/game/schema.game-gaining.transaction';
+import { ControllerAuth } from './controllers/controller.auth';
+import { ControllerFriends } from './controllers/controller.friends';
+import { ControllerUser } from './controllers/controller.user';
+import { ServiceAuth } from './services/service.auth';
+import { ServiceFriends } from './services/service.friends';
+import { ServiceUser } from './services/service.user';
+import { ProviderCrypto } from './providers/provider.crypto';
 
 @Module({
   imports: [
@@ -51,7 +56,7 @@ import {
       },
     ]),
   ],
-  controllers: [UsersController],
-  providers: [UsersService],
+  controllers: [ControllerAuth, ControllerFriends, ControllerUser],
+  providers: [ProviderCrypto, ServiceAuth, ServiceFriends, ServiceUser],
 })
 export class UsersModule {}
