@@ -177,15 +177,12 @@ class PlayContent extends BasicHomeContent {
         // ------------------------------------
 
         final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), this);
+        final darknessScaleRatio = Main.ActualScreenHeight / 1280;
+        darkness.scaleY = darknessScaleRatio;
+
         screenDarknessDisplacementTile = Res.instance.getTileResource(SeidhResource.FX_NORMALMAP);
-        darkness.filter = new Displacement(screenDarknessDisplacementTile, 3, 7);
+        darkness.filter = new Displacement(screenDarknessDisplacementTile, 14, 14);
         darkness.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
-
-        final dummyHeaderBlackTile = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, 720, 150, 0.95), this);
-        dummyHeaderBlackTile.setPosition(0, 0);
-
-        final dummyFooterBlackTile = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, 720, 150, 0.95), this);
-        dummyFooterBlackTile.setPosition(0, Main.ActualScreenHeight - 150);
 
         // ------------------------------------
         // Buttons

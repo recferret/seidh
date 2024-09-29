@@ -3,8 +3,8 @@ package game.entity.consumable;
 import engine.base.entity.impl.EngineConsumableEntity;
 
 import game.scene.impl.GameScene;
+import game.tilemap.TilemapManager;
 import game.utils.Utils;
-import game.Res.SeidhResource;
 
 class ClientConsumableEntity extends BasicClientEntity<EngineConsumableEntity> {
 
@@ -20,12 +20,12 @@ class ClientConsumableEntity extends BasicClientEntity<EngineConsumableEntity> {
 
         switch (engineEntity.getEntityType()) {
             case COIN:
-                bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.CONSUMABLE_COIN), this);
+                bmp = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.COIN), this);
                 bmp.setScale(2);
             case HEALTH_POTION:
-                bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.CONSUMABLE_HEALTH_POTION), this);
+                bmp = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.POTION_RED), this);
             case LOSOS:
-                bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.CONSUMABLE_LOSOS), this);
+                bmp = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SALMON), this);
             default:
         }
     }

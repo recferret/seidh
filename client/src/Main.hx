@@ -1,3 +1,4 @@
+import game.tilemap.TilemapManager;
 import game.js.NativeWindowJS;
 import hxd.res.DefaultFont;
 
@@ -53,6 +54,8 @@ class Main extends hxd.App {
 			}
 			loadingText.text = 'Loading... ' + params.progress + '%';
 		});
+
+		TilemapManager.instance.init();
 	}
 
 	override function update(dt:Float) {

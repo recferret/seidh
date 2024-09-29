@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import game.tilemap.TilemapManager;
 import game.Res.SeidhResource;
 import game.entity.terrain.ClientTerrainEntity;
 import game.utils.Utils;
@@ -34,6 +35,9 @@ class SceneSpritesTest extends BasicScene {
 
     public function new() {
 		super(null);
+
+		final redPotionBmp = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.ARTIFACT_1), this);
+		redPotionBmp.setPosition(100, 100);
 
 		// new TerrainManager(this);
 
@@ -95,23 +99,21 @@ class SceneSpritesTest extends BasicScene {
 
 		// FX
 
-		ragnar = new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 200, 200, EntityType.RAGNAR_LOH));
+		// ragnar = new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 200, 200, EntityType.RAGNAR_LOH));
 
-        rock = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_ROCK));
-        rock.setPosition(300, 200);
+        // rock = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_ROCK));
+        // rock.setPosition(300, 200);
 
-		tree = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1));
-        tree.setPosition(600, 200);
+		// tree = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1));
+        // tree.setPosition(600, 200);
 
-		fence = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_FENCE));
-        fence.setPosition(900, 200);
+		// fence = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_FENCE));
+        // fence.setPosition(900, 200);
 
-		weed = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1));
-        weed.setPosition(650, 400);
+		// weed = new ClientTerrainEntity(this, Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1));
+        // weed.setPosition(650, 400);
 
 		// tree.blendMode = BlendMode;
-		
-
 
 		// final ragnarLeft = new ClientCharacterEntity(this);
 		// ragnarLeft.initiateEngineEntity(SeidhEntityFactory.InitiateCharacter(null, null, 850, 600, EntityType.RAGNAR_LOH));
@@ -153,33 +155,33 @@ class SceneSpritesTest extends BasicScene {
 	}
 
 	public function customUpdate(dt:Float, fps:Float) {
-		Utils.DrawRect(debugGraphics, rock.getRect(), GameConfig.BlueColor);
-		Utils.DrawRect(debugGraphics, tree.getRect(), GameConfig.BlueColor);
-		Utils.DrawRect(debugGraphics, fence.getRect(), GameConfig.BlueColor);
-		Utils.DrawRect(debugGraphics, weed.getRect(), GameConfig.BlueColor);
+		// Utils.DrawRect(debugGraphics, rock.getRect(), GameConfig.BlueColor);
+		// Utils.DrawRect(debugGraphics, tree.getRect(), GameConfig.BlueColor);
+		// Utils.DrawRect(debugGraphics, fence.getRect(), GameConfig.BlueColor);
+		// Utils.DrawRect(debugGraphics, weed.getRect(), GameConfig.BlueColor);
 
-        Utils.DrawRect(debugGraphics, rock.getBottomRect(), GameConfig.GreenColor);
-		Utils.DrawRect(debugGraphics, tree.getBottomRect(), GameConfig.GreenColor);
-		Utils.DrawRect(debugGraphics, fence.getBottomRect(), GameConfig.GreenColor);
-		Utils.DrawRect(debugGraphics, weed.getBottomRect(), GameConfig.GreenColor);
+        // Utils.DrawRect(debugGraphics, rock.getBottomRect(), GameConfig.GreenColor);
+		// Utils.DrawRect(debugGraphics, tree.getBottomRect(), GameConfig.GreenColor);
+		// Utils.DrawRect(debugGraphics, fence.getBottomRect(), GameConfig.GreenColor);
+		// Utils.DrawRect(debugGraphics, weed.getBottomRect(), GameConfig.GreenColor);
 
-		Utils.DrawRect(debugGraphics, ragnar.getRect(), GameConfig.BlueColor);
-        Utils.DrawRect(debugGraphics, ragnar.getBottomRect(), GameConfig.GreenColor);
+		// Utils.DrawRect(debugGraphics, ragnar.getRect(), GameConfig.BlueColor);
+        // Utils.DrawRect(debugGraphics, ragnar.getBottomRect(), GameConfig.GreenColor);
 
-		final ragnarBottom = ragnar.getBottomRect().getCenter();
-		final ragnarRect = ragnar.getRect();
+		// final ragnarBottom = ragnar.getBottomRect().getCenter();
+		// final ragnarRect = ragnar.getRect();
 
-		final rockBottom = rock.getBottomRect().getCenter();
-		final rockRect = rock.getRect();
+		// final rockBottom = rock.getBottomRect().getCenter();
+		// final rockRect = rock.getRect();
 
-		final treeBottom = tree.getBottomRect().getCenter();
-		final treeRect = tree.getRect();
+		// final treeBottom = tree.getBottomRect().getCenter();
+		// final treeRect = tree.getRect();
 
-		final fenceBottom = fence.getBottomRect().getCenter();
-		final fenceRect = fence.getRect();
+		// final fenceBottom = fence.getBottomRect().getCenter();
+		// final fenceRect = fence.getRect();
 
-		final weedBottom = weed.getBottomRect().getCenter();
-		final weedRect = weed.getRect();
+		// final weedBottom = weed.getBottomRect().getCenter();
+		// final weedRect = weed.getRect();
 
 		// final rockBottom = rock.getBottomRect().getCenter();
 		// if (rockBottom.distance(ragnarBottom) < 250) {
@@ -209,32 +211,32 @@ class SceneSpritesTest extends BasicScene {
 
 		// TOMORROW move to the client
 
-		final characterToEnvIntersections = new Array<Dynamic>();
-		characterToEnvIntersections.push(ragnar);
+		// final characterToEnvIntersections = new Array<Dynamic>();
+		// characterToEnvIntersections.push(ragnar);
 
-		if (rockRect.intersectsWithRect(ragnarRect)) {
-			characterToEnvIntersections.push(rock);
-		}
+		// if (rockRect.intersectsWithRect(ragnarRect)) {
+		// 	characterToEnvIntersections.push(rock);
+		// }
 
-		if (treeRect.intersectsWithRect(ragnarRect)) {
-			characterToEnvIntersections.push(tree);
-		}
+		// if (treeRect.intersectsWithRect(ragnarRect)) {
+		// 	characterToEnvIntersections.push(tree);
+		// }
 
-		if (weedRect.intersectsWithRect(ragnarRect)) {
-			characterToEnvIntersections.push(weed);
-		}
+		// if (weedRect.intersectsWithRect(ragnarRect)) {
+		// 	characterToEnvIntersections.push(weed);
+		// }
 
-		if (characterToEnvIntersections.length > 1) {
-			characterToEnvIntersections.sort((a, b) -> {
-				final aBottom = a.getBottomRect().getCenter();
-				final bBottom = b.getBottomRect().getCenter();
-				return aBottom.y - bBottom.y;
-			});
+		// if (characterToEnvIntersections.length > 1) {
+		// 	characterToEnvIntersections.sort((a, b) -> {
+		// 		final aBottom = a.getBottomRect().getCenter();
+		// 		final bBottom = b.getBottomRect().getCenter();
+		// 		return aBottom.y - bBottom.y;
+		// 	});
 
-			for (index => env in characterToEnvIntersections) {
-				env.zOrder = index;
-			}
-		}
+		// 	for (index => env in characterToEnvIntersections) {
+		// 		env.zOrder = index;
+		// 	}
+		// }
 
 			// if (treeBottom.y < ragnarBottom.y) {
 			// 	ragnar.oZrder = 3;
@@ -280,7 +282,7 @@ class SceneSpritesTest extends BasicScene {
 		// }
 
 		// TODO impl z order state
-		sortObjectsByZOrder();
+		// sortObjectsByZOrder();
 
 		// if (tree.getRect().getCenter())
 
@@ -290,23 +292,23 @@ class SceneSpritesTest extends BasicScene {
 
         // IMPL SIMPLE MOVEMENT
 
-        final left = K.isDown(K.LEFT);
-		final right = K.isDown(K.RIGHT);
-		final up = K.isDown(K.UP);
-		final down = K.isDown(K.DOWN);
+        // final left = K.isDown(K.LEFT);
+		// final right = K.isDown(K.RIGHT);
+		// final up = K.isDown(K.UP);
+		// final down = K.isDown(K.DOWN);
 
-        if (left) {
-            ragnar.x -= 5;
-        }
-        if (right) {
-            ragnar.x += 5;
-        }
-        if (up) {
-            ragnar.y -= 5;
-        }
-        if (down) {
-            ragnar.y += 5;
-        }
+        // if (left) {
+        //     ragnar.x -= 5;
+        // }
+        // if (right) {
+        //     ragnar.x += 5;
+        // }
+        // if (up) {
+        //     ragnar.y -= 5;
+        // }
+        // if (down) {
+        //     ragnar.y += 5;
+        // }
 	}
 
 }

@@ -17,22 +17,6 @@ enum SeidhResource {
     FX_NORMALMAP;
 
     // ------------------------------------
-    // ICON
-    // ------------------------------------
-
-    ICON_COINS;
-    ICON_FRIENDS;
-    ICON_SKILL;
-
-    // ------------------------------------
-    // CONSUMABLES
-    // ------------------------------------
-
-    CONSUMABLE_COIN;
-    CONSUMABLE_HEALTH_POTION;
-    CONSUMABLE_LOSOS;
-
-    // ------------------------------------
     // RAGNAR
     // ------------------------------------
     
@@ -59,6 +43,12 @@ enum SeidhResource {
     SOUND_ZOMBIE_DEATH;
     SOUND_ZOMBIE_DMG;
     SOUND_ZOMBIE_HIT;
+
+    // ------------------------------------
+    // STUFF
+    // ------------------------------------
+
+    STUFF_TILEMAP;
 
     // ------------------------------------
     // TERRAIN
@@ -88,7 +78,6 @@ enum SeidhResource {
 
     UI_GAME_JOYSTICK_1;
     UI_GAME_JOYSTICK_2;
-    UI_GAME_SKILL_SLOT;
 
     UI_GAME_HEADER;
     UI_GAME_FOOTER;
@@ -220,20 +209,10 @@ class Res {
                 remoteResourceMap.set(FX_NORMALMAP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/FX_NORMALMAP.png');
 
                 // ------------------------------------
-                // ICON
+                // STUFF
                 // ------------------------------------
             
-                remoteResourceMap.set(ICON_COINS, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/icons/ICON_COINS.png');
-                remoteResourceMap.set(ICON_FRIENDS, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/icons/ICON_FRIENDS.png');
-                remoteResourceMap.set(ICON_SKILL, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/icons/ICON_SKILL.png');
-
-                // ------------------------------------
-                // CONSUMABLE
-                // ------------------------------------
-
-                remoteResourceMap.set(CONSUMABLE_COIN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/consumables/CONSUMABLE_COIN.png');
-                remoteResourceMap.set(CONSUMABLE_HEALTH_POTION, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/consumables/CONSUMABLE_HEALTH_POTION.png');
-                remoteResourceMap.set(CONSUMABLE_LOSOS, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/consumables/CONSUMABLE_LOSOS.png');
+                remoteResourceMap.set(STUFF_TILEMAP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/icons/STUFF_TILEMAP.png');
 
                 // ------------------------------------
                 // RAGNAR
@@ -292,7 +271,6 @@ class Res {
             
                 remoteResourceMap.set(UI_GAME_JOYSTICK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_1.png');
                 remoteResourceMap.set(UI_GAME_JOYSTICK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_2.png');
-                remoteResourceMap.set(UI_GAME_SKILL_SLOT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_SKILL_SLOT.png');
                 remoteResourceMap.set(UI_GAME_HEADER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_HEADER.png');
                 remoteResourceMap.set(UI_GAME_FOOTER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_FOOTER.png');
                 remoteResourceMap.set(UI_GAME_FRAME, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_FRAME.png');
@@ -354,22 +332,6 @@ class Res {
                 tileResMap.set(FX_NORMALMAP, hxd.Res.fx.FX_NORMALMAP.toTile());
             
                 // ------------------------------------
-                // ICON
-                // ------------------------------------
-            
-                tileResMap.set(ICON_COINS, hxd.Res.icons.ICON_COINS.toTile().center());
-                tileResMap.set(ICON_FRIENDS, hxd.Res.icons.ICON_FRIENDS.toTile().center());
-                tileResMap.set(ICON_SKILL, hxd.Res.icons.ICON_SKILL.toTile().center());
-
-                // ------------------------------------
-                // CONSUMABLES
-                // ------------------------------------
-
-                tileResMap.set(CONSUMABLE_COIN, hxd.Res.consumables.CONSUMABLE_COIN.toTile().center());
-                tileResMap.set(CONSUMABLE_HEALTH_POTION, hxd.Res.consumables.CONSUMABLE_HEALTH_POTION.toTile().center());
-                tileResMap.set(CONSUMABLE_LOSOS, hxd.Res.consumables.CONSUMABLE_LOSOS.toTile().center());
-
-                // ------------------------------------
                 // RAGNAR
                 // ------------------------------------
             
@@ -398,6 +360,11 @@ class Res {
                 soundResMap.set(SOUND_ZOMBIE_HIT, hxd.Res.sound.SOUND_ZOMBIE_HIT);
             
                 // ------------------------------------
+                // STUFF
+                // ------------------------------------
+                tileResMap.set(STUFF_TILEMAP, hxd.Res.stuff.STUFF_TILEMAP.toTile().center());
+
+                // ------------------------------------
                 // TERRAIN
                 // ------------------------------------
             
@@ -425,7 +392,6 @@ class Res {
             
                 tileResMap.set(UI_GAME_JOYSTICK_1, hxd.Res.ui.game.UI_GAME_JOYSTICK_1.toTile().center());
                 tileResMap.set(UI_GAME_JOYSTICK_2, hxd.Res.ui.game.UI_GAME_JOYSTICK_2.toTile().center());
-                tileResMap.set(UI_GAME_SKILL_SLOT, hxd.Res.ui.game.UI_GAME_SKILL_SLOT.toTile().center());
             
                 tileResMap.set(UI_GAME_HEADER, hxd.Res.ui.game.UI_GAME_HEADER.toTile().center());
                 tileResMap.set(UI_GAME_FOOTER, hxd.Res.ui.game.UI_GAME_FOOTER.toTile().center());

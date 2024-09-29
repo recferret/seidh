@@ -5,7 +5,6 @@ import engine.base.BaseTypesAndClasses;
 import engine.seidh.SeidhGameEngine;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
-import game.entity.terrain.ClientTerrainEntity;
 import game.event.EventManager;
 import game.event.EventManager.EventListener;
 import game.network.Networking;

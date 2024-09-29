@@ -1,5 +1,7 @@
 package game.ui.bar;
 
+import game.tilemap.TilemapManager;
+import game.tilemap.TilemapManager.TileType;
 import hxd.res.DefaultFont;
 
 import game.Res.SeidhResource;
@@ -28,9 +30,9 @@ class BarGold extends h2d.Object {
         goldText.setPosition(50, -11);
         addChild(goldText);
 
-        goldIcon = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.ICON_COINS), this);
-        goldIcon.setScale(0.25);
-        goldIcon.setPosition(75, 0);
+        goldIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.WEALTH_COINS), this);
+        goldIcon.setScale(0.7);
+        goldIcon.setPosition(20, -70);
     }
 
     public function getBitmapWidth() {

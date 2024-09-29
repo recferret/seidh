@@ -1,5 +1,6 @@
 package game.scene;
 
+import game.tilemap.TilemapManager;
 import hxd.res.DefaultFont;
 import game.Res.SeidhResource;
 import game.event.EventManager;
@@ -152,8 +153,8 @@ class GameUiScene extends h2d.Scene {
 			}
         });
 
-		skillSlot = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_GAME_SKILL_SLOT), this);
-		skillIcon = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.ICON_SKILL), this);
+		skillSlot = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.ICON_SKILL_BACKGROUND), this);
+		skillIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SKILL_ACTION_MAIN), this);
 
 		skillSlotInteraction = new h2d.Interactive(skillSlot.tile.width, skillSlot.tile.height);
 		skillSlotInteraction.onClick = function(event:hxd.Event) {
