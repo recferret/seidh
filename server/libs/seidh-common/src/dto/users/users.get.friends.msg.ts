@@ -18,5 +18,5 @@ export interface UsersGetFriendsServiceResponse {
   success: boolean;
   friends?: Friend[];
   friendsInvited?: number;
-  virtualTokenBalance?: number;
+  coins?: number;
 }

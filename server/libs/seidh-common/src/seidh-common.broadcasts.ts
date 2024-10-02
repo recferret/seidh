@@ -17,7 +17,8 @@ export class SeidhCommonBroadcasts {
     if (user) {
       const message: WsGatewayUserBalanceMsg = {
         targetUserId: userId,
-        balance: user.virtualTokenBalance,
+        coins: user.coins,
+        teeth: user.teeth,
       };
       this.wsGatewayService.emit(WsGatewayUserBalancePattern, message);
     }

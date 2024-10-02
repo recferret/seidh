@@ -9,12 +9,12 @@ import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
 import { ServiceName } from '@app/seidh-common';
 import {
-  UsersCheckTokenMessageRequest,
-  UsersCheckTokenMessageResponse,
+  UsersCheckTokenServiceRequest,
+  UsersCheckTokenServiceResponse,
   UsersCheckTokenPattern,
 } from '@app/seidh-common/dto/users/users.check.token.msg';
 import { firstValueFrom } from 'rxjs';
-import { IUserSession } from '../gateway.controller';
+import { IUserSession } from '../controllers/interfaces';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -31,10 +31,10 @@ export class AuthGuard implements CanActivate {
       const decodedToken = await this.jwtService.verifyAsync(authToken);
 
       // Check if token was refreshed
-      const checkTokenRequest: UsersCheckTokenMessageRequest = {
+      const checkTokenRequest: UsersCheckTokenServiceRequest = {
         authToken,
       };
-      const checkTokenResponse: UsersCheckTokenMessageResponse =
+      const checkTokenResponse: UsersCheckTokenServiceResponse =
         await firstValueFrom(
           this.usersService.send(UsersCheckTokenPattern, checkTokenRequest),
         );

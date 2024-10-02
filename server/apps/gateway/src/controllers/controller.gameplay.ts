@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Session, UseGuards } from '@nestjs/common';
-import { GameType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
+import { GameplayType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { AuthGuard } from '../guards/guard.auth';
 import { IUserSession } from './interfaces';
 import { ServiceGameplay } from '../services/service.gameplay';
@@ -12,8 +12,8 @@ export class ControllerGameplay {
   @UseGuards(AuthGuard)
   findGame(
     @Session() session: IUserSession,
-    @Body() body: { gameType: GameType },
+    @Body() body: { gameplayType: GameplayType },
   ) {
-    return this.serviceGameplay.findGame(session.userId, body.gameType);
+    return this.serviceGameplay.findGame(session.userId, body.gameplayType);
   }
 }

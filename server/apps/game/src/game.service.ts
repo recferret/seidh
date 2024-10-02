@@ -188,6 +188,14 @@ export class GameService implements OnModuleInit {
     );
 
     if (existingGame && gameProgressCache) {
+      if (
+        request.reason == GameFinishReason.Win &&
+        gameProgressCache.mobsSpawned == this.maxMobs &&
+        gameProgressCache.mobsKilled == this.maxMobs
+      ) {
+        gameProgressCache.mobsKilled == this.maxMobs;
+      }
+
       await this.finishExistingGame(existingGame, request.reason);
     }
 

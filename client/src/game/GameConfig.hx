@@ -15,6 +15,7 @@ class GameConfig {
 	public static final HpBarColor = 0xc22a2a;
 	public static final XpBarColor = 0xfcff76;
 	public static final FontColor = 0xebddae;
+	public static final UiBrownColor = 0x332D1A;
 
 	public final Production:Bool;
 	public final DebugDraw:Bool;

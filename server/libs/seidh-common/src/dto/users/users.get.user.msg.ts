@@ -24,18 +24,13 @@ export interface UserBody {
   telegramName: string;
   telegramPremium: boolean;
 
-  virtualTokenBalance: number;
+  coins: number;
+  teeth: number;
 
   // Chatacters
   characters: CharacterBody[];
 
-  hasExpBoost1: boolean;
-  hasExpBoost2: boolean;
-  hasPotionDropBoost1: boolean;
-  hasPotionDropBoost2: boolean;
-  hasMaxPotionBoost1: boolean;
-  hasMaxPotionBoost2: boolean;
-  hasMaxPotionBoost3: boolean;
+  boostsOwned: string[];
 }
 
 export interface UsersGetUserServiceRequest {

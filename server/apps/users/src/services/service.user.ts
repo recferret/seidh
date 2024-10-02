@@ -45,7 +45,8 @@ export class ServiceUser {
         telegramName: user.telegramName,
         telegramPremium: user.telegramPremium,
 
-        virtualTokenBalance: user.virtualTokenBalance,
+        coins: user.coins,
+        teeth: user.teeth,
 
         characters: user.characters.map((c: any) => {
           const character: CharacterBody = {
@@ -63,13 +64,7 @@ export class ServiceUser {
           return character;
         }),
 
-        hasExpBoost1: user.hasExpBoost1,
-        hasExpBoost2: user.hasExpBoost2,
-        hasPotionDropBoost1: user.hasPotionDropBoost1,
-        hasPotionDropBoost2: user.hasPotionDropBoost2,
-        hasMaxPotionBoost1: user.hasMaxPotionBoost1,
-        hasMaxPotionBoost2: user.hasMaxPotionBoost2,
-        hasMaxPotionBoost3: user.hasMaxPotionBoost3,
+        boostsOwned: user.boostsOwned,
       };
 
       response.user = userBody;
@@ -84,22 +79,22 @@ export class ServiceUser {
   async updateGainings(message: UsersUpdateGainingsServiceMessage) {
     const user = await this.userModel.findById(message.userGainings.userId);
     if (user) {
-      let tokensToAdd = message.userGainings.tokens;
-      let expToAdd = message.userGainings.kills;
+      const tokensToAdd = message.userGainings.tokens;
+      const expToAdd = message.userGainings.kills;
 
-      if (user.hasCoinBoost1) {
-        tokensToAdd *= 2;
-      } else if (user.hasCoinBoost2) {
-        tokensToAdd *= 3;
-      }
+      // if (user.hasCoinBoost1) {
+      //   tokensToAdd *= 2;
+      // } else if (user.hasCoinBoost2) {
+      //   tokensToAdd *= 3;
+      // }
 
-      if (user.hasExpBoost1) {
-        expToAdd *= 1.5;
-      } else if (user.hasExpBoost2) {
-        expToAdd *= 2;
-      }
+      // if (user.hasExpBoost1) {
+      //   expToAdd *= 1.5;
+      // } else if (user.hasExpBoost2) {
+      //   expToAdd *= 2;
+      // }
 
-      user.virtualTokenBalance += tokensToAdd;
+      user.coins += tokensToAdd;
       user.kills += message.userGainings.kills;
 
       await user.save();

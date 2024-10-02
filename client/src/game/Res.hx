@@ -75,6 +75,8 @@ enum SeidhResource {
     UI_DIALOG_BUTTON_YAY;
     UI_DIALOG_WINDOW_SMALL;
     UI_DIALOG_WINDOW_MEDIUM;
+    UI_DIALOG_XL_HEADER;
+    UI_DIALOG_XL_FOOTER;
 
     UI_GAME_JOYSTICK_1;
     UI_GAME_JOYSTICK_2;
@@ -268,6 +270,8 @@ class Res {
                 remoteResourceMap.set(UI_DIALOG_BUTTON_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_BUTTON_YAY.png');
                 remoteResourceMap.set(UI_DIALOG_WINDOW_SMALL, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_WINDOW_SMALL.png');
                 remoteResourceMap.set(UI_DIALOG_WINDOW_MEDIUM, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_WINDOW_MEDIUM.png');
+                remoteResourceMap.set(UI_DIALOG_XL_HEADER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_XL_HEADER.png');
+                remoteResourceMap.set(UI_DIALOG_XL_FOOTER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_XL_FOOTER.png');
             
                 remoteResourceMap.set(UI_GAME_JOYSTICK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_1.png');
                 remoteResourceMap.set(UI_GAME_JOYSTICK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_2.png');
@@ -388,8 +392,10 @@ class Res {
                 tileResMap.set(UI_DIALOG_BUTTON_NAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
                 tileResMap.set(UI_DIALOG_BUTTON_YAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
                 tileResMap.set(UI_DIALOG_WINDOW_SMALL, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_SMALL.toTile().center());
-                tileResMap.set(UI_DIALOG_WINDOW_MEDIUM, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_MEDIUM.toTile().center());
-            
+                tileResMap.set(UI_DIALOG_WINDOW_MEDIUM, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_MEDIUM.toTile().center());     
+                tileResMap.set(UI_DIALOG_XL_HEADER, hxd.Res.ui.dialog.UI_DIALOG_XL_HEADER.toTile().center());
+                tileResMap.set(UI_DIALOG_XL_FOOTER, hxd.Res.ui.dialog.UI_DIALOG_XL_FOOTER.toTile().center());
+
                 tileResMap.set(UI_GAME_JOYSTICK_1, hxd.Res.ui.game.UI_GAME_JOYSTICK_1.toTile().center());
                 tileResMap.set(UI_GAME_JOYSTICK_2, hxd.Res.ui.game.UI_GAME_JOYSTICK_2.toTile().center());
             

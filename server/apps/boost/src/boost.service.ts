@@ -11,6 +11,8 @@ import {
 import {
   Boost,
   BoostDocument,
+  BoostType,
+  CurrencyType,
 } from '@app/seidh-common/schemas/boost/schema.boost';
 import { BoostTransaction } from '@app/seidh-common/schemas/boost/schema.boost.transaction';
 import { User } from '@app/seidh-common/schemas/user/schema.user';
@@ -22,39 +24,6 @@ import { Model } from 'mongoose';
 @Injectable()
 export class BoostService implements OnModuleInit {
   private readonly boosts: Array<BoostDocument> = [];
-
-  private static readonly BOOST_EXP_BOOST_1_NAME = 'Exp 1';
-  private static readonly BOOST_EXP_BOOST_1_DESCRIPTION = '+50% exp';
-  private static readonly BOOST_EXP_BOOST_2_NAME = 'Exp 2';
-  private static readonly BOOST_EXP_BOOST_2_DESCRIPTION = '+100% exp';
-
-  private static readonly BOOST_COIN_BOOST_1_NAME = 'Coins 1';
-  private static readonly BOOST_COIN_BOOST_1_DESCRIPTION =
-    '+100% coins from monsters';
-  private static readonly BOOST_COIN_BOOST_2_NAME = 'Coins 2';
-  private static readonly BOOST_COIN_BOOST_2_DESCRIPTION =
-    '+200% coins from monsters';
-
-  private static readonly BOOST_POTION_DROP_1_NAME = 'Potion 1';
-  private static readonly BOOST_POTION_DROP_1_DESCRIPTION =
-    'Enable potion drop';
-  private static readonly BOOST_POTION_DROP_2_NAME = 'Potion 2';
-  private static readonly BOOST_POTION_DROP_2_DESCRIPTION =
-    'More and better potions drop';
-
-  private static readonly BOOST_MAX_POTIONS_1_NAME = 'Max potions 1';
-  private static readonly BOOST_MAX_POTIONS_1_DESCRIPTION =
-    'Custom potions capacity +1';
-  private static readonly BOOST_MAX_POTIONS_2_NAME = 'Max potions 2';
-  private static readonly BOOST_MAX_POTIONS_2_DESCRIPTION =
-    'Custom potions capacity +2';
-  private static readonly BOOST_MAX_POTIONS_3_NAME = 'Max potions 3';
-  private static readonly BOOST_MAX_POTIONS_3_DESCRIPTION =
-    'Custom potions capacity +3';
-
-  private static readonly BOOST_PRAYER_1_NAME = 'Thor prayer';
-  private static readonly BOOST_PRAYER_1_DESCRIPTION = '+100% dmg for 1h';
-
   private readonly seidhCommonBroadcasts: SeidhCommonBroadcasts;
 
   constructor(
@@ -73,87 +42,169 @@ export class BoostService implements OnModuleInit {
   async onModuleInit() {
     const boosts = await this.boostModel.find();
     if (!boosts || boosts.length == 0) {
+      // Exp
       this.boosts.push(
         await this.boostModel.create({
-          name: BoostService.BOOST_EXP_BOOST_1_NAME,
-          description: BoostService.BOOST_EXP_BOOST_1_DESCRIPTION,
           order: 1,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_EXP_BOOST_2_NAME,
-          description: BoostService.BOOST_EXP_BOOST_2_DESCRIPTION,
-          order: 2,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_COIN_BOOST_1_NAME,
-          description: BoostService.BOOST_COIN_BOOST_1_DESCRIPTION,
-          order: 3,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_COIN_BOOST_2_NAME,
-          description: BoostService.BOOST_COIN_BOOST_2_DESCRIPTION,
-          order: 4,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_POTION_DROP_1_NAME,
-          description: BoostService.BOOST_POTION_DROP_1_DESCRIPTION,
-          order: 5,
-          price: 100,
-        }),
-      );
-      this.boosts.push(
-        await this.boostModel.create({
-          name: BoostService.BOOST_POTION_DROP_2_NAME,
-          description: BoostService.BOOST_POTION_DROP_2_DESCRIPTION,
-          order: 6,
-          price: 100,
-        }),
-      );
+          boostType: BoostType.Rune,
 
-      // this.boosts.push(
-      //   await this.boostModel.create({
-      //     name: BoostService.BOOST_MAX_POTIONS_1_NAME,
-      //     description: BoostService.BOOST_MAX_POTIONS_1_DESCRIPTION,
-      //     order: 5,
-      //     price: 100,
-      //   }),
-      // );
-      // this.boosts.push(
-      //   await this.boostModel.create({
-      //     name: BoostService.BOOST_MAX_POTIONS_2_NAME,
-      //     description: BoostService.BOOST_MAX_POTIONS_2_DESCRIPTION,
-      //     order: 6,
-      //     price: 100,
-      //   }),
-      // );
-      // this.boosts.push(
-      //   await this.boostModel.create({
-      //     name: BoostService.BOOST_MAX_POTIONS_3_NAME,
-      //     description: BoostService.BOOST_MAX_POTIONS_3_DESCRIPTION,
-      //     order: 7,
-      //     price: 100,
-      //   }),
-      // );
-      // this.boosts.push(
-      //   await this.boostModel.create({
-      //     name: BoostService.BOOST_PRAYER_1_NAME,
-      //     description: BoostService.BOOST_PRAYER_1_DESCRIPTION,
-      //     order: 8,
-      //     price: 100,
-      //   }),
-      // );
+          levelOneId: 'EXP_1',
+          levelOneName: 'Exp +50%',
+          levelOneDescription: 'More exp per monster kill',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+
+          levelTwoId: 'EXP_2',
+          levelTwoName: 'Exp +100%',
+          levelTwoDescription: 'Even more exp per monster kill',
+          levelTwoPrice: 500,
+          levelTwoCurrencyType: CurrencyType.Coins,
+
+          levelThreeId: 'EXP_3',
+          levelThreeName: 'Exp +200%',
+          levelThreeDescription: 'Three time more exp per monster kill',
+          levelThreePrice: 1000,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+      // Item radius
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 2,
+          boostType: BoostType.Rune,
+
+          levelOneId: 'ITEM_RADIUS_1',
+          levelOneName: 'Pick up radius +100%',
+          levelOneDescription: 'Better items pick up radius',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+
+          levelTwoId: 'ITEM_RADIUS_2',
+          levelTwoName: 'Pick up radius +200%',
+          levelTwoDescription: 'Even better items pick up radius',
+          levelTwoPrice: 500,
+          levelTwoCurrencyType: CurrencyType.Coins,
+
+          levelThreeId: 'ITEM_RADIUS_3',
+          levelThreeName: 'Pick up radius +300%',
+          levelThreeDescription: 'Best items pick up radius',
+          levelThreePrice: 1000,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+      // More tokens
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 3,
+          boostType: BoostType.Rune,
+
+          levelOneId: 'MORE_TOKENS_1',
+          levelOneName: 'Double tokens gained',
+          levelOneDescription: 'X2 tokens from monsters',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+
+          levelTwoId: 'MORE_TOKENS_2',
+          levelTwoName: 'Triple tokens gained',
+          levelTwoDescription: 'X3 tokens from monsters',
+          levelTwoPrice: 500,
+          levelTwoCurrencyType: CurrencyType.Coins,
+
+          levelThreeId: 'MORE_TOKENS_3',
+          levelThreeName: 'Quadruple tokens gained',
+          levelThreeDescription: 'X4 tokens from monsters',
+          levelThreePrice: 1000,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+      // Monsters
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 4,
+          boostType: BoostType.Rune,
+
+          levelOneId: 'MONSTERS_1',
+          levelOneName: 'Monsters 1',
+          levelOneDescription: 'More and stronger monsters',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+
+          levelTwoId: 'MONSTERS_2',
+          levelTwoName: 'Monsters 2',
+          levelTwoDescription: 'New types of monsters',
+          levelTwoPrice: 500,
+          levelTwoCurrencyType: CurrencyType.Coins,
+
+          levelThreeId: 'MONSTERS_2',
+          levelThreeName: 'Monsters 3',
+          levelThreeDescription: 'New types of monsters and bosses',
+          levelThreePrice: 1000,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+      // Items drop
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 5,
+          boostType: BoostType.Scroll,
+
+          levelOneId: 'ITEMS_DROP_1',
+          levelOneName: 'Items drop 1',
+          levelOneDescription: 'Health potions may drop',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+
+          levelTwoId: 'ITEMS_DROP_2',
+          levelTwoName: 'Items drop 2',
+          levelTwoDescription: 'Boost potions may drop',
+          levelTwoPrice: 500,
+          levelTwoCurrencyType: CurrencyType.Coins,
+
+          levelThreeId: 'ITEMS_DROP_3',
+          levelThreeName: 'Items drop 3',
+          levelThreeDescription: 'More potions drop',
+          levelThreePrice: 1000,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+      // Stats
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 6,
+          boostType: BoostType.Scroll,
+
+          levelOneId: 'STATS_1',
+          levelOneName: 'Better stats 1',
+          levelOneDescription: 'Stats boost +20%',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+
+          levelTwoId: 'STATS_2',
+          levelTwoName: 'Better stats 2',
+          levelTwoDescription: 'Stats boost +50%',
+          levelTwoPrice: 500,
+          levelTwoCurrencyType: CurrencyType.Coins,
+
+          levelThreeId: 'STATS_2',
+          levelThreeName: 'Better stats 3',
+          levelThreeDescription: 'Stats boost +100%',
+          levelThreePrice: 1000,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+      // Artrifact
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 7,
+          boostType: BoostType.Artifact,
+
+          levelOneId: 'ARTIFACT_1',
+          levelOneName: "Valkyrie's feather",
+          levelOneDescription: 'Revive once a game',
+          levelOnePrice: 5,
+          levelOneCurrencyType: CurrencyType.Teeth,
+        }),
+      );
     } else {
       this.boosts.push(...boosts);
     }
@@ -174,68 +225,40 @@ export class BoostService implements OnModuleInit {
       .sort((a, b) => a.order - b.order)
       .map((boost) => {
         const boostBody: BoostBody = {
-          id: boost.id,
           order: boost.order,
-          name: boost.name,
-          description: boost.description,
-          price: boost.price,
-          accquired: false,
+
+          boostType: boost.boostType,
+
+          levelOneId: boost.levelOneId,
+          levelOneName: boost.levelOneName,
+          levelOneDescription: boost.levelOneDescription,
+          levelOnePrice: boost.levelOnePrice,
+          levelOneCurrencyType: boost.levelOneCurrencyType,
+          levelOneAccquired: false,
+
+          levelTwoId: boost.levelTwoId,
+          levelTwoName: boost.levelTwoName,
+          levelTwoDescription: boost.levelTwoDescription,
+          levelTwoPrice: boost.levelTwoPrice,
+          levelTwoCurrencyType: boost.levelTwoCurrencyType,
+          levelTwoAccquired: false,
+
+          levelThreeId: boost.levelThreeId,
+          levelThreeName: boost.levelThreeName,
+          levelThreeDescription: boost.levelThreeDescription,
+          levelThreePrice: boost.levelThreePrice,
+          levelThreeCurrencyType: boost.levelThreeCurrencyType,
+          levelThreeAccquired: false,
         };
 
-        switch (boost.name) {
-          case BoostService.BOOST_EXP_BOOST_1_NAME:
-            if (user.hasExpBoost1) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_EXP_BOOST_2_NAME:
-            if (user.hasExpBoost2) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_COIN_BOOST_1_NAME:
-            if (user.hasCoinBoost1) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_COIN_BOOST_2_NAME:
-            if (user.hasCoinBoost2) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_POTION_DROP_1_NAME:
-            if (user.hasPotionDropBoost1) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_POTION_DROP_2_NAME:
-            if (user.hasPotionDropBoost2) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_MAX_POTIONS_1_NAME:
-            if (user.hasMaxPotionBoost1) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_MAX_POTIONS_2_NAME:
-            if (user.hasMaxPotionBoost2) {
-              boostBody.accquired = true;
-            }
-            break;
-
-          case BoostService.BOOST_MAX_POTIONS_3_NAME:
-            if (user.hasMaxPotionBoost3) {
-              boostBody.accquired = true;
-            }
-            break;
+        if (user.boostsOwned.includes(boostBody.levelOneId)) {
+          boostBody.levelOneAccquired = true;
+        }
+        if (user.boostsOwned.includes(boostBody.levelTwoId)) {
+          boostBody.levelTwoAccquired = true;
+        }
+        if (user.boostsOwned.includes(boostBody.levelThreeId)) {
+          boostBody.levelThreeAccquired = true;
         }
 
         return boostBody;
@@ -252,121 +275,78 @@ export class BoostService implements OnModuleInit {
       success: false,
     };
 
-    const boost = this.boosts.find((boost) => boost.id == request.boostId);
+    const boost = this.boosts.find(
+      (boost) =>
+        boost.levelOneId == request.boostId ||
+        boost.levelTwoId == request.boostId ||
+        boost.levelThreeId == request.boostId,
+    );
+    // Has such boost
     if (!boost) {
       response.message = 'Boost not found';
       return response;
     }
+    // Has such user
     const user = await this.userModel.findById(request.userId);
     if (!user) {
       response.message = 'User not found';
       return response;
     }
-    if (user.virtualTokenBalance < boost.price) {
-      response.message = 'Not enough coins';
+    // User has such boost
+    if (user.boostsOwned.includes(request.boostId)) {
+      response.message = 'Already owned';
       return response;
-    } else {
-      user.virtualTokenBalance -= boost.price;
     }
+    // User has enough coins
+    let currencyType = CurrencyType.Coins;
+    let price = 0;
+    if (request.boostId.includes('1')) {
+      currencyType = boost.levelOneCurrencyType;
+      price = boost.levelOnePrice;
+    } else if (request.boostId.includes('2')) {
+      // Check if level 1 owned
+      if (!user.boostsOwned.includes(boost.levelOneId)) {
+        response.message = 'Need level 1 first';
+        return response;
+      }
 
-    // Make sure that user does not have particular boost yet
-    switch (boost.name) {
-      case BoostService.BOOST_EXP_BOOST_1_NAME:
-        if (!user.hasExpBoost1) {
-          user.hasExpBoost1 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
+      currencyType = boost.levelTwoCurrencyType;
+      price = boost.levelTwoPrice;
+    } else if (request.boostId.includes('3')) {
+      // Check if level 2 owned
+      if (!user.boostsOwned.includes(boost.levelTwoId)) {
+        response.message = 'Need level 2 first';
+        return response;
+      }
 
-      case BoostService.BOOST_EXP_BOOST_2_NAME:
-        if (!user.hasExpBoost2) {
-          user.hasExpBoost2 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_COIN_BOOST_1_NAME:
-        if (!user.hasCoinBoost1) {
-          user.hasExpBoost1 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_COIN_BOOST_2_NAME:
-        if (!user.hasCoinBoost2) {
-          user.hasExpBoost2 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_POTION_DROP_1_NAME:
-        if (!user.hasPotionDropBoost1) {
-          user.hasPotionDropBoost1 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_POTION_DROP_2_NAME:
-        if (!user.hasPotionDropBoost2) {
-          user.hasPotionDropBoost2 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_MAX_POTIONS_1_NAME:
-        if (!user.hasMaxPotionBoost1) {
-          user.hasMaxPotionBoost1 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_MAX_POTIONS_2_NAME:
-        if (!user.hasMaxPotionBoost2) {
-          user.hasMaxPotionBoost2 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_MAX_POTIONS_3_NAME:
-        if (!user.hasMaxPotionBoost3) {
-          user.hasMaxPotionBoost3 = true;
-        } else {
-          response.message = 'Already aqquired';
-          return response;
-        }
-        break;
-
-      case BoostService.BOOST_PRAYER_1_NAME:
-        // TODO implement boost here
-        break;
+      currencyType = boost.levelThreeCurrencyType;
+      price = boost.levelThreePrice;
     }
-
+    // Has enough coins
+    if (
+      (currencyType == CurrencyType.Coins && price > user.coins) ||
+      (currencyType == CurrencyType.Teeth && price > user.teeth)
+    ) {
+      response.message = 'Not enough money';
+      return response;
+    }
+    // OK flow, spent money
+    if (currencyType == CurrencyType.Coins) {
+      user.coins -= price;
+    } else if (currencyType == CurrencyType.Teeth) {
+      user.teeth -= price;
+    }
+    // add boost
+    user.boostsOwned.push(request.boostId);
+    // save and notify about balance change
     await user.save();
     await this.boostTransactionModel.create({
       boost,
-      boostName: boost.name,
+      boostId: request.boostId,
       user,
     });
     await this.seidhCommonBroadcasts.notifyBalanceUpdate(user.id);
-
     response.success = true;
-
     return response;
   }
 }

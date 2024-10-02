@@ -1,12 +1,35 @@
+import {
+  BoostType,
+  CurrencyType,
+} from '@app/seidh-common/schemas/boost/schema.boost';
+
 export const BoostsGetPattern = 'boosts.get';
 
 export interface BoostBody {
-  id: string;
   order: number;
-  name: string;
-  description: string;
-  price: number;
-  accquired: boolean;
+
+  boostType: BoostType;
+
+  levelOneId: string;
+  levelOneName: string;
+  levelOneDescription: string;
+  levelOnePrice: number;
+  levelOneCurrencyType: CurrencyType;
+  levelOneAccquired: boolean;
+
+  levelTwoId: string;
+  levelTwoName: string;
+  levelTwoDescription: string;
+  levelTwoPrice: number;
+  levelTwoCurrencyType: CurrencyType;
+  levelTwoAccquired: boolean;
+
+  levelThreeId: string;
+  levelThreeName: string;
+  levelThreeDescription: string;
+  levelThreePrice: number;
+  levelThreeCurrencyType: CurrencyType;
+  levelThreeAccquired: boolean;
 }
 
 export interface BoostsGetServiceRequest {

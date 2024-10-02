@@ -303,7 +303,8 @@ class HomeScene extends BasicScene implements EventListener {
 	// --------------------------------------
 
 	private function processUserBalanceEvent(payload:UserBalancePayload) {
-		Player.instance.tokens = payload.balance;
+		Player.instance.coins = payload.coins;
+		Player.instance.teeth = payload.teeth;
 	}
 
 	private function setSceneContent(homeSceneContent:HomeSceneContent) {

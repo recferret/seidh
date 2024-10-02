@@ -34,39 +34,18 @@ export class User {
   // Boosts
   // -----------------------
 
-  @Prop({ default: false })
-  hasExpBoost1: boolean;
-
-  @Prop({ default: false })
-  hasExpBoost2: boolean;
-
-  @Prop({ default: false })
-  hasCoinBoost1: boolean;
-
-  @Prop({ default: false })
-  hasCoinBoost2: boolean;
-
-  @Prop({ default: false })
-  hasPotionDropBoost1: boolean;
-
-  @Prop({ default: false })
-  hasPotionDropBoost2: boolean;
-
-  @Prop({ default: false })
-  hasMaxPotionBoost1: boolean;
-
-  @Prop({ default: false })
-  hasMaxPotionBoost2: boolean;
-
-  @Prop({ default: false })
-  hasMaxPotionBoost3: boolean;
+  @Prop({ default: [] })
+  boostsOwned: string[];
 
   // -----------------------
   // Stats
   // -----------------------
 
   @Prop({ default: 0 })
-  virtualTokenBalance: number;
+  coins: number;
+
+  @Prop({ default: 0 })
+  teeth: number;
 
   @Prop({ default: 0 })
   kills: number;

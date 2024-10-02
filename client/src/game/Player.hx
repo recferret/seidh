@@ -3,11 +3,26 @@ package game;
 import game.js.NativeWindowJS;
 
 typedef BoostBody = {
-	id:String,
-	name:String,
-	description:String,
-	price:Int,
-	accquired:Bool,
+	order: Int,
+	boostType: String,
+	levelOneId: String,
+	levelOneName: String,
+	levelOneDescription: String,
+	levelOnePrice: Int,
+	levelOneCurrencyType: String,
+	levelOneAccquired: Bool,
+	levelTwoId: String,
+	levelTwoName: String,
+	levelTwoDescription: String,
+	levelTwoPrice: Int,
+	levelTwoCurrencyType: String,
+	levelTwoAccquired: Bool,
+	levelThreeId: String,
+	levelThreeName: String,
+	levelThreeDescription: String,
+	levelThreePrice: Int,
+	levelThreeCurrencyType: String,
+	levelThreeAccquired: Bool
 };
 
 class Player {
@@ -19,7 +34,8 @@ class Player {
 	public var userEntityId:String;
 	public var userName:String;
 	public var authToken:String;
-	public var tokens:Int;
+	public var coins:Int;
+	public var teeth:Int;
 	public var kills:Int;
 
 	public final boosts = new Array<BoostBody>();
@@ -34,7 +50,8 @@ class Player {
 		userEntityId = 'entity_' + userData.userId;
 		userName = 'USER 1';
 		authToken = userData.authToken;
-		tokens = userData.virtualTokenBalance;
+		coins = userData.coins;
+		teeth = userData.teeth;
 		kills = userData.kills;
 	}
 

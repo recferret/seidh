@@ -82,7 +82,6 @@ class DialogManager {
     }
 
 }
-
 private class Dialog extends h2d.Object {
 
     public function new(

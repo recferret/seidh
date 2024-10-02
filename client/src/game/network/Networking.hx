@@ -43,7 +43,8 @@ typedef ActionsPayload = {
 }
 
 typedef UserBalancePayload = {
-    balance:Int,
+    coins:Int,
+    teeth:Int,
 }
 
 class Networking {

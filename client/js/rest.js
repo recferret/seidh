@@ -29,7 +29,7 @@ async function restFindGame(authToken, gameType) {
 }
 
 async function restAuthenticate(telegramInitData, login, referrerId) {
-    return await _postWrapper(restUrl + 'authenticate', {
+    return await _postWrapper(restUrl + 'auth', {
         telegramInitData,
         login,
         referrerId

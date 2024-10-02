@@ -1,129 +1,192 @@
 package game.scene.home;
 
-import game.js.NativeWindowJS;
-import game.sound.SoundManager;
-import game.ui.dialog.Dialog;
+import game.tilemap.TilemapManager;
 import game.Player.BoostBody;
 import game.Res.SeidhResource;
 
 import hxd.res.DefaultFont;
 
-class BoostButton extends h2d.Object {
-
-    private final w = 0.0;
-    private final h = 0.0;
-    private final bmp:h2d.Bitmap;
+class BoostItem extends h2d.Object {
 
     public function new(parent:h2d.Object, px:Int, py:Int, boost:BoostBody) {
         super(parent);
 
-        final scaleX = 0.7;
-        final scaleY = 0.7;
-        bmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL), this);
-        bmp.scaleX = scaleX;
-        bmp.scaleY = scaleY;
-        w = bmp.tile.width * scaleX;
-        h = bmp.tile.height * scaleY;
-
-        final font : h2d.Font = DefaultFont.get();
-        final tf = new h2d.Text(font);
-        tf.text = boost.name;
-        tf.textColor = GameConfig.FontColor;
-        tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        tf.textAlign = Center;
-        tf.setScale(4);
-        tf.setPosition(0, -35);
-
         setPosition(px, py);
 
-        addChild(tf);
+        final iconBg = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.ICON_BOOST), this);
+        var boostIcon:h2d.Bitmap = null;
 
-        final interaction = new h2d.Interactive(w, h);
-        interaction.setPosition(px - w / 2, py - h / 2);
-
-        interaction.onPush = function(event:hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
-                setScale(0.9);
-            }
+        var boostId = null;
+        var boostDescription = null;
+        var boostPrice = null;
+        if (!boost.levelOneAccquired) {
+            boostId = boost.levelOneId;
+            boostDescription = boost.levelOneDescription;
+            boostPrice = boost.levelOnePrice;
+        } else if (!boost.levelTwoAccquired) {
+            boostId = boost.levelTwoId;
+            boostDescription = boost.levelTwoDescription;
+            boostPrice = boost.levelTwoPrice;
+        } else if (!boost.levelThreeAccquired) {
+            boostId = boost.levelThreeId;
+            boostDescription = boost.levelThreeDescription;
+            boostPrice = boost.levelThreePrice;
         }
-        interaction.onRelease = function(event:hxd.Event) {
-            setScale(1);
+
+        switch (boostId) {
+            case BoostContent.EXP_1:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1), this);
+            case BoostContent.EXP_2:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_1_LVL_2), this);
+            case BoostContent.EXP_3:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_1_LVL_3), this);
+        
+            case BoostContent.ITEM_RADIUS_1:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1), this);
+            case BoostContent.ITEM_RADIUS_2:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_2_LVL_2), this);
+            case BoostContent.ITEM_RADIUS_3:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_2), this);
+        
+            case BoostContent.MORE_TOKENS_1:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1), this);
+            case BoostContent.MORE_TOKENS_2:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_2), this);
+            case BoostContent.MORE_TOKENS_3:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_2), this);
+        
+            case BoostContent.MONSTERS_1:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1), this);
+            case BoostContent.MONSTERS_2:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_4_LVL_2), this);
+            case BoostContent.MONSTERS_3:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.RUNE_TYPE_4_LVL_2), this);
+            
+            case BoostContent.ITEMS_DROP_1:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SCROLL_TYPE_ANY_LVL_1), this);
+            case BoostContent.ITEMS_DROP_2:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SCROLL_TYPE_1_LVL_2), this);
+            case BoostContent.ITEMS_DROP_3:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SCROLL_TYPE_1_LVL_3), this);
+        
+            case BoostContent.STATS_1:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SCROLL_TYPE_ANY_LVL_1), this);
+            case BoostContent.STATS_2:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SCROLL_TYPE_2_LVL_2), this);
+            case BoostContent.STATS_3:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SCROLL_TYPE_2_LVL_3), this);
+        
+            case BoostContent.ARTIFACT_1:
+                boostIcon = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.ARTIFACT_1), this);
         }
-        interaction.onClick = function(event:hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
-                SoundManager.instance.playButton2();
 
-                DialogManager.ShowDialog(
-                    parent, 
-                    DialogType.MEDIUM, 
-                    boost.name,
-                    boost.description, 
-                    boost.accquired ? "Already accquired" : boost.price + " SDH",
-                    boost.accquired ? null : "BUY",
-                    boost.accquired ? "OK" : "Cancel",
-                    function positiveCallback() {
-                        if (Player.instance.tokens - boost.price >= 0) {
-                            NativeWindowJS.networkBuyBoost(boost.id, function callback(data:Dynamic) {
-                                // TODO show the dialog ok or not ok
-                                trace(data);
-                            });
-                        } else {
-                            NativeWindowJS.tgShowAlert('Not enough balance');
-                        }
-                    },
-                    function negativeCallback() {
-                    }
-                );
-            }
-        }
-        parent.addChild(interaction);
+        boostIcon.setPosition(iconBg.x + 10, iconBg.y + 10);
 
-        if (boost.accquired) {
-            alpha = 0.9;
-        }
-    }
+        final font : h2d.Font = DefaultFont.get();
+        final descriptionText = new h2d.Text(font);
+        descriptionText.text = boostDescription;
+        descriptionText.textColor = GameConfig.FontColor;
+        descriptionText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        descriptionText.textAlign = Left;
+        descriptionText.setScale(2);
+        descriptionText.setPosition(iconBg.x + 80, iconBg.y - 55);
+        addChild(descriptionText);
 
-    public function getBitmap() {
-        return bmp;
-    }
+        final priceText = new h2d.Text(font);
+        priceText.text = Std.string(boostPrice);
+        priceText.textColor = GameConfig.FontColor;
+        priceText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        priceText.textAlign = Left;
+        priceText.setScale(2);
+        priceText.setPosition(iconBg.x + 80, iconBg.y + 25);
+        addChild(priceText);
 
-    public function getHeight() {
-        return h;
-    }
-
-    public function getWidth() {
-        return w;
+        final coin = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.COIN), this);
+        coin.setScale(0.6);
+        coin.setPosition(priceText.x + priceText.textWidth + 40, priceText.y + 5);
     }
 
 }
 
+class BoostFrame extends h2d.Object {
+
+    public function new(parent:h2d.Object) {
+        super(parent);
+
+        final header = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_XL_HEADER));
+        final footer = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_XL_FOOTER));
+
+        final basicHeightDiff = Main.ActualScreenHeight - 1280;
+        final middlePartHeight = Main.ActualScreenHeight - Std.int(header.tile.height) - Std.int(footer.tile.height) - basicHeightDiff;
+        final middle = new h2d.Bitmap(h2d.Tile.fromColor(GameConfig.UiBrownColor, Std.int(header.tile.width), middlePartHeight));
+
+        header.setPosition(Main.ActualScreenWidth / 2, 200);
+        footer.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight - footer.tile.height);
+        middle.setPosition(112, 254);
+
+        addChild(header);
+        addChild(middle);
+        addChild(footer);
+    }
+
+    public function update(dt:Float) {
+        // rune1.y++;
+    }
+}
+
 class BoostContent extends BasicHomeContent {
+
+    public static final EXP_1 = 'EXP_1';
+    public static final EXP_2 = 'EXP_2';
+    public static final EXP_3 = 'EXP_3';
+
+    public static final ITEM_RADIUS_1 = 'ITEM_RADIUS_1';
+    public static final ITEM_RADIUS_2 = 'ITEM_RADIUS_2';
+    public static final ITEM_RADIUS_3 = 'ITEM_RADIUS_3';
+
+    public static final MORE_TOKENS_1 = 'MORE_TOKENS_1';
+    public static final MORE_TOKENS_2 = 'MORE_TOKENS_2';
+    public static final MORE_TOKENS_3 = 'MORE_TOKENS_3';
+
+    public static final MONSTERS_1 = 'MONSTERS_1';
+    public static final MONSTERS_2 = 'MONSTERS_2';
+    public static final MONSTERS_3 = 'MONSTERS_3';
+    
+    public static final ITEMS_DROP_1 = 'ITEMS_DROP_1';
+    public static final ITEMS_DROP_2 = 'ITEMS_DROP_2';
+    public static final ITEMS_DROP_3 = 'ITEMS_DROP_3';
+
+    public static final STATS_1 = 'STATS_1';
+    public static final STATS_2 = 'STATS_2';
+    public static final STATS_3 = 'STATS_3';
+
+    public static final ARTIFACT_1 = 'ARTIFACT_1';
+
+    final boostFrame: BoostFrame;
 
     public function new() {
 	    super();
 
-        var boostY = 200;
+        boostFrame = new BoostFrame(this);
+
+        var boostX = 180;
+        var boostY = 340;
         for (index => boost in Player.instance.boosts) {
-            var boostX = 215;
-
-            if (index % 2 == 0) {
-                boostX = Main.ActualScreenWidth - 215;
-                boostY += 200;
-            }
-
-            new BoostButton(this, boostX, boostY, boost);
+            new BoostItem(this, boostX, boostY, boost);
+            boostY += 150;
         }
     }
 
     public function update(dt:Float) {
+        // boostFrame.update(dt);
     }
 
     public static function BoostClick(boost:BoostBody) {
-        if (boost.accquired) {
-            trace('Already accquired');
-        } else {
-            trace('Check for balance locally');
-        }
+        // if (boost.accquired) {
+        //     trace('Already accquired');
+        // } else {
+        //     trace('Check for balance locally');
+        // }
 
         // TODO show the dialog
 

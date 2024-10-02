@@ -12,7 +12,7 @@ export class BoostTransaction {
   boost: Types.ObjectId;
 
   @Prop()
-  boostName: string;
+  boostId: string;
 
   @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
   user: Types.ObjectId;

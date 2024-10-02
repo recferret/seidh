@@ -36,7 +36,7 @@ export class ServiceFriends {
         // possibleToJoinGame: boolean;
       }));
       response.friendsInvited = user.friendsInvited.length;
-      response.virtualTokenBalance = user.virtualTokenBalance;
+      response.coins = user.coins;
     } else {
       Logger.error(`getFriends. user ${request.userId} not found`);
     }

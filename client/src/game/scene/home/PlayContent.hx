@@ -308,7 +308,7 @@ class PlayContent extends BasicHomeContent {
         leftBunny.update(dt);
         rightBunny.update(dt);
 
-        barGold.setGold(Player.instance.tokens);
+        barGold.setGold(Player.instance.coins);
     }
 
     private function switchRagner(dir:String) {
