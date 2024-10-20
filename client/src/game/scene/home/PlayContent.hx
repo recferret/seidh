@@ -1,16 +1,11 @@
 package game.scene.home;
 
-import game.ui.bar.BarUserName;
-import game.ui.bar.BarGold;
-import game.js.NativeWindowJS;
 import h2d.filter.Displacement;
 
-import engine.base.MathUtils;
-
+import game.js.NativeWindowJS;
 import game.Res.SeidhResource;
 import game.sound.SoundManager;
 import game.event.EventManager;
-import game.scene.base.BasicScene;
 
 import motion.Actuate;
 
@@ -48,9 +43,6 @@ class PlayContent extends BasicHomeContent {
 
     private final leftBunny:Bunny;
     private final rightBunny:Bunny;
-    private final screenDarknessDisplacementTile:h2d.Tile;
-
-    private final barGold:BarGold;
 
     // 1 - left, 2 - central, 3 - right
     private var leftRagnarPosX = 0.0;
@@ -74,31 +66,6 @@ class PlayContent extends BasicHomeContent {
 		super();
 
         // ------------------------------------
-        // Grass
-        // ------------------------------------
-
-        for (x in 0...(Std.int(720 / 183) + 1)) {
-            for (y in 0...(Std.int(1280 / 183) + 1)) {
-
-                var groundTile:h2d.Tile = null; 
-                final groundRnd = MathUtils.randomIntInRange(1, 4);
-
-                if (groundRnd == 1) {
-                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_1);
-                } else if (groundRnd == 2) {
-                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_2);
-                } else if (groundRnd == 3) {
-                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_3);
-                } else if (groundRnd == 4) {
-                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_4);
-                }
-
-                final grass = new h2d.Bitmap(groundTile, this);
-                grass.setPosition(grass.tile.width / 2 + (x * grass.tile.width), grass.tile.height / 2 + (y * grass.tile.height));
-            }
-        }
-
-        // ------------------------------------
         // Bunnies
         // ------------------------------------
 
@@ -108,45 +75,6 @@ class PlayContent extends BasicHomeContent {
         rightBunny = new Bunny(this);
         rightBunny.setPosition(Main.ActualScreenWidth - rightBunny.getWidth(), Main.ActualScreenHeight / 1.55);
         rightBunny.flipX();
-
-        // ------------------------------------
-        // Trees
-        // ------------------------------------
-
-        function placeTree(x:Float, y:Float) {
-            final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
-                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1)) : 
-                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_2));
-            treeBitmap.setPosition(x, y);
-            addChild(treeBitmap);
-        }
-
-        placeTree(70, 600);
-        placeTree(100, 210);
-        placeTree(160, 320);
-        placeTree(300, 280);
-
-        placeTree(500, 300);
-        placeTree(400, 200);
-        placeTree(600, 350);
-        placeTree(660, 550);
-        
-        // ------------------------------------
-        // Weed
-        // ------------------------------------
-
-        function placeWeed(x:Float, y:Float) {
-            final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
-                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1)) : 
-                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_2));
-            treeBitmap.setPosition(x, y);
-            addChild(treeBitmap);
-        }
-
-        placeWeed(100, 1200);
-        placeWeed(200, 1100);
-
-        placeWeed(600, 1100);
 
         // ------------------------------------
         // Ragnars
@@ -173,18 +101,6 @@ class PlayContent extends BasicHomeContent {
         centralRagnar.setPosition(centralRagnarPosX, centralRagnarPosY);
 
         // ------------------------------------
-        // Shadow
-        // ------------------------------------
-
-        final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), this);
-        final darknessScaleRatio = Main.ActualScreenHeight / 1280;
-        darkness.scaleY = darknessScaleRatio;
-
-        screenDarknessDisplacementTile = Res.instance.getTileResource(SeidhResource.FX_NORMALMAP);
-        darkness.filter = new Displacement(screenDarknessDisplacementTile, 14, 14);
-        darkness.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
-
-        // ------------------------------------
         // Buttons
         // ------------------------------------
 
@@ -195,7 +111,7 @@ class PlayContent extends BasicHomeContent {
         final playButton = new h2d.Bitmap(playButtonActiveTile, this);
         playButton.setPosition(
             Main.ActualScreenWidth / 2, 
-            300
+            340
         );
 
         final playButtonInteractive = new h2d.Interactive(playButtonActiveTile.width, playButtonActiveTile.height);
@@ -291,24 +207,11 @@ class PlayContent extends BasicHomeContent {
             switchRagner('right');
         }
         addChild(nextRagnarButtonInteractive);
-
-        // Balance
-        barGold = new BarGold(this);
-        barGold.setPosition(playButton.x, playButton.y + 110);
-        barGold.setScale(1.3);
-
-        // User name
-        final barUserName = new BarUserName(this);
-        barUserName.setPosition(lvlButton.x, lvlButton.y - 120);
-        barUserName.setScale(1.3);
     }
 
     public function update(dt:Float) {
-        screenDarknessDisplacementTile.scrollDiscrete(1 * dt, 7 * dt);
         leftBunny.update(dt);
         rightBunny.update(dt);
-
-        barGold.setGold(Player.instance.coins);
     }
 
     private function switchRagner(dir:String) {

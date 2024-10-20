@@ -4,5 +4,5 @@ export class FriendsGetResponseDto {
   success: boolean;
   friends?: Friend[];
   friendsInvited: number;
-  virtualTokenBalance: number;
+  coins: number;
 }

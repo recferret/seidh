@@ -14,7 +14,7 @@ export class ServiceFriends {
       success: result.success,
       friends: result.friends,
       friendsInvited: result.friendsInvited,
-      virtualTokenBalance: result.virtualTokenBalance,
+      coins: result.coins,
     };
     return response;
   }

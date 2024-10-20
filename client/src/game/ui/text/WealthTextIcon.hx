@@ -1,0 +1,36 @@
+package game.ui.text;
+
+import h2d.Text.Align;
+import hxd.res.DefaultFont;
+
+class WealthTextIcon extends h2d.Object {
+
+    private final text:h2d.Text;
+    private final icon:h2d.Bitmap;
+
+    public function new(parent:h2d.Object, tile:h2d.Tile, textAlign:Align) {
+        super(parent);
+
+        text = new h2d.Text(DefaultFont.get());
+        text.textColor = GameConfig.FontColor;
+        text.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        text.textAlign = textAlign;
+        text.setScale(1.8);
+        addChild(text);
+
+        icon = new h2d.Bitmap(tile);
+        icon.setScale(0.7);
+        addChild(icon);
+
+        if (textAlign == Right) {
+            text.setPosition(-30, -6);
+        } else {
+            text.setPosition(34, -6);
+        }
+    }
+
+    public function setText(s:String) { 
+        text.text = s;
+    }
+
+}

@@ -1,5 +1,6 @@
 package game.scene.home;
 
+import h2d.Object;
 import game.tilemap.TilemapManager;
 import game.Player.BoostBody;
 import game.Res.SeidhResource;
@@ -104,6 +105,23 @@ class BoostItem extends h2d.Object {
         final coin = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.COIN), this);
         coin.setScale(0.6);
         coin.setPosition(priceText.x + priceText.textWidth + 40, priceText.y + 5);
+
+        // Iteraction
+
+        final interaction = new h2d.Interactive(300, boostIcon.height);
+        interaction.setPosition(boostIcon.x - boostIcon.tile.width / 2, boostIcon.y - boostIcon.tile.height / 2);
+
+        
+
+        interaction.onPush = function(event : hxd.Event) {
+            setScale(0.9);
+        }
+        interaction.onRelease = function(event : hxd.Event) {
+            setScale(1);
+        }
+        interaction.onClick = function(event : hxd.Event) {
+        }
+        addChild(interaction);
     }
 
 }
@@ -118,11 +136,11 @@ class BoostFrame extends h2d.Object {
 
         final basicHeightDiff = Main.ActualScreenHeight - 1280;
         final middlePartHeight = Main.ActualScreenHeight - Std.int(header.tile.height) - Std.int(footer.tile.height) - basicHeightDiff;
-        final middle = new h2d.Bitmap(h2d.Tile.fromColor(GameConfig.UiBrownColor, Std.int(header.tile.width), middlePartHeight));
+        final middle = new h2d.Bitmap(h2d.Tile.fromColor(GameConfig.UiBrownColor, Std.int(header.tile.width) + 1, middlePartHeight + 100));
 
-        header.setPosition(Main.ActualScreenWidth / 2, 200);
+        header.setPosition(Main.ActualScreenWidth / 2, header.tile.height - 100);
         footer.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight - footer.tile.height);
-        middle.setPosition(112, 254);
+        middle.setPosition(113, header.tile.height + 45);
 
         addChild(header);
         addChild(middle);
@@ -163,33 +181,38 @@ class BoostContent extends BasicHomeContent {
     public static final ARTIFACT_1 = 'ARTIFACT_1';
 
     final boostFrame: BoostFrame;
+    final boostContainer: h2d.Object;
 
     public function new() {
 	    super();
 
         boostFrame = new BoostFrame(this);
+        boostContainer = new h2d.Object(this);
 
         var boostX = 180;
-        var boostY = 340;
-        for (index => boost in Player.instance.boosts) {
-            new BoostItem(this, boostX, boostY, boost);
+        var boostY = 320;
+        for (boost in Player.instance.boosts) {
+            new BoostItem(boostContainer, boostX, boostY, boost);
             boostY += 150;
         }
     }
 
     public function update(dt:Float) {
         // boostFrame.update(dt);
+
+        // boostContainer.y = contentScrollY;
     }
 
     public static function BoostClick(boost:BoostBody) {
-        // if (boost.accquired) {
+        // if (boost.) {
         //     trace('Already accquired');
         // } else {
         //     trace('Check for balance locally');
         // }
 
-        // TODO show the dialog
+        trace('boost click');
 
+        // TODO show the dialog
     }
 
 }

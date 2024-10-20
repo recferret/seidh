@@ -1,5 +1,10 @@
 package game.scene.impl;
 
+import hxd.res.DefaultFont;
+import game.tilemap.TilemapManager;
+import game.ui.text.WealthTextIcon;
+import engine.base.MathUtils;
+import h2d.filter.Displacement;
 import engine.base.geometry.Point;
 import h2d.Bitmap;
 
@@ -25,13 +30,24 @@ enum HomeSceneContent {
 }
 
 class HomeScene extends BasicScene implements EventListener {
+	private final playContent = new PlayContent();
+	private final boostContent = new BoostContent();
+	private final collectionContent = new CollectionContent();
+	private final friendsContent = new FriendsContent();
+
 	private var homeSceneContent:HomeSceneContent;
 	private var pageContent:BasicHomeContent;
 
-	private final playContent:PlayContent;
-	private final boostContent:BoostContent;
-	private final collectionContent:CollectionContent;
-	private final friendsContent:FriendsContent;
+	private var usernameText:h2d.Text;
+	private var friendsTextIcon:WealthTextIcon;
+	private var coinsTextIcon:WealthTextIcon;
+	private var teethTextIcon:WealthTextIcon;
+
+    private var titleBitmap:h2d.Bitmap;
+    private var collectionTitleTile:h2d.Tile;
+    private var friendsTitleTile:h2d.Tile;
+    private var storeTitleTile:h2d.Tile;
+    private var screenDarknessDisplacementTile:h2d.Tile;
 
 	private var inTouch = false;
 	private var touchStarted = false;
@@ -55,15 +71,13 @@ class HomeScene extends BasicScene implements EventListener {
 					);
 
 					if (params.y > lastTouchPos.y) {
-						pageContent.y += touchPosDiff.y;
+						pageContent.contentScrollY += touchPosDiff.y;
 					} else if (params.y < lastTouchPos.y) {
-						pageContent.y -= touchPosDiff.y;
+						pageContent.contentScrollY -= touchPosDiff.y;
 					}
 
-					if (pageContent.y < -120) {
-						pageContent.y = -120;
-					} else if (pageContent.y > 0) {
-						pageContent.y = 0;
+					if (pageContent.contentScrollY < 0 || pageContent.y > 0) {
+						pageContent.contentScrollY = 0;
 					}
 				}
 
@@ -72,15 +86,86 @@ class HomeScene extends BasicScene implements EventListener {
 			}
 		});
 
-		playContent = new PlayContent();
-		boostContent = new BoostContent();
-		collectionContent = new CollectionContent();
-		friendsContent = new FriendsContent();
+		headerItems();
+		generateBackground();
+		frame();
+		setSceneContent(HomeSceneContent.HomePlayContent);
+		bottomButtons();
 
-        // ------------------------------------
-        // Tree frame
-        // ------------------------------------
+		SoundManager.instance.playMenuTheme();
+		EventManager.instance.subscribe(EventManager.EVENT_USER_BALANCE, this);
+	}
 
+	// --------------------------------------
+	// Impl
+	// --------------------------------------
+
+	public function start() {}
+
+	public function customUpdate(dt:Float, fps:Float) {
+		if (pageContent != null) {
+			screenDarknessDisplacementTile.scrollDiscrete(1 * dt, 7 * dt);
+			pageContent.update(dt);
+
+			if (touchStarted) {
+				if (timeSinceLastTouch == 0.0 || timeSinceLastTouch <= touchActivationTime) {
+					inTouch = true;
+				} else {
+					inTouch = false;
+					touchStarted = false;
+					timeSinceLastTouch = 0.0;
+					lastTouchPos.x = 0;
+					lastTouchPos.y = 0;
+				}
+
+				timeSinceLastTouch += dt;
+			}
+		}
+	}
+
+	public function notify(event:String, message:Dynamic) {
+		switch (event) {
+			case EventManager.EVENT_USER_BALANCE:
+				processUserBalanceEvent(message);
+		}
+	}
+
+	// --------------------------------------
+	// UI elements
+	// --------------------------------------
+
+	private function headerItems() {
+        collectionTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_COLLECTION);
+		friendsTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_FRIENDS);
+		storeTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_STORE);
+
+		titleBitmap = new h2d.Bitmap(this);
+		titleBitmap.alpha = 0;
+		titleBitmap.setPosition(Main.ActualScreenWidth / 2, 100);
+
+		usernameText = new h2d.Text(DefaultFont.get());
+        usernameText.textColor = GameConfig.FontColor;
+        usernameText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        usernameText.textAlign = Left;
+		usernameText.text = "FerretRec";
+        usernameText.setScale(2);
+		usernameText.setPosition(80, 70);
+        addChild(usernameText);
+
+		friendsTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_FRIENDS), Left);
+		friendsTextIcon.setText('10/100');
+		friendsTextIcon.setPosition(100, 120);
+		
+		coinsTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_COINS), Right);
+		coinsTextIcon.setText('10000');
+		coinsTextIcon.setPosition(Main.ActualScreenWidth - 90, 80);
+
+		teethTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_TEETH), Right);
+		teethTextIcon.setText('100');
+		teethTextIcon.setPosition(Main.ActualScreenWidth - 90, 120);
+	}
+
+	private function frame() {
         final frameHeader = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_HEADER), this);
         frameHeader.setPosition(Main.ActualScreenWidth / 2, frameHeader.tile.height / 2);
 
@@ -113,10 +198,9 @@ class HomeScene extends BasicScene implements EventListener {
 		final rightSideFrameBottom = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FRAME), this);
 		rightSideFrameBottom.tile.flipX();
 		rightSideFrameBottom.setPosition(Main.ActualScreenWidth - rightSideFrameBottom.tile.width / 2, Main.ActualScreenHeight - frameFooter.tile.height + 1 - (rightSideFrameBottom.tile.height * 1) / 2);
+	}
 
-		// Make content above 
-		setSceneContent(HomeSceneContent.HomePlayContent);
-
+	private function bottomButtons() {
 		// ---------------------------------------------------
 		// Bottom bar buttons
 		// ---------------------------------------------------
@@ -161,6 +245,7 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionHome.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomePlayContent) {
+				titleBitmap.alpha = 0;
 				SoundManager.instance.playButton1();
 				NativeWindowJS.trackHomeClick();
 
@@ -191,6 +276,9 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionBoost.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
+				titleBitmap.alpha = 1;
+				titleBitmap.tile = storeTitleTile;
+
 				SoundManager.instance.playButton1();
 				NativeWindowJS.trackBoostsClick();
 
@@ -221,6 +309,9 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionCollection.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
+				titleBitmap.alpha = 1;
+				titleBitmap.tile = collectionTitleTile;
+
 				SoundManager.instance.playButton1();
 				NativeWindowJS.trackCollectionClick();
 
@@ -251,6 +342,9 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionFriends.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
+				titleBitmap.alpha = 1;
+				titleBitmap.tile = friendsTitleTile;
+
 				SoundManager.instance.playButton1();
 				NativeWindowJS.trackFriendsClick();
 
@@ -260,47 +354,92 @@ class HomeScene extends BasicScene implements EventListener {
 				setSceneContent(HomeSceneContent.HomeFriendsContent);
 			}
 		}
-
-		SoundManager.instance.playMenuTheme();
-
-		EventManager.instance.subscribe(EventManager.EVENT_USER_BALANCE, this);
 	}
 
 	// --------------------------------------
-	// Impl
+	// General
 	// --------------------------------------
 
-	public function start() {}
+	private function generateBackground() {
+        screenDarknessDisplacementTile = Res.instance.getTileResource(SeidhResource.FX_NORMALMAP);
 
-	public function customUpdate(dt:Float, fps:Float) {
-		if (pageContent != null) {
-			pageContent.update(dt);
+		final backgroundObject = new h2d.Object();
+		addChildAt(backgroundObject, 0);
 
-			if (touchStarted) {
-				if (timeSinceLastTouch == 0.0 || timeSinceLastTouch <= touchActivationTime) {
-					inTouch = true;
-				} else {
-					inTouch = false;
-					touchStarted = false;
-					timeSinceLastTouch = 0.0;
-					lastTouchPos.x = 0;
-					lastTouchPos.y = 0;
-				}
-				timeSinceLastTouch += dt;
-			}
-		}
+		// ------------------------------------
+        // Grass
+        // ------------------------------------
+
+        for (x in 0...(Std.int(720 / 183) + 1)) {
+            for (y in 0...(Std.int(1280 / 183) + 1)) {
+                var groundTile:h2d.Tile = null; 
+                final groundRnd = MathUtils.randomIntInRange(1, 4);
+
+                if (groundRnd == 1) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_1);
+                } else if (groundRnd == 2) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_2);
+                } else if (groundRnd == 3) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_3);
+                } else if (groundRnd == 4) {
+                    groundTile = Res.instance.getTileResource(SeidhResource.TERRAIN_GROUND_4);
+                }
+
+                final grass = new h2d.Bitmap(groundTile, backgroundObject);
+                grass.setPosition(grass.tile.width / 2 + (x * grass.tile.width), grass.tile.height / 2 + (y * grass.tile.height));
+            }
+        }
+
+        // ------------------------------------
+        // Trees
+        // ------------------------------------
+
+        function placeTree(x:Float, y:Float) {
+            final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1)) : 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_2));
+            treeBitmap.setPosition(x, y);
+            backgroundObject.addChild(treeBitmap);
+        }
+
+        placeTree(70, 600);
+        placeTree(100, 210);
+        placeTree(160, 320);
+        placeTree(300, 280);
+
+        placeTree(500, 300);
+        placeTree(400, 200);
+        placeTree(600, 350);
+        placeTree(660, 550);
+
+        // ------------------------------------
+        // Weed
+        // ------------------------------------
+
+        function placeWeed(x:Float, y:Float) {
+            final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1)) : 
+                new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_2));
+            treeBitmap.setPosition(x, y);
+            backgroundObject.addChild(treeBitmap);
+        }
+
+        placeWeed(100, 1200);
+        placeWeed(200, 1100);
+
+        placeWeed(600, 1100);
+
+        // ------------------------------------
+        // Shadow
+        // ------------------------------------
+
+        final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), backgroundObject);
+        final darknessScaleRatio = Main.ActualScreenHeight / 1280;
+        darkness.scaleY = darknessScaleRatio;
+
+        darkness.filter = new Displacement(screenDarknessDisplacementTile, 14, 14);
+        darkness.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
 	}
-
-	public function notify(event:String, message:Dynamic) {
-		switch (event) {
-			case EventManager.EVENT_USER_BALANCE:
-				processUserBalanceEvent(message);
-		}
-	}
-
-	// --------------------------------------
-	// Common
-	// --------------------------------------
 
 	private function processUserBalanceEvent(payload:UserBalancePayload) {
 		Player.instance.coins = payload.coins;
@@ -332,7 +471,7 @@ class HomeScene extends BasicScene implements EventListener {
 				default:
 			}
 
-			addChildAt(pageContent, 0);
+			addChildAt(pageContent, 1);
 		}
 	}
 

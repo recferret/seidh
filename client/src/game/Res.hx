@@ -111,6 +111,11 @@ enum SeidhResource {
 
     UI_HOME_BUNNY;
     UI_HOME_BUNNY_FIRE;
+
+    UI_HOME_TITLE_COLLECTION;
+    UI_HOME_TITLE_FRIENDS;
+    UI_HOME_TITLE_SOON;
+    UI_HOME_TITLE_STORE;
     
     // ------------------------------------
     // ZOMBIE BOY
@@ -304,6 +309,11 @@ class Res {
                 remoteResourceMap.set(UI_HOME_BUNNY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_BUNNY.png');
                 remoteResourceMap.set(UI_HOME_BUNNY_FIRE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_BUNNY_FIRE.png');
 
+                remoteResourceMap.set(UI_HOME_TITLE_COLLECTION, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_COLLECTION.png');
+                remoteResourceMap.set(UI_HOME_TITLE_FRIENDS, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_FRIENDS.png');
+                remoteResourceMap.set(UI_HOME_TITLE_SOON, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_SOON.png');
+                remoteResourceMap.set(UI_HOME_TITLE_STORE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_STORE.png');
+
                 // ------------------------------------
                 // ZOMBIE BOY
                 // ------------------------------------
@@ -393,7 +403,7 @@ class Res {
                 tileResMap.set(UI_DIALOG_BUTTON_YAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
                 tileResMap.set(UI_DIALOG_WINDOW_SMALL, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_SMALL.toTile().center());
                 tileResMap.set(UI_DIALOG_WINDOW_MEDIUM, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_MEDIUM.toTile().center());     
-                tileResMap.set(UI_DIALOG_XL_HEADER, hxd.Res.ui.dialog.UI_DIALOG_XL_HEADER.toTile().center());
+                tileResMap.set(UI_DIALOG_XL_HEADER, hxd.Res.ui.dialog.UI_DIALOG_XL_HEADER_2.toTile().center());
                 tileResMap.set(UI_DIALOG_XL_FOOTER, hxd.Res.ui.dialog.UI_DIALOG_XL_FOOTER.toTile().center());
 
                 tileResMap.set(UI_GAME_JOYSTICK_1, hxd.Res.ui.game.UI_GAME_JOYSTICK_1.toTile().center());
@@ -429,6 +439,16 @@ class Res {
 
                 tileResMap.set(UI_HOME_BUNNY, hxd.Res.ui.home.UI_HOME_BUNNY.toTile().center());
                 tileResMap.set(UI_HOME_BUNNY_FIRE, hxd.Res.ui.home.UI_HOME_BUNNY_FIRE.toTile().center());
+
+                tileResMap.set(UI_HOME_TITLE_COLLECTION, hxd.Res.ui.home.UI_HOME_TITLE_COLLECTION.toTile().center());
+                tileResMap.set(UI_HOME_TITLE_FRIENDS, hxd.Res.ui.home.UI_HOME_TITLE_FRIENDS.toTile().center());
+                tileResMap.set(UI_HOME_TITLE_SOON, hxd.Res.ui.home.UI_HOME_TITLE_SOON.toTile().center());
+                tileResMap.set(UI_HOME_TITLE_STORE, hxd.Res.ui.home.UI_HOME_TITLE_STORE.toTile().center());
+
+                tileResMap.set(UI_DIALOG_BUTTON_NAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
+                tileResMap.set(UI_DIALOG_BUTTON_YAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
+                tileResMap.set(UI_DIALOG_WINDOW_SMALL, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_SMALL.toTile().center());
+                tileResMap.set(UI_DIALOG_WINDOW_MEDIUM, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_MEDIUM.toTile().center());     
 
                 // ------------------------------------
                 // ZOMBIE BOY
