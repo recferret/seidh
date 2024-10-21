@@ -66,7 +66,7 @@ class DialogManager {
     ) {
         if (!DialogManager.IsDialogActive) {
             DialogManager.IsDialogActive = true;
-            
+
             new Dialog(
                 parent,
                 dialogType,

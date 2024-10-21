@@ -203,134 +203,135 @@ class Res {
             resCallback = callback;
 
             initialized = true;
-            if (GameConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) { 
+            if (GameConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) {
+                final url = 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/';
                 // ------------------------------------
                 // FX
                 // ------------------------------------
 
-                remoteResourceMap.set(FX_IMPACT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/ragnar/FX_IMPACT.png');
+                remoteResourceMap.set(FX_IMPACT, url + 'fx/ragnar/FX_IMPACT.png');
 
-                remoteResourceMap.set(FX_ZOMBIE_BLOOD_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_BLOOD_1.png');
-                remoteResourceMap.set(FX_ZOMBIE_BLOOD_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/zombie/FX_ZOMBIE_ATTACK_3.png');
+                remoteResourceMap.set(FX_ZOMBIE_BLOOD_1, url + 'fx/zombie/FX_ZOMBIE_BLOOD_1.png');
+                remoteResourceMap.set(FX_ZOMBIE_BLOOD_2, url + 'fx/zombie/FX_ZOMBIE_ATTACK_3.png');
 
-                remoteResourceMap.set(FX_NORMALMAP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/fx/FX_NORMALMAP.png');
+                remoteResourceMap.set(FX_NORMALMAP, url + 'fx/FX_NORMALMAP.png');
 
                 // ------------------------------------
                 // STUFF
                 // ------------------------------------
             
-                remoteResourceMap.set(STUFF_TILEMAP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/icons/STUFF_TILEMAP.png');
+                remoteResourceMap.set(STUFF_TILEMAP, url + 'icons/STUFF_TILEMAP.png');
 
                 // ------------------------------------
                 // RAGNAR
                 // ------------------------------------
             
-                remoteResourceMap.set(RAGNAR_IDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_IDLE.png');
-                remoteResourceMap.set(RAGNAR_RUN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_RUN.png');
-                remoteResourceMap.set(RAGNAR_ATTACK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_ATTACK.png');
-                remoteResourceMap.set(RAGNAR_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_DEATH.png');
+                remoteResourceMap.set(RAGNAR_IDLE, url + 'ragnar/RAGNAR_IDLE.png');
+                remoteResourceMap.set(RAGNAR_RUN, url + 'ragnar/RAGNAR_RUN.png');
+                remoteResourceMap.set(RAGNAR_ATTACK, url + 'ragnar/RAGNAR_ATTACK.png');
+                remoteResourceMap.set(RAGNAR_DEATH, url + 'ragnar/RAGNAR_DEATH.png');
 
-                remoteResourceMap.set(RAGNAR_DUDE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_DUDE.png');
-                remoteResourceMap.set(RAGNAR_NORM, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_NORM.png');
-                remoteResourceMap.set(RAGNAR_BASE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ragnar/RAGNAR_BASE.png');
+                remoteResourceMap.set(RAGNAR_DUDE, url + 'ragnar/RAGNAR_DUDE.png');
+                remoteResourceMap.set(RAGNAR_NORM, url + 'ragnar/RAGNAR_NORM.png');
+                remoteResourceMap.set(RAGNAR_BASE, url + 'ragnar/RAGNAR_BASE.png');
             
                 // ------------------------------------
                 // SOUND
                 // ------------------------------------
             
-                remoteResourceMap.set(SOUND_BUTTON_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_BUTTON_1.mp3');
-                remoteResourceMap.set(SOUND_BUTTON_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_BUTTON_2.mp3');
-                remoteResourceMap.set(SOUND_GAMEPLAY_THEME, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_GAMEPLAY_THEME.mp3');
-                remoteResourceMap.set(SOUND_MENU_THEME, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_MENU_THEME.mp3');
-                remoteResourceMap.set(SOUND_VIKING_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_VIKING_DEATH.mp3');
-                remoteResourceMap.set(SOUND_VIKING_DMG, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_VIKING_DMG.mp3');
-                remoteResourceMap.set(SOUND_VIKING_HIT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_VIKING_HIT.mp3');
-                remoteResourceMap.set(SOUND_ZOMBIE_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_ZOMBIE_DEATH.mp3');
-                remoteResourceMap.set(SOUND_ZOMBIE_DMG, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_ZOMBIE_DMG.mp3');
-                remoteResourceMap.set(SOUND_ZOMBIE_HIT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/sound/SOUND_ZOMBIE_HIT.mp3');
+                remoteResourceMap.set(SOUND_BUTTON_1, url + 'sound/SOUND_BUTTON_1.mp3');
+                remoteResourceMap.set(SOUND_BUTTON_2, url + 'sound/SOUND_BUTTON_2.mp3');
+                remoteResourceMap.set(SOUND_GAMEPLAY_THEME, url + 'sound/SOUND_GAMEPLAY_THEME.mp3');
+                remoteResourceMap.set(SOUND_MENU_THEME, url + 'sound/SOUND_MENU_THEME.mp3');
+                remoteResourceMap.set(SOUND_VIKING_DEATH, url + 'sound/SOUND_VIKING_DEATH.mp3');
+                remoteResourceMap.set(SOUND_VIKING_DMG, url + 'sound/SOUND_VIKING_DMG.mp3');
+                remoteResourceMap.set(SOUND_VIKING_HIT, url + 'sound/SOUND_VIKING_HIT.mp3');
+                remoteResourceMap.set(SOUND_ZOMBIE_DEATH, url + 'sound/SOUND_ZOMBIE_DEATH.mp3');
+                remoteResourceMap.set(SOUND_ZOMBIE_DMG, url + 'sound/SOUND_ZOMBIE_DMG.mp3');
+                remoteResourceMap.set(SOUND_ZOMBIE_HIT, url + 'sound/SOUND_ZOMBIE_HIT.mp3');
             
                 // ------------------------------------
                 // TERRAIN
                 // ------------------------------------
             
-                remoteResourceMap.set(TERRAIN_GROUND_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_GROUND_1.png');
-                remoteResourceMap.set(TERRAIN_GROUND_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_GROUND_2.png');
-                remoteResourceMap.set(TERRAIN_GROUND_3, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_GROUND_3.png');
-                remoteResourceMap.set(TERRAIN_GROUND_4, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_GROUND_4.png');
-                remoteResourceMap.set(TERRAIN_FENCE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_FENCE.png');
-                remoteResourceMap.set(TERRAIN_PUDDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_PUDDLE.png');
-                remoteResourceMap.set(TERRAIN_ROCK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_ROCK.png');
-                remoteResourceMap.set(TERRAIN_TREE_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_TREE_1.png');
-                remoteResourceMap.set(TERRAIN_TREE_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_TREE_2.png');
-                remoteResourceMap.set(TERRAIN_WEED_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_WEED_1.png');
-                remoteResourceMap.set(TERRAIN_WEED_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_WEED_2.png');
-                remoteResourceMap.set(TERRAIN_ENV_TILEMAP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/terrain/TERRAIN_ENV_TILEMAP.png');
+                remoteResourceMap.set(TERRAIN_GROUND_1, url + 'terrain/TERRAIN_GROUND_1.png');
+                remoteResourceMap.set(TERRAIN_GROUND_2, url + 'terrain/TERRAIN_GROUND_2.png');
+                remoteResourceMap.set(TERRAIN_GROUND_3, url + 'terrain/TERRAIN_GROUND_3.png');
+                remoteResourceMap.set(TERRAIN_GROUND_4, url + 'terrain/TERRAIN_GROUND_4.png');
+                remoteResourceMap.set(TERRAIN_FENCE, url + 'terrain/TERRAIN_FENCE.png');
+                remoteResourceMap.set(TERRAIN_PUDDLE, url + 'terrain/TERRAIN_PUDDLE.png');
+                remoteResourceMap.set(TERRAIN_ROCK, url + 'terrain/TERRAIN_ROCK.png');
+                remoteResourceMap.set(TERRAIN_TREE_1, url + 'terrain/TERRAIN_TREE_1.png');
+                remoteResourceMap.set(TERRAIN_TREE_2, url + 'terrain/TERRAIN_TREE_2.png');
+                remoteResourceMap.set(TERRAIN_WEED_1, url + 'terrain/TERRAIN_WEED_1.png');
+                remoteResourceMap.set(TERRAIN_WEED_2, url + 'terrain/TERRAIN_WEED_2.png');
+                remoteResourceMap.set(TERRAIN_ENV_TILEMAP, url + 'terrain/TERRAIN_ENV_TILEMAP.png');
                 
 
                 // ------------------------------------
                 // UI
                 // ------------------------------------
 
-                remoteResourceMap.set(UI_DIALOG_BUTTON_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_BUTTON_NAY.png');
-                remoteResourceMap.set(UI_DIALOG_BUTTON_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_BUTTON_YAY.png');
-                remoteResourceMap.set(UI_DIALOG_WINDOW_SMALL, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_WINDOW_SMALL.png');
-                remoteResourceMap.set(UI_DIALOG_WINDOW_MEDIUM, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_WINDOW_MEDIUM.png');
-                remoteResourceMap.set(UI_DIALOG_XL_HEADER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_XL_HEADER.png');
-                remoteResourceMap.set(UI_DIALOG_XL_FOOTER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/dialog/UI_DIALOG_XL_FOOTER.png');
+                remoteResourceMap.set(UI_DIALOG_BUTTON_NAY, url + 'ui/dialog/UI_DIALOG_BUTTON_NAY.png');
+                remoteResourceMap.set(UI_DIALOG_BUTTON_YAY, url + 'ui/dialog/UI_DIALOG_BUTTON_YAY.png');
+                remoteResourceMap.set(UI_DIALOG_WINDOW_SMALL, url + 'ui/dialog/UI_DIALOG_WINDOW_SMALL.png');
+                remoteResourceMap.set(UI_DIALOG_WINDOW_MEDIUM, url + 'ui/dialog/UI_DIALOG_WINDOW_MEDIUM.png');
+                remoteResourceMap.set(UI_DIALOG_XL_HEADER, url + 'ui/dialog/UI_DIALOG_XL_HEADER.png');
+                remoteResourceMap.set(UI_DIALOG_XL_FOOTER, url + 'ui/dialog/UI_DIALOG_XL_FOOTER.png');
             
-                remoteResourceMap.set(UI_GAME_JOYSTICK_1, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_1.png');
-                remoteResourceMap.set(UI_GAME_JOYSTICK_2, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_JOYSTICK_2.png');
-                remoteResourceMap.set(UI_GAME_HEADER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_HEADER.png');
-                remoteResourceMap.set(UI_GAME_FOOTER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_FOOTER.png');
-                remoteResourceMap.set(UI_GAME_FRAME, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_FRAME.png');
-                remoteResourceMap.set(UI_GAME_FRAME_RIGHT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_FRAME_RIGHT.png');
-                remoteResourceMap.set(UI_GAME_HP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_HP.png');
-                remoteResourceMap.set(UI_GAME_XP, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_XP.png');
-                remoteResourceMap.set(UI_GAME_MONEY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/game/UI_GAME_MONEY.png');
+                remoteResourceMap.set(UI_GAME_JOYSTICK_1, url + 'ui/game/UI_GAME_JOYSTICK_1.png');
+                remoteResourceMap.set(UI_GAME_JOYSTICK_2, url + 'ui/game/UI_GAME_JOYSTICK_2.png');
+                remoteResourceMap.set(UI_GAME_HEADER, url + 'ui/game/UI_GAME_HEADER.png');
+                remoteResourceMap.set(UI_GAME_FOOTER, url + 'ui/game/UI_GAME_FOOTER.png');
+                remoteResourceMap.set(UI_GAME_FRAME, url + 'ui/game/UI_GAME_FRAME.png');
+                remoteResourceMap.set(UI_GAME_FRAME_RIGHT, url + 'ui/game/UI_GAME_FRAME_RIGHT.png');
+                remoteResourceMap.set(UI_GAME_HP, url + 'ui/game/UI_GAME_HP.png');
+                remoteResourceMap.set(UI_GAME_XP, url + 'ui/game/UI_GAME_XP.png');
+                remoteResourceMap.set(UI_GAME_MONEY, url + 'ui/game/UI_GAME_MONEY.png');
             
-                remoteResourceMap.set(UI_HOME_ARROW_LEFT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_ARROW_LEFT.png');
-                remoteResourceMap.set(UI_HOME_ARROW_RIGHT, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_ARROW_RIGHT.png');
-                remoteResourceMap.set(UI_HOME_LVL_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_LVL_NAY.png');
-                remoteResourceMap.set(UI_HOME_LVL_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_LVL_YAY.png');
-                remoteResourceMap.set(UI_HOME_PLAY_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_PLAY_NAY.png');
-                remoteResourceMap.set(UI_HOME_PLAY_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_PLAY_YAY.png');
-                remoteResourceMap.set(UI_HOME_DARKNESS, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_DARKNESS.png');
-                remoteResourceMap.set(UI_HOME_HEADER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_HEADER.png');
-                remoteResourceMap.set(UI_HOME_FRAME, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_FRAME.png');
-                remoteResourceMap.set(UI_HOME_FOOTER, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_FOOTER.png');
-                remoteResourceMap.set(UI_HOME_HOME_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_HOME_NAY.png');
-                remoteResourceMap.set(UI_HOME_HOME_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_HOME_YAY.png');
-                remoteResourceMap.set(UI_HOME_BOOST_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_BOOST_NAY.png');
-                remoteResourceMap.set(UI_HOME_BOOST_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_BOOST_YAY.png');
-                remoteResourceMap.set(UI_HOME_COLLECT_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_COLLECT_NAY.png');
-                remoteResourceMap.set(UI_HOME_COLLECT_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_COLLECT_YAY.png');
-                remoteResourceMap.set(UI_HOME_FRIEND_NAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_FRIEND_NAY.png');
-                remoteResourceMap.set(UI_HOME_FRIEND_YAY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_FRIEND_YAY.png');
-                remoteResourceMap.set(UI_HOME_BUNNY, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_BUNNY.png');
-                remoteResourceMap.set(UI_HOME_BUNNY_FIRE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_BUNNY_FIRE.png');
+                remoteResourceMap.set(UI_HOME_ARROW_LEFT, url + 'ui/home/UI_HOME_ARROW_LEFT.png');
+                remoteResourceMap.set(UI_HOME_ARROW_RIGHT, url + 'ui/home/UI_HOME_ARROW_RIGHT.png');
+                remoteResourceMap.set(UI_HOME_LVL_NAY, url + 'ui/home/UI_HOME_LVL_NAY.png');
+                remoteResourceMap.set(UI_HOME_LVL_YAY, url + 'ui/home/UI_HOME_LVL_YAY.png');
+                remoteResourceMap.set(UI_HOME_PLAY_NAY, url + 'ui/home/UI_HOME_PLAY_NAY.png');
+                remoteResourceMap.set(UI_HOME_PLAY_YAY, url + 'ui/home/UI_HOME_PLAY_YAY.png');
+                remoteResourceMap.set(UI_HOME_DARKNESS, url + 'ui/home/UI_HOME_DARKNESS.png');
+                remoteResourceMap.set(UI_HOME_HEADER, url + 'ui/home/UI_HOME_HEADER.png');
+                remoteResourceMap.set(UI_HOME_FRAME, url + 'ui/home/UI_HOME_FRAME.png');
+                remoteResourceMap.set(UI_HOME_FOOTER, url + 'ui/home/UI_HOME_FOOTER.png');
+                remoteResourceMap.set(UI_HOME_HOME_NAY, url + 'ui/home/UI_HOME_HOME_NAY.png');
+                remoteResourceMap.set(UI_HOME_HOME_YAY, url + 'ui/home/UI_HOME_HOME_YAY.png');
+                remoteResourceMap.set(UI_HOME_BOOST_NAY, url + 'ui/home/UI_HOME_BOOST_NAY.png');
+                remoteResourceMap.set(UI_HOME_BOOST_YAY, url + 'ui/home/UI_HOME_BOOST_YAY.png');
+                remoteResourceMap.set(UI_HOME_COLLECT_NAY, url + 'ui/home/UI_HOME_COLLECT_NAY.png');
+                remoteResourceMap.set(UI_HOME_COLLECT_YAY, url + 'ui/home/UI_HOME_COLLECT_YAY.png');
+                remoteResourceMap.set(UI_HOME_FRIEND_NAY, url + 'ui/home/UI_HOME_FRIEND_NAY.png');
+                remoteResourceMap.set(UI_HOME_FRIEND_YAY, url + 'ui/home/UI_HOME_FRIEND_YAY.png');
+                remoteResourceMap.set(UI_HOME_BUNNY, url + 'ui/home/UI_HOME_BUNNY.png');
+                remoteResourceMap.set(UI_HOME_BUNNY_FIRE, url + 'ui/home/UI_HOME_BUNNY_FIRE.png');
 
-                remoteResourceMap.set(UI_HOME_TITLE_COLLECTION, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_COLLECTION.png');
-                remoteResourceMap.set(UI_HOME_TITLE_FRIENDS, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_FRIENDS.png');
-                remoteResourceMap.set(UI_HOME_TITLE_SOON, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_SOON.png');
-                remoteResourceMap.set(UI_HOME_TITLE_STORE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/ui/home/UI_HOME_TITLE_STORE.png');
+                remoteResourceMap.set(UI_HOME_TITLE_COLLECTION, url + 'ui/home/UI_HOME_TITLE_COLLECTION.png');
+                remoteResourceMap.set(UI_HOME_TITLE_FRIENDS, url + 'ui/home/UI_HOME_TITLE_FRIENDS.png');
+                remoteResourceMap.set(UI_HOME_TITLE_SOON, url + 'ui/home/UI_HOME_TITLE_SOON.png');
+                remoteResourceMap.set(UI_HOME_TITLE_STORE, url + 'ui/home/UI_HOME_TITLE_STORE.png');
 
                 // ------------------------------------
                 // ZOMBIE BOY
                 // ------------------------------------
             
-                remoteResourceMap.set(ZOMBIE_BOY_IDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_IDLE.png');
-                remoteResourceMap.set(ZOMBIE_BOY_RUN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_RUN.png');
-                remoteResourceMap.set(ZOMBIE_BOY_ATTACK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_ATTACK.png');
-                remoteResourceMap.set(ZOMBIE_BOY_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_BOY_DEATH.png');
+                remoteResourceMap.set(ZOMBIE_BOY_IDLE, url + 'zombie-boy/ZOMBIE_BOY_IDLE.png');
+                remoteResourceMap.set(ZOMBIE_BOY_RUN, url + 'zombie-boy/ZOMBIE_BOY_RUN.png');
+                remoteResourceMap.set(ZOMBIE_BOY_ATTACK, url + 'zombie-boy/ZOMBIE_BOY_ATTACK.png');
+                remoteResourceMap.set(ZOMBIE_BOY_DEATH, url + 'zombie-boy/ZOMBIE_BOY_DEATH.png');
 
                 // ------------------------------------
                 // ZOMBIE GIRL
                 // ------------------------------------
             
-                remoteResourceMap.set(ZOMBIE_GIRL_IDLE, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_IDLE.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_RUN, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_RUN.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-boy/ZOMBIE_GIRL_ATTACK.png');
-                remoteResourceMap.set(ZOMBIE_GIRL_DEATH, 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/zombie-girl/ZOMBIE_GIRL_DEATH.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_IDLE, url + 'zombie-girl/ZOMBIE_GIRL_IDLE.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_RUN, url + 'zombie-girl/ZOMBIE_GIRL_RUN.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_ATTACK, url + 'zombie-boy/ZOMBIE_GIRL_ATTACK.png');
+                remoteResourceMap.set(ZOMBIE_GIRL_DEATH, url + 'zombie-girl/ZOMBIE_GIRL_DEATH.png');
 
                 loadRemoteResources();
             } else if (GameConfig.instance.ResProvider == ResourceProvider.LOCAL) {

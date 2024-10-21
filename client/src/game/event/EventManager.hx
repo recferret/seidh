@@ -26,6 +26,7 @@ class EventManager {
 	public static final EVENT_HOME_SCENE = 'EVENT_HOME_SCENE';
 	public static final EVENT_REF_SHARE = 'EVENT_REF_SHARE';
 	public static final EVENT_CHARACTER_DEATH_ANIM_END = 'EVENT_CHARACTER_DEATH_ANIM_END';
+	public static final EVENT_INVALIDATE_BOOSTS = 'EVENT_INVALIDATE_BOOSTS';
 
 	private final listeners = new Map<String, List<EventListener>>();
 

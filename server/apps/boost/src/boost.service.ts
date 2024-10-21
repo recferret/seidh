@@ -49,20 +49,20 @@ export class BoostService implements OnModuleInit {
           boostType: BoostType.Rune,
 
           levelOneId: 'EXP_1',
-          levelOneName: 'Exp +50%',
-          levelOneDescription: 'More exp per monster kill',
+          levelOneName: 'Exp 1/3',
+          levelOneDescription: '50% more exp',
           levelOnePrice: 100,
           levelOneCurrencyType: CurrencyType.Coins,
 
           levelTwoId: 'EXP_2',
-          levelTwoName: 'Exp +100%',
-          levelTwoDescription: 'Even more exp per monster kill',
+          levelTwoName: 'Exp 2/3',
+          levelTwoDescription: '100% more exp',
           levelTwoPrice: 500,
           levelTwoCurrencyType: CurrencyType.Coins,
 
           levelThreeId: 'EXP_3',
-          levelThreeName: 'Exp +200%',
-          levelThreeDescription: 'Three time more exp per monster kill',
+          levelThreeName: 'Exp 3/3',
+          levelThreeDescription: '300% more exp',
           levelThreePrice: 1000,
           levelThreeCurrencyType: CurrencyType.Teeth,
         }),
@@ -74,20 +74,20 @@ export class BoostService implements OnModuleInit {
           boostType: BoostType.Rune,
 
           levelOneId: 'ITEM_RADIUS_1',
-          levelOneName: 'Pick up radius +100%',
-          levelOneDescription: 'Better items pick up radius',
+          levelOneName: 'Pick up 1/3',
+          levelOneDescription: 'Pick up radius +50%',
           levelOnePrice: 100,
           levelOneCurrencyType: CurrencyType.Coins,
 
           levelTwoId: 'ITEM_RADIUS_2',
-          levelTwoName: 'Pick up radius +200%',
-          levelTwoDescription: 'Even better items pick up radius',
+          levelTwoName: 'Pick up 2/3',
+          levelTwoDescription: 'Pick up radius +100%',
           levelTwoPrice: 500,
           levelTwoCurrencyType: CurrencyType.Coins,
 
           levelThreeId: 'ITEM_RADIUS_3',
-          levelThreeName: 'Pick up radius +300%',
-          levelThreeDescription: 'Best items pick up radius',
+          levelThreeName: 'Pick up 3/3',
+          levelThreeDescription: 'Pick up radius +200%',
           levelThreePrice: 1000,
           levelThreeCurrencyType: CurrencyType.Teeth,
         }),
@@ -98,21 +98,21 @@ export class BoostService implements OnModuleInit {
           order: 3,
           boostType: BoostType.Rune,
 
-          levelOneId: 'MORE_TOKENS_1',
-          levelOneName: 'Double tokens gained',
-          levelOneDescription: 'X2 tokens from monsters',
+          levelOneId: 'MORE_COINS_1',
+          levelOneName: 'Coins 1/3',
+          levelOneDescription: '100% more coins',
           levelOnePrice: 100,
           levelOneCurrencyType: CurrencyType.Coins,
 
-          levelTwoId: 'MORE_TOKENS_2',
-          levelTwoName: 'Triple tokens gained',
-          levelTwoDescription: 'X3 tokens from monsters',
+          levelTwoId: 'MORE_COINS_2',
+          levelTwoName: 'Coins 2/3',
+          levelTwoDescription: '200% more coins',
           levelTwoPrice: 500,
           levelTwoCurrencyType: CurrencyType.Coins,
 
-          levelThreeId: 'MORE_TOKENS_3',
-          levelThreeName: 'Quadruple tokens gained',
-          levelThreeDescription: 'X4 tokens from monsters',
+          levelThreeId: 'MORE_COINS_3',
+          levelThreeName: 'Coins 3/3',
+          levelThreeDescription: '400% more coins',
           levelThreePrice: 1000,
           levelThreeCurrencyType: CurrencyType.Teeth,
         }),
@@ -124,20 +124,20 @@ export class BoostService implements OnModuleInit {
           boostType: BoostType.Rune,
 
           levelOneId: 'MONSTERS_1',
-          levelOneName: 'Monsters 1',
-          levelOneDescription: 'More and stronger monsters',
+          levelOneName: 'Monsters 1/3',
+          levelOneDescription: 'New types of monsters',
           levelOnePrice: 100,
           levelOneCurrencyType: CurrencyType.Coins,
 
           levelTwoId: 'MONSTERS_2',
-          levelTwoName: 'Monsters 2',
-          levelTwoDescription: 'New types of monsters',
+          levelTwoName: 'Monsters 2/3',
+          levelTwoDescription: 'More and stronger monsters',
           levelTwoPrice: 500,
           levelTwoCurrencyType: CurrencyType.Coins,
 
-          levelThreeId: 'MONSTERS_2',
-          levelThreeName: 'Monsters 3',
-          levelThreeDescription: 'New types of monsters and bosses',
+          levelThreeId: 'MONSTERS_3',
+          levelThreeName: 'Monsters 3/3',
+          levelThreeDescription: 'Stronger monsters and bosses',
           levelThreePrice: 1000,
           levelThreeCurrencyType: CurrencyType.Teeth,
         }),
@@ -149,19 +149,19 @@ export class BoostService implements OnModuleInit {
           boostType: BoostType.Scroll,
 
           levelOneId: 'ITEMS_DROP_1',
-          levelOneName: 'Items drop 1',
+          levelOneName: 'Items 1/3',
           levelOneDescription: 'Health potions may drop',
           levelOnePrice: 100,
           levelOneCurrencyType: CurrencyType.Coins,
 
           levelTwoId: 'ITEMS_DROP_2',
-          levelTwoName: 'Items drop 2',
+          levelTwoName: 'Items 2/3',
           levelTwoDescription: 'Boost potions may drop',
           levelTwoPrice: 500,
           levelTwoCurrencyType: CurrencyType.Coins,
 
           levelThreeId: 'ITEMS_DROP_3',
-          levelThreeName: 'Items drop 3',
+          levelThreeName: 'Items 3/3',
           levelThreeDescription: 'More potions drop',
           levelThreePrice: 1000,
           levelThreeCurrencyType: CurrencyType.Teeth,
@@ -174,19 +174,19 @@ export class BoostService implements OnModuleInit {
           boostType: BoostType.Scroll,
 
           levelOneId: 'STATS_1',
-          levelOneName: 'Better stats 1',
+          levelOneName: 'Stats 1/3',
           levelOneDescription: 'Stats boost +20%',
           levelOnePrice: 100,
           levelOneCurrencyType: CurrencyType.Coins,
 
           levelTwoId: 'STATS_2',
-          levelTwoName: 'Better stats 2',
+          levelTwoName: 'Stats 2/3',
           levelTwoDescription: 'Stats boost +50%',
           levelTwoPrice: 500,
           levelTwoCurrencyType: CurrencyType.Coins,
 
-          levelThreeId: 'STATS_2',
-          levelThreeName: 'Better stats 3',
+          levelThreeId: 'STATS_3',
+          levelThreeName: 'Stats 3/3',
           levelThreeDescription: 'Stats boost +100%',
           levelThreePrice: 1000,
           levelThreeCurrencyType: CurrencyType.Teeth,
@@ -281,22 +281,26 @@ export class BoostService implements OnModuleInit {
         boost.levelTwoId == request.boostId ||
         boost.levelThreeId == request.boostId,
     );
+
     // Has such boost
     if (!boost) {
       response.message = 'Boost not found';
       return response;
     }
+
     // Has such user
     const user = await this.userModel.findById(request.userId);
     if (!user) {
       response.message = 'User not found';
       return response;
     }
+
     // User has such boost
     if (user.boostsOwned.includes(request.boostId)) {
       response.message = 'Already owned';
       return response;
     }
+
     // User has enough coins
     let currencyType = CurrencyType.Coins;
     let price = 0;
@@ -322,6 +326,7 @@ export class BoostService implements OnModuleInit {
       currencyType = boost.levelThreeCurrencyType;
       price = boost.levelThreePrice;
     }
+
     // Has enough coins
     if (
       (currencyType == CurrencyType.Coins && price > user.coins) ||
@@ -330,14 +335,17 @@ export class BoostService implements OnModuleInit {
       response.message = 'Not enough money';
       return response;
     }
+
     // OK flow, spent money
     if (currencyType == CurrencyType.Coins) {
       user.coins -= price;
     } else if (currencyType == CurrencyType.Teeth) {
       user.teeth -= price;
     }
+
     // add boost
     user.boostsOwned.push(request.boostId);
+
     // save and notify about balance change
     await user.save();
     await this.boostTransactionModel.create({
@@ -345,8 +353,61 @@ export class BoostService implements OnModuleInit {
       boostId: request.boostId,
       user,
     });
+
     await this.seidhCommonBroadcasts.notifyBalanceUpdate(user.id);
+
     response.success = true;
+    response.boosts = await this.getBoostsByUserId(request.userId);
+
     return response;
+  }
+
+  private async getBoostsByUserId(userId: string) {
+    const user = await this.userModel.findById(userId);
+
+    const boosts = this.boosts
+      .sort((a, b) => a.order - b.order)
+      .map((boost) => {
+        const boostBody: BoostBody = {
+          order: boost.order,
+
+          boostType: boost.boostType,
+
+          levelOneId: boost.levelOneId,
+          levelOneName: boost.levelOneName,
+          levelOneDescription: boost.levelOneDescription,
+          levelOnePrice: boost.levelOnePrice,
+          levelOneCurrencyType: boost.levelOneCurrencyType,
+          levelOneAccquired: false,
+
+          levelTwoId: boost.levelTwoId,
+          levelTwoName: boost.levelTwoName,
+          levelTwoDescription: boost.levelTwoDescription,
+          levelTwoPrice: boost.levelTwoPrice,
+          levelTwoCurrencyType: boost.levelTwoCurrencyType,
+          levelTwoAccquired: false,
+
+          levelThreeId: boost.levelThreeId,
+          levelThreeName: boost.levelThreeName,
+          levelThreeDescription: boost.levelThreeDescription,
+          levelThreePrice: boost.levelThreePrice,
+          levelThreeCurrencyType: boost.levelThreeCurrencyType,
+          levelThreeAccquired: false,
+        };
+
+        if (user.boostsOwned.includes(boostBody.levelOneId)) {
+          boostBody.levelOneAccquired = true;
+        }
+        if (user.boostsOwned.includes(boostBody.levelTwoId)) {
+          boostBody.levelTwoAccquired = true;
+        }
+        if (user.boostsOwned.includes(boostBody.levelThreeId)) {
+          boostBody.levelThreeAccquired = true;
+        }
+
+        return boostBody;
+      });
+
+    return boosts;
   }
 }

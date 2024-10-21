@@ -147,21 +147,21 @@ class HomeScene extends BasicScene implements EventListener {
         usernameText.textColor = GameConfig.FontColor;
         usernameText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         usernameText.textAlign = Left;
-		usernameText.text = "FerretRec";
+		usernameText.text = Player.instance.userName;
         usernameText.setScale(2);
 		usernameText.setPosition(80, 70);
         addChild(usernameText);
 
 		friendsTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_FRIENDS), Left);
-		friendsTextIcon.setText('10/100');
+		friendsTextIcon.setText('0/0');
 		friendsTextIcon.setPosition(100, 120);
 		
 		coinsTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_COINS), Right);
-		coinsTextIcon.setText('10000');
+		coinsTextIcon.setText(Std.string(Player.instance.coins));
 		coinsTextIcon.setPosition(Main.ActualScreenWidth - 90, 80);
 
 		teethTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_TEETH), Right);
-		teethTextIcon.setText('100');
+		teethTextIcon.setText(Std.string(Player.instance.teeth));
 		teethTextIcon.setPosition(Main.ActualScreenWidth - 90, 120);
 	}
 
@@ -356,10 +356,6 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 	}
 
-	// --------------------------------------
-	// General
-	// --------------------------------------
-
 	private function generateBackground() {
         screenDarknessDisplacementTile = Res.instance.getTileResource(SeidhResource.FX_NORMALMAP);
 
@@ -441,10 +437,9 @@ class HomeScene extends BasicScene implements EventListener {
         darkness.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
 	}
 
-	private function processUserBalanceEvent(payload:UserBalancePayload) {
-		Player.instance.coins = payload.coins;
-		Player.instance.teeth = payload.teeth;
-	}
+	// --------------------------------------
+	// General
+	// --------------------------------------
 
 	private function setSceneContent(homeSceneContent:HomeSceneContent) {
 		if (this.homeSceneContent != homeSceneContent) {
@@ -473,6 +468,14 @@ class HomeScene extends BasicScene implements EventListener {
 
 			addChildAt(pageContent, 1);
 		}
+	}
+
+	private function processUserBalanceEvent(payload:UserBalancePayload) {
+		Player.instance.coins = payload.coins;
+		Player.instance.teeth = payload.teeth;
+
+		coinsTextIcon.setText(Std.string(Player.instance.coins));
+		teethTextIcon.setText(Std.string(Player.instance.teeth));
 	}
 
 }
