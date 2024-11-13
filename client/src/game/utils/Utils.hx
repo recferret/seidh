@@ -1,5 +1,6 @@
 package game.utils;
 
+import engine.base.geometry.Circle;
 import engine.base.geometry.Rectangle;
 
 class Utils {
@@ -13,6 +14,14 @@ class Utils {
 
 	public static function MaskEthAddress(text:String) {
 		return text.substring(0, 4) + '...' + text.substring(text.length - 4, text.length);
+	}
+
+	public static function DrawCircle(graphics:h2d.Graphics, circle:Circle, color:Int) {
+		graphics.lineStyle(2, color);
+
+		graphics.drawCircle(circle.x, circle.y, circle.r);
+
+		graphics.endFill();
 	}
 
 	public static function DrawLine(graphics:h2d.Graphics, x1:Float, y1:Float, x2:Float, y2:Float, color:Int) {

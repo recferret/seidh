@@ -52,7 +52,7 @@ class SeidhEntityFactory {
                 width: 50,
                 height: 50,
                 rectOffsetX: 0,
-                rectOffsetY: 0,
+                rectOffsetY: 40,
             },
         }), amount);
     }

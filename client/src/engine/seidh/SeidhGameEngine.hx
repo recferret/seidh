@@ -68,6 +68,12 @@ class SeidhGameEngine extends BaseEngine {
 
     public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
         createCharacterEntity(SeidhEntityFactory.InitiateCharacter(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType));
+
+        // createConsumable(struct.x + 300, struct.y);
+        // createConsumable(struct.x + 400, struct.y);
+        // createConsumable(struct.x + 500, struct.y);
+        // createConsumable(struct.x + 600, struct.y);
+        // createConsumable(struct.x + 700, struct.y);
     }
 
     public function createCharacterEntityFromFullStruct(struct:CharacterEntityFullStruct) {
@@ -167,8 +173,9 @@ class SeidhGameEngine extends BaseEngine {
                             final consumable = cast(c, EngineConsumableEntity);
 
                             // Pick up items
-                            if (character1.getBodyRectangle().getCenter().distance(consumable.getBodyRectangle().getCenter()) < 150) {
-                                if (character1.getBodyRectangle().containsRect(consumable.getBodyRectangle())) {
+                            final characterPickUpCircle = character1.getBodyCircle();
+                            if (characterPickUpCircle.getCenter().distance(consumable.getBodyRectangle().getCenter()) < characterPickUpCircle.r + 10) {
+                                if (characterPickUpCircle.containsRect(consumable.getBodyRectangle())) {
                                     if (consumable.getEntityType() == EntityType.COIN) {
                                         // Increase tokens accquired
                                         final currentBalance = playerTokensAccquired.get(character1OwnerId);
@@ -266,7 +273,10 @@ class SeidhGameEngine extends BaseEngine {
                                                 }
 
                                                 // Create a new random consumable
-                                                createConsumable(character2);
+                                                createConsumable(
+                                                    Std.int(character2.getBodyRectangle().x), 
+                                                    Std.int(character2.getBodyRectangle().y)
+                                                );
                                             }
                                             character2.isAlive = false;
                                             deadEntities.push(character2.getId());
@@ -410,10 +420,7 @@ class SeidhGameEngine extends BaseEngine {
         return nearestPlayer;
     }
 
-    private function createConsumable(character:EngineCharacterEntity) {
-        final x = Std.int(character.getBodyRectangle().x);
-        final y = Std.int(character.getBodyRectangle().y);
-
+    private function createConsumable(x:Int, y:Int) {
         final rnd = MathUtils.randomIntInRange(1, 40);
         if (rnd == 1) {
             createConsumableEntity(SeidhEntityFactory.InitiateCoin(x, y, 25));

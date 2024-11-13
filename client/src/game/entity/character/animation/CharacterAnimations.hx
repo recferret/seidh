@@ -170,10 +170,14 @@ class CharacterAnimations {
             default:
         }
 
-        final idleTiles = [
-            for(x in 0 ... Std.int(idleTile.width / tw))
-                idleTile.sub(x * tw, 0, tw, th).center()
-        ];
+        final idleTiles = [];
+        for(x in 0 ... Std.int(idleTile.width / tw)) {
+            final tile = idleTile.sub(x * tw, 0, tw, th).center();
+            if (entrityType == EntityType.RAGNAR_LOH) {
+                tile.dx += 30;
+            }
+            idleTiles.push(tile);
+        }
         animation.loadIdle(idleTiles);
 
         final runTiles = [

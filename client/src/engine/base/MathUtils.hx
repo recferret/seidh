@@ -5,10 +5,6 @@ import engine.base.geometry.Point;
 
 class MathUtils {
 
-    public static function angleBetweenPoints(point1:Point, point2:Point) {
-		return Math.atan2(point2.y - point1.y, point2.x - point1.x);
-	}
-
 	public static function degreeToRads(degrees:Float) {
 		return (Math.PI / 180) * degrees;
 	}
@@ -24,6 +20,10 @@ class MathUtils {
 		} else {
 			return rads + 2 * Math.PI;
 		}
+	}
+
+    public static function angleBetweenPoints(point1:Point, point2:Point) {
+		return Math.atan2(point2.y - point1.y, point2.x - point1.x);
 	}
 
 	public static function rotatePointAroundCenter(x:Float, y:Float, cx:Float, cy:Float, r:Float) {

@@ -88,20 +88,6 @@ class Rectangle {
 		};
 	}
 
-	public function containsRect(b:Rectangle) {
-		var result = true;
-
-		// no horizontal overlap
-		if (getLeft() >= b.getRight() || b.getLeft() >= getRight())
-			result = false;
-
-		// no vertical overlap
-		if (getTop() >= b.getBottom() || b.getTop() >= getBottom())
-			result = false;
-
-		return result;
-	}
-
 	public function containtPoint(p:Point) {
 		return (getLeft() <= p.x && getRight() >= p.x && getTop() <= p.y && getBottom() >= p.y);
 	}
@@ -133,10 +119,21 @@ class Rectangle {
 		return Math.abs(cx - tx) < w / 2 && Math.abs(cy - ty) < h / 2;
 	}
 
-	// TODO Need to use Separating Axis Theorem (SAT) in order to reduce computation cost
-	// https://github.com/Prozi/detect-collisions (BVH + SAT)
+	public function containsRect(b:Rectangle) {
+		var result = true;
+
+		// no horizontal overlap
+		if (getLeft() >= b.getRight() || b.getLeft() >= getRight())
+			result = false;
+
+		// no vertical overlap
+		if (getTop() >= b.getBottom() || b.getTop() >= getBottom())
+			result = false;
+
+		return result;
+	}
+
 	public function intersectsWithRect(b:Rectangle) {
-		// TODO add distance check first
 		if (r == 0 && b.r == 0) {
 			return containsRect(b);
 		} else {

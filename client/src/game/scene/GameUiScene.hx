@@ -232,10 +232,10 @@ class GameUiScene extends h2d.Scene {
 
 		movementController.initiate(rectSize / 2, h - rectSize / 2, rectSize);
 
-		skillIcon.setPosition(w - (skillSlot.tile.width * 1.4), h - (skillSlot.tile.height * 2));
-		skillSlot.setPosition(w - (skillSlot.tile.width * 1.4), h - (skillSlot.tile.height * 2));
+		skillIcon.setPosition(w - (skillSlot.tile.width * 1), h - (skillSlot.tile.height * 2));
+		skillSlot.setPosition(w - (skillSlot.tile.width * 1), h - (skillSlot.tile.height * 2));
 		skillSlotInteraction.setPosition(
-			w - (skillSlot.tile.width * 1.4) - skillSlot.tile.width / 2, 
+			w - (skillSlot.tile.width * 1) - skillSlot.tile.width / 2, 
 			h - (skillSlot.tile.height * 2) - skillSlot.tile.height / 2
 		);
 	}

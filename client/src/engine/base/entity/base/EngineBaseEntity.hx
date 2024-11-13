@@ -1,5 +1,6 @@
 package engine.base.entity.base;
 
+import engine.base.geometry.Circle;
 import haxe.Int32;
 import engine.base.BaseTypesAndClasses;
 import engine.base.geometry.Rectangle;
@@ -42,7 +43,14 @@ abstract class EngineBaseEntity {
 		final rectOffsetY = baseEntity.entityShape.rectOffsetY;
 		final x = baseEntity.x;
 		final y = baseEntity.y;
-		return new Rectangle(x + (baseEntity.side == Side.RIGHT ? -rectOffsetX : rectOffsetX), y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
+		return new Rectangle(x + 0, y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
+		// return new Rectangle(x + (baseEntity.side == Side.RIGHT ? -rectOffsetX : rectOffsetX), y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
+	}
+
+	public function getBodyCircle() {
+		final x = baseEntity.x;
+		final y = baseEntity.y;
+		return new Circle(x, y, 200);
 	}
 
     public function getX() {

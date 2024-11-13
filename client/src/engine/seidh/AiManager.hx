@@ -18,7 +18,7 @@ class AiManager {
     private var allowSpawnMobs = false;
 
     // Max mobs at a time
-    private var mobsMax = 130;
+    private var mobsMax = 100;
     // Total mobs per level
     private var mobsTotal = 500;
     private var mobsSpawned = 0;

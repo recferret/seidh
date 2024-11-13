@@ -69,22 +69,22 @@ class WalletButton extends h2d.Object {
     public function setPosTop() {
         setPosition(
             Main.ActualScreenWidth / 2 ,
-            300
+            400
         );
         interaction.setPosition(
             Main.ActualScreenWidth / 2 - w / 2,
-            270 - h / 2
+            370 - h / 2
         );
     }
 
     public function setPosBelowTop() {
         setPosition(
             Main.ActualScreenWidth / 2 ,
-            470
+            570
         );
         interaction.setPosition(
             Main.ActualScreenWidth / 2 - w / 2,
-            470 - h / 2
+            570 - h / 2
         );
     }
 

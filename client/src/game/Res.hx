@@ -116,6 +116,7 @@ enum SeidhResource {
     UI_HOME_TITLE_FRIENDS;
     UI_HOME_TITLE_SOON;
     UI_HOME_TITLE_STORE;
+    UI_HOME_TITLE_HOME;
     
     // ------------------------------------
     // ZOMBIE BOY
@@ -314,6 +315,7 @@ class Res {
                 remoteResourceMap.set(UI_HOME_TITLE_FRIENDS, url + 'ui/home/UI_HOME_TITLE_FRIENDS.png');
                 remoteResourceMap.set(UI_HOME_TITLE_SOON, url + 'ui/home/UI_HOME_TITLE_SOON.png');
                 remoteResourceMap.set(UI_HOME_TITLE_STORE, url + 'ui/home/UI_HOME_TITLE_STORE.png');
+                remoteResourceMap.set(UI_HOME_TITLE_HOME, url + 'ui/home/UI_HOME_TITLE_HOME.png');
 
                 // ------------------------------------
                 // ZOMBIE BOY
@@ -445,6 +447,7 @@ class Res {
                 tileResMap.set(UI_HOME_TITLE_FRIENDS, hxd.Res.ui.home.UI_HOME_TITLE_FRIENDS.toTile().center());
                 tileResMap.set(UI_HOME_TITLE_SOON, hxd.Res.ui.home.UI_HOME_TITLE_SOON.toTile().center());
                 tileResMap.set(UI_HOME_TITLE_STORE, hxd.Res.ui.home.UI_HOME_TITLE_STORE.toTile().center());
+                tileResMap.set(UI_HOME_TITLE_HOME, hxd.Res.ui.home.UI_HOME_TITLE_HOME.toTile().center());
 
                 tileResMap.set(UI_DIALOG_BUTTON_NAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
                 tileResMap.set(UI_DIALOG_BUTTON_YAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
