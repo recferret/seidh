@@ -126,7 +126,7 @@ class InviteFriendButton extends h2d.Object {
 class FriendsContent extends BasicHomeContent {
 
     public function new() {
-		super();
+		super(false);
 
         final font : h2d.Font = DefaultFont.get();
 

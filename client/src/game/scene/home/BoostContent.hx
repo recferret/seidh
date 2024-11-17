@@ -173,32 +173,6 @@ class BoostItem extends h2d.Object {
     }
 }
 
-class BoostFrame extends h2d.Object {
-
-    public function new(parent:h2d.Object) {
-        super(parent);
-
-        final header = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_XL_HEADER));
-        final footer = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_XL_FOOTER));
-
-        final basicHeightDiff = Main.ActualScreenHeight - 1280;
-        final middlePartHeight = Main.ActualScreenHeight - Std.int(header.tile.height) - Std.int(footer.tile.height) - basicHeightDiff;
-        final middle = new h2d.Bitmap(h2d.Tile.fromColor(GameConfig.UiBrownColor, Std.int(header.tile.width) + 1, middlePartHeight + 100));
-
-        header.setPosition(Main.ActualScreenWidth / 2, header.tile.height - 100);
-        footer.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight - footer.tile.height);
-        middle.setPosition(113, header.tile.height + 45);
-
-        addChild(header);
-        addChild(middle);
-        addChild(footer);
-    }
-
-    public function update(dt:Float) {
-        // rune1.y++;
-    }
-}
-
 class BoostContent extends BasicHomeContent implements EventListener {
 
     public static final EXP_1 = 'EXP_1';
@@ -230,15 +204,13 @@ class BoostContent extends BasicHomeContent implements EventListener {
     public static final CURRENCY_TYPE_COINS = 'Coins';
     public static final CURRENCY_TYPE_TEETH = 'Teeth';
 
-    final boostFrame: BoostFrame;
     final boostContainer: h2d.Object;
 
     public final boostsMap = new Map<String, BoostItem>();
 
     public function new() {
-	    super();
+	    super(true);
 
-        boostFrame = new BoostFrame(this);
         boostContainer = new h2d.Object(this);
 
         var boostX = 180;

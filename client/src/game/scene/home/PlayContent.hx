@@ -63,7 +63,7 @@ class PlayContent extends BasicHomeContent {
     private final ragnarDudeTile:h2d.Tile;
 
     public function new() {
-		super();
+		super(false);
 
         // ------------------------------------
         // Bunnies

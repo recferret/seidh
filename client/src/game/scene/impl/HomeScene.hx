@@ -44,7 +44,8 @@ class HomeScene extends BasicScene implements EventListener {
 	private var teethTextIcon:WealthTextIcon;
 
     private var titleBitmap:h2d.Bitmap;
-    private var collectionTitleTile:h2d.Tile;
+    private var homeTitleTile:h2d.Tile;
+	private var collectionTitleTile:h2d.Tile;
     private var friendsTitleTile:h2d.Tile;
     private var storeTitleTile:h2d.Tile;
     private var screenDarknessDisplacementTile:h2d.Tile;
@@ -135,13 +136,14 @@ class HomeScene extends BasicScene implements EventListener {
 	// --------------------------------------
 
 	private function headerItems() {
-        collectionTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_COLLECTION);
+        homeTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_HOME);
+		collectionTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_COLLECTION);
 		friendsTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_FRIENDS);
 		storeTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_STORE);
 
 		titleBitmap = new h2d.Bitmap(this);
-		titleBitmap.alpha = 0;
 		titleBitmap.setPosition(Main.ActualScreenWidth / 2, 100);
+		titleBitmap.tile = homeTitleTile;
 
 		usernameText = new h2d.Text(DefaultFont.get());
         usernameText.textColor = GameConfig.FontColor;
@@ -245,7 +247,8 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionHome.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomePlayContent) {
-				titleBitmap.alpha = 0;
+				titleBitmap.tile = homeTitleTile;
+
 				SoundManager.instance.playButton1();
 				NativeWindowJS.trackHomeClick();
 
@@ -276,7 +279,6 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionBoost.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
-				titleBitmap.alpha = 1;
 				titleBitmap.tile = storeTitleTile;
 
 				SoundManager.instance.playButton1();
@@ -309,7 +311,6 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionCollection.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
-				titleBitmap.alpha = 1;
 				titleBitmap.tile = collectionTitleTile;
 
 				SoundManager.instance.playButton1();
@@ -342,7 +343,6 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionFriends.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
-				titleBitmap.alpha = 1;
 				titleBitmap.tile = friendsTitleTile;
 
 				SoundManager.instance.playButton1();

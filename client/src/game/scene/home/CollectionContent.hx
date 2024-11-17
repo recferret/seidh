@@ -93,33 +93,38 @@ class WalletButton extends h2d.Object {
 class CollectionContent extends BasicHomeContent {
 
     public function new() {
-		super();
+		super(true);
 
-        final buyRagnar = new WalletButton(this, 'Buy Ragnar', 'mint_ragnar');
+        // final buyRagnar = new WalletButton(this, 'Buy Ragnar', 'mint_ragnar');
 
-        if (Player.instance.getWalletAddress() == null) {
-            buyRagnar.setPosBelowTop();
+        // if (Player.instance.getWalletAddress() == null) {
+        //     buyRagnar.setPosBelowTop();
 
-            final walletConnect = new WalletButton(this, 'Connect wallet', 'connect_wallet');
-            walletConnect.setPosTop();
-        } else {
-            final walletDisconnect = new WalletButton(this, 'Disconnect wallet', 'disconnect_wallet');
-            walletDisconnect.setPosTop();
+        //     final walletConnect = new WalletButton(this, 'Connect wallet', 'connect_wallet');
+        //     walletConnect.setPosTop();
+        // } else {
+        //     final walletDisconnect = new WalletButton(this, 'Disconnect wallet', 'disconnect_wallet');
+        //     walletDisconnect.setPosTop();
 
-            buyRagnar.setPosBelowTop();
-        }
+        //     buyRagnar.setPosBelowTop();
+        // }
 
         final ragnarDudeBitmap = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE), this);
-        ragnarDudeBitmap.setPosition(Main.ActualScreenWidth / 2, 770);
+        ragnarDudeBitmap.setPosition(Main.ActualScreenWidth / 2, 570);
 
-        final tf = new h2d.Text(DefaultFont.get());
-        tf.text = "2000 / 2000 Ragnars!";
-        tf.textColor = GameConfig.FontColor;
-        tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        tf.textAlign = Center;
-        tf.setScale(4);
-        tf.setPosition(Main.ActualScreenWidth / 2, 950);
-        addChild(tf);
+        // final tf = new h2d.Text(DefaultFont.get());
+        // tf.text = "2000 / 2000 NFT Ragnars!";
+        // tf.textColor = GameConfig.FontColor;
+        // tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        // tf.textAlign = Center;
+        // tf.setScale(3);
+        // tf.setPosition(Main.ActualScreenWidth / 2, 670);
+        // addChild(tf);
+
+        final soonTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_SOON);
+        final soonBitmap = new h2d.Bitmap(this);
+		soonBitmap.setPosition(Main.ActualScreenWidth / 2, 800);
+		soonBitmap.tile = soonTile;
     }
 
     public function update(dt:Float) {
