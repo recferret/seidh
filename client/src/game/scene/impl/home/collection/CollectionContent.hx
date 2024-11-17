@@ -1,4 +1,4 @@
-package game.scene.home;
+package game.scene.impl.home.collection;
 
 import hxd.res.DefaultFont;
 

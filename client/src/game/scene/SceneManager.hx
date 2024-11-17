@@ -6,8 +6,8 @@ import game.event.EventManager;
 import game.js.NativeWindowJS;
 import game.scene.base.BasicScene;
 import game.scene.impl.LoadingScene;
-import game.scene.impl.HomeScene;
-import game.scene.impl.GameScene;
+import game.scene.impl.home.HomeScene;
+import game.scene.impl.game.GameScene;
 import game.scene.impl.MapSceneTest;
 import game.scene.impl.SpritesSceneTest.SceneSpritesTest;
 

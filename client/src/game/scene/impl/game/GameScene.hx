@@ -1,4 +1,4 @@
-package game.scene.impl;
+package game.scene.impl.game;
 
 import engine.base.geometry.Rectangle;
 import engine.base.BaseTypesAndClasses;

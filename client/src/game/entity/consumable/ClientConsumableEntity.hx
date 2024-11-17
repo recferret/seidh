@@ -2,7 +2,7 @@ package game.entity.consumable;
 
 import engine.base.entity.impl.EngineConsumableEntity;
 
-import game.scene.impl.GameScene;
+import game.scene.impl.game.GameScene;
 import game.tilemap.TilemapManager;
 import game.utils.Utils;
 

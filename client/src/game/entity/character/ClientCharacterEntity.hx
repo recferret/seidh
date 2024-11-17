@@ -7,7 +7,7 @@ import engine.base.entity.impl.EngineCharacterEntity;
 
 import game.entity.character.animation.CharacterAnimations;
 import game.fx.FxManager;
-import game.scene.impl.GameScene;
+import game.scene.impl.game.GameScene;
 import game.sound.SoundManager;
 import game.utils.Utils;
 

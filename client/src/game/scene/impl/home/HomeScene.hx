@@ -1,4 +1,4 @@
-package game.scene.impl;
+package game.scene.impl.home;
 
 import hxd.res.DefaultFont;
 import game.tilemap.TilemapManager;
@@ -12,11 +12,11 @@ import game.js.NativeWindowJS;
 import game.event.EventManager;
 import game.network.Networking.UserBalancePayload;
 import game.scene.base.BasicScene;
-import game.scene.impl.home.CollectionContent;
-import game.scene.impl.home.BoostContent;
-import game.scene.impl.home.FriendsContent;
+import game.scene.impl.home.collection.CollectionContent;
+import game.scene.impl.home.boost.BoostContent;
+import game.scene.impl.home.friends.FriendsContent;
+import game.scene.impl.home.play.PlayContent;
 import game.scene.impl.home.BasicHomeContent;
-import game.scene.impl.home.PlayContent;
 import game.sound.SoundManager;
 import game.ui.dialog.Dialog.DialogManager;
 import game.Res.SeidhResource;

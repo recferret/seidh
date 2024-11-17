@@ -1,4 +1,4 @@
-package game.scene.impl.home;
+package game.scene.impl.home.friends;
 
 import game.js.NativeWindowJS;
 import game.Res.SeidhResource;
@@ -15,43 +15,35 @@ enum abstract FriendStatus(Int) {
 
 class Friend extends h2d.Object {
 
-    private var height = 100;
+    private var height = 50;
 
     public function new(parent:h2d.Object, friendStatus:FriendStatus, friendNameText:String, friendRewardText:String) {
         super(parent);
 
         var statusText = '';
-        switch (friendStatus) {
-            case OFFLINE:
-                statusText = ', offline';
-            case ONLINE:
-                statusText = ', online';
-            case PLAYING_NOT_POSSIBLE_TO_JOIN:
-                statusText = ', playing';
-            case PLAYING_POSSIBLE_TO_JOIN:
-                statusText = ', playing';
-                // height = 200;
-        }
+        // switch (friendStatus) {
+        //     case OFFLINE:
+        //         statusText = ', offline';
+        //     case ONLINE:
+        //         statusText = ', online';
+        //     case PLAYING_NOT_POSSIBLE_TO_JOIN:
+        //         statusText = ', playing';
+        //     case PLAYING_POSSIBLE_TO_JOIN:
+        //         statusText = ', playing';
+        // }
+
+        final lvl = ', 1 LVL';
 
         final font : h2d.Font = DefaultFont.get();
 
-        final friendName = new h2d.Text(font);
-        friendName.text = friendNameText + statusText;
-        friendName.textColor = GameConfig.FontColor;
-        friendName.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        friendName.textAlign = Left;
-        friendName.setScale(4);
-        friendName.setPosition(65, 0);
-        addChild(friendName);
-
-        final friendReward = new h2d.Text(font);
-        friendReward.text = "+" + friendRewardText + " SDH";
-        friendReward.textColor = GameConfig.FontColor;
-        friendReward.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        friendReward.textAlign = Right;
-        friendReward.setScale(4);
-        friendReward.setPosition(Main.ActualScreenWidth - friendReward.textWidth - 15, 0);
-        addChild(friendReward);
+        final friendDetails = new h2d.Text(font);
+        friendDetails.text = friendNameText + statusText + lvl;
+        friendDetails.textColor = GameConfig.FontColor;
+        friendDetails.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        friendDetails.textAlign = Left;
+        friendDetails.setScale(3);
+        friendDetails.setPosition(65, 0);
+        addChild(friendDetails);
     }
 
     public function getHeight() {
@@ -72,8 +64,8 @@ class ScrollingFriendsContainer extends h2d.Object {
     public function addFriend(friendNameText:String, friendStatus:FriendStatus, friendRewardText:String) {
         final newFriend = new Friend(this, friendStatus, friendNameText, friendRewardText);
         addChild(newFriend);
-        newFriend.setPosition(0, friendNextPositionY);
-        friendNextPositionY  += newFriend.getHeight();
+        newFriend.setPosition(60, friendNextPositionY);
+        friendNextPositionY += newFriend.getHeight();
         // friendsTotal++;
     }
 
@@ -130,7 +122,7 @@ class FriendsContent extends BasicHomeContent {
         friendsInvited.textColor = GameConfig.FontColor;
         friendsInvited.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         friendsInvited.textAlign = Left;
-        friendsInvited.setScale(2.5);
+        friendsInvited.setScale(3);
         friendsInvited.setPosition(125, 450);
         addChild(friendsInvited);
 
@@ -139,18 +131,27 @@ class FriendsContent extends BasicHomeContent {
         friendsOnline.textColor = GameConfig.FontColor;
         friendsOnline.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         friendsOnline.textAlign = Left;
-        friendsOnline.setScale(2.5);
+        friendsOnline.setScale(3);
         friendsOnline.setPosition(125, 490);
         addChild(friendsOnline);
 
-        final totalRewards = new h2d.Text(font);
-        totalRewards.text = "Total earned: +2000 SDH";
-        totalRewards.textColor = GameConfig.FontColor;
-        totalRewards.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        totalRewards.textAlign = Left;
-        totalRewards.setScale(2.5);
-        totalRewards.setPosition(125, 530);
-        addChild(totalRewards);
+        final coinRewards = new h2d.Text(font);
+        coinRewards.text = "Coins earned: 2000";
+        coinRewards.textColor = GameConfig.FontColor;
+        coinRewards.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        coinRewards.textAlign = Left;
+        coinRewards.setScale(3);
+        coinRewards.setPosition(125, 530);
+        addChild(coinRewards);
+
+        final teethRewards = new h2d.Text(font);
+        teethRewards.text = "Teeth earned: 2000";
+        teethRewards.textColor = GameConfig.FontColor;
+        teethRewards.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        teethRewards.textAlign = Left;
+        teethRewards.setScale(3);
+        teethRewards.setPosition(125, 570);
+        addChild(teethRewards);
 
         // Invite button
         final inviteButton = new InviteFriendButton(this);
@@ -177,13 +178,45 @@ class FriendsContent extends BasicHomeContent {
         }
         addChild(interactionInvite);
 
+        // Invitation rules
+        final invitationRule1 = new h2d.Text(font);
+        invitationRule1.text = "Get 200 coins per invite";
+        invitationRule1.textColor = GameConfig.FontColor;
+        invitationRule1.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        invitationRule1.textAlign = Left;
+        invitationRule1.setScale(3);
+        invitationRule1.setPosition(125, 670);
+        addChild(invitationRule1);
+
+        final invitationRule2 = new h2d.Text(font);
+        invitationRule2.text = "Get 200 teeth per levelup";
+        invitationRule2.textColor = GameConfig.FontColor;
+        invitationRule2.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        invitationRule2.textAlign = Left;
+        invitationRule2.setScale(3);
+        invitationRule2.setPosition(125, 720);
+        addChild(invitationRule2);
+
         // Friend scrolling container
+        final topFriends = new h2d.Text(font);
+        topFriends.text = "TOP 10 friends:";
+        topFriends.textColor = GameConfig.FontColor;
+        topFriends.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        topFriends.textAlign = Left;
+        topFriends.setScale(3.5);
+        topFriends.setPosition(125, 820);
+        addChild(topFriends);
+
         final friendsContainer = new ScrollingFriendsContainer(this);
-        friendsContainer.setPosition(0, 600);
+        friendsContainer.setPosition(0, 900);
 
         friendsContainer.addFriend("Sofia", FriendStatus.PLAYING_POSSIBLE_TO_JOIN, "200");
         friendsContainer.addFriend("Sofia", FriendStatus.PLAYING_NOT_POSSIBLE_TO_JOIN, "200");
         friendsContainer.addFriend("Sofia", FriendStatus.ONLINE, "200");
+        friendsContainer.addFriend("Sofia", FriendStatus.OFFLINE, "200");
+        friendsContainer.addFriend("Sofia", FriendStatus.OFFLINE, "200");
+        friendsContainer.addFriend("Sofia", FriendStatus.OFFLINE, "200");
+        friendsContainer.addFriend("Sofia", FriendStatus.OFFLINE, "200");
         friendsContainer.addFriend("Sofia", FriendStatus.OFFLINE, "200");
         friendsContainer.addFriend("Sofia", FriendStatus.OFFLINE, "200");
         friendsContainer.addFriend("Sofia", FriendStatus.OFFLINE, "200");

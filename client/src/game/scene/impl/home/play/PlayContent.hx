@@ -1,5 +1,6 @@
-package game.scene.home;
+package game.scene.impl.home.play;
 
+import game.scene.impl.home.play.dialog.CharacterStatsDialog;
 import h2d.filter.Displacement;
 
 import game.js.NativeWindowJS;
@@ -62,8 +63,12 @@ class PlayContent extends BasicHomeContent {
     private final ragnarNormTile:h2d.Tile;
     private final ragnarDudeTile:h2d.Tile;
 
+    private final characterStatsDialog:CharacterStatsDialog;
+
     public function new() {
 		super(false);
+
+        characterStatsDialog = new CharacterStatsDialog(this);
 
         // ------------------------------------
         // Bunnies
@@ -132,7 +137,7 @@ class PlayContent extends BasicHomeContent {
         }
         addChild(playButtonInteractive);
 
-        // Play button
+        // Lvl button
         final lvlButtonInactiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_LVL_NAY);
         final lvlButtonActiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_LVL_YAY);
         
@@ -154,9 +159,9 @@ class PlayContent extends BasicHomeContent {
             lvlButton.tile = lvlButtonActiveTile;
         }
         lvlButtonInteractive.onClick = function(event : hxd.Event) {
-            SoundManager.instance.playButton2();
-
-            NativeWindowJS.trackLvlUpClick();
+            characterStatsDialog.show();
+            // SoundManager.instance.playButton2();
+            // NativeWindowJS.trackLvlUpClick();
         }
         addChild(lvlButtonInteractive);
 

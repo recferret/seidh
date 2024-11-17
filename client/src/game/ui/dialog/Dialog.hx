@@ -81,6 +81,9 @@ class DialogManager {
         }
     }
 
+    public static ShowCustomDialog() {
+        
+    }
 }
 private class Dialog extends h2d.Object {
 

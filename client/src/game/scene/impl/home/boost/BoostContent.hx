@@ -1,4 +1,4 @@
-package game.scene.impl.home;
+package game.scene.impl.home.boost;
 
 import game.event.EventManager;
 import game.js.NativeWindowJS;
