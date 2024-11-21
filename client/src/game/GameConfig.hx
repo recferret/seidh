@@ -14,7 +14,10 @@ class GameConfig {
 	public static final YellowColor = 0xFFFF00;
 	public static final HpBarColor = 0xc22a2a;
 	public static final XpBarColor = 0xfcff76;
-	public static final FontColor = 0xebddae;
+	public static final DefaultFontColor = 0xD1B15C;
+	public static final WhiteFontColor = 0xDBD1B8;
+	public static final UpgradeFontColor = 0x54A227;
+	public static final ErrorFontColor = 0xA23E27;
 	public static final UiBrownColor = 0x332D1A;
 
 	public final Production:Bool;

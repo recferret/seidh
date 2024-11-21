@@ -10,6 +10,8 @@ export interface BoostBody {
 
   boostType: BoostType;
 
+  levelZeroName: string;
+
   levelOneId: string;
   levelOneName: string;
   levelOneDescription: string;

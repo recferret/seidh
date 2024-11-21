@@ -26,7 +26,7 @@ class WalletButton extends h2d.Object {
         final font : h2d.Font = DefaultFont.get();
         final tf = new h2d.Text(font);
         tf.text = boostLabel;
-        tf.textColor = GameConfig.FontColor;
+        tf.textColor = GameConfig.DefaultFontColor;
         tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         tf.textAlign = Center;
         tf.setScale(4);

@@ -184,7 +184,7 @@ class GameUiScene extends h2d.Scene {
 		final font : h2d.Font = DefaultFont.get();
         surviveTimer = new h2d.Text(font);
         surviveTimer.text = 'Survive for .. seconds';
-        surviveTimer.textColor = GameConfig.FontColor;
+        surviveTimer.textColor = GameConfig.DefaultFontColor;
         surviveTimer.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         surviveTimer.textAlign = Center;
         surviveTimer.setScale(3);
@@ -275,30 +275,36 @@ class GameUiScene extends h2d.Scene {
 			this, 
 			DialogType.MEDIUM,
 			null,
-			"You have won!", 
-			"Zombies killed: " + zombiesKilled,
-			"OK",
-			null,
-			function positiveCallback() {
-				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+			{ label: "You have won!", scale: 3, color: GameConfig.DefaultFontColor, },
+			{ label: "Zombies killed: " + zombiesKilled, scale: 3, color: GameConfig.DefaultFontColor, },
+			{
+                buttons: ONE,
+				positiveLabel: "OK",
+				positiveCallback: function positiveCallback() {
+					EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+				},
+				negativeLabel: null,
+				negativeCallback: null,
 			},
-			null
 		);
 	}
 
 	public function showLoseDialog(zombiesKilled:Int) {
 		DialogManager.ShowDialog(
-			this, 
-			DialogType.SMALL, 
+			this,
+			DialogType.SMALL,
 			null,
-			"You lose!", 
-			"",// "Zombies killed: " + zombiesKilled,
-			"OK",
+			{ label: "You lose!", scale: 3, color: GameConfig.DefaultFontColor, },
 			null,
-			function positiveCallback() {
-				EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+			{
+                buttons: ONE,
+				positiveLabel: "OK",
+				positiveCallback: function positiveCallback() {
+					EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+				},
+				negativeLabel: null,
+				negativeCallback: null,
 			},
-			null
 		);
 	}
 

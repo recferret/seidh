@@ -48,6 +48,8 @@ export class BoostService implements OnModuleInit {
           order: 1,
           boostType: BoostType.Rune,
 
+          levelZeroName: 'Exp 0/3',
+
           levelOneId: 'EXP_1',
           levelOneName: 'Exp 1/3',
           levelOneDescription: '50% more exp',
@@ -72,6 +74,8 @@ export class BoostService implements OnModuleInit {
         await this.boostModel.create({
           order: 2,
           boostType: BoostType.Rune,
+
+          levelZeroName: 'Pick up 0/3',
 
           levelOneId: 'ITEM_RADIUS_1',
           levelOneName: 'Pick up 1/3',
@@ -98,6 +102,8 @@ export class BoostService implements OnModuleInit {
           order: 3,
           boostType: BoostType.Rune,
 
+          levelZeroName: 'Coins 0/3',
+
           levelOneId: 'MORE_COINS_1',
           levelOneName: 'Coins 1/3',
           levelOneDescription: '100% more coins',
@@ -122,6 +128,8 @@ export class BoostService implements OnModuleInit {
         await this.boostModel.create({
           order: 4,
           boostType: BoostType.Rune,
+
+          levelZeroName: 'Monsters 0/3',
 
           levelOneId: 'MONSTERS_1',
           levelOneName: 'Monsters 1/3',
@@ -148,6 +156,8 @@ export class BoostService implements OnModuleInit {
           order: 5,
           boostType: BoostType.Scroll,
 
+          levelZeroName: 'Items 0/3',
+
           levelOneId: 'ITEMS_DROP_1',
           levelOneName: 'Items 1/3',
           levelOneDescription: 'Health potions may drop',
@@ -172,6 +182,8 @@ export class BoostService implements OnModuleInit {
         await this.boostModel.create({
           order: 6,
           boostType: BoostType.Scroll,
+
+          levelZeroName: 'Stats 0/3',
 
           levelOneId: 'STATS_1',
           levelOneName: 'Stats 1/3',
@@ -228,6 +240,8 @@ export class BoostService implements OnModuleInit {
           order: boost.order,
 
           boostType: boost.boostType,
+
+          levelZeroName: boost.levelZeroName,
 
           levelOneId: boost.levelOneId,
           levelOneName: boost.levelOneName,
@@ -372,6 +386,8 @@ export class BoostService implements OnModuleInit {
           order: boost.order,
 
           boostType: boost.boostType,
+
+          levelZeroName: boost.levelZeroName,
 
           levelOneId: boost.levelOneId,
           levelOneName: boost.levelOneName,

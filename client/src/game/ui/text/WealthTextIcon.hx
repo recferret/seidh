@@ -11,11 +11,7 @@ class WealthTextIcon extends h2d.Object {
     public function new(parent:h2d.Object, tile:h2d.Tile, textAlign:Align) {
         super(parent);
 
-        text = new h2d.Text(DefaultFont.get());
-        text.textColor = GameConfig.FontColor;
-        text.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        text.textAlign = textAlign;
-        text.setScale(1.8);
+        text = TextUtils.GetDefaultTextObject(0, 0, 1.8, textAlign, GameConfig.DefaultFontColor);
         addChild(text);
 
         icon = new h2d.Bitmap(tile);

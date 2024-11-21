@@ -1,5 +1,6 @@
 package game.scene.impl.home.friends;
 
+import game.ui.text.TextUtils;
 import game.js.NativeWindowJS;
 import game.Res.SeidhResource;
 import game.sound.SoundManager;
@@ -36,13 +37,8 @@ class Friend extends h2d.Object {
 
         final font : h2d.Font = DefaultFont.get();
 
-        final friendDetails = new h2d.Text(font);
+        final friendDetails = TextUtils.GetDefaultTextObject(65, 0, 3.5, Left, GameConfig.DefaultFontColor);
         friendDetails.text = friendNameText + statusText + lvl;
-        friendDetails.textColor = GameConfig.FontColor;
-        friendDetails.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        friendDetails.textAlign = Left;
-        friendDetails.setScale(3);
-        friendDetails.setPosition(65, 0);
         addChild(friendDetails);
     }
 
@@ -115,42 +111,20 @@ class FriendsContent extends BasicHomeContent {
     public function new() {
 		super(true);
 
-        final font : h2d.Font = DefaultFont.get();
-
-        final friendsInvited = new h2d.Text(font);
+        final friendsInvited = TextUtils.GetDefaultTextObject(125, 450, 3, Left, GameConfig.DefaultFontColor);
         friendsInvited.text = "Friends invited: 10";
-        friendsInvited.textColor = GameConfig.FontColor;
-        friendsInvited.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        friendsInvited.textAlign = Left;
-        friendsInvited.setScale(3);
-        friendsInvited.setPosition(125, 450);
         addChild(friendsInvited);
 
-        final friendsOnline = new h2d.Text(font);
+        final friendsOnline = TextUtils.GetDefaultTextObject(125, 490, 3, Left, GameConfig.DefaultFontColor);
         friendsOnline.text = "Friends online: 2";
-        friendsOnline.textColor = GameConfig.FontColor;
-        friendsOnline.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        friendsOnline.textAlign = Left;
-        friendsOnline.setScale(3);
-        friendsOnline.setPosition(125, 490);
         addChild(friendsOnline);
 
-        final coinRewards = new h2d.Text(font);
+        final coinRewards = TextUtils.GetDefaultTextObject(125, 530, 3, Left, GameConfig.DefaultFontColor);
         coinRewards.text = "Coins earned: 2000";
-        coinRewards.textColor = GameConfig.FontColor;
-        coinRewards.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        coinRewards.textAlign = Left;
-        coinRewards.setScale(3);
-        coinRewards.setPosition(125, 530);
         addChild(coinRewards);
 
-        final teethRewards = new h2d.Text(font);
+        final teethRewards = TextUtils.GetDefaultTextObject(125, 570, 3, Left, GameConfig.DefaultFontColor);
         teethRewards.text = "Teeth earned: 2000";
-        teethRewards.textColor = GameConfig.FontColor;
-        teethRewards.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        teethRewards.textAlign = Left;
-        teethRewards.setScale(3);
-        teethRewards.setPosition(125, 570);
         addChild(teethRewards);
 
         // Invite button
@@ -179,32 +153,17 @@ class FriendsContent extends BasicHomeContent {
         addChild(interactionInvite);
 
         // Invitation rules
-        final invitationRule1 = new h2d.Text(font);
+        final invitationRule1 = TextUtils.GetDefaultTextObject(125, 670, 3, Left, GameConfig.DefaultFontColor);
         invitationRule1.text = "Get 200 coins per invite";
-        invitationRule1.textColor = GameConfig.FontColor;
-        invitationRule1.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        invitationRule1.textAlign = Left;
-        invitationRule1.setScale(3);
-        invitationRule1.setPosition(125, 670);
         addChild(invitationRule1);
 
-        final invitationRule2 = new h2d.Text(font);
+        final invitationRule2 = TextUtils.GetDefaultTextObject(125, 720, 3, Left, GameConfig.DefaultFontColor);
         invitationRule2.text = "Get 200 teeth per levelup";
-        invitationRule2.textColor = GameConfig.FontColor;
-        invitationRule2.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        invitationRule2.textAlign = Left;
-        invitationRule2.setScale(3);
-        invitationRule2.setPosition(125, 720);
         addChild(invitationRule2);
 
         // Friend scrolling container
-        final topFriends = new h2d.Text(font);
+        final topFriends = TextUtils.GetDefaultTextObject(125, 820, 3.5, Left, GameConfig.DefaultFontColor);
         topFriends.text = "TOP 10 friends:";
-        topFriends.textColor = GameConfig.FontColor;
-        topFriends.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        topFriends.textAlign = Left;
-        topFriends.setScale(3.5);
-        topFriends.setPosition(125, 820);
         addChild(topFriends);
 
         final friendsContainer = new ScrollingFriendsContainer(this);

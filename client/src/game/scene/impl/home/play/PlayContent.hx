@@ -1,7 +1,9 @@
 package game.scene.impl.home.play;
 
-import game.scene.impl.home.play.dialog.CharacterStatsDialog;
 import h2d.filter.Displacement;
+
+import game.scene.impl.home.play.dialog.CharacterStatsDialogContent.CharacterStatsDialog;
+import game.ui.dialog.Dialog.DialogManager;
 
 import game.js.NativeWindowJS;
 import game.Res.SeidhResource;
@@ -55,20 +57,16 @@ class PlayContent extends BasicHomeContent {
 
     private var currentRagnar = 2;
 
-    private final leftRagnar:h2d.Bitmap;
-    private final rightRagnar:h2d.Bitmap;
+    // private final leftRagnar:h2d.Bitmap;
+    // private final rightRagnar:h2d.Bitmap;
     private final centralRagnar:h2d.Bitmap;
 
     private final ragnarBaseTile:h2d.Tile;
-    private final ragnarNormTile:h2d.Tile;
-    private final ragnarDudeTile:h2d.Tile;
-
-    private final characterStatsDialog:CharacterStatsDialog;
+    // private final ragnarNormTile:h2d.Tile;
+    // private final ragnarDudeTile:h2d.Tile;
 
     public function new() {
 		super(false);
-
-        characterStatsDialog = new CharacterStatsDialog(this);
 
         // ------------------------------------
         // Bunnies
@@ -86,8 +84,8 @@ class PlayContent extends BasicHomeContent {
         // ------------------------------------
 
         ragnarBaseTile = Res.instance.getTileResource(SeidhResource.RAGNAR_BASE);
-        ragnarNormTile = Res.instance.getTileResource(SeidhResource.RAGNAR_NORM);
-        ragnarDudeTile = Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE);
+        // ragnarNormTile = Res.instance.getTileResource(SeidhResource.RAGNAR_NORM);
+        // ragnarDudeTile = Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE);
 
         leftRagnarPosX = 100;
         leftRagnarPosY = Main.ActualScreenHeight / 2.5;
@@ -96,11 +94,11 @@ class PlayContent extends BasicHomeContent {
         rightRagnarPosX = Main.ActualScreenWidth - ragnarBaseTile.width / 2 - 20;
         rightRagnarPosY = Main.ActualScreenHeight / 2.5;
 
-        leftRagnar = new h2d.Bitmap(ragnarNormTile, this);
-        leftRagnar.setPosition(leftRagnarPosX, leftRagnarPosY);
+        // leftRagnar = new h2d.Bitmap(ragnarNormTile, this);
+        // leftRagnar.setPosition(leftRagnarPosX, leftRagnarPosY);
 
-        rightRagnar = new h2d.Bitmap(ragnarDudeTile, this);
-        rightRagnar.setPosition(rightRagnarPosX, rightRagnarPosY);
+        // rightRagnar = new h2d.Bitmap(ragnarDudeTile, this);
+        // rightRagnar.setPosition(rightRagnarPosX, rightRagnarPosY);
 
         centralRagnar = new h2d.Bitmap(ragnarBaseTile, this);
         centralRagnar.setPosition(centralRagnarPosX, centralRagnarPosY);
@@ -125,15 +123,21 @@ class PlayContent extends BasicHomeContent {
             Main.ActualScreenHeight / 5 - playButtonActiveTile.height / 2
         );
         playButtonInteractive.onPush = function(event : hxd.Event) {
-            playButton.tile = playButtonInactiveTile;
+            if (!DialogManager.IsDialogActive) {
+                playButton.tile = playButtonInactiveTile;
+			}
         }
         playButtonInteractive.onRelease = function(event : hxd.Event) {
-            playButton.tile = playButtonActiveTile;
+            if (!DialogManager.IsDialogActive) {
+                playButton.tile = playButtonActiveTile;
+			}
         }
         playButtonInteractive.onClick = function(event : hxd.Event) {
-			SoundManager.instance.playButton2();
-            NativeWindowJS.trackPlayClick();
-            EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
+            if (!DialogManager.IsDialogActive) {
+                SoundManager.instance.playButton2();
+                NativeWindowJS.trackPlayClick();
+                EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
+			}
         }
         addChild(playButtonInteractive);
 
@@ -153,65 +157,72 @@ class PlayContent extends BasicHomeContent {
             Main.ActualScreenHeight * 0.8 - lvlButtonActiveTile.height / 2
         );
         lvlButtonInteractive.onPush = function(event : hxd.Event) {
-            lvlButton.tile = lvlButtonInactiveTile;
+            if (!DialogManager.IsDialogActive) {
+                lvlButton.tile = lvlButtonInactiveTile;
+			}
         }
         lvlButtonInteractive.onRelease = function(event : hxd.Event) {
-            lvlButton.tile = lvlButtonActiveTile;
+            if (!DialogManager.IsDialogActive) {
+                lvlButton.tile = lvlButtonActiveTile;
+			}
         }
         lvlButtonInteractive.onClick = function(event : hxd.Event) {
-            characterStatsDialog.show();
+            if (!DialogManager.IsDialogActive) {
+                final xxx = new CharacterStatsDialog(true);
+                DialogManager.ShowCustomDialog(this, xxx, 'UP');
+            }
             // SoundManager.instance.playButton2();
             // NativeWindowJS.trackLvlUpClick();
         }
         addChild(lvlButtonInteractive);
 
         // Prev button
-        final prevRagnarButton = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_ARROW_LEFT), this);
-        prevRagnarButton.setPosition(
-            prevRagnarButton.tile.width * 1.2,
-            Main.ActualScreenHeight / 2
-        );
-        prevRagnarButton.setScale(1.2);
+        // final prevRagnarButton = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_ARROW_LEFT), this);
+        // prevRagnarButton.setPosition(
+        //     prevRagnarButton.tile.width * 1.2,
+        //     Main.ActualScreenHeight / 2
+        // );
+        // prevRagnarButton.setScale(1.2);
 
-        final prevRagnarButtonInteractive = new h2d.Interactive(prevRagnarButton.tile.width, prevRagnarButton.tile.height);
-        prevRagnarButtonInteractive.setPosition(
-            prevRagnarButton.tile.width / 2, 
-            Main.ActualScreenHeight / 2 - prevRagnarButton.tile.height / 2
-        );
-        prevRagnarButtonInteractive.onPush = function(event : hxd.Event) {
-            prevRagnarButton.setScale(1);
-        }
-        prevRagnarButtonInteractive.onRelease = function(event : hxd.Event) {
-            prevRagnarButton.setScale(1.2);
-        }
-        prevRagnarButtonInteractive.onClick = function(event : hxd.Event) {
-            switchRagner('left');
-        }
-        addChild(prevRagnarButtonInteractive);
+        // final prevRagnarButtonInteractive = new h2d.Interactive(prevRagnarButton.tile.width, prevRagnarButton.tile.height);
+        // prevRagnarButtonInteractive.setPosition(
+        //     prevRagnarButton.tile.width / 2, 
+        //     Main.ActualScreenHeight / 2 - prevRagnarButton.tile.height / 2
+        // );
+        // prevRagnarButtonInteractive.onPush = function(event : hxd.Event) {
+        //     prevRagnarButton.setScale(1);
+        // }
+        // prevRagnarButtonInteractive.onRelease = function(event : hxd.Event) {
+        //     prevRagnarButton.setScale(1.2);
+        // }
+        // prevRagnarButtonInteractive.onClick = function(event : hxd.Event) {
+        //     switchRagner('left');
+        // }
+        // addChild(prevRagnarButtonInteractive);
 
         // Next button
-        final nextRagnarButton = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_ARROW_RIGHT), this);
-        nextRagnarButton.setPosition(
-            Main.ActualScreenWidth - nextRagnarButton.tile.width * 1.2, 
-            Main.ActualScreenHeight / 2
-        );
-        nextRagnarButton.setScale(1.2);
+        // final nextRagnarButton = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_ARROW_RIGHT), this);
+        // nextRagnarButton.setPosition(
+        //     Main.ActualScreenWidth - nextRagnarButton.tile.width * 1.2, 
+        //     Main.ActualScreenHeight / 2
+        // );
+        // nextRagnarButton.setScale(1.2);
 
-        final nextRagnarButtonInteractive = new h2d.Interactive(nextRagnarButton.tile.width, nextRagnarButton.tile.height);
-        nextRagnarButtonInteractive.setPosition(
-            Main.ActualScreenWidth - nextRagnarButton.tile.width * 1.5, 
-            Main.ActualScreenHeight / 2 - nextRagnarButton.tile.height / 2
-        );
-        nextRagnarButtonInteractive.onPush = function(event : hxd.Event) {
-            nextRagnarButton.setScale(1);
-        }
-        nextRagnarButtonInteractive.onRelease = function(event : hxd.Event) {
-            nextRagnarButton.setScale(1.2);
-        }
-        nextRagnarButtonInteractive.onClick = function(event : hxd.Event) {
-            switchRagner('right');
-        }
-        addChild(nextRagnarButtonInteractive);
+        // final nextRagnarButtonInteractive = new h2d.Interactive(nextRagnarButton.tile.width, nextRagnarButton.tile.height);
+        // nextRagnarButtonInteractive.setPosition(
+        //     Main.ActualScreenWidth - nextRagnarButton.tile.width * 1.5, 
+        //     Main.ActualScreenHeight / 2 - nextRagnarButton.tile.height / 2
+        // );
+        // nextRagnarButtonInteractive.onPush = function(event : hxd.Event) {
+        //     nextRagnarButton.setScale(1);
+        // }
+        // nextRagnarButtonInteractive.onRelease = function(event : hxd.Event) {
+        //     nextRagnarButton.setScale(1.2);
+        // }
+        // nextRagnarButtonInteractive.onClick = function(event : hxd.Event) {
+        //     switchRagner('right');
+        // }
+        // addChild(nextRagnarButtonInteractive);
     }
 
     public function update(dt:Float) {
@@ -219,65 +230,65 @@ class PlayContent extends BasicHomeContent {
         rightBunny.update(dt);
     }
 
-    private function switchRagner(dir:String) {
-        SoundManager.instance.playButton2();
+    // private function switchRagner(dir:String) {
+    //     SoundManager.instance.playButton2();
 
-        NativeWindowJS.trackChangeCharacterClick();
+    //     NativeWindowJS.trackChangeCharacterClick();
 
-        if (dir == 'right') {
-            // Current is left, after one spin
-            if (currentRagnar == 1) {
-                Actuate.tween(leftRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
-                Actuate.tween(centralRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
-                Actuate.tween(rightRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
-                currentRagnar = 3;
-                return;
-            }
+    //     if (dir == 'right') {
+    //         // Current is left, after one spin
+    //         if (currentRagnar == 1) {
+    //             Actuate.tween(leftRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
+    //             Actuate.tween(centralRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
+    //             Actuate.tween(rightRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
+    //             currentRagnar = 3;
+    //             return;
+    //         }
 
-            // Current is central, this is also default
-            if (currentRagnar == 2) {
-                Actuate.tween(leftRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
-                Actuate.tween(centralRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
-                Actuate.tween(rightRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
-                currentRagnar = 1;
-                return;
-            }
+    //         // Current is central, this is also default
+    //         if (currentRagnar == 2) {
+    //             Actuate.tween(leftRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
+    //             Actuate.tween(centralRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
+    //             Actuate.tween(rightRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
+    //             currentRagnar = 1;
+    //             return;
+    //         }
 
-            // Current is right, third spin
-            if (currentRagnar == 3) {
-                Actuate.tween(leftRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
-                Actuate.tween(centralRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
-                Actuate.tween(rightRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
-                currentRagnar = 2;
-                return;
-            }
-        } else if (dir == 'left') {
-            // Current is left, after one spin
-            if (currentRagnar == 1) {
-                Actuate.tween(leftRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
-                Actuate.tween(centralRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
-                Actuate.tween(rightRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
-                currentRagnar = 3;
-                return;
-            }
+    //         // Current is right, third spin
+    //         if (currentRagnar == 3) {
+    //             Actuate.tween(leftRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
+    //             Actuate.tween(centralRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
+    //             Actuate.tween(rightRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
+    //             currentRagnar = 2;
+    //             return;
+    //         }
+    //     } else if (dir == 'left') {
+    //         // Current is left, after one spin
+    //         if (currentRagnar == 1) {
+    //             Actuate.tween(leftRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
+    //             Actuate.tween(centralRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
+    //             Actuate.tween(rightRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
+    //             currentRagnar = 3;
+    //             return;
+    //         }
 
-            // Current is central, this is also default
-            if (currentRagnar == 2) {
-                Actuate.tween(leftRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
-                Actuate.tween(centralRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
-                Actuate.tween(rightRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
-                currentRagnar = 1;
-                return;
-            }
+    //         // Current is central, this is also default
+    //         if (currentRagnar == 2) {
+    //             Actuate.tween(leftRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
+    //             Actuate.tween(centralRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
+    //             Actuate.tween(rightRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
+    //             currentRagnar = 1;
+    //             return;
+    //         }
 
-            // Current is right, third spin
-            if (currentRagnar == 3) {
-                Actuate.tween(leftRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
-                Actuate.tween(centralRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
-                Actuate.tween(rightRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
-                currentRagnar = 2;
-                return;
-            }
-        }
-    }
+    //         // Current is right, third spin
+    //         if (currentRagnar == 3) {
+    //             Actuate.tween(leftRagnar, 1, { x: leftRagnarPosX, y: leftRagnarPosY });
+    //             Actuate.tween(centralRagnar, 1, { x: centralRagnarPosX, y: centralRagnarPosY });
+    //             Actuate.tween(rightRagnar, 1, { x: rightRagnarPosX, y: rightRagnarPosY });
+    //             currentRagnar = 2;
+    //             return;
+    //         }
+    //     }
+    // }
 }

@@ -35,7 +35,7 @@ class Main extends hxd.App {
 
 		loadingText = new h2d.Text(DefaultFont.get());
         loadingText.text = "Loading...";
-        loadingText.textColor = GameConfig.FontColor;
+        loadingText.textColor = GameConfig.DefaultFontColor;
         loadingText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         loadingText.textAlign = Center;
         loadingText.setScale(6);

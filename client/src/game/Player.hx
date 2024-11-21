@@ -5,6 +5,7 @@ import game.js.NativeWindowJS;
 typedef BoostBody = {
 	order: Int,
 	boostType: String,
+	levelZeroName: String,
 	levelOneId: String,
 	levelOneName: String,
 	levelOneDescription: String,

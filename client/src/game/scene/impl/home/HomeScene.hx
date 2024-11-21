@@ -1,5 +1,6 @@
 package game.scene.impl.home;
 
+import game.ui.text.TextUtils;
 import hxd.res.DefaultFont;
 import game.tilemap.TilemapManager;
 import game.ui.text.WealthTextIcon;
@@ -145,13 +146,8 @@ class HomeScene extends BasicScene implements EventListener {
 		titleBitmap.setPosition(Main.ActualScreenWidth / 2, 100);
 		titleBitmap.tile = homeTitleTile;
 
-		usernameText = new h2d.Text(DefaultFont.get());
-        usernameText.textColor = GameConfig.FontColor;
-        usernameText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        usernameText.textAlign = Left;
+		usernameText = TextUtils.GetDefaultTextObject(80, 70, 2, Left, GameConfig.DefaultFontColor);
 		usernameText.text = Player.instance.userName;
-        usernameText.setScale(2);
-		usernameText.setPosition(80, 70);
         addChild(usernameText);
 
 		friendsTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_FRIENDS), Left);

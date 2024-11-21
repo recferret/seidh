@@ -23,6 +23,10 @@ export class Boost {
   boostType: BoostType;
 
   // Level one
+  @Prop({ required: false })
+  levelZeroName: string;
+
+  // Level one
   @Prop({ required: true })
   levelOneId: string;
 

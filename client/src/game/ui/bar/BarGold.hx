@@ -23,7 +23,7 @@ class BarGold extends h2d.Object {
 
         goldText = new h2d.Text(DefaultFont.get());
         goldText.text = Std.string(goldAmount);
-        goldText.textColor = GameConfig.FontColor;
+        goldText.textColor = GameConfig.DefaultFontColor;
         goldText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         goldText.textAlign = Right;
         goldText.setScale(1.4);

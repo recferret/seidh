@@ -1,13 +1,32 @@
 package game.ui.dialog;
 
 import h2d.Object;
-import hxd.res.DefaultFont;
 
+import game.ui.text.TextUtils;
 import game.Res.SeidhResource;
 
 enum abstract DialogType(Int) {
 	var SMALL = 1;
 	var MEDIUM = 2;
+}
+
+enum abstract Buttons(Int) {
+	var ONE = 1;
+	var TWO = 2;
+}
+
+typedef TextStyle = {
+	label:String,
+    scale:Float,
+    color:Int,
+}
+
+typedef ButtonParams = {
+    buttons:Buttons,
+    positiveLabel:String,
+    negativeLabel:String,
+    positiveCallback:Void->Void,
+    negativeCallback:Void->Void,
 }
 
 class DialogButton extends h2d.Object {
@@ -23,14 +42,8 @@ class DialogButton extends h2d.Object {
         h = bmp.tile.height;
         w = bmp.tile.width;
 
-        final font : h2d.Font = DefaultFont.get();
-        final tf = new h2d.Text(font);
+        final tf = TextUtils.GetDefaultTextObject(0, -25, 3, Center, GameConfig.WhiteFontColor);
         tf.text = text;
-        tf.textColor = GameConfig.FontColor;
-        tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        tf.textAlign = Center;
-        tf.setScale(3);
-        tf.setPosition(0, -25);
 
         addChild(tf);
     }
@@ -49,6 +62,7 @@ class DialogButton extends h2d.Object {
 
 }
 
+// TODO dispose the dialog object
 class DialogManager {
 
     public static var IsDialogActive = false;
@@ -56,55 +70,56 @@ class DialogManager {
     public static function ShowDialog(
         parent:h2d.Object, 
         dialogType:DialogType,
-        textTitle:String, 
-        textLine1:String,
-        textLine2:String, 
-        textPositive:String,
-        textNegative:String,
-        positiveCallback:Void->Void,
-        negativeCallback:Void->Void,
+        textHeader:TextStyle,
+        textLine1:TextStyle,
+        textLine2:TextStyle,
+        buttonParams:ButtonParams,
     ) {
         if (!DialogManager.IsDialogActive) {
             DialogManager.IsDialogActive = true;
 
-            new Dialog(
+            new CommonDialog(
                 parent,
                 dialogType,
-                textTitle,
+                textHeader,
                 textLine1,
                 textLine2,
-                textPositive,
-                textNegative,
-                positiveCallback,
-                negativeCallback,
+                buttonParams,
             );
         }
     }
 
-    public static ShowCustomDialog() {
-        
+    public static function ShowCustomDialog(
+        parent:h2d.Object,
+        cotnent:h2d.Object,
+        buttonText:String,
+    ) {
+        if (!DialogManager.IsDialogActive) {
+            DialogManager.IsDialogActive = true;
+            new CustomDialog(
+                parent,
+                cotnent,
+                buttonText
+            );
+        }
     }
 }
-private class Dialog extends h2d.Object {
+
+private class CommonDialog extends h2d.Object {
 
     public function new(
         parent:h2d.Object, 
         dialogType:DialogType,
-        textTitle:String, 
-        textLine1:String,
-        textLine2:String, 
-        textPositive:String,
-        textNegative:String,
-        positiveCallback:Void->Void,
-        negativeCallback:Void->Void,
+        ?textHeader:TextStyle,
+        textLine1:TextStyle,
+        ?textLine2:TextStyle,
+        buttonParams:ButtonParams,
     ) {
         super(parent);
 
         // Shadow background
         final backgroundTile = h2d.Tile.fromColor(0x000000, Main.ActualScreenWidth, Main.ActualScreenHeight, 0.7);
         addChild(new h2d.Bitmap(backgroundTile));
-
-        var positiveButtonOffsetY = 50;
 
         // Dialog type
         var dialogBmp:h2d.Bitmap;
@@ -113,10 +128,19 @@ private class Dialog extends h2d.Object {
                 dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_SMALL));
             case MEDIUM:
                 dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_MEDIUM));
-                positiveButtonOffsetY = 100;
         }
         dialogBmp.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
         addChild(dialogBmp);
+
+        if (textHeader != null) {
+            final tfLine = TextUtils.GetDefaultTextObject(0, 0, textHeader.scale, Center, textHeader.color);
+            tfLine.text = textHeader.label;
+            tfLine.setPosition(
+                Main.ActualScreenWidth / 2,
+                Main.ActualScreenHeight / 2 - 200
+            );
+            addChild(tfLine);
+        }
 
         // Line by line text
         final fui = new h2d.Flow(this);
@@ -124,58 +148,65 @@ private class Dialog extends h2d.Object {
 		fui.verticalSpacing = 25;
         fui.setPosition(
             Main.ActualScreenWidth / 2,
-            Main.ActualScreenHeight / 2 - 100
+            Main.ActualScreenHeight / 2 - 120
         );
 
-        final font : h2d.Font = DefaultFont.get();
-
-        final tfLine1 = new h2d.Text(font);
-        tfLine1.text = textLine1;
-        tfLine1.textColor = GameConfig.FontColor;
-        tfLine1.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        tfLine1.textAlign = Center;
-        tfLine1.setScale(3);
+        final tfLine1 = TextUtils.GetDefaultTextObject(0, 0, textLine1.scale, Center, textLine1.color);
+        tfLine1.text = textLine1.label;
         fui.addChild(tfLine1);
 
         if (textLine2 != null) {
-            final tfLine2 = new h2d.Text(font);
-            tfLine2.text = textLine2;
-            tfLine2.textColor = GameConfig.FontColor;
-            tfLine2.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-            tfLine2.textAlign = Center;
-            tfLine2.setScale(3);
+            final tfLine2 = TextUtils.GetDefaultTextObject(0, 0, textLine2.scale, Center, textLine2.color);
+            tfLine2.text = textLine2.label;
             fui.addChild(tfLine2);
         }
 
         var buttonPositive:DialogButton = null;
         var interactionPositive:h2d.Interactive = null;
-
-        if (textPositive != null) {
-            buttonPositive = new DialogButton(this, textPositive);
-            interactionPositive = new h2d.Interactive(buttonPositive.getWidth(), buttonPositive.getHeight());
-
-            interactionPositive.onPush = function(event : hxd.Event) {
-                buttonPositive.setScale(0.9);
-            }
-            interactionPositive.onRelease = function(event : hxd.Event) {
-                buttonPositive.setScale(1);
-            }
-            interactionPositive.onClick = function(event : hxd.Event) {
-                interactionPositive.remove();
-                parent.removeChild(this);
-                if (positiveCallback != null) {
-                    positiveCallback();
-                }
-                DialogManager.IsDialogActive = false;
-            }
-            addChild(interactionPositive);
-        }
-
         var buttonNegative:DialogButton = null;
         var interactionNegative:h2d.Interactive = null;
 
-        if (textNegative != null) {
-            buttonNegative = new DialogButton(this, textNegative);
+        buttonPositive = new DialogButton(this, buttonParams.positiveLabel);
+        interactionPositive = new h2d.Interactive(buttonPositive.getWidth(), buttonPositive.getHeight());
+
+        interactionPositive.onPush = function(event : hxd.Event) {
+            buttonPositive.setScale(0.9);
+        }
+        interactionPositive.onRelease = function(event : hxd.Event) {
+            buttonPositive.setScale(1);
+        }
+        interactionPositive.onClick = function(event : hxd.Event) {
+            interactionPositive.remove();
+            parent.removeChild(this);
+            if (buttonParams.positiveCallback != null) {
+                buttonParams.positiveCallback();
+            }
+            DialogManager.IsDialogActive = false;
+        }
+        addChild(interactionPositive);
+
+        if (buttonParams.buttons == ONE) {
+            if (dialogType == SMALL) {
+                interactionPositive.setPosition(
+                    Main.ActualScreenWidth / 2 - buttonPositive.getWidth() / 2,
+                    Main.ActualScreenHeight / 2 + 50 - buttonPositive.getHeight() / 2
+                );
+                buttonPositive.setPosition(
+                    Main.ActualScreenWidth / 2, 
+                    Main.ActualScreenHeight / 2 + 50
+                );
+            } else {
+                interactionPositive.setPosition(
+                    Main.ActualScreenWidth / 2 - buttonPositive.getWidth() / 2,
+                    (Main.ActualScreenHeight / 2 + 140) - buttonPositive.getHeight() / 2
+                );
+                buttonPositive.setPosition(
+                    Main.ActualScreenWidth / 2, 
+                    Main.ActualScreenHeight / 2 + 140
+                );
+            }
+        } else {
+            buttonNegative = new DialogButton(this, buttonParams.negativeLabel);
             interactionNegative = new h2d.Interactive(buttonNegative.getWidth(), buttonNegative.getHeight());
 
             interactionNegative.onPush = function(event : hxd.Event) {
@@ -187,67 +218,81 @@ private class Dialog extends h2d.Object {
             interactionNegative.onClick = function(event : hxd.Event) {
                 interactionNegative.remove();
                 parent.removeChild(this);
-                if (negativeCallback != null) {
-                    negativeCallback();
+                if (buttonParams.negativeCallback != null) {
+                    buttonParams.negativeCallback();
                 }
                 DialogManager.IsDialogActive = false;
             }
             addChild(interactionNegative);
-        }
 
-        if (dialogType == SMALL) {
+            buttonNegative.setPosition(
+                Main.ActualScreenWidth / 2 + 100, 
+                Main.ActualScreenHeight / 2 + 140
+            );
+            interactionNegative.setPosition(
+                (Main.ActualScreenWidth / 2 + 100) - buttonNegative.getWidth() / 2,
+                (Main.ActualScreenHeight / 2 + 140) - buttonNegative.getHeight() / 2
+            );
+
             interactionPositive.setPosition(
-                Main.ActualScreenWidth / 2 - buttonPositive.getWidth() / 2,
-                Main.ActualScreenHeight / 2 + 50 - buttonPositive.getHeight() / 2
+                (Main.ActualScreenWidth / 2 - 100) - buttonPositive.getWidth() / 2,
+                (Main.ActualScreenHeight / 2 + 140) - buttonPositive.getHeight() / 2
             );
             buttonPositive.setPosition(
-                Main.ActualScreenWidth / 2, 
-                Main.ActualScreenHeight / 2 + 50
+                Main.ActualScreenWidth / 2 - 100, 
+                Main.ActualScreenHeight / 2 + 140
             );
-        } else {
-            if (textNegative != null && textPositive != null) {
-                buttonNegative.setPosition(
-                    Main.ActualScreenWidth / 2 + 100, 
-                    Main.ActualScreenHeight / 2 + 140
-                );
-                interactionNegative.setPosition(
-                    (Main.ActualScreenWidth / 2 + 100) - buttonNegative.getWidth() / 2,
-                    (Main.ActualScreenHeight / 2 + 140) - buttonNegative.getHeight() / 2
-                );
-
-                interactionPositive.setPosition(
-                    (Main.ActualScreenWidth / 2 - 100) - buttonPositive.getWidth() / 2,
-                    (Main.ActualScreenHeight / 2 + 140) - buttonPositive.getHeight() / 2
-                );
-                buttonPositive.setPosition(
-                    Main.ActualScreenWidth / 2 - 100, 
-                    Main.ActualScreenHeight / 2 + 140
-                );
-            } else if (textPositive != null) {
-                interactionPositive.setPosition(
-                    Main.ActualScreenWidth / 2 - buttonPositive.getWidth() / 2,
-                    Main.ActualScreenHeight / 2 + positiveButtonOffsetY - buttonPositive.getHeight() / 2
-                );
-                buttonPositive.setPosition(
-                    Main.ActualScreenWidth / 2, 
-                    Main.ActualScreenHeight / 2 + positiveButtonOffsetY
-                );
-            }
-            
-            if (textTitle != null) {
-                final tfTitle = new h2d.Text(font);
-                tfTitle.text = textTitle;
-                tfTitle.textColor = GameConfig.FontColor;
-                tfTitle.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-                tfTitle.textAlign = Center;
-                tfTitle.setScale(4);
-                tfTitle.setPosition(
-                    Main.ActualScreenWidth / 2,
-                    Main.ActualScreenHeight / 2 - 200
-                );
-                addChild(tfTitle);
-            }
         }
+    }
+
+}
+
+private class CustomDialog extends h2d.Object { 
+
+    public function new(
+        parent:h2d.Object,
+        content:h2d.Object,
+        buttonText:String,
+    ) {
+        super(parent);
+
+        final backgroundTile = h2d.Tile.fromColor(0x000000, Main.ActualScreenWidth, Main.ActualScreenHeight, 0.7);
+        addChild(new h2d.Bitmap(backgroundTile));
+
+        final dialogBmp = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_DIALOG_WINDOW_MEDIUM));
+        dialogBmp.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
+        addChild(dialogBmp);
+
+        addChild(content);
+
+        var buttonPositive:DialogButton = null;
+        var interactionPositive:h2d.Interactive = null;
+
+        buttonPositive = new DialogButton(this, buttonText);
+        interactionPositive = new h2d.Interactive(buttonPositive.getWidth(), buttonPositive.getHeight());
+
+        interactionPositive.onPush = function(event : hxd.Event) {
+            buttonPositive.setScale(0.9);
+        }
+        interactionPositive.onRelease = function(event : hxd.Event) {
+            buttonPositive.setScale(1);
+        }
+        interactionPositive.onClick = function(event : hxd.Event) {
+            interactionPositive.remove();
+            parent.removeChild(this);
+            DialogManager.IsDialogActive = false;
+        }
+
+        interactionPositive.setPosition(
+            Main.ActualScreenWidth / 2 - buttonPositive.getWidth() / 2,
+            Main.ActualScreenHeight / 2 + 160 - buttonPositive.getHeight() / 2
+        );
+        buttonPositive.setPosition(
+            Main.ActualScreenWidth / 2, 
+            Main.ActualScreenHeight / 2 + 160
+        );
+
+        addChild(interactionPositive);
     }
 
 }
