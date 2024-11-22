@@ -7,8 +7,62 @@ import game.ui.dialog.Dialog;
 import game.ui.dialog.Dialog.DialogManager;
 import game.tilemap.TilemapManager;
 import game.Player.BoostBody;
+import game.Res.SeidhResource;
 
-class BoostItem extends h2d.Object {
+enum abstract BoostType(String) {
+    var Boost; 
+    var Rune;
+    var Scroll;
+    var Artifact;
+}
+
+enum abstract CurrencyType(String) {
+    var Coins; 
+    var Teeth;
+    var Stars;
+}
+
+private class BoostCard extends h2d.Object {
+
+    private final fui:h2d.Flow;
+
+    public function new(parent:h2d.Object, px:Float, py:Float, verticalSpacing:Int, label:String, size:Int) {
+        super(parent);
+
+        setPosition(px, py);
+
+        final headerTile = Res.instance.getTileResource(SeidhResource.UI_BOOST_SCROLL_HEADER);
+        final bodyTile = Res.instance.getTileResource(SeidhResource.UI_BOOST_SCROLL_BODY);
+
+        for (i in 0...size) {
+            final bodyPart = new h2d.Bitmap(bodyTile, this);
+            bodyPart.setPosition(0, 20 + (i * bodyTile.height));
+        }
+
+        new h2d.Bitmap(headerTile, this);
+        final footer = new h2d.Bitmap(headerTile, this);
+        footer.tile.flipY();
+        footer.setPosition(0, size * bodyTile.height - 20);
+
+        final labelText = TextUtils.GetDefaultTextObject(0, 0, 4, Center, GameConfig.WhiteFontColor);
+        labelText.text = label;
+        labelText.setPosition(0, -30);
+        addChild(labelText);
+
+        fui = new h2d.Flow(this);
+		fui.layout = Vertical;
+		fui.verticalSpacing = verticalSpacing;
+		fui.paddingHorizontal = -150;
+		fui.paddingVertical = 145;
+    }
+
+    public function addBoost(boostItem:BoostItem) {
+        fui.addChild(boostItem);
+    }
+
+}
+
+private class BoostItem extends h2d.Object {
 
     public var currentBoostId = '';
     private var currentBoostName = '';
@@ -20,7 +74,7 @@ class BoostItem extends h2d.Object {
 
     private var boostPrice = null;
     private var currentLevel = 0;
-    private var currencyType = BoostContent.CURRENCY_TYPE_COINS;
+    private var currencyType = CurrencyType.Coins;
     private var maxLevel = 3;
 
     private final nameText:h2d.Text;
@@ -30,16 +84,15 @@ class BoostItem extends h2d.Object {
     private final boostIcon:h2d.Bitmap;
     private var boostTile:h2d.Tile = null;
     
-    public function new(parent:h2d.Object, px:Int, py:Int, boost:BoostBody) {
+    public function new(parent:h2d.Object, root:h2d.Object, boost:BoostBody) {
         super(parent);
 
-        setPosition(px, py);
         parseBoost(boost);
 
-        final iconBg = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.ICON_BOOST), this);
+        final iconBg = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.ICON_BOOST_BROWN), this);
+
         boostIcon = new h2d.Bitmap(this);
         boostIcon.tile = boostTile;
-        boostIcon.setPosition(iconBg.x + 10, iconBg.y + 10);
 
         nameText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y - 55, 2, Left, GameConfig.WhiteFontColor);
         addChild(nameText);
@@ -51,7 +104,7 @@ class BoostItem extends h2d.Object {
         addChild(priceText);
 
         priceIcon = new h2d.Bitmap(
-            currencyType == BoostContent.CURRENCY_TYPE_COINS ?
+            currencyType == CurrencyType.Coins ?
                 TilemapManager.instance.getTile(TileType.WEALTH_COINS) :
                 TilemapManager.instance.getTile(TileType.WEALTH_TEETH), this);
         priceIcon.setScale(0.6);
@@ -60,11 +113,11 @@ class BoostItem extends h2d.Object {
 
         nameText.text = currentBoostName;
         priceText.text = Std.string(boostPrice);
-        priceIcon.setPosition(priceText.x + priceText.textWidth * 2 + 30, priceText.y + 10);
+        priceIcon.setPosition(priceText.x + priceText.textWidth * 2 + 30, priceText.y + 16);
 
         // Iteraction
-        final interaction = new h2d.Interactive(550, boostIcon.height);
-        interaction.setPosition(boostIcon.x - boostIcon.tile.width / 2, boostIcon.y - boostIcon.tile.height / 2);
+        final interaction = new h2d.Interactive(450, iconBg.tile.height - 20);
+        interaction.setPosition(iconBg.x - iconBg.tile.width / 2 + 20, iconBg.y - iconBg.tile.height / 2 + 10);
 
         interaction.onPush = function(event:hxd.Event) {
             if (!DialogManager.IsDialogActive) {
@@ -78,7 +131,7 @@ class BoostItem extends h2d.Object {
         }
         interaction.onClick = function(event:hxd.Event) {
             if (!DialogManager.IsDialogActive) {
-                BoostContent.BoostClick(parent, nextBoostId, nextBoostName, nextBoostDescription, boostPrice, currencyType, currentLevel, maxLevel);
+                BoostContent.BoostClick(root, nextBoostId, nextBoostName, nextBoostDescription, boostPrice, currencyType, currentLevel, maxLevel);
             }
         }
         addChild(interaction);
@@ -87,55 +140,71 @@ class BoostItem extends h2d.Object {
     private function parseBoost(boost:BoostBody) {
         maxLevel = 3;
 
-        if (!boost.levelOneAccquired) {
-            currentBoostId = boost.levelOneId;
-            currentBoostName = boost.levelZeroName;
-            currentBoostDescription = '';
+        if (boost.boostType == BoostType.Rune || boost.boostType == BoostType.Scroll) {
+            if (!boost.levelOneAccquired) {
+                currentBoostId = boost.levelOneId;
+                currentBoostName = boost.levelZeroName;
+                currentBoostDescription = '';
 
-            nextBoostId = boost.levelOneName;
-            nextBoostName = boost.levelOneName;
-            nextBoostDescription = boost.levelOneDescription;
+                nextBoostId = boost.levelOneId;
+                nextBoostName = boost.levelOneName;
+                nextBoostDescription = boost.levelOneDescription;
+
+                boostPrice = boost.levelOnePrice;
+                
+                currentLevel = 0;
+                currencyType = boost.levelOneCurrencyType;
+            } else {
+                if (boost.levelThreeAccquired) {
+                    currentLevel = 3;
+                } else if (boost.levelTwoAccquired) {
+                    currentBoostId = boost.levelTwoId;
+                    currentBoostName = boost.levelTwoName;
+                    currentBoostDescription = boost.levelTwoDescription;
+
+                    nextBoostId = boost.levelThreeId;
+                    nextBoostName = boost.levelThreeName;
+                    nextBoostDescription = boost.levelThreeDescription;
+
+                    boostPrice = boost.levelThreePrice;
+
+                    currentLevel = 2;
+                    currencyType = boost.levelThreeCurrencyType;
+                } else {
+                    currentBoostId = boost.levelOneId;
+                    currentBoostName = boost.levelOneName;
+                    currentBoostDescription = boost.levelOneDescription;
+
+                    nextBoostId = boost.levelTwoId;
+                    nextBoostName = boost.levelTwoName;
+                    nextBoostDescription = boost.levelTwoDescription;
+
+                    boostPrice = boost.levelTwoPrice;
+
+                    currentLevel = 1;
+                    currencyType = boost.levelTwoCurrencyType;
+                }
+            }
+        } else {
+            currentBoostId = boost.levelOneId;
+            currentBoostName = boost.levelOneName;
+            currentBoostDescription = boost.levelOneDescription;
 
             boostPrice = boost.levelOnePrice;
-            
-            currentLevel = 0;
             currencyType = boost.levelOneCurrencyType;
-        } else {
-            if (boost.levelThreeAccquired) {
-                currentLevel = 3;
-            } else if (boost.levelTwoAccquired) {
-                currentBoostId = boost.levelTwoId;
-                currentBoostName = boost.levelTwoName;
-                currentBoostDescription = boost.levelTwoDescription;
-
-                nextBoostId = boost.levelThreeId;
-                nextBoostName = boost.levelThreeName;
-                nextBoostDescription = boost.levelThreeDescription;
-
-                boostPrice = boost.levelThreePrice;
-
-                currentLevel = 2;
-                currencyType = boost.levelThreeCurrencyType;
-            } else {
-                currentBoostId = boost.levelOneId;
-                currentBoostName = boost.levelOneName;
-                currentBoostDescription = boost.levelOneDescription;
-
-                nextBoostId = boost.levelTwoId;
-                nextBoostName = boost.levelTwoName;
-                nextBoostDescription = boost.levelTwoDescription;
-
-                boostPrice = boost.levelTwoPrice;
-
-                currentLevel = 1;
-                currencyType = boost.levelTwoCurrencyType;
-            }
         }
 
-        if (currentLevel == 0) {
+        if (currentLevel == 0 && (boost.boostType == BoostType.Rune || boost.boostType == BoostType.Scroll)) {
             boostTile = h2d.Tile.fromColor(0x000000, 32, 32, 0);
         } else {
             switch (currentBoostId) {
+                case BoostContent.TEETH:
+                    boostTile = TilemapManager.instance.getTile(TileType.WEALTH_TEETH);
+                case BoostContent.SALMON:
+                    boostTile = TilemapManager.instance.getTile(TileType.SALMON);
+                case BoostContent.SWORD:
+                    boostTile = TilemapManager.instance.getTile(TileType.SWORD);
+                
                 case BoostContent.EXP_1:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1);
                 case BoostContent.EXP_2:
@@ -148,35 +217,35 @@ class BoostItem extends h2d.Object {
                 case BoostContent.ITEM_RADIUS_2:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_2_LVL_2);
                 case BoostContent.ITEM_RADIUS_3:
-                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_2);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_3);
             
                 case BoostContent.MORE_COINS_1:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1);
                 case BoostContent.MORE_COINS_2:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_2);
                 case BoostContent.MORE_COINS_3:
-                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_2);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_3);
             
                 case BoostContent.MONSTERS_1:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1);
                 case BoostContent.MONSTERS_2:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_4_LVL_2);
                 case BoostContent.MONSTERS_3:
-                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_4_LVL_2);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_4_LVL_3);
                 
                 case BoostContent.ITEMS_DROP_1:
-                    boostTile = TilemapManager.instance.getTile(TileType.SCROLL_TYPE_ANY_LVL_1);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1);
                 case BoostContent.ITEMS_DROP_2:
-                    boostTile = TilemapManager.instance.getTile(TileType.SCROLL_TYPE_1_LVL_2);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_5_LVL_2);
                 case BoostContent.ITEMS_DROP_3:
-                    boostTile = TilemapManager.instance.getTile(TileType.SCROLL_TYPE_1_LVL_3);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_5_LVL_3);
             
                 case BoostContent.STATS_1:
-                    boostTile = TilemapManager.instance.getTile(TileType.SCROLL_TYPE_ANY_LVL_1);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1);
                 case BoostContent.STATS_2:
-                    boostTile = TilemapManager.instance.getTile(TileType.SCROLL_TYPE_2_LVL_2);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_6_LVL_2);
                 case BoostContent.STATS_3:
-                    boostTile = TilemapManager.instance.getTile(TileType.SCROLL_TYPE_2_LVL_3);
+                    boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_6_LVL_3);
             
                 case BoostContent.ARTIFACT_1:
                     boostTile = TilemapManager.instance.getTile(TileType.ARTIFACT_1);
@@ -191,6 +260,10 @@ class BoostItem extends h2d.Object {
 }
 
 class BoostContent extends BasicHomeContent implements EventListener {
+
+    public static final TEETH = 'TEETH';
+    public static final SALMON = 'SALMON';
+    public static final SWORD = 'SWORD';
 
     public static final EXP_1 = 'EXP_1';
     public static final EXP_2 = 'EXP_2';
@@ -216,10 +289,19 @@ class BoostContent extends BasicHomeContent implements EventListener {
     public static final STATS_2 = 'STATS_2';
     public static final STATS_3 = 'STATS_3';
 
-    public static final ARTIFACT_1 = 'ARTIFACT_1';
+    public static final KNOWLEDGE_1 = 'KNOWLEDGE_1';
+    public static final KNOWLEDGE_2 = 'KNOWLEDGE_2';
+    public static final KNOWLEDGE_3 = 'KNOWLEDGE_3';
 
-    public static final CURRENCY_TYPE_COINS = 'Coins';
-    public static final CURRENCY_TYPE_TEETH = 'Teeth';
+    public static final THOR_MIGHT_1 = 'THOR_MIGHT_1';
+    public static final THOR_MIGHT_2 = 'THOR_MIGHT_2';
+    public static final THOR_MIGHT_3 = 'THOR_MIGHT_3';
+
+    public static final SKALD_SONG_1 = 'SKALD_SONG_1';
+    public static final SKALD_SONG_2 = 'SKALD_SONG_2';
+    public static final SKALD_SONG_3 = 'SKALD_SONG_3';
+
+    public static final ARTIFACT_1 = 'ARTIFACT_1';
 
     final boostContainer: h2d.Object;
 
@@ -230,13 +312,32 @@ class BoostContent extends BasicHomeContent implements EventListener {
 
         boostContainer = new h2d.Object(this);
 
-        var boostX = 180;
-        var boostY = 360;
+        final boostCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 350, 50, 'BOOSTS', 12);
+        final runesCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 1100, 45, 'RUNES', 20);
+        final scrollsCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 2250, 50, 'SCROLLS', 12);
+        final artifactsCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 3000, 50, 'ARTIFACTS', 6);
 
         for (boost in Player.instance.boosts) {
-            final boost = new BoostItem(boostContainer, boostX, boostY, boost);
-            boostsMap.set(boost.currentBoostId, boost);
-            boostY += 150;
+            var boostItem:BoostItem = null;
+
+            switch (boost.boostType) {
+                case BoostType.Boost:
+                    boostItem = new BoostItem(boostCard, this, boost);
+                    boostCard.addBoost(boostItem);
+                case BoostType.Rune:
+                    boostItem = new BoostItem(runesCard, this, boost);
+                    runesCard.addBoost(boostItem);
+                case BoostType.Scroll:
+                    boostItem = new BoostItem(scrollsCard, this, boost);
+                    scrollsCard.addBoost(boostItem);
+                case BoostType.Artifact:
+                    boostItem = new BoostItem(artifactsCard, this, boost);
+                    artifactsCard.addBoost(boostItem);
+            }
+
+            if (boostItem != null) {
+                boostsMap.set(boostItem.currentBoostId, boostItem);
+            }
         }
 
         EventManager.instance.subscribe(EventManager.EVENT_INVALIDATE_BOOSTS, this);
@@ -250,9 +351,8 @@ class BoostContent extends BasicHomeContent implements EventListener {
 	}
 
     public function update(dt:Float) {
-        // boostFrame.update(dt);
-
-        // boostContainer.y = contentScrollY;
+        // boostContainer.update(dt);
+        boostContainer.y = contentScrollY;
     }
 
     private function invalidateBoosts(message:Dynamic) {
@@ -271,20 +371,33 @@ class BoostContent extends BasicHomeContent implements EventListener {
         name:String, 
         description:String, 
         price:Int, 
-        currencyType:String,
+        currencyType:CurrencyType,
         currentLevel:Int, 
         maxLevel:Int
     ) {
         var hasEnoughMoney = true;
+        var currencyTypeValue = 'coins';
 
-        if (currencyType == BoostContent.CURRENCY_TYPE_COINS) {
+        if (currencyType == CurrencyType.Coins) {
             if (Player.instance.coins - price < 0) {
                 hasEnoughMoney = false;
             }
-        } else {
+        } else if (currencyType == CurrencyType.Teeth) {
+            currencyTypeValue = 'teeth';
             if (Player.instance.teeth - price < 0) {
                 hasEnoughMoney = false;
             }
+        }
+
+        function positiveCallback1():Void {
+            NativeWindowJS.networkBuyBoost(boostId, function callback(data:Dynamic) {
+                if (data.success) {
+                    Player.instance.setBoostData(data.boosts);
+                    EventManager.instance.notify(EventManager.EVENT_INVALIDATE_BOOSTS, { accquiredBoostId: boostId });
+                } else {
+                    // TODO impl alert
+                }
+            });
         }
 
         DialogManager.ShowDialog(
@@ -294,7 +407,7 @@ class BoostContent extends BasicHomeContent implements EventListener {
 			{ label: description, scale: 3, color: GameConfig.DefaultFontColor, },
 			{ 
                 label: hasEnoughMoney ? 
-                    'Buy it for ' + price + ' ' + currencyType.toLowerCase() + ' ?' : 
+                    'Buy it for ' + price + ' ' + currencyTypeValue + ' ?' : 
                     'Not enough teeth!', 
                 scale: hasEnoughMoney ? 3 : 4, 
                 color: hasEnoughMoney ? GameConfig.DefaultFontColor : GameConfig.ErrorFontColor, 
@@ -303,18 +416,10 @@ class BoostContent extends BasicHomeContent implements EventListener {
                 buttons: hasEnoughMoney ? TWO : ONE,
                 positiveLabel: hasEnoughMoney ? "YES" : "OK",
                 negativeLabel: "NO",
-                positiveCallback: function positiveCallback() {
-                    NativeWindowJS.networkBuyBoost(boostId, function callback(data:Dynamic) {
-                        if (data.success) {
-                            Player.instance.setBoostData(data.boosts);
-                            EventManager.instance.notify(EventManager.EVENT_INVALIDATE_BOOSTS, { accquiredBoostId: boostId });
-                        } else {
-                            // TODO impl alert
-                        }
-                    });
-                },
+                positiveCallback: positiveCallback1,
                 negativeCallback: null,
             },
 		);
     }
+
 }

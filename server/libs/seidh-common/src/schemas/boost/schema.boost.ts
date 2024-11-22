@@ -6,9 +6,11 @@ export type BoostDocument = HydratedDocument<Boost>;
 export enum CurrencyType {
   Coins = 'Coins',
   Teeth = 'Teeth',
+  Stars = 'Stars',
 }
 
 export enum BoostType {
+  Boost = 'Boost',
   Rune = 'Rune',
   Scroll = 'Scroll',
   Artifact = 'Artifact',
@@ -24,7 +26,7 @@ export class Boost {
 
   // Level one
   @Prop({ required: false })
-  levelZeroName: string;
+  levelZeroName?: string;
 
   // Level one
   @Prop({ required: true })

@@ -137,7 +137,7 @@ private class CommonDialog extends h2d.Object {
             tfLine.text = textHeader.label;
             tfLine.setPosition(
                 Main.ActualScreenWidth / 2,
-                Main.ActualScreenHeight / 2 - 200
+                Main.ActualScreenHeight / 2 - 200,
             );
             addChild(tfLine);
         }

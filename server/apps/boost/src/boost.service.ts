@@ -42,10 +42,57 @@ export class BoostService implements OnModuleInit {
   async onModuleInit() {
     const boosts = await this.boostModel.find();
     if (!boosts || boosts.length == 0) {
-      // Exp
+      // ---------------------
+      // BOOSTS
+      // ---------------------
+
       this.boosts.push(
         await this.boostModel.create({
           order: 1,
+          boostType: BoostType.Boost,
+
+          levelOneId: 'TEETH',
+          levelOneName: 'Golden teef',
+          levelOneDescription: '100 golden teef',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Stars,
+        }),
+      );
+
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 2,
+          boostType: BoostType.Boost,
+
+          levelOneId: 'SALMON',
+          levelOneName: 'Salmon',
+          levelOneDescription: 'Salted! Heals 50% HP',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+        }),
+      );
+
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 3,
+          boostType: BoostType.Boost,
+
+          levelOneId: 'SWORD',
+          levelOneName: 'Sword',
+          levelOneDescription: 'Attack radius +50%',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Coins,
+        }),
+      );
+
+      // ---------------------
+      // RUNES
+      // ---------------------
+
+      // Exp
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 4,
           boostType: BoostType.Rune,
 
           levelZeroName: 'Exp 0/3',
@@ -72,7 +119,7 @@ export class BoostService implements OnModuleInit {
       // Item radius
       this.boosts.push(
         await this.boostModel.create({
-          order: 2,
+          order: 5,
           boostType: BoostType.Rune,
 
           levelZeroName: 'Pick up 0/3',
@@ -99,7 +146,7 @@ export class BoostService implements OnModuleInit {
       // More tokens
       this.boosts.push(
         await this.boostModel.create({
-          order: 3,
+          order: 6,
           boostType: BoostType.Rune,
 
           levelZeroName: 'Coins 0/3',
@@ -126,7 +173,7 @@ export class BoostService implements OnModuleInit {
       // Monsters
       this.boosts.push(
         await this.boostModel.create({
-          order: 4,
+          order: 7,
           boostType: BoostType.Rune,
 
           levelZeroName: 'Monsters 0/3',
@@ -153,8 +200,8 @@ export class BoostService implements OnModuleInit {
       // Items drop
       this.boosts.push(
         await this.boostModel.create({
-          order: 5,
-          boostType: BoostType.Scroll,
+          order: 8,
+          boostType: BoostType.Rune,
 
           levelZeroName: 'Items 0/3',
 
@@ -180,8 +227,8 @@ export class BoostService implements OnModuleInit {
       // Stats
       this.boosts.push(
         await this.boostModel.create({
-          order: 6,
-          boostType: BoostType.Scroll,
+          order: 9,
+          boostType: BoostType.Rune,
 
           levelZeroName: 'Stats 0/3',
 
@@ -204,10 +251,100 @@ export class BoostService implements OnModuleInit {
           levelThreeCurrencyType: CurrencyType.Teeth,
         }),
       );
-      // Artrifact
+
+      // ---------------------
+      // SCROLLS
+      // ---------------------
+
       this.boosts.push(
         await this.boostModel.create({
-          order: 7,
+          order: 10,
+          boostType: BoostType.Scroll,
+
+          levelZeroName: 'Knowledge 0/3',
+
+          levelOneId: 'KNOWLEDGE_1',
+          levelOneName: 'Knowledge 1/3',
+          levelOneDescription: 'Unlock LVL 1 upgrades',
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Teeth,
+
+          levelTwoId: 'KNOWLEDGE_2',
+          levelTwoName: 'Knowledge 2/3',
+          levelTwoDescription: 'Unlock LVL 2 upgrades',
+          levelTwoPrice: 500,
+          levelTwoCurrencyType: CurrencyType.Teeth,
+
+          levelThreeId: 'KNOWLEDGE_3',
+          levelThreeName: 'Knowledge 3/3',
+          levelThreeDescription: 'Unlock LVL 3 upgrades',
+          levelThreePrice: 1000,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 11,
+          boostType: BoostType.Scroll,
+
+          levelZeroName: 'Thor might 0/3',
+
+          levelOneId: 'THOR_MIGHT_1',
+          levelOneName: 'Thor might 1/3',
+          levelOneDescription: `Thor's strike!`,
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Teeth,
+
+          levelTwoId: 'THOR_MIGHT_2',
+          levelTwoName: 'Thor might 2/3',
+          levelTwoDescription: `Super Thor's strike!`,
+          levelTwoPrice: 100,
+          levelTwoCurrencyType: CurrencyType.Teeth,
+
+          levelThreeId: 'THOR_MIGHT_3',
+          levelThreeName: 'Thor might 3/3',
+          levelThreeDescription: `Ultimate Thor's strike!`,
+          levelThreePrice: 100,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 12,
+          boostType: BoostType.Scroll,
+
+          levelZeroName: 'Skald song 0/3',
+
+          levelOneId: 'SKALD_SONG_1',
+          levelOneName: 'Skald song 1/3',
+          levelOneDescription: `Full health and immortality!`,
+          levelOnePrice: 100,
+          levelOneCurrencyType: CurrencyType.Teeth,
+
+          levelTwoId: 'SKALD_SONG_2',
+          levelTwoName: 'Skald song 2/3',
+          levelTwoDescription: `Freeze your enemies!`,
+          levelTwoPrice: 100,
+          levelTwoCurrencyType: CurrencyType.Teeth,
+
+          levelThreeId: 'SKALD_SONG_3',
+          levelThreeName: 'Skald song 3/3',
+          levelThreeDescription: `Ultimate Thor's strike!`,
+          levelThreePrice: 100,
+          levelThreeCurrencyType: CurrencyType.Teeth,
+        }),
+      );
+
+      // ---------------------
+      // ARTIFACTS
+      // ---------------------
+
+      // Valkyre feather
+      this.boosts.push(
+        await this.boostModel.create({
+          order: 13,
           boostType: BoostType.Artifact,
 
           levelOneId: 'ARTIFACT_1',

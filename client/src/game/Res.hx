@@ -117,6 +117,9 @@ enum SeidhResource {
     UI_HOME_TITLE_SOON;
     UI_HOME_TITLE_STORE;
     UI_HOME_TITLE_HOME;
+
+    UI_BOOST_SCROLL_BODY;
+    UI_BOOST_SCROLL_HEADER;
     
     // ------------------------------------
     // ZOMBIE BOY
@@ -317,6 +320,9 @@ class Res {
                 remoteResourceMap.set(UI_HOME_TITLE_STORE, url + 'ui/home/UI_HOME_TITLE_STORE.png');
                 remoteResourceMap.set(UI_HOME_TITLE_HOME, url + 'ui/home/UI_HOME_TITLE_HOME.png');
 
+                remoteResourceMap.set(UI_BOOST_SCROLL_BODY, url + 'ui/home/UI_BOOST_SCROLL_BODY.png');
+                remoteResourceMap.set(UI_BOOST_SCROLL_HEADER, url + 'ui/home/UI_BOOST_SCROLL_HEADER.png');
+
                 // ------------------------------------
                 // ZOMBIE BOY
                 // ------------------------------------
@@ -453,6 +459,10 @@ class Res {
                 tileResMap.set(UI_DIALOG_BUTTON_YAY, hxd.Res.ui.dialog.UI_DIALOG_BUTTON_NAY.toTile().center());
                 tileResMap.set(UI_DIALOG_WINDOW_SMALL, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_SMALL.toTile().center());
                 tileResMap.set(UI_DIALOG_WINDOW_MEDIUM, hxd.Res.ui.dialog.UI_DIALOG_WINDOW_MEDIUM.toTile().center());     
+
+
+                tileResMap.set(UI_BOOST_SCROLL_BODY, hxd.Res.ui.boost.UI_BOOST_SCROLL_BODY.toTile().center());
+                tileResMap.set(UI_BOOST_SCROLL_HEADER, hxd.Res.ui.boost.UI_BOOST_SCROLL_HEADER.toTile().center());
 
                 // ------------------------------------
                 // ZOMBIE BOY

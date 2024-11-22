@@ -1,28 +1,30 @@
 package game;
 
+import game.scene.impl.home.boost.BoostContent.CurrencyType;
+import game.scene.impl.home.boost.BoostContent.BoostType;
 import game.js.NativeWindowJS;
 
 typedef BoostBody = {
 	order: Int,
-	boostType: String,
+	boostType: BoostType,
 	levelZeroName: String,
 	levelOneId: String,
 	levelOneName: String,
 	levelOneDescription: String,
 	levelOnePrice: Int,
-	levelOneCurrencyType: String,
+	levelOneCurrencyType: CurrencyType,
 	levelOneAccquired: Bool,
 	levelTwoId: String,
 	levelTwoName: String,
 	levelTwoDescription: String,
 	levelTwoPrice: Int,
-	levelTwoCurrencyType: String,
+	levelTwoCurrencyType: CurrencyType,
 	levelTwoAccquired: Bool,
 	levelThreeId: String,
 	levelThreeName: String,
 	levelThreeDescription: String,
 	levelThreePrice: Int,
-	levelThreeCurrencyType: String,
+	levelThreeCurrencyType: CurrencyType,
 	levelThreeAccquired: Bool
 };
 

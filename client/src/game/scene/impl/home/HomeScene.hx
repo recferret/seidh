@@ -1,12 +1,9 @@
 package game.scene.impl.home;
 
-import game.ui.text.TextUtils;
-import hxd.res.DefaultFont;
-import game.tilemap.TilemapManager;
-import game.ui.text.WealthTextIcon;
 import engine.base.MathUtils;
-import h2d.filter.Displacement;
 import engine.base.geometry.Point;
+
+import h2d.filter.Displacement;
 import h2d.Bitmap;
 
 import game.js.NativeWindowJS;
@@ -19,7 +16,10 @@ import game.scene.impl.home.friends.FriendsContent;
 import game.scene.impl.home.play.PlayContent;
 import game.scene.impl.home.BasicHomeContent;
 import game.sound.SoundManager;
+import game.tilemap.TilemapManager;
 import game.ui.dialog.Dialog.DialogManager;
+import game.ui.text.TextUtils;
+import game.ui.text.TextIcon;
 import game.Res.SeidhResource;
 
 enum HomeSceneContent {
@@ -40,9 +40,9 @@ class HomeScene extends BasicScene implements EventListener {
 	private var pageContent:BasicHomeContent;
 
 	private var usernameText:h2d.Text;
-	private var friendsTextIcon:WealthTextIcon;
-	private var coinsTextIcon:WealthTextIcon;
-	private var teethTextIcon:WealthTextIcon;
+	private var friendsTextIcon:TextIcon;
+	private var coinsTextIcon:TextIcon;
+	private var teethTextIcon:TextIcon;
 
     private var titleBitmap:h2d.Bitmap;
     private var homeTitleTile:h2d.Tile;
@@ -79,7 +79,7 @@ class HomeScene extends BasicScene implements EventListener {
 					}
 
 					if (pageContent.contentScrollY < 0 || pageContent.y > 0) {
-						pageContent.contentScrollY = 0;
+						// pageContent.contentScrollY = 0;
 					}
 				}
 
@@ -88,10 +88,10 @@ class HomeScene extends BasicScene implements EventListener {
 			}
 		});
 
-		headerItems();
+		setSceneContent(HomeSceneContent.HomePlayContent);
 		generateBackground();
 		frame();
-		setSceneContent(HomeSceneContent.HomePlayContent);
+		headerItems();
 		bottomButtons();
 
 		SoundManager.instance.playMenuTheme();
@@ -150,15 +150,15 @@ class HomeScene extends BasicScene implements EventListener {
 		usernameText.text = Player.instance.userName;
         addChild(usernameText);
 
-		friendsTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_FRIENDS), Left);
+		friendsTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_FRIENDS), Left, 10);
 		friendsTextIcon.setText('0/0');
 		friendsTextIcon.setPosition(100, 120);
 		
-		coinsTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_COINS), Right);
+		coinsTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_COINS), Right, 10);
 		coinsTextIcon.setText(Std.string(Player.instance.coins));
 		coinsTextIcon.setPosition(Main.ActualScreenWidth - 90, 80);
 
-		teethTextIcon = new WealthTextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_TEETH), Right);
+		teethTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_TEETH), Right, 5);
 		teethTextIcon.setText(Std.string(Player.instance.teeth));
 		teethTextIcon.setPosition(Main.ActualScreenWidth - 90, 120);
 	}
@@ -425,7 +425,7 @@ class HomeScene extends BasicScene implements EventListener {
         // Shadow
         // ------------------------------------
 
-        final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), backgroundObject);
+        final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), this);
         final darknessScaleRatio = Main.ActualScreenHeight / 1280;
         darkness.scaleY = darknessScaleRatio;
 

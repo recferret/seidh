@@ -67,24 +67,25 @@ enum abstract TileType(Int) {
     // Icons
     // ---------------------------
 
-    var ICON_BOOST = 29;
+    var ICON_BOOST_BLACK = 29;
     var ICON_SKILL_BACKGROUND = 30;
     var ICON_CLOSE = 31;
     var ICON_SCROLL = 32;
+    var ICON_BOOST_BROWN = 33;
 
     // ---------------------------
     // Skills
     // ---------------------------
 
-    var SKILL_ACTION_MAIN = 33;
+    var SKILL_ACTION_MAIN = 34;
 
     // ---------------------------
     // Wealth
     // ---------------------------
 
-    var WEALTH_COINS = 34;
-    var WEALTH_TEETH = 35;
-    var WEALTH_FRIENDS = 36;
+    var WEALTH_COINS = 35;
+    var WEALTH_TEETH = 36;
+    var WEALTH_FRIENDS = 37;
 }
 
 class TilemapManager {
@@ -143,10 +144,11 @@ class TilemapManager {
             tilesMap.set(TileType.ARTIFACT_1, stufftTilemapTile.sub(1 * tw, 3 * th, tw, th).center());
             
             // Icons
-            tilesMap.set(TileType.ICON_BOOST, stufftTilemapTile.sub(1 * tw, 4 * th, tw, th).center());
+            tilesMap.set(TileType.ICON_BOOST_BLACK, stufftTilemapTile.sub(1 * tw, 4 * th, tw, th).center());
             tilesMap.set(TileType.ICON_SKILL_BACKGROUND, stufftTilemapTile.sub(2 * tw, 4 * th, tw, th).center());
             tilesMap.set(TileType.ICON_CLOSE, stufftTilemapTile.sub(3 * tw, 4 * th, tw, th).center());
             tilesMap.set(TileType.ICON_SCROLL, stufftTilemapTile.sub(4 * tw, 4 * th, tw, th).center());
+            tilesMap.set(TileType.ICON_BOOST_BROWN, stufftTilemapTile.sub(5 * tw, 4 * th, tw, th).center());
 
             // Skills
             tilesMap.set(TileType.SKILL_ACTION_MAIN, stufftTilemapTile.sub(1 * tw, 5 * th, tw, th).center());
