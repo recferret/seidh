@@ -277,6 +277,7 @@ class GameUiScene extends h2d.Scene {
 			null,
 			{ label: "You have won!", scale: 3, color: GameConfig.DefaultFontColor, },
 			{ label: "Zombies killed: " + zombiesKilled, scale: 3, color: GameConfig.DefaultFontColor, },
+			null,
 			{
                 buttons: ONE,
 				positiveLabel: "OK",
@@ -295,6 +296,7 @@ class GameUiScene extends h2d.Scene {
 			DialogType.SMALL,
 			null,
 			{ label: "You lose!", scale: 3, color: GameConfig.DefaultFontColor, },
+			null,
 			null,
 			{
                 buttons: ONE,

@@ -14,24 +14,27 @@ export interface BoostBody {
 
   levelOneId: string;
   levelOneName: string;
-  levelOneDescription: string;
+  levelOneDescription1: string;
+  levelOneDescription2?: string;
   levelOnePrice: number;
   levelOneCurrencyType: CurrencyType;
   levelOneAccquired: boolean;
 
-  levelTwoId: string;
-  levelTwoName: string;
-  levelTwoDescription: string;
-  levelTwoPrice: number;
-  levelTwoCurrencyType: CurrencyType;
-  levelTwoAccquired: boolean;
+  levelTwoId?: string;
+  levelTwoName?: string;
+  levelTwoDescription1?: string;
+  levelTwoDescription2?: string;
+  levelTwoPrice?: number;
+  levelTwoCurrencyType?: CurrencyType;
+  levelTwoAccquired?: boolean;
 
-  levelThreeId: string;
-  levelThreeName: string;
-  levelThreeDescription: string;
-  levelThreePrice: number;
-  levelThreeCurrencyType: CurrencyType;
-  levelThreeAccquired: boolean;
+  levelThreeId?: string;
+  levelThreeName?: string;
+  levelThreeDescription1?: string;
+  levelThreeDescription2?: string;
+  levelThreePrice?: number;
+  levelThreeCurrencyType?: CurrencyType;
+  levelThreeAccquired?: boolean;
 }
 
 export interface BoostsGetServiceRequest {

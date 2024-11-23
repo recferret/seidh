@@ -73,6 +73,7 @@ class DialogManager {
         textHeader:TextStyle,
         textLine1:TextStyle,
         textLine2:TextStyle,
+        textLine3:TextStyle,
         buttonParams:ButtonParams,
     ) {
         if (!DialogManager.IsDialogActive) {
@@ -84,6 +85,7 @@ class DialogManager {
                 textHeader,
                 textLine1,
                 textLine2,
+                textLine3,
                 buttonParams,
             );
         }
@@ -113,6 +115,7 @@ private class CommonDialog extends h2d.Object {
         ?textHeader:TextStyle,
         textLine1:TextStyle,
         ?textLine2:TextStyle,
+        ?textLine3:TextStyle,
         buttonParams:ButtonParams,
     ) {
         super(parent);
@@ -159,6 +162,12 @@ private class CommonDialog extends h2d.Object {
             final tfLine2 = TextUtils.GetDefaultTextObject(0, 0, textLine2.scale, Center, textLine2.color);
             tfLine2.text = textLine2.label;
             fui.addChild(tfLine2);
+        }
+
+        if (textLine3 != null) {
+            final tfLine3 = TextUtils.GetDefaultTextObject(0, 0, textLine3.scale, Center, textLine3.color);
+            tfLine3.text = textLine3.label;
+            fui.addChild(tfLine3);
         }
 
         var buttonPositive:DialogButton = null;

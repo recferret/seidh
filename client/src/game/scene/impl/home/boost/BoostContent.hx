@@ -65,11 +65,13 @@ private class BoostItem extends h2d.Object {
 
     public var currentBoostId = '';
     private var currentBoostName = '';
-    private var currentBoostDescription = '';
+    private var currentBoostDescription1 = '';
+    private var currentBoostDescription2 = null;
 
     public var nextBoostId = '';
     private var nextBoostName = '';
-    private var nextBoostDescription = '';
+    private var nextBoostDescription1 = '';
+    private var nextBoostDescription2 = null;
 
     private var boostPrice = null;
     private var currentLevel = 0;
@@ -110,7 +112,7 @@ private class BoostItem extends h2d.Object {
                 TilemapManager.instance.getTile(TileType.WEALTH_TEETH), this);
         priceIcon.setScale(0.6);
 
-        descriptionText.text = currentBoostDescription;
+        descriptionText.text = currentBoostDescription1;
 
         nameText.text = currentBoostName;
         priceText.text = Std.string(boostPrice);
@@ -138,7 +140,17 @@ private class BoostItem extends h2d.Object {
         }
         interaction.onClick = function(event:hxd.Event) {
             if (clickStarted && !DialogManager.IsDialogActive) {
-                BoostContent.BoostClick(root, nextBoostId, nextBoostName, nextBoostDescription, boostPrice, currencyType, currentLevel, maxLevel);
+                BoostContent.BoostClick(
+                    root,
+                    nextBoostId,
+                    nextBoostName,
+                    nextBoostDescription1,
+                    nextBoostDescription2,
+                    boostPrice,
+                    currencyType,
+                    currentLevel,
+                    maxLevel
+                );
             }
             clickStarted = false;
         }
@@ -152,11 +164,13 @@ private class BoostItem extends h2d.Object {
             if (!boost.levelOneAccquired) {
                 currentBoostId = boost.levelOneId;
                 currentBoostName = boost.levelZeroName;
-                currentBoostDescription = '';
+                currentBoostDescription1 = '';
+                currentBoostDescription2 = '';
 
                 nextBoostId = boost.levelOneId;
                 nextBoostName = boost.levelOneName;
-                nextBoostDescription = boost.levelOneDescription;
+                nextBoostDescription1 = boost.levelOneDescription1;
+                nextBoostDescription2 = boost.levelOneDescription2;
 
                 boostPrice = boost.levelOnePrice;
                 
@@ -168,11 +182,13 @@ private class BoostItem extends h2d.Object {
                 } else if (boost.levelTwoAccquired) {
                     currentBoostId = boost.levelTwoId;
                     currentBoostName = boost.levelTwoName;
-                    currentBoostDescription = boost.levelTwoDescription;
+                    currentBoostDescription1 = boost.levelTwoDescription1;
+                    currentBoostDescription2 = boost.levelTwoDescription2;
 
                     nextBoostId = boost.levelThreeId;
                     nextBoostName = boost.levelThreeName;
-                    nextBoostDescription = boost.levelThreeDescription;
+                    nextBoostDescription1 = boost.levelThreeDescription1;
+                    nextBoostDescription2 = boost.levelThreeDescription2;
 
                     boostPrice = boost.levelThreePrice;
 
@@ -181,11 +197,13 @@ private class BoostItem extends h2d.Object {
                 } else {
                     currentBoostId = boost.levelOneId;
                     currentBoostName = boost.levelOneName;
-                    currentBoostDescription = boost.levelOneDescription;
+                    currentBoostDescription1 = boost.levelOneDescription1;
+                    currentBoostDescription2 = boost.levelOneDescription2;
 
                     nextBoostId = boost.levelTwoId;
                     nextBoostName = boost.levelTwoName;
-                    nextBoostDescription = boost.levelTwoDescription;
+                    nextBoostDescription1 = boost.levelTwoDescription1;
+                    nextBoostDescription2 = boost.levelTwoDescription2;
 
                     boostPrice = boost.levelTwoPrice;
 
@@ -196,7 +214,8 @@ private class BoostItem extends h2d.Object {
         } else {
             currentBoostId = boost.levelOneId;
             currentBoostName = boost.levelOneName;
-            currentBoostDescription = boost.levelOneDescription;
+            currentBoostDescription1 = boost.levelOneDescription1;
+            currentBoostDescription2 = boost.levelOneDescription2;
 
             boostPrice = boost.levelOnePrice;
             currencyType = boost.levelOneCurrencyType;
@@ -376,12 +395,13 @@ class BoostContent extends BasicHomeContent implements EventListener {
     public static function BoostClick(
         parent:h2d.Object,
         boostId:String,
-        name:String, 
-        description:String, 
-        price:Int, 
+        name:String,
+        description1:String,
+        description2:String,
+        price:Int,
         currencyType:CurrencyType,
         currentLevel:Int, 
-        maxLevel:Int
+        maxLevel:Int,
     ) {
         var hasEnoughMoney = true;
         var currencyTypeValue = 'coins';
@@ -412,13 +432,14 @@ class BoostContent extends BasicHomeContent implements EventListener {
 			parent, 
 			DialogType.MEDIUM, 
 			{ label: name, scale: 4, color: GameConfig.WhiteFontColor, },
-			{ label: description, scale: 3, color: GameConfig.DefaultFontColor, },
+			{ label: description1, scale: 3, color: GameConfig.DefaultFontColor, },
+            description2 != null ? { label: description2, scale: 3, color: GameConfig.DefaultFontColor, } : null,
 			{ 
                 label: hasEnoughMoney ? 
                     'Buy it for ' + price + ' ' + currencyTypeValue + ' ?' : 
                     'Not enough teeth!', 
                 scale: hasEnoughMoney ? 3 : 4, 
-                color: hasEnoughMoney ? GameConfig.DefaultFontColor : GameConfig.ErrorFontColor, 
+                color: hasEnoughMoney ? GameConfig.WhiteFontColor : GameConfig.ErrorFontColor, 
             },
             {
                 buttons: hasEnoughMoney ? TWO : ONE,
