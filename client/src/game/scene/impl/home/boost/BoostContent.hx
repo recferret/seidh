@@ -103,20 +103,22 @@ private class BoostItem extends h2d.Object {
         descriptionText = TextUtils.GetDefaultTextObject(iconBg.x + 78, iconBg.y - 15, 2, Left, GameConfig.DefaultFontColor);
         addChild(descriptionText);
 
-        priceText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y + 25, 2, Left, GameConfig.DefaultFontColor);
-        addChild(priceText);
+        if (currentLevel < 3) {
+            priceText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y + 25, 2, Left, GameConfig.DefaultFontColor);
+            addChild(priceText);
 
-        priceIcon = new h2d.Bitmap(
-            currencyType == CurrencyType.Coins ?
-                TilemapManager.instance.getTile(TileType.WEALTH_COINS) :
-                TilemapManager.instance.getTile(TileType.WEALTH_TEETH), this);
-        priceIcon.setScale(0.6);
+            priceIcon = new h2d.Bitmap(
+                currencyType == CurrencyType.Coins ?
+                    TilemapManager.instance.getTile(TileType.WEALTH_COINS) :
+                    TilemapManager.instance.getTile(TileType.WEALTH_TEETH), this);
+            priceIcon.setScale(0.6);
 
-        descriptionText.text = currentBoostDescription1;
+            priceText.text = Std.string(boostPrice);
+            priceIcon.setPosition(priceText.x + priceText.textWidth * 2 + 30, priceText.y + 16);
+        }
 
         nameText.text = currentBoostName;
-        priceText.text = Std.string(boostPrice);
-        priceIcon.setPosition(priceText.x + priceText.textWidth * 2 + 30, priceText.y + 16);
+        descriptionText.text = currentBoostDescription1;
 
         // Iteraction
         final interaction = new h2d.Interactive(450, iconBg.tile.height - 20);
@@ -178,6 +180,16 @@ private class BoostItem extends h2d.Object {
                 currencyType = boost.levelOneCurrencyType;
             } else {
                 if (boost.levelThreeAccquired) {
+                    currentBoostId = boost.levelThreeId;
+                    currentBoostName = boost.levelThreeName;
+                    currentBoostDescription1 = boost.levelThreeDescription1;
+                    currentBoostDescription2 = boost.levelThreeDescription2;
+
+                    nextBoostId = boost.levelThreeId;
+                    nextBoostName = boost.levelThreeName;
+                    nextBoostDescription1 = boost.levelThreeDescription1;
+                    nextBoostDescription2 = boost.levelThreeDescription2;
+
                     currentLevel = 3;
                 } else if (boost.levelTwoAccquired) {
                     currentBoostId = boost.levelTwoId;
@@ -434,16 +446,17 @@ class BoostContent extends BasicHomeContent implements EventListener {
 			{ label: name, scale: 4, color: GameConfig.WhiteFontColor, },
 			{ label: description1, scale: 3, color: GameConfig.DefaultFontColor, },
             description2 != null ? { label: description2, scale: 3, color: GameConfig.DefaultFontColor, } : null,
-			{ 
-                label: hasEnoughMoney ? 
-                    'Buy it for ' + price + ' ' + currencyTypeValue + ' ?' : 
-                    'Not enough teeth!', 
-                scale: hasEnoughMoney ? 3 : 4, 
-                color: hasEnoughMoney ? GameConfig.WhiteFontColor : GameConfig.ErrorFontColor, 
-            },
+			currentLevel < 3 ? 
+                { 
+                    label: hasEnoughMoney ? 
+                        'Buy it for ' + price + ' ' + currencyTypeValue + ' ?' : 
+                        'Not enough teeth!', 
+                    scale: hasEnoughMoney ? 3 : 4, 
+                    color: hasEnoughMoney ? GameConfig.WhiteFontColor : GameConfig.ErrorFontColor, 
+                } : null,
             {
-                buttons: hasEnoughMoney ? TWO : ONE,
-                positiveLabel: hasEnoughMoney ? "YES" : "OK",
+                buttons: (hasEnoughMoney && currentLevel < 3) ? TWO : ONE,
+                positiveLabel: (hasEnoughMoney && currentLevel < 3) ? "YES" : "OK",
                 negativeLabel: "NO",
                 positiveCallback: positiveCallback1,
                 negativeCallback: null,
