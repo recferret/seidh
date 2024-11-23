@@ -31,7 +31,6 @@ private class BoostCard extends h2d.Object {
 
         setPosition(px, py);
 
-        final headerTile = Res.instance.getTileResource(SeidhResource.UI_BOOST_SCROLL_HEADER);
         final bodyTile = Res.instance.getTileResource(SeidhResource.UI_BOOST_SCROLL_BODY);
 
         for (i in 0...size) {
@@ -39,14 +38,14 @@ private class BoostCard extends h2d.Object {
             bodyPart.setPosition(0, 20 + (i * bodyTile.height));
         }
 
-        new h2d.Bitmap(headerTile, this);
-        final footer = new h2d.Bitmap(headerTile, this);
+        new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_BOOST_SCROLL_HEADER), this);
+        final footer = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_BOOST_SCROLL_HEADER), this);
         footer.tile.flipY();
         footer.setPosition(0, size * bodyTile.height - 20);
 
         final labelText = TextUtils.GetDefaultTextObject(0, 0, 4, Center, GameConfig.WhiteFontColor);
         labelText.text = label;
-        labelText.setPosition(0, -30);
+        labelText.setPosition(0, -42);
         addChild(labelText);
 
         fui = new h2d.Flow(this);
@@ -83,6 +82,8 @@ private class BoostItem extends h2d.Object {
     private final priceIcon:h2d.Bitmap;
     private final boostIcon:h2d.Bitmap;
     private var boostTile:h2d.Tile = null;
+
+    private var clickStarted = false;
     
     public function new(parent:h2d.Object, root:h2d.Object, boost:BoostBody) {
         super(parent);
@@ -119,7 +120,13 @@ private class BoostItem extends h2d.Object {
         final interaction = new h2d.Interactive(450, iconBg.tile.height - 20);
         interaction.setPosition(iconBg.x - iconBg.tile.width / 2 + 20, iconBg.y - iconBg.tile.height / 2 + 10);
 
+        interaction.onMove = function(event:hxd.Event) {
+            clickStarted = false;
+        }
+
         interaction.onPush = function(event:hxd.Event) {
+            clickStarted = true;
+            
             if (!DialogManager.IsDialogActive) {
                 setScale(0.9);
             }
@@ -130,9 +137,10 @@ private class BoostItem extends h2d.Object {
             }
         }
         interaction.onClick = function(event:hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
+            if (clickStarted && !DialogManager.IsDialogActive) {
                 BoostContent.BoostClick(root, nextBoostId, nextBoostName, nextBoostDescription, boostPrice, currencyType, currentLevel, maxLevel);
             }
+            clickStarted = false;
         }
         addChild(interaction);
     }
@@ -312,7 +320,7 @@ class BoostContent extends BasicHomeContent implements EventListener {
 
         boostContainer = new h2d.Object(this);
 
-        final boostCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 350, 50, 'BOOSTS', 12);
+        final boostCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 350, 50, 'CONSUMABLES', 12);
         final runesCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 1100, 45, 'RUNES', 20);
         final scrollsCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 2250, 50, 'SCROLLS', 12);
         final artifactsCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 3000, 50, 'ARTIFACTS', 6);

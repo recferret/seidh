@@ -78,8 +78,12 @@ class HomeScene extends BasicScene implements EventListener {
 						pageContent.contentScrollY -= touchPosDiff.y;
 					}
 
-					if (pageContent.contentScrollY < 0 || pageContent.y > 0) {
-						// pageContent.contentScrollY = 0;
+					if (pageContent.contentScrollY > 0) {
+						pageContent.contentScrollY = 0;
+					}
+
+					if (pageContent.contentScrollY < -1980) {
+						pageContent.contentScrollY = -1980;
 					}
 				}
 

@@ -25,7 +25,7 @@ export class Boost {
   boostType: BoostType;
 
   // Level one
-  @Prop({ required: false })
+  @Prop()
   levelZeroName?: string;
 
   // Level one
@@ -36,7 +36,10 @@ export class Boost {
   levelOneName: string;
 
   @Prop({ required: true })
-  levelOneDescription: string;
+  levelOneDescription1: string;
+
+  @Prop()
+  levelOneDescription2?: string;
 
   @Prop({ required: true })
   levelOnePrice: number;
@@ -53,7 +56,10 @@ export class Boost {
   levelTwoName?: string;
 
   @Prop()
-  levelTwoDescription?: string;
+  levelTwoDescription1?: string;
+
+  @Prop()
+  levelTwoDescription2?: string;
 
   @Prop()
   levelTwoPrice?: number;
@@ -70,7 +76,10 @@ export class Boost {
   levelThreeName?: string;
 
   @Prop()
-  levelThreeDescription?: string;
+  levelThreeDescription1?: string;
+
+  @Prop()
+  levelThreeDescription2?: string;
 
   @Prop()
   levelThreePrice?: number;
