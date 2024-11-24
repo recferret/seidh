@@ -1,7 +1,8 @@
 package engine.base.entity.base;
 
-import engine.base.geometry.Circle;
 import haxe.Int32;
+
+import engine.base.geometry.Circle;
 import engine.base.BaseTypesAndClasses;
 import engine.base.geometry.Rectangle;
 
@@ -50,7 +51,7 @@ abstract class EngineBaseEntity {
 	public function getBodyCircle() {
 		final x = baseEntity.x;
 		final y = baseEntity.y;
-		return new Circle(x, y, 200);
+		return new Circle(x, y, baseEntity.entityShape.radius);
 	}
 
     public function getX() {

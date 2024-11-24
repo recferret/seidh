@@ -4,7 +4,7 @@ import hxd.res.DefaultFont;
 
 import game.scene.SceneManager;
 import game.scene.base.BasicScene;
-import game.GameConfig;
+import game.GameClientConfig;
 import game.Res;
 
 class Main extends hxd.App {
@@ -35,7 +35,7 @@ class Main extends hxd.App {
 
 		loadingText = new h2d.Text(DefaultFont.get());
         loadingText.text = "Loading...";
-        loadingText.textColor = GameConfig.DefaultFontColor;
+        loadingText.textColor = GameClientConfig.DefaultFontColor;
         loadingText.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         loadingText.textAlign = Center;
         loadingText.setScale(6);
@@ -71,7 +71,7 @@ class Main extends hxd.App {
 	}
 
 	static function main() {
-		if (GameConfig.instance.ResProvider == ResourceProvider.LOCAL) {
+		if (GameClientConfig.instance.ResProvider == ResourceProvider.LOCAL) {
 			// #if debug
 				hxd.Res.initEmbed();
 			// #end

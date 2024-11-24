@@ -40,6 +40,10 @@ async function restGetUser(authToken) {
     return await _getWrapper(restUrl + 'user', authToken);
 }
 
+async function restGetGameConfig(authToken) {
+    return await _getWrapper(restUrl + 'game/config', authToken);
+}
+
 async function restGetBoosts(authToken) {
     return await _getWrapper(restUrl + 'boosts', authToken);
 }

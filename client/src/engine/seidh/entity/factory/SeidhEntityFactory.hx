@@ -1,26 +1,23 @@
 package engine.seidh.entity.factory;
 
-import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.BaseTypesAndClasses;
+import engine.base.entity.impl.EngineConsumableEntity;
 import engine.seidh.entity.impl.RagnarLohEntity;
-import engine.seidh.entity.impl.RagnarNormEntity;
 import engine.seidh.entity.impl.ZombieBoyEntity;
 import engine.seidh.entity.impl.ZombieGirlEntity;
 import engine.seidh.entity.base.SeidhBaseEntity;
 
 class SeidhEntityFactory {
 
-    public static function InitiateCharacter(id:String, ownerId:String, x:Int, y:Int, entityType:EntityType) {
+    public static function InitiateCharacter(struct:CharacterEntityMinStruct) {
         var entity:SeidhBaseEntity = null;
-        switch (entityType) {
+        switch (struct.entityType) {
             case RAGNAR_LOH:
-                entity = new RagnarLohEntity(RagnarLohEntity.GenerateObjectEntity(id, ownerId, x, y));
-            case RAGNAR_NORM:
-                entity = new RagnarNormEntity(RagnarNormEntity.GenerateObjectEntity(id, ownerId, x, y));
+                entity = new RagnarLohEntity(RagnarLohEntity.GenerateObjectEntity(struct));
             case ZOMBIE_BOY:
-                entity = new ZombieBoyEntity(ZombieBoyEntity.GenerateObjectEntity(id, ownerId, x, y));
+                entity = new ZombieBoyEntity(ZombieBoyEntity.GenerateObjectEntity(struct));
             case ZOMBIE_GIRL:
-                entity = new ZombieGirlEntity(ZombieGirlEntity.GenerateObjectEntity(id, ownerId, x, y));
+                entity = new ZombieGirlEntity(ZombieGirlEntity.GenerateObjectEntity(struct));
             default:
         }
         return entity;
@@ -31,8 +28,6 @@ class SeidhEntityFactory {
         switch (struct.base.entityType) {
             case RAGNAR_LOH:
                 entity = new RagnarLohEntity(new CharacterEntity(struct));
-            case RAGNAR_NORM:
-                entity = new RagnarNormEntity(new CharacterEntity(struct));
             case ZOMBIE_BOY:
                 entity = new ZombieBoyEntity(new CharacterEntity(struct));
             case ZOMBIE_GIRL:

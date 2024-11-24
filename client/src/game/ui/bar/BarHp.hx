@@ -23,7 +23,7 @@ class BarHp extends h2d.Object {
         final maxHealthBarWidthPx = 205;
         final currentHealthBarWidthPx = maxHealthBarWidthPx / 100 * (currentHealth / maxHealth * 100);
 
-        Utils.DrawRectFilled(customGraphics, new engine.base.geometry.Rectangle(83, 34, currentHealthBarWidthPx, 14, 0), GameConfig.HpBarColor);
+        Utils.DrawRectFilled(customGraphics, new engine.base.geometry.Rectangle(83, 34, currentHealthBarWidthPx, 14, 0), GameClientConfig.HpBarColor);
     }
 
     public function getBitmapWidth() {

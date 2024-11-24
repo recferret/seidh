@@ -1,13 +1,26 @@
-import { Body, Controller, Post, Session, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Session,
+  UseGuards,
+} from '@nestjs/common';
 import { ServiceGame } from '../services/service.game';
 import { AuthGuard } from '../guards/guard.auth';
-import { GameFinishGameRequestDto } from '../dto/game/game.finish.game.dto';
-import { GameProgressGameRequestDto } from '../dto/game/game.progress.game.dto';
+import { GameServiceProgressGameRequestDto } from '../dto/game/game.progress-game.dto';
+import { GameServiceFinishGameRequestDto } from '../dto/game/game.finish-game.dto';
 import { IUserSession } from './interfaces';
 
 @Controller('game')
 export class ControllerGame {
   constructor(private readonly serviceGame: ServiceGame) {}
+
+  @Get('config')
+  @UseGuards(AuthGuard)
+  getConfig() {
+    return this.serviceGame.getGameConfig();
+  }
 
   @Post('start')
   @UseGuards(AuthGuard)
@@ -19,7 +32,7 @@ export class ControllerGame {
   @UseGuards(AuthGuard)
   progressGame(
     @Session() session: IUserSession,
-    @Body() req: GameProgressGameRequestDto,
+    @Body() req: GameServiceProgressGameRequestDto,
   ) {
     return this.serviceGame.progressGame(session.userId, req);
   }
@@ -28,7 +41,7 @@ export class ControllerGame {
   @UseGuards(AuthGuard)
   finishGame(
     @Session() session: IUserSession,
-    @Body() req: GameFinishGameRequestDto,
+    @Body() req: GameServiceFinishGameRequestDto,
   ) {
     return this.serviceGame.finishGame(session.userId, req);
   }

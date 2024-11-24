@@ -12,7 +12,7 @@ class CharacterStatsDialog extends h2d.Object {
             Main.ActualScreenHeight / 2 - 210,
             3,
             Center,
-            GameConfig.WhiteFontColor
+            GameClientConfig.WhiteFontColor
         );
         titleText.text = 'Ragnar';
         addChild(titleText);
@@ -27,7 +27,7 @@ class CharacterStatsDialog extends h2d.Object {
             Main.ActualScreenHeight / 2 - 160,
             2.5,
             Center,
-            GameConfig.WhiteFontColor
+            GameClientConfig.WhiteFontColor
         );
         lvlText.text = 'Level: 1/10';
         addChild(lvlText);
@@ -42,7 +42,7 @@ class CharacterStatsDialog extends h2d.Object {
             Main.ActualScreenHeight / 2 - 110,
             2.5,
             Left,
-            GameConfig.DefaultFontColor
+            GameClientConfig.DefaultFontColor
         );
         healthText.text = 'Health: 100';
         addChild(healthText);
@@ -54,7 +54,7 @@ class CharacterStatsDialog extends h2d.Object {
                 Main.ActualScreenHeight / 2 - 110,
                 2.5,
                 Left,
-                GameConfig.UpgradeFontColor
+                GameClientConfig.UpgradeFontColor
             );
             healthText.text = '> 150';
             addChild(healthText);
@@ -70,7 +70,7 @@ class CharacterStatsDialog extends h2d.Object {
             Main.ActualScreenHeight / 2 - 60,
             2.5,
             Left,
-            GameConfig.DefaultFontColor
+            GameClientConfig.DefaultFontColor
         );
         damageText.text = 'Damage: 10';
         addChild(damageText);
@@ -82,7 +82,7 @@ class CharacterStatsDialog extends h2d.Object {
                 Main.ActualScreenHeight / 2 - 60,
                 2.5,
                 Left,
-                GameConfig.UpgradeFontColor
+                GameClientConfig.UpgradeFontColor
             );
             damageText.text = '> 15';
             addChild(damageText);
@@ -98,7 +98,7 @@ class CharacterStatsDialog extends h2d.Object {
             Main.ActualScreenHeight / 2 - 10,
             2.5,
             Left,
-            GameConfig.DefaultFontColor
+            GameClientConfig.DefaultFontColor
         );
         attackSpeedText.text = 'Attack speed: 1';
         addChild(attackSpeedText);
@@ -110,7 +110,7 @@ class CharacterStatsDialog extends h2d.Object {
                 Main.ActualScreenHeight / 2 - 10,
                 2.5,
                 Left,
-                GameConfig.UpgradeFontColor
+                GameClientConfig.UpgradeFontColor
             );
             attackSpeedText.text = '> 2';
             addChild(attackSpeedText);
@@ -126,7 +126,7 @@ class CharacterStatsDialog extends h2d.Object {
             Main.ActualScreenHeight / 2 + 40,
             2.5,
             Left,
-            GameConfig.DefaultFontColor
+            GameClientConfig.DefaultFontColor
         );
         movementSpeedText.text = 'Movement speed: 100';
         addChild(movementSpeedText);
@@ -138,7 +138,7 @@ class CharacterStatsDialog extends h2d.Object {
                 Main.ActualScreenHeight / 2 + 40,
                 2.5,
                 Left,
-                GameConfig.UpgradeFontColor
+                GameClientConfig.UpgradeFontColor
             );
             movementSpeedText.text = '> 110';
             addChild(movementSpeedText);

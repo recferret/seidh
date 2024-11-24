@@ -11,6 +11,7 @@ import {
 import { ScheduleModule } from '@nestjs/schedule';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.user';
+import { GameConfig, GameConfigSchema } from '@app/seidh-common/schemas/game/schema.game-config';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.us
     MongooseModule.forFeature([
       { name: Game.name, schema: GameSchema },
       { name: GameProgress.name, schema: GameProgressSchema },
+      { name: GameConfig.name, schema: GameConfigSchema },
     ]),
     ScheduleModule.forRoot(),
   ],

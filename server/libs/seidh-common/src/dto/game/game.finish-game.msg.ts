@@ -1,13 +1,13 @@
 import { GameFinishReason } from '@app/seidh-common/schemas/game/schema.game';
 
-export const GameFinishGamePattern = 'game.finish.game';
+export const GameServiceFinishGamePattern = 'game.finish-game';
 
-export interface GameFinishGameServiceRequest {
+export interface GameServiceFinishGameRequest {
   userId: string;
   gameId: string;
   reason: GameFinishReason;
 }
 
-export interface GameFinishGameServiceResponse {
+export interface GameServiceFinishGameResponse {
   success: boolean;
 }

@@ -57,24 +57,24 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
                 line.y1,
                 line.x2,
                 line.y2,
-                engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);
+                engineEntity.intersectsWithCharacter ? GameClientConfig.RedColor : GameClientConfig.BlueColor);
 
             // PickUp rect
-            Utils.DrawCircle(graphics, engineEntity.getBodyCircle(), GameConfig.RedColor);
+            Utils.DrawCircle(graphics, engineEntity.getBodyCircle(), GameClientConfig.RedColor);
         } else if (engineEntity.botForwardLookingLine != null) {
             Utils.DrawLine(graphics, 
                 engineEntity.botForwardLookingLine.x1,
                 engineEntity.botForwardLookingLine.y1,
                 engineEntity.botForwardLookingLine.x2,
                 engineEntity.botForwardLookingLine.y2,
-                engineEntity.intersectsWithCharacter ? GameConfig.RedColor : GameConfig.BlueColor);   
+                engineEntity.intersectsWithCharacter ? GameClientConfig.RedColor : GameClientConfig.BlueColor);   
         }
 
         if (engineEntity.getCurrentActionRect() != null) {
-            Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(), GameConfig.RedColor);
+            Utils.DrawRect(graphics, engineEntity.getCurrentActionRect(), GameClientConfig.RedColor);
         }
 
-        Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
+        Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameClientConfig.GreenColor);
     }
  
     // ------------------------------------------------------------

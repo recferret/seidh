@@ -150,7 +150,7 @@ class HomeScene extends BasicScene implements EventListener {
 		titleBitmap.setPosition(Main.ActualScreenWidth / 2, 100);
 		titleBitmap.tile = homeTitleTile;
 
-		usernameText = TextUtils.GetDefaultTextObject(80, 70, 2, Left, GameConfig.DefaultFontColor);
+		usernameText = TextUtils.GetDefaultTextObject(80, 70, 2, Left, GameClientConfig.DefaultFontColor);
 		usernameText.text = Player.instance.userName;
         addChild(usernameText);
 

@@ -12,7 +12,7 @@ class BgFrame extends h2d.Object {
 
         final basicHeightDiff = Main.ActualScreenHeight - 1280;
         final middlePartHeight = Main.ActualScreenHeight - Std.int(header.tile.height) - Std.int(footer.tile.height) - basicHeightDiff;
-        final middle = new h2d.Bitmap(h2d.Tile.fromColor(GameConfig.UiBrownColor, Std.int(header.tile.width) + 1, middlePartHeight + 100));
+        final middle = new h2d.Bitmap(h2d.Tile.fromColor(GameClientConfig.UiBrownColor, Std.int(header.tile.width) + 1, middlePartHeight + 100));
 
         header.setPosition(Main.ActualScreenWidth / 2, header.tile.height - 100);
         footer.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight - footer.tile.height);

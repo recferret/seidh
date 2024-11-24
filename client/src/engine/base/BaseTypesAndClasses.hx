@@ -7,6 +7,32 @@ import engine.base.geometry.Rectangle;
 // General
 // -------------------------------
 
+typedef GameConfig = {
+	// Mobs spawn
+	mobsMaxAtTheSameTime: Int,
+	mobsMaxPerGame: Int,
+	mobSpawnDelayMs: Int,
+
+	// Exp boost
+	expLevel1Multiplier: Float,
+	expLevel2Multiplier: Float,
+	expLevel3Multiplier: Float,
+
+	// Stats boost
+	statsLevel1Multiplier: Float,
+	statsLevel2Multiplier: Float,
+	statsLevel3Multiplier: Float,
+
+	// Wealth boost
+	wealthLevel1PickUpRangeMultiplier: Float,
+	wealthLevel2PickUpRangeMultiplier: Float,
+	wealthLevel3PickUpRangeMultiplier: Float,
+
+	wealthLevel1CoinsMultiplier: Float,
+	wealthLevel2CoinsMultiplier: Float,
+	wealthLevel3CoinsMultiplier: Float,
+};
+
 enum abstract EngineMode(Int) {
 	var CLIENT_SINGLEPLAYER = 1;
 	var CLIENT_MULTIPLAYER = 2;
@@ -80,6 +106,7 @@ typedef ShapeStruct = {
 	height:Int,
 	rectOffsetX:Int,
 	rectOffsetY:Int,
+	?radius:Float,
 }
 
 typedef MeleeStruct = {
@@ -116,13 +143,15 @@ typedef BaseEntityStruct = {
 }
 
 typedef CharacterEntityMinStruct = {
-    id:String,
+    ?id:String,
     ?ownerId:String,
     x:Int,
     y:Int,
 	?health:Int,
 	?side: Side,
     ?entityType:EntityType,
+	?statsModifier:Float,
+	?pickUpModifier:Float,
 }
 
 typedef CharacterEntityFullStruct = {

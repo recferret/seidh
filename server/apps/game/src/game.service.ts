@@ -1,15 +1,19 @@
 import {
-  GameFinishGameServiceRequest,
-  GameFinishGameServiceResponse,
-} from '@app/seidh-common/dto/game/game.finish.game.msg';
+  GameServiceFinishGameRequest,
+  GameServiceFinishGameResponse,
+} from '@app/seidh-common/dto/game/game.finish-game.msg';
 import {
-  GameProgressGameServiceRequest,
-  GameProgressGameServiceResponse,
-} from '@app/seidh-common/dto/game/game.progress.game.msg';
+  GameServiceGetGameConfigGameRequest,
+  GameServiceGetGameConfigResponse,
+} from '@app/seidh-common/dto/game/game.get-game-config.msg';
 import {
-  GameStartGameServiceRequest,
-  GameStartGameServiceResponse,
-} from '@app/seidh-common/dto/game/game.start.game.msg';
+  GameServiceProgressGameRequest,
+  GameServiceProgressGameResponse,
+} from '@app/seidh-common/dto/game/game.progress-game.msg';
+import {
+  GameServiceStartGameRequest,
+  GameServiceStartGameResponse,
+} from '@app/seidh-common/dto/game/game.start-game.msg';
 import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.user';
 import {
   Game,
@@ -19,6 +23,7 @@ import {
   GameState,
   GameType,
 } from '@app/seidh-common/schemas/game/schema.game';
+import { GameConfig } from '@app/seidh-common/schemas/game/schema.game-config';
 import { GameProgress } from '@app/seidh-common/schemas/game/schema.game-progress';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -36,17 +41,102 @@ interface IGameProgress {
 
 @Injectable()
 export class GameService implements OnModuleInit {
-  private readonly maxMobs = 120;
   private readonly gameProgressByPlayerCache = new Map<string, IGameProgress>();
+
+  private gameConfig: GameServiceGetGameConfigResponse;
 
   constructor(
     private microserviceUser: MicroserviceUser,
-    @InjectModel(Game.name) private gameModel: Model<Game>,
+    @InjectModel(Game.name)
+    private gameModel: Model<Game>,
     @InjectModel(GameProgress.name)
     private gameProgressModel: Model<GameProgress>,
+    @InjectModel(GameConfig.name)
+    private gameConfigModel: Model<GameConfig>,
   ) {}
 
   async onModuleInit() {
+    // Mobs spawn
+    const mobsMaxAtTheSameTime = 100;
+    const mobsMaxPerGame = 500;
+    const mobSpawnDelayMs = 2500;
+
+    // Exp boost
+    const expLevel1Multiplier = 1.5;
+    const expLevel2Multiplier = 2;
+    const expLevel3Multiplier = 3;
+
+    // Stats boost
+    const statsLevel1Multiplier = 1.2;
+    const statsLevel2Multiplier = 1.5;
+    const statsLevel3Multiplier = 2;
+
+    // Wealth boost
+    const wealthLevel1PickUpRangeMultiplier = 1.2;
+    const wealthLevel2PickUpRangeMultiplier = 2;
+    const wealthLevel3PickUpRangeMultiplier = 2.5;
+
+    const wealthLevel1CoinsMultiplier = 2;
+    const wealthLevel2CoinsMultiplier = 3;
+    const wealthLevel3CoinsMultiplier = 4;
+
+    const gameConfig = await this.gameConfigModel.find();
+    if (!gameConfig || gameConfig.length == 0) {
+      await this.gameConfigModel.create({
+        // Mobs spawn
+        mobsMaxAtTheSameTime,
+        mobsMaxPerGame,
+        mobSpawnDelayMs,
+
+        // Exp boost
+        expLevel1Multiplier,
+        expLevel2Multiplier,
+        expLevel3Multiplier,
+
+        // Stats boost
+        statsLevel1Multiplier,
+        statsLevel2Multiplier,
+        statsLevel3Multiplier,
+
+        // Wealth boost
+        wealthLevel1PickUpRangeMultiplier,
+        wealthLevel2PickUpRangeMultiplier,
+        wealthLevel3PickUpRangeMultiplier,
+
+        wealthLevel1CoinsMultiplier,
+        wealthLevel2CoinsMultiplier,
+        wealthLevel3CoinsMultiplier,
+      });
+    }
+
+    this.gameConfig = {
+      success: true,
+
+      // Mobs spawn
+      mobsMaxAtTheSameTime,
+      mobsMaxPerGame,
+      mobSpawnDelayMs,
+
+      // Exp boost
+      expLevel1Multiplier,
+      expLevel2Multiplier,
+      expLevel3Multiplier,
+
+      // Stats boost
+      statsLevel1Multiplier,
+      statsLevel2Multiplier,
+      statsLevel3Multiplier,
+
+      // Wealth boost
+      wealthLevel1PickUpRangeMultiplier,
+      wealthLevel2PickUpRangeMultiplier,
+      wealthLevel3PickUpRangeMultiplier,
+
+      wealthLevel1CoinsMultiplier,
+      wealthLevel2CoinsMultiplier,
+      wealthLevel3CoinsMultiplier,
+    };
+
     const existingGames = await this.gameModel.find({
       type: GameType.Single,
       state: GameState.Playing,
@@ -59,8 +149,13 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  async startGame(request: GameStartGameServiceRequest) {
-    const response: GameStartGameServiceResponse = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getGameConfig(request: GameServiceGetGameConfigGameRequest) {
+    return this.gameConfig;
+  }
+
+  async startGame(request: GameServiceStartGameRequest) {
+    const response: GameServiceStartGameResponse = {
       success: false,
     };
 
@@ -106,8 +201,8 @@ export class GameService implements OnModuleInit {
     return response;
   }
 
-  async progressGame(request: GameProgressGameServiceRequest) {
-    const response: GameProgressGameServiceResponse = {
+  async progressGame(request: GameServiceProgressGameRequest) {
+    const response: GameServiceProgressGameResponse = {
       success: false,
     };
 
@@ -121,7 +216,10 @@ export class GameService implements OnModuleInit {
       let logicErrorString = undefined;
 
       // Check total mobs spawned
-      if (gameProgressCache.mobsSpawned + request.mobsSpawned < this.maxMobs) {
+      if (
+        gameProgressCache.mobsSpawned + request.mobsSpawned <
+        this.gameConfig.mobsMaxAtTheSameTime
+      ) {
         gameProgressCache.mobsSpawned += request.mobsSpawned;
 
         // Check mobs killed
@@ -177,8 +275,8 @@ export class GameService implements OnModuleInit {
     return response;
   }
 
-  async finishGame(request: GameFinishGameServiceRequest) {
-    const response: GameFinishGameServiceResponse = {
+  async finishGame(request: GameServiceFinishGameRequest) {
+    const response: GameServiceFinishGameResponse = {
       success: false,
     };
 
@@ -190,10 +288,10 @@ export class GameService implements OnModuleInit {
     if (existingGame && gameProgressCache) {
       if (
         request.reason == GameFinishReason.Win &&
-        gameProgressCache.mobsSpawned == this.maxMobs &&
-        gameProgressCache.mobsKilled == this.maxMobs
+        gameProgressCache.mobsSpawned == this.gameConfig.mobsMaxAtTheSameTime &&
+        gameProgressCache.mobsKilled == this.gameConfig.mobsMaxAtTheSameTime
       ) {
-        gameProgressCache.mobsKilled == this.maxMobs;
+        gameProgressCache.mobsKilled == this.gameConfig.mobsMaxAtTheSameTime;
       }
 
       await this.finishExistingGame(existingGame, request.reason);

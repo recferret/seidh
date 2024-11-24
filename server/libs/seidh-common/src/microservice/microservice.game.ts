@@ -3,42 +3,54 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ServiceName } from '../seidh-common.internal-protocol';
 import { firstValueFrom } from 'rxjs';
 import {
-  GameStartGamePattern,
-  GameStartGameServiceRequest,
-  GameStartGameServiceResponse,
-} from '../dto/game/game.start.game.msg';
+  GameServiceGetGameConfigPattern,
+  GameServiceGetGameConfigGameRequest,
+  GameServiceGetGameConfigResponse,
+} from '../dto/game/game.get-game-config.msg';
 import {
-  GameFinishGamePattern,
-  GameFinishGameServiceRequest,
-  GameFinishGameServiceResponse,
-} from '../dto/game/game.finish.game.msg';
+  GameServiceStartGamePattern,
+  GameServiceStartGameRequest,
+  GameServiceStartGameResponse,
+} from '../dto/game/game.start-game.msg';
 import {
-  GameProgressGamePattern,
-  GameProgressGameServiceRequest,
-  GameProgressGameServiceResponse,
-} from '../dto/game/game.progress.game.msg';
+  GameServiceProgressGamePattern,
+  GameServiceProgressGameRequest,
+  GameServiceProgressGameResponse,
+} from '../dto/game/game.progress-game.msg';
+import {
+  GameServiceFinishGamePattern,
+  GameServiceFinishGameRequest,
+  GameServiceFinishGameResponse,
+} from '../dto/game/game.finish-game.msg';
 
 @Injectable()
 export class MicroserviceGame {
   constructor(@Inject(ServiceName.Game) private gameService: ClientProxy) {}
 
-  async startGame(request: GameStartGameServiceRequest) {
-    const response: GameStartGameServiceResponse = await firstValueFrom(
-      this.gameService.send(GameStartGamePattern, request),
+  async getGameConfig(request: GameServiceGetGameConfigGameRequest) {
+    const response: GameServiceGetGameConfigResponse = await firstValueFrom(
+      this.gameService.send(GameServiceGetGameConfigPattern, request),
     );
     return response;
   }
 
-  async progressGame(request: GameProgressGameServiceRequest) {
-    const response: GameProgressGameServiceResponse = await firstValueFrom(
-      this.gameService.send(GameProgressGamePattern, request),
+  async startGame(request: GameServiceStartGameRequest) {
+    const response: GameServiceStartGameResponse = await firstValueFrom(
+      this.gameService.send(GameServiceStartGamePattern, request),
     );
     return response;
   }
 
-  async finishGame(request: GameFinishGameServiceRequest) {
-    const response: GameFinishGameServiceResponse = await firstValueFrom(
-      this.gameService.send(GameFinishGamePattern, request),
+  async progressGame(request: GameServiceProgressGameRequest) {
+    const response: GameServiceProgressGameResponse = await firstValueFrom(
+      this.gameService.send(GameServiceProgressGamePattern, request),
+    );
+    return response;
+  }
+
+  async finishGame(request: GameServiceFinishGameRequest) {
+    const response: GameServiceFinishGameResponse = await firstValueFrom(
+      this.gameService.send(GameServiceFinishGamePattern, request),
     );
     return response;
   }

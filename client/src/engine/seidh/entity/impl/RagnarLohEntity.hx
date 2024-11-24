@@ -13,15 +13,21 @@ class RagnarLohEntity extends SeidhBaseEntity {
 	// Dummy stats hardcode instead of database
 	// ------------------------------------------------
 
-    public static function GenerateObjectEntity(id: String, ownerId: String, x:Int, y:Int) {
+    public static function GenerateObjectEntity(struct:CharacterEntityMinStruct) {
         return new CharacterEntity({
             base: {
-                x: x, 
-                y: y,
+                x: struct.x, 
+                y: struct.y,
                 entityType: EntityType.RAGNAR_LOH,
-                entityShape: {width: 180, height: 260, rectOffsetX: 0, rectOffsetY: 0},
-                id: id,
-                ownerId: ownerId,
+                entityShape: {
+                    width: 180,
+                    height: 260,
+                    rectOffsetX: 0,
+                    rectOffsetY: 0,
+                    radius: 150 * struct.pickUpModifier,
+                },
+                id: struct.id,
+                ownerId: struct.ownerId,
                 rotation: 0
             },
             health: 100,
@@ -41,7 +47,12 @@ class RagnarLohEntity extends SeidhBaseEntity {
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: true,
-                    shape: {width: 350, height: 260, rectOffsetX: 175 - 90, rectOffsetY: 0},
+                    shape: {
+                        width: 350, 
+                        height: 260, 
+                        rectOffsetX: 175 - 90, 
+                        rectOffsetY: 0,
+                    },
                 }
             },
             action1: {
@@ -54,7 +65,12 @@ class RagnarLohEntity extends SeidhBaseEntity {
                     speed: 200,
                     travelDistance: 900,
                     projectiles: 1,
-                    shape: {width: 30, height: 10, rectOffsetX: 0, rectOffsetY: 0},
+                    shape: {
+                        width: 30, 
+                        height: 10, 
+                        rectOffsetX: 0, 
+                        rectOffsetY: 0,
+                    },
                 },
             },
             action2: {

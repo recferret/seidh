@@ -7,7 +7,7 @@ enum ResourceProvider {
 	YANDEX_S3;
 }
 
-class GameConfig {
+class GameClientConfig {
 	public static final RedColor = 0xF00F00;
 	public static final GreenColor = 0x00FF00;
 	public static final BlueColor = 0x0000FF;
@@ -34,23 +34,23 @@ class GameConfig {
 	public final JoinGameType:String;
 	public final ResProvider = ResourceProvider.LOCAL;
 
-	public static final instance:GameConfig = new GameConfig();
+	public static final instance:GameClientConfig = new GameClientConfig();
 
 	private function new() {
-		final gameConfig = NativeWindowJS.getGameConfig();
+		final appConfig = NativeWindowJS.getAppConfig();
 
-		Production = gameConfig.Production;
-		DebugDraw = gameConfig.DebugDraw;
-		PlayMusic = gameConfig.PlayMusic;
-		PlaySounds = gameConfig.PlaySounds;
-		TelegramAuth = gameConfig.TelegramAuth;
-		TelegramTestAuth = gameConfig.TelegramTestAuth;
-		TelegramInitData = gameConfig.TelegramInitData;
-		Analytics = gameConfig.Analytics;
-		Serverless = gameConfig.Serverless;
-		TestLogin = gameConfig.TestLogin;
-		TestReferrerId = gameConfig.TestReferrerId;
-		JoinGameType = gameConfig.JoinGameType;
+		Production = appConfig.Production;
+		DebugDraw = appConfig.DebugDraw;
+		PlayMusic = appConfig.PlayMusic;
+		PlaySounds = appConfig.PlaySounds;
+		TelegramAuth = appConfig.TelegramAuth;
+		TelegramTestAuth = appConfig.TelegramTestAuth;
+		TelegramInitData = appConfig.TelegramInitData;
+		Analytics = appConfig.Analytics;
+		Serverless = appConfig.Serverless;
+		TestLogin = appConfig.TestLogin;
+		TestReferrerId = appConfig.TestReferrerId;
+		JoinGameType = appConfig.JoinGameType;
 	}
 
 }

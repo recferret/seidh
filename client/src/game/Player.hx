@@ -1,8 +1,16 @@
 package game;
 
+import game.scene.impl.home.boost.BoostContent;
 import game.scene.impl.home.boost.BoostContent.CurrencyType;
 import game.scene.impl.home.boost.BoostContent.BoostType;
 import game.js.NativeWindowJS;
+
+typedef UserBody = {
+	userId: String,
+	coins: Int,
+	teeth: Int,
+	boostsOwned: Array<String>,
+};
 
 typedef BoostBody = {
 	order: Int,
@@ -34,15 +42,14 @@ typedef BoostBody = {
 class Player {
 	private final WalletAddressKey = 'WalletAddress';
 
-	public static final instance:Player = new Player();
+	public static final instance: Player = new Player();
 
-	public var userId:String;
-	public var userEntityId:String;
-	public var userName:String;
-	public var authToken:String;
-	public var coins:Int;
-	public var teeth:Int;
-	public var kills:Int;
+	public var userId: String;
+	public var userEntityId: String;
+	public var userName: String;
+	public var coins: Int;
+	public var teeth: Int;
+	public var boostsOwned: Array<String>;
 
 	public final boosts = new Array<BoostBody>();
 
@@ -55,16 +62,35 @@ class Player {
 		userId = userData.userId;
 		userEntityId = 'entity_' + userData.userId;
 		userName = 'USER 1';
-		authToken = userData.authToken;
 		coins = userData.coins;
 		teeth = userData.teeth;
-		kills = userData.kills;
+		boostsOwned = userData.boostsOwned;
 	}
 
-	public function setBoostData(boostData:Array<Dynamic>) {
+	public function setBoostData(boostData:Array<BoostBody>) {
 		for (boost in boostData) {
 			boosts.push(boost);
 		}
+	}
+
+	public function getStatsLevel() {
+		if (boostsOwned.contains(BoostContent.STATS_3))
+			return 3;
+		if (boostsOwned.contains(BoostContent.STATS_2))
+			return 2;
+		if (boostsOwned.contains(BoostContent.STATS_1))
+			return 1;
+		return 0;
+	}
+
+	public function getWealthLevel() {
+		if (boostsOwned.contains(BoostContent.WEALTH_3))
+			return 3;
+		if (boostsOwned.contains(BoostContent.WEALTH_2))
+			return 2;
+		if (boostsOwned.contains(BoostContent.WEALTH_1))
+			return 1;
+		return 0;
 	}
 
 	public function incrementAndGetInputIndex() {

@@ -4,10 +4,8 @@ import game.tilemap.TilemapManager;
 import hxd.res.DefaultFont;
 import game.Res.SeidhResource;
 import game.event.EventManager;
-import game.scene.base.BasicScene;
 import game.ui.dialog.Dialog;
 import game.ui.bar.BarGold;
-import game.ui.bar.BarXp;
 import game.ui.bar.BarHp;
 import game.utils.Utils;
 import engine.base.MathUtils;
@@ -85,7 +83,7 @@ class MovementController extends h2d.Object {
 	}
 
 	public function update() {
-		if (GameConfig.instance.DebugDraw) {
+		if (GameClientConfig.instance.DebugDraw) {
 			customGraphics.clear();
 		}
 
@@ -97,7 +95,7 @@ class MovementController extends h2d.Object {
 
 			controlTargetPos = MathUtils.rotatePointAroundCenter(p1.x + 80, p1.y, p1.x, p1.y, angle);
 
-			if (GameConfig.instance.DebugDraw) {
+			if (GameClientConfig.instance.DebugDraw) {
 				customGraphics.lineStyle(2, 0xEA8220);
 				customGraphics.moveTo(p1.x, p1.y);
 				customGraphics.lineTo(controlTargetPos.x, controlTargetPos.y);
@@ -105,8 +103,8 @@ class MovementController extends h2d.Object {
 			}
 		}
 
-		if (GameConfig.instance.DebugDraw) {
-			Utils.DrawRect(customGraphics, shapeRect, GameConfig.RedColor);
+		if (GameClientConfig.instance.DebugDraw) {
+			Utils.DrawRect(customGraphics, shapeRect, GameClientConfig.RedColor);
 		}
 	}
 
@@ -184,7 +182,7 @@ class GameUiScene extends h2d.Scene {
 		final font : h2d.Font = DefaultFont.get();
         surviveTimer = new h2d.Text(font);
         surviveTimer.text = 'Survive for .. seconds';
-        surviveTimer.textColor = GameConfig.DefaultFontColor;
+        surviveTimer.textColor = GameClientConfig.DefaultFontColor;
         surviveTimer.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
         surviveTimer.textAlign = Center;
         surviveTimer.setScale(3);
@@ -275,8 +273,8 @@ class GameUiScene extends h2d.Scene {
 			this, 
 			DialogType.MEDIUM,
 			null,
-			{ label: "You have won!", scale: 3, color: GameConfig.DefaultFontColor, },
-			{ label: "Zombies killed: " + zombiesKilled, scale: 3, color: GameConfig.DefaultFontColor, },
+			{ label: "You have won!", scale: 3, color: GameClientConfig.DefaultFontColor, },
+			{ label: "Zombies killed: " + zombiesKilled, scale: 3, color: GameClientConfig.DefaultFontColor, },
 			null,
 			{
                 buttons: ONE,
@@ -295,7 +293,7 @@ class GameUiScene extends h2d.Scene {
 			this,
 			DialogType.SMALL,
 			null,
-			{ label: "You lose!", scale: 3, color: GameConfig.DefaultFontColor, },
+			{ label: "You lose!", scale: 3, color: GameClientConfig.DefaultFontColor, },
 			null,
 			null,
 			{

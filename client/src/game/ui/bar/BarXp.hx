@@ -17,7 +17,7 @@ class BarXp extends h2d.Object {
 
     public function update() {
         customGraphics.clear();
-        Utils.DrawRectFilled(customGraphics, new engine.base.geometry.Rectangle(43, 64, 118, 15, 0), GameConfig.XpBarColor);
+        Utils.DrawRectFilled(customGraphics, new engine.base.geometry.Rectangle(43, 64, 118, 15, 0), GameClientConfig.XpBarColor);
     }
 
     public function getBitmapWidth() {

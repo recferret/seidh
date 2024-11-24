@@ -43,7 +43,7 @@ private class BoostCard extends h2d.Object {
         footer.tile.flipY();
         footer.setPosition(0, size * bodyTile.height - 20);
 
-        final labelText = TextUtils.GetDefaultTextObject(0, 0, 4, Center, GameConfig.WhiteFontColor);
+        final labelText = TextUtils.GetDefaultTextObject(0, 0, 4, Center, GameClientConfig.WhiteFontColor);
         labelText.text = label;
         labelText.setPosition(0, -42);
         addChild(labelText);
@@ -97,14 +97,14 @@ private class BoostItem extends h2d.Object {
         boostIcon = new h2d.Bitmap(this);
         boostIcon.tile = boostTile;
 
-        nameText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y - 55, 2, Left, GameConfig.WhiteFontColor);
+        nameText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y - 55, 2, Left, GameClientConfig.WhiteFontColor);
         addChild(nameText);
 
-        descriptionText = TextUtils.GetDefaultTextObject(iconBg.x + 78, iconBg.y - 15, 2, Left, GameConfig.DefaultFontColor);
+        descriptionText = TextUtils.GetDefaultTextObject(iconBg.x + 78, iconBg.y - 15, 2, Left, GameClientConfig.DefaultFontColor);
         addChild(descriptionText);
 
         if (currentLevel < 3) {
-            priceText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y + 25, 2, Left, GameConfig.DefaultFontColor);
+            priceText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y + 25, 2, Left, GameClientConfig.DefaultFontColor);
             addChild(priceText);
 
             priceIcon = new h2d.Bitmap(
@@ -251,18 +251,18 @@ private class BoostItem extends h2d.Object {
                 case BoostContent.EXP_3:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_1_LVL_3);
             
-                case BoostContent.ITEM_RADIUS_1:
+                case BoostContent.WEALTH_1:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1);
-                case BoostContent.ITEM_RADIUS_2:
+                case BoostContent.WEALTH_2:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_2_LVL_2);
-                case BoostContent.ITEM_RADIUS_3:
+                case BoostContent.WEALTH_3:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_3);
             
-                case BoostContent.MORE_COINS_1:
+                case BoostContent.ATTACK_1:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_ANY_LVL_1);
-                case BoostContent.MORE_COINS_2:
+                case BoostContent.ATTACK_2:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_2);
-                case BoostContent.MORE_COINS_3:
+                case BoostContent.ATTACK_3:
                     boostTile = TilemapManager.instance.getTile(TileType.RUNE_TYPE_3_LVL_3);
             
                 case BoostContent.MONSTERS_1:
@@ -308,13 +308,13 @@ class BoostContent extends BasicHomeContent implements EventListener {
     public static final EXP_2 = 'EXP_2';
     public static final EXP_3 = 'EXP_3';
 
-    public static final ITEM_RADIUS_1 = 'ITEM_RADIUS_1';
-    public static final ITEM_RADIUS_2 = 'ITEM_RADIUS_2';
-    public static final ITEM_RADIUS_3 = 'ITEM_RADIUS_3';
+    public static final WEALTH_1 = 'WEALTH_1';
+    public static final WEALTH_2 = 'WEALTH_2';
+    public static final WEALTH_3 = 'WEALTH_3';
 
-    public static final MORE_COINS_1 = 'MORE_COINS_1';
-    public static final MORE_COINS_2 = 'MORE_COINS_2';
-    public static final MORE_COINS_3 = 'MORE_COINS_3';
+    public static final ATTACK_1 = 'ATTACK_1';
+    public static final ATTACK_2 = 'ATTACK_2';
+    public static final ATTACK_3 = 'ATTACK_3';
 
     public static final MONSTERS_1 = 'MONSTERS_1';
     public static final MONSTERS_2 = 'MONSTERS_2';
@@ -443,16 +443,16 @@ class BoostContent extends BasicHomeContent implements EventListener {
         DialogManager.ShowDialog(
 			parent, 
 			DialogType.MEDIUM, 
-			{ label: name, scale: 4, color: GameConfig.WhiteFontColor, },
-			{ label: description1, scale: 3, color: GameConfig.DefaultFontColor, },
-            description2 != null ? { label: description2, scale: 3, color: GameConfig.DefaultFontColor, } : null,
+			{ label: name, scale: 4, color: GameClientConfig.WhiteFontColor, },
+			{ label: description1, scale: 3, color: GameClientConfig.DefaultFontColor, },
+            description2 != null ? { label: description2, scale: 3, color: GameClientConfig.DefaultFontColor, } : null,
 			currentLevel < 3 ? 
                 { 
                     label: hasEnoughMoney ? 
                         'Buy it for ' + price + ' ' + currencyTypeValue + ' ?' : 
                         'Not enough teeth!', 
                     scale: hasEnoughMoney ? 3 : 4, 
-                    color: hasEnoughMoney ? GameConfig.WhiteFontColor : GameConfig.ErrorFontColor, 
+                    color: hasEnoughMoney ? GameClientConfig.WhiteFontColor : GameClientConfig.ErrorFontColor, 
                 } : null,
             {
                 buttons: (hasEnoughMoney && currentLevel < 3) ? TWO : ONE,

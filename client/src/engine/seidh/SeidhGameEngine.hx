@@ -17,8 +17,33 @@ import engine.seidh.entity.factory.SeidhEntityFactory;
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
-    // TODO move to config
     public static var ZOMBIE_DAMAGE = 5;
+    public static final GameWorldSize = 5000;
+    public static final GAME_CONFIG:GameConfig = {
+        // Mobs spawn
+	    mobsMaxAtTheSameTime: 1,
+        mobsMaxPerGame: 0,
+        mobSpawnDelayMs: 0,
+
+        // Exp boost
+        expLevel1Multiplier: 1.5,
+        expLevel2Multiplier: 2,
+        expLevel3Multiplier: 3,
+
+        // Stats boost
+        statsLevel1Multiplier: 1.2,
+        statsLevel2Multiplier: 1.5,
+        statsLevel3Multiplier: 2,
+
+        // Wealth boost
+        wealthLevel1PickUpRangeMultiplier: 1.5,
+        wealthLevel2PickUpRangeMultiplier: 2,
+        wealthLevel3PickUpRangeMultiplier: 2.5,
+
+        wealthLevel1CoinsMultiplier: 2,
+        wealthLevel2CoinsMultiplier: 3,
+        wealthLevel3CoinsMultiplier: 4,
+    };
 
     private var lastDt = 0.0;
     private var framesPassed = 0;
@@ -43,7 +68,6 @@ class SeidhGameEngine extends BaseEngine {
         new Point(2500, 2500)
     ];
 
-    public static final GameWorldSize = 5000;
 
     public static function main() {}
 
@@ -66,14 +90,14 @@ class SeidhGameEngine extends BaseEngine {
     // Create entity helpers
     // ---------------------------------------------------
 
-    public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
-        createCharacterEntity(SeidhEntityFactory.InitiateCharacter(struct.id, struct.ownerId, struct.x, struct.y, struct.entityType));
-
         // createConsumable(struct.x + 300, struct.y);
         // createConsumable(struct.x + 400, struct.y);
         // createConsumable(struct.x + 500, struct.y);
         // createConsumable(struct.x + 600, struct.y);
         // createConsumable(struct.x + 700, struct.y);
+
+    public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
+        createCharacterEntity(SeidhEntityFactory.InitiateCharacter(struct));
     }
 
     public function createCharacterEntityFromFullStruct(struct:CharacterEntityFullStruct) {
@@ -351,11 +375,11 @@ class SeidhGameEngine extends BaseEngine {
             final spawnMob = aiManager.spawnMob(player.getX(), player.getY());
             if (spawnMob.spawn) {
                 createCharacterEntity(SeidhEntityFactory.InitiateCharacter(
-                    null,
-                    null, 
-                    spawnMob.positionX, 
-                    spawnMob.positionY,
-                    spawnMob.entityType
+                    {
+                        x: spawnMob.positionX,
+                        y: spawnMob.positionY,
+                        entityType: spawnMob.entityType,
+                    }
                 ));
             }
         }

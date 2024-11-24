@@ -56,7 +56,7 @@ class Networking {
     }
 
     public function findAndJoinGame() {
-        NativeWindowJS.networkFindAndJoinGame(GameConfig.instance.JoinGameType);
+        NativeWindowJS.networkFindAndJoinGame(GameClientConfig.instance.JoinGameType);
     }
 
     public function input(input:PlayerInputCommand) {

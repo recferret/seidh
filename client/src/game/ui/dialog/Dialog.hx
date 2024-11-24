@@ -42,7 +42,7 @@ class DialogButton extends h2d.Object {
         h = bmp.tile.height;
         w = bmp.tile.width;
 
-        final tf = TextUtils.GetDefaultTextObject(0, -25, 3, Center, GameConfig.WhiteFontColor);
+        final tf = TextUtils.GetDefaultTextObject(0, -25, 3, Center, GameClientConfig.WhiteFontColor);
         tf.text = text;
 
         addChild(tf);

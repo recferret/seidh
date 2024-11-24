@@ -41,7 +41,9 @@ class GameScene extends BasicScene implements EventListener {
 				Player.instance.userId, 
 				Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].x), 
 				Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].y), 
-				RAGNAR_LOH
+				RAGNAR_LOH,
+				1,
+				1,
 			);
 			seidhGameEngine.allowMobsSpawn(true);
 			seidhGameEngine.setLocalPlayerId(Player.instance.userId);
@@ -53,7 +55,7 @@ class GameScene extends BasicScene implements EventListener {
 		// Visual borders
 		// -------------------------------------------
 
-		if (GameConfig.instance.Production) {
+		if (GameClientConfig.instance.Production) {
 			// Top
 			final topBorder = new h2d.Bitmap(h2d.Tile.fromColor(0x000000, SeidhGameEngine.GameWorldSize, Std.int(SeidhGameEngine.GameWorldSize / 2), 1));
 			topBorder.setPosition(0, -topBorder.tile.height);
@@ -155,7 +157,7 @@ class GameScene extends BasicScene implements EventListener {
 			consumable.update(dt, fps);
 		}
 
-		if (GameConfig.instance.DebugDraw) {
+		if (GameClientConfig.instance.DebugDraw) {
 			for (line in seidhGameEngine.getLineColliders()) {
 				Utils.DrawLine(
 					debugGraphics,
@@ -163,7 +165,7 @@ class GameScene extends BasicScene implements EventListener {
 					line.y1,
 					line.x2,
 					line.y2, 
-					GameConfig.RedColor
+					GameClientConfig.RedColor
 				);
 			}
 
@@ -179,7 +181,7 @@ class GameScene extends BasicScene implements EventListener {
 				Utils.DrawRectFilled(
 					debugGraphics,
 					new Rectangle(spawnPoint.x, spawnPoint.y, 50, 50, 0),
-					GameConfig.RedColor
+					GameClientConfig.RedColor
 				);
 			}
 		}

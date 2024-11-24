@@ -1,6 +1,6 @@
 package game;
 
-import game.GameConfig.ResourceProvider;
+import game.GameClientConfig.ResourceProvider;
 import hxd.net.BinaryLoader;
 
 enum SeidhResource {
@@ -207,7 +207,7 @@ class Res {
             resCallback = callback;
 
             initialized = true;
-            if (GameConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) {
+            if (GameClientConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) {
                 final url = 'https://storage.yandexcloud.net/seidh-static-and-assets/resources/';
                 // ------------------------------------
                 // FX
@@ -342,7 +342,7 @@ class Res {
                 remoteResourceMap.set(ZOMBIE_GIRL_DEATH, url + 'zombie-girl/ZOMBIE_GIRL_DEATH.png');
 
                 loadRemoteResources();
-            } else if (GameConfig.instance.ResProvider == ResourceProvider.LOCAL) {
+            } else if (GameClientConfig.instance.ResProvider == ResourceProvider.LOCAL) {
                 // ------------------------------------
                 // FX
                 // ------------------------------------
@@ -493,7 +493,7 @@ class Res {
 	}
 
     public function loadRemoteResources() {
-        if (GameConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) {
+        if (GameClientConfig.instance.ResProvider == ResourceProvider.YANDEX_S3) {
             var remoteResCount = 0;
             for (key in remoteResourceMap.keys()) {
                 remoteResCount++;

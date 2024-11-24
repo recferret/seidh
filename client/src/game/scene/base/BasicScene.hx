@@ -328,7 +328,7 @@ abstract class BasicScene extends h2d.Scene {
 
 	public override function render(e:Engine) {
 		for (character in clientCharacterEntities) {
-			if (GameConfig.instance.DebugDraw) {
+			if (GameClientConfig.instance.DebugDraw) {
 				character.debugDraw(debugGraphics);
 			}
 		}
@@ -396,13 +396,15 @@ abstract class BasicScene extends h2d.Scene {
 	// Entities
 	// ----------------------------------
 
-	public function createCharacterEntityFromMinimalStruct(id:String, ownerId:String, x:Int, y:Int, entityType:EntityType) {
+	public function createCharacterEntityFromMinimalStruct(id:String, ownerId:String, x:Int, y:Int, entityType:EntityType, statsModifier:Float = 1.0, pickUpModifier:Float = 1.0) {
 		seidhGameEngine.createCharacterEntityFromMinimalStruct({
 			id: id, 
 			ownerId: ownerId, 
 			x: x, 
 			y: y,
-			entityType: entityType
+			entityType: entityType,
+			statsModifier: statsModifier,
+			pickUpModifier: pickUpModifier,
 		});
 	}
 
@@ -441,7 +443,7 @@ abstract class BasicScene extends h2d.Scene {
 
 	public function addText(label:String) {
 		final text = new h2d.Text(hxd.res.DefaultFont.get(), fui);
-		text.textColor = GameConfig.RedColor;
+		text.textColor = GameClientConfig.RedColor;
 		text.text = label;
 		return text;
 	}

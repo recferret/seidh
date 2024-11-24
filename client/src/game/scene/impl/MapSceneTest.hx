@@ -30,7 +30,12 @@ class MapSceneTest extends BasicScene {
 		var zombieY = 1550;
 		// for (x in 1...11) {
 			for (y in 1...11) {
-				characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, zombieX, zombieY, EntityType.ZOMBIE_BOY)));
+				characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter({
+						x: zombieX,
+						y: zombieY,
+						entityType: EntityType.ZOMBIE_BOY,
+					})
+				));
 				zombieY += 200;
 			}
 			zombieX += 200;
@@ -94,8 +99,8 @@ class MapSceneTest extends BasicScene {
 		for (index => character in characters) {
 			characterToEnvIntersections.push(character);
 
-			Utils.DrawRect(debugGraphics, character.getRect(), GameConfig.BlueColor);
-			Utils.DrawRect(debugGraphics, character.getBottomRect(), GameConfig.GreenColor);
+			Utils.DrawRect(debugGraphics, character.getRect(), GameClientConfig.BlueColor);
+			Utils.DrawRect(debugGraphics, character.getBottomRect(), GameClientConfig.GreenColor);
 
 			// final ragnarBottom = character.getBottomRect().getCenter();
 			final characterRect = character.getRect();
@@ -104,8 +109,8 @@ class MapSceneTest extends BasicScene {
 				// final treeBottom = tree.getBottomRect().getCenter();
 				final terrainRect = terrain.getRect();
 
-				Utils.DrawRect(debugGraphics, terrain.getRect(), GameConfig.BlueColor);
-				Utils.DrawRect(debugGraphics, terrain.getBottomRect(), GameConfig.GreenColor);
+				Utils.DrawRect(debugGraphics, terrain.getRect(), GameClientConfig.BlueColor);
+				Utils.DrawRect(debugGraphics, terrain.getBottomRect(), GameClientConfig.GreenColor);
 
 				if (terrainRect.getCenter().distance(characterRect.getCenter()) < 200) {
 					if (terrainRect.intersectsWithRect(characterRect)) {

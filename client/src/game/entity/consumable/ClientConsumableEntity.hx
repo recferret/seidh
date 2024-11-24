@@ -42,7 +42,7 @@ class ClientConsumableEntity extends BasicClientEntity<EngineConsumableEntity> {
     }
 
     public function debugDraw(graphics:h2d.Graphics) {
-        Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameConfig.GreenColor);
+        Utils.DrawRect(graphics, engineEntity.getBodyRectangle(), GameClientConfig.GreenColor);
     }
 
 }

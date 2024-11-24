@@ -37,7 +37,7 @@ class Friend extends h2d.Object {
 
         final font : h2d.Font = DefaultFont.get();
 
-        final friendDetails = TextUtils.GetDefaultTextObject(65, 0, 3.5, Left, GameConfig.DefaultFontColor);
+        final friendDetails = TextUtils.GetDefaultTextObject(65, 0, 3.5, Left, GameClientConfig.DefaultFontColor);
         friendDetails.text = friendNameText + statusText + lvl;
         addChild(friendDetails);
     }
@@ -111,19 +111,19 @@ class FriendsContent extends BasicHomeContent {
     public function new() {
 		super(true);
 
-        final friendsInvited = TextUtils.GetDefaultTextObject(125, 450, 3, Left, GameConfig.DefaultFontColor);
+        final friendsInvited = TextUtils.GetDefaultTextObject(125, 450, 3, Left, GameClientConfig.DefaultFontColor);
         friendsInvited.text = "Friends invited: 10";
         addChild(friendsInvited);
 
-        final friendsOnline = TextUtils.GetDefaultTextObject(125, 490, 3, Left, GameConfig.DefaultFontColor);
+        final friendsOnline = TextUtils.GetDefaultTextObject(125, 490, 3, Left, GameClientConfig.DefaultFontColor);
         friendsOnline.text = "Friends online: 2";
         addChild(friendsOnline);
 
-        final coinRewards = TextUtils.GetDefaultTextObject(125, 530, 3, Left, GameConfig.DefaultFontColor);
+        final coinRewards = TextUtils.GetDefaultTextObject(125, 530, 3, Left, GameClientConfig.DefaultFontColor);
         coinRewards.text = "Coins earned: 2000";
         addChild(coinRewards);
 
-        final teethRewards = TextUtils.GetDefaultTextObject(125, 570, 3, Left, GameConfig.DefaultFontColor);
+        final teethRewards = TextUtils.GetDefaultTextObject(125, 570, 3, Left, GameClientConfig.DefaultFontColor);
         teethRewards.text = "Teeth earned: 2000";
         addChild(teethRewards);
 
@@ -153,16 +153,16 @@ class FriendsContent extends BasicHomeContent {
         addChild(interactionInvite);
 
         // Invitation rules
-        final invitationRule1 = TextUtils.GetDefaultTextObject(125, 670, 3, Left, GameConfig.DefaultFontColor);
+        final invitationRule1 = TextUtils.GetDefaultTextObject(125, 670, 3, Left, GameClientConfig.DefaultFontColor);
         invitationRule1.text = "Get 200 coins per invite";
         addChild(invitationRule1);
 
-        final invitationRule2 = TextUtils.GetDefaultTextObject(125, 720, 3, Left, GameConfig.DefaultFontColor);
+        final invitationRule2 = TextUtils.GetDefaultTextObject(125, 720, 3, Left, GameClientConfig.DefaultFontColor);
         invitationRule2.text = "Get 200 teeth per levelup";
         addChild(invitationRule2);
 
         // Friend scrolling container
-        final topFriends = TextUtils.GetDefaultTextObject(125, 820, 3.5, Left, GameConfig.DefaultFontColor);
+        final topFriends = TextUtils.GetDefaultTextObject(125, 820, 3.5, Left, GameClientConfig.DefaultFontColor);
         topFriends.text = "TOP 10 friends:";
         addChild(topFriends);
 

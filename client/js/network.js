@@ -2,12 +2,13 @@ let _currentGameId = undefined;
 let _currentGameplayServiceId = undefined;
 let _authToken = undefined;
 
-async function networkAuthAndGetUser(telegramInitData, login, referrerId, userCallback, boostCallback) {
+async function networkInit(telegramInitData, login, referrerId, userCallback, boostCallback, getGameConfigCallback) {
     const authResponse = await restAuthenticate(telegramInitData, login, referrerId);
     if (authResponse.success) {
         _authToken = 'Bearer ' + authResponse.authToken;
         const userResponse = await restGetUser(_authToken)
         if (userResponse.success) {
+            await networkGetGameConfig(getGameConfigCallback);
             await networkGetBoosts(boostCallback);
             if (userCallback) {
                 userCallback(userResponse.user);
@@ -19,6 +20,10 @@ async function networkAuthAndGetUser(telegramInitData, login, referrerId, userCa
         console.error('Failed to authenticate');
     }
 }
+
+// ----------------------------------
+// Multiplayer
+// ----------------------------------
 
 function networkWsInit(wsCallback) {
     wsConnect(_authToken, wsCallback);
@@ -38,6 +43,21 @@ async function networkFindAndJoinGame(gameType) {
 
 function networkInput(actionType, movAngle) {
     wsInput(actionType, movAngle);
+}
+
+// ----------------------------------
+// REST wrappers
+// ----------------------------------
+
+async function networkGetGameConfig(getGameConfigCallback) {
+    const gameConfigResult = await restGetGameConfig(_authToken);
+    if (gameConfigResult.success) {
+        if (getGameConfigCallback) {
+            getGameConfigCallback(gameConfigResult);
+        }
+    } else {
+        console.error('Failed to get game config');
+    }
 }
 
 async function networkGetBoosts(callback) {

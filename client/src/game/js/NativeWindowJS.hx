@@ -11,14 +11,21 @@ enum abstract YandexMetricsGoals(String) {
 extern class NativeWindowJS {
 
     // Networking
-    static function networkAuthAndGetUser(telegramInitData:String, login:String, referrerId:String, userCallback:Dynamic->Void, boostCallback:Dynamic->Void):Void;
+    static function networkInit(
+        telegramInitData:String,
+        login:String,
+        referrerId:String,
+        userCallback:Dynamic->Void,
+        boostCallback:Dynamic->Void,
+        gameConfigCallback:Dynamic->Void
+    ):Void;
     static function networkWsInit(callback:Dynamic->Void):Void;
     static function networkFindAndJoinGame(gameType:String):Void;
     static function networkInput(actionType:CharacterActionType, movAngle:Float):Void;
     static function networkBuyBoost(boostId:String, callback:Dynamic->Void):Void;
 
     // Common
-    static function getGameConfig():Dynamic;
+    static function getAppConfig():Dynamic;
     static function getMobile():String;
     static function getScreenParams():Dynamic;
     static function alertScreenParams():Void;

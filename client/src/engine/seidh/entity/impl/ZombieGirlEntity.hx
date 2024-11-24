@@ -14,7 +14,7 @@ class ZombieGirlEntity extends SeidhBaseEntity {
 	// Dummy stats hardcode instead of database
 	// ------------------------------------------------
 
-    public static function GenerateObjectEntity(id: String, ownerId: String, x:Int, y:Int) {
+    public static function GenerateObjectEntity(struct:CharacterEntityMinStruct) {
         final defaultSpeed = 3;
         final additionalRndSpeed = MathUtils.randomIntInRange(0, 7);
         var speedFactor = 10;
@@ -38,12 +38,12 @@ class ZombieGirlEntity extends SeidhBaseEntity {
 
         return new CharacterEntity({
             base: {
-                x: x, 
-                y: y,
+                x: struct.x, 
+                y: struct.y,
                 entityType: EntityType.ZOMBIE_GIRL,
                 entityShape: {width: 200, height: 260, rectOffsetX: 0, rectOffsetY: 0},
-                id: id,
-                ownerId: ownerId,
+                id: struct.id,
+                ownerId: struct.ownerId,
                 rotation: 0
             },
             health: 10,
