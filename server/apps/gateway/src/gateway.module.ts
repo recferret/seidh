@@ -20,6 +20,9 @@ import { MicroserviceFriends } from '@app/seidh-common/microservice/microservice
 import { MicroserviceGame } from '@app/seidh-common/microservice/microservice.game';
 import { MicroserviceGameplay } from '@app/seidh-common/microservice/microservice.gameplay';
 import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
+import { ControllerCharacters } from './controllers/controller.characters';
+import { ServiceCharacters } from './services/service.characters';
+import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
 
 @Module({
   imports: [
@@ -58,6 +61,13 @@ import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.u
           servers: [InternalProtocol.NatsUrl],
         },
       },
+      {
+        name: ServiceName.Characters,
+        transport: Transport.NATS,
+        options: {
+          servers: [InternalProtocol.NatsUrl],
+        },
+      },
     ]),
     JwtModule.register({
       global: true,
@@ -71,6 +81,7 @@ import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.u
     ControllerGame,
     ControllerGameplay,
     ControllerUsers,
+    ControllerCharacters,
   ],
   providers: [
     MicroserviceBoost,
@@ -78,11 +89,13 @@ import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.u
     MicroserviceGame,
     MicroserviceGameplay,
     MicroserviceUsers,
+    MicroserviceCharacters,
     ServiceBoost,
     ServiceFriends,
     ServiceGame,
     ServiceGameplay,
     ServiceUsers,
+    ServiceCharacters,
   ],
 })
 export class GatewayModule {}

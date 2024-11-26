@@ -1,4 +1,3 @@
-import { ServiceName } from '@app/seidh-common';
 import {
   UsersAuthenticateServiceRequest,
   UsersAuthenticateServiceResponse,
@@ -9,15 +8,13 @@ import {
 } from '@app/seidh-common/dto/users/users.check.token.msg';
 
 import { User, UserDocument } from '@app/seidh-common/schemas/user/schema.user';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { firstValueFrom } from 'rxjs';
 import { ProviderCrypto } from '../providers/provider.crypto';
-import { MicroserviceCharacter } from '@app/seidh-common/microservice/microservice.characters';
+import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
 import { CharacterType } from '@app/seidh-common/dto/types/types.character';
 
 @Injectable()
@@ -28,7 +25,7 @@ export class ServiceAuth {
   constructor(
     private jwtService: JwtService,
     private providerCrypto: ProviderCrypto,
-    private microserviceCharacter: MicroserviceCharacter,
+    private microserviceCharacter: MicroserviceCharacters,
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 

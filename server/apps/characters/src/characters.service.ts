@@ -1,5 +1,6 @@
 import { CharactersServiceCreateRequest, CharactersServiceCreateResponse } from '@app/seidh-common/dto/characters/characters.create.msg';
-import { CharactersServiceGetByUserIdRequest } from '@app/seidh-common/dto/characters/characters.get-by-user-id.msg';
+import { CharactersServiceGetByIdsRequest, CharactersServiceGetByIdsResponse } from '@app/seidh-common/dto/characters/characters.get-by-ids.msg';
+import { CharactersServiceGetDefaultParamsResponse } from '@app/seidh-common/dto/characters/characters.get-default-params.msg';
 import { CharactersServicelevelUpRequest } from '@app/seidh-common/dto/characters/characters.level-up.msg';
 import { CharacterType, CharacterParams } from '@app/seidh-common/dto/types/types.character';
 import { Character } from '@app/seidh-common/schemas/character/schema.character';
@@ -45,12 +46,56 @@ export class CharactersService {
     return response;
   }
 
-  async getByUserId(request: CharactersServiceGetByUserIdRequest) {
-    
+  async getByIds(request: CharactersServiceGetByIdsRequest) {
+    const response: CharactersServiceGetByIdsResponse = {
+      success: false,
+    };
+
+    try {
+      const chars = await this.characterModel.find().where('_id').in(request.ids).exec();
+      response.characterParams = chars.map((char) => {
+        const params: CharacterParams = {
+          type: char.type,
+          levelCurrent: char.levelCurrent,
+          levelMax: char.levelMax,
+          expCurrent: char.expCurrent,
+          expTillNewLevel: char.expTillNewLevel,
+          health: char.health,
+          entityShape: char.entityShape,
+          movement: char.movement,
+          actionMain: char.actionMain,
+        };
+        return params;
+      });
+      response.success = true;
+    } catch (error) {
+      Logger.log({
+        msg: 'CharactersService getDefaultParams',
+        error,
+      });
+    }
+
+    return response;
   }
 
-  async getMobParams() {
+  async getDefaultParams() {
+    const response: CharactersServiceGetDefaultParamsResponse = {
+      success: false,
+    };
 
+    try {
+      response.ragnarLoh = this.getBasicCharacterParamsByType(CharacterType.RagnarLoh);
+      response.zombieBoy = this.getBasicCharacterParamsByType(CharacterType.ZombieBoy);
+      response.zombieGirl = this.getBasicCharacterParamsByType(CharacterType.ZombieGirl);
+      response.success = true;
+    } catch (error) {
+      Logger.log({
+        msg: 'CharactersService getDefaultParams',
+        error,
+      });
+    }
+
+    return response;
   }
 
   async levelUp(request: CharactersServicelevelUpRequest) {

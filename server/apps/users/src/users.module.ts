@@ -17,7 +17,7 @@ import { ServiceAuth } from './services/service.auth';
 import { ServiceFriends } from './services/service.friends';
 import { ServiceUser } from './services/service.user';
 import { ProviderCrypto } from './providers/provider.crypto';
-import { MicroserviceCharacter } from '@app/seidh-common/microservice/microservice.characters';
+import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
 
 @Module({
   imports: [
@@ -65,7 +65,7 @@ import { MicroserviceCharacter } from '@app/seidh-common/microservice/microservi
     ControllerUser
   ],
   providers: [
-    MicroserviceCharacter,
+    MicroserviceCharacters,
     ProviderCrypto,
     ServiceAuth,
     ServiceFriends,
