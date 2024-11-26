@@ -32,14 +32,10 @@ class RagnarLohEntity extends SeidhBaseEntity {
             },
             health: 100,
             movement: {
-                canWalk: true,
                 canRun: false,
                 runSpeed: 40,
                 speedFactor: 10,
-                movementDelay: 0.100,
-                vitality: 100,
-                vitalityConsumptionPerSec: 20,
-                vitalityRegenPerSec: 10,
+                inputDelay: 0.100,
             },
             actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,

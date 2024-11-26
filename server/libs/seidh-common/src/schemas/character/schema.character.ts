@@ -5,44 +5,57 @@ export type CharacterDocument = HydratedDocument<Character>;
 
 export enum CharacterType {
   RagnarLoh = 'RagnarLoh',
+  ZombieBoy = 'ZombieBoy',
+  ZombieGirl = 'ZombieGirl',
 }
 
 export type CharacterMovementStruct = {
   runSpeed: number;
-  walkSpeed: number;
+  speedFactor: number;
+  inputDelay: number;
 };
 
 export type CharacterActionStruct = {
   damage: number;
+  inputDelay: number;
+  meleeStruct: {
+    aoe: boolean;
+    shape: {
+        width: number;
+        height: number;
+        rectOffsetX: number; 
+        rectOffsetY: number;
+    },
+}
 };
 
 @Schema()
 export class Character {
-  @Prop({ type: String, enum: CharacterType })
+  @Prop({ required: true, type: String, enum: CharacterType })
   type: CharacterType;
 
-  @Prop({ default: true })
+  @Prop({ required: true, default: true })
   active: boolean;
 
-  @Prop({ default: 1 })
+  @Prop({ required: true, default: 1 })
   levelCurrent: number;
 
-  @Prop({ default: 10 })
+  @Prop({ required: true, default: 10 })
   levelMax: number;
 
-  @Prop({ default: 0 })
+  @Prop({ required: true, default: 0 })
   expCurrent: number;
 
-  @Prop({ default: 0 })
+  @Prop({ required: true, default: 0 })
   expTillNewLevel: number;
 
-  @Prop({ default: 100 })
+  @Prop({ required: true, default: 100 })
   health: number;
 
-  @Prop({ type: { runSpeed: Number, walkSpeed: Number } })
+  @Prop({ required: true, type: { runSpeed: Number, speedFactor: Number, movementDelay: Number } })
   movement: CharacterMovementStruct;
 
-  @Prop({ type: { damage: Number } })
+  @Prop({ required: true, type: { damage: Number } })
   actionMain: CharacterActionStruct;
 }
 

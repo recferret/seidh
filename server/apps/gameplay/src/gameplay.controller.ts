@@ -12,7 +12,7 @@ import { WsGameEvent } from '@app/seidh-common';
 import {
   GameplayJoinGameMessage,
   GameplayJoinGamePattern,
-} from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
+} from '@app/seidh-common/dto/gameplay/gameplay.join-game.msg';
 import {
   GameplayInputPattern,
   GameplayInputMessage,
@@ -25,7 +25,7 @@ import {
 import {
   GameplayCreateGamePattern,
   GameplayCreateGameMessageRequest,
-} from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
+} from '@app/seidh-common/dto/gameplay/gameplay.create-game.msg';
 
 @Injectable()
 class InstanceIdGuard implements CanActivate {

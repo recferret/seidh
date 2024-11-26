@@ -16,7 +16,7 @@ import {
   GameplayCreateGamePattern,
   GameplayCreateGameMessageRequest,
   GameplayCreateGameMessageResponse,
-} from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
+} from '@app/seidh-common/dto/gameplay/gameplay.create-game.msg';
 
 @Injectable()
 export class GameplayLobbyService {

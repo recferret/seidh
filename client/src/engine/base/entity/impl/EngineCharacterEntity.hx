@@ -49,8 +49,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// Movement
 	// ------------------------------------------------
 
-	public var currentVitality:Int;
-	public var isWalking = false;
 	public var isRunning = false;
 
 	private var lastLocalMovementInputCheck = 0.0;
@@ -100,8 +98,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		if (baseEntity.ownerId == null) {
 			baseEntity.ownerId = Uuid.short();
 		}
-
-		currentVitality = this.characterEntity.movement.vitality;
 
 		actionMain = this.characterEntity.actionMain;
 		action1 = this.characterEntity.action1;
@@ -158,7 +154,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		if (customUpdate != null)
 			customUpdate.postUpdate();
 
-		renegerateVitality();
 		updateHash();
 	}
 
@@ -245,12 +240,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// Movement and input
 	// ------------------------------------------------
 
-	private function renegerateVitality() {
-		if (characterEntity.movement.canRun && !isWalking && !isRunning) {
-			currentVitality += characterEntity.movement.vitalityRegenPerSec;
-		}
-	}
-
 	public function move() {
 		if (canMove && performMoveNextUpdate) {
 			final speed = characterEntity.movement.runSpeed;
@@ -268,7 +257,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function checkLocalMovementInput() {
 		final now = haxe.Timer.stamp();
-		if (lastLocalMovementInputCheck == 0 || lastLocalMovementInputCheck + characterEntity.movement.movementDelay < now) {
+		if (lastLocalMovementInputCheck == 0 || lastLocalMovementInputCheck + characterEntity.movement.inputDelay < now) {
 			lastLocalMovementInputCheck = now;
 			return true;
 		} else {

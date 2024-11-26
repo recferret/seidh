@@ -10,7 +10,7 @@ import {
   GameplayLobbyUpdateGamesPattern,
   GameplayLobbyUpdateGamesServiceMessage,
 } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.update.games.msg';
-import { GameplayJoinGameServiceMessage } from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
+import { GameplayJoinGameServiceMessage } from '@app/seidh-common/dto/gameplay/gameplay.join-game.msg';
 import { GameplayType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { EventGameCreateCharacter } from './events/event.game.create-character';
@@ -68,7 +68,7 @@ import { EventGameInit } from './events/event.game.init';
 import {
   GameplayCreateGameServiceRequest,
   GameplayCreateGameServiceResponse,
-} from '@app/seidh-common/dto/gameplay/gameplay.create.game.msg';
+} from '@app/seidh-common/dto/gameplay/gameplay.create-game.msg';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EventGameUserGainings } from './events/event.game.user-gainings';
 import {

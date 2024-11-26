@@ -11,19 +11,19 @@ import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
 import { ServiceName } from '@app/seidh-common';
 import { FindGameDto } from './dto/find.game.dto';
-import {
-  GameplayJoinGameMessage,
-  GameplayJoinGamePattern,
-} from '@app/seidh-common/dto/gameplay/gameplay.join.game.msg';
-import { WsGatewayGameBaseMsg } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.base.msg';
-import {
-  GameplayDisconnectedMessage,
-  GameplayDisconnectedPattern,
-} from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
 import { InputDto } from './dto/input.dto';
 import {
-  GameplayInputMessage,
-  GameplayInputPattern,
+  GameplayServiceJoinGameMessage,
+  GameplayServiceJoinGamePattern,
+} from '@app/seidh-common/dto/gameplay/gameplay.join-game.msg';
+import { WsGatewayGameBaseMsg } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.base.msg';
+import {
+  GameplayServiceDisconnectedMessage,
+  GameplayServiceDisconnectedPattern,
+} from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+import {
+  GameplayServiceInputMessage,
+  GameplayServiceInputPattern,
 } from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
 import { WsGatewayBaseMsg } from '@app/seidh-common/dto/ws-gateway/ws-gateway.base.msg';
 
@@ -90,10 +90,10 @@ export class WsGatewayWsController implements OnModuleInit {
           const userId = this.socketIdToUserId.get(socket.id);
 
           if (userId) {
-            const request: GameplayDisconnectedMessage = {
+            const request: GameplayServiceDisconnectedMessage = {
               userId,
             };
-            this.gameplayService.emit(GameplayDisconnectedPattern, request);
+            this.gameplayService.emit(GameplayServiceDisconnectedPattern, request);
 
             this.userSockets.delete(this.socketIdToUserId.get(socket.id));
             this.socketIdToUserId.delete(socket.id);
@@ -118,12 +118,12 @@ export class WsGatewayWsController implements OnModuleInit {
     @MessageBody() data: FindGameDto,
   ) {
     const userId = this.socketIdToUserId.get(client.id);
-    const request: GameplayJoinGameMessage = {
+    const request: GameplayServiceJoinGameMessage = {
       userId,
       gameId: data.gameId,
       gameplayServiceId: data.gameplayServiceId,
     };
-    this.gameplayService.emit(GameplayJoinGamePattern, request);
+    this.gameplayService.emit(GameplayServiceJoinGamePattern, request);
     this.userIdToGameplayService.set(userId, data.gameplayServiceId);
   }
 
@@ -133,14 +133,14 @@ export class WsGatewayWsController implements OnModuleInit {
     @MessageBody() data: InputDto,
   ) {
     const userId = this.socketIdToUserId.get(client.id);
-    const request: GameplayInputMessage = {
+    const request: GameplayServiceInputMessage = {
       userId,
       gameId: this.userIdToGameId.get(userId),
       gameplayServiceId: this.userIdToGameplayService.get(userId),
       actionType: data.actionType,
       movAngle: data.movAngle,
     };
-    this.gameplayService.emit(GameplayInputPattern, request);
+    this.gameplayService.emit(GameplayServiceInputPattern, request);
   }
 
   // ----------------------------------------------

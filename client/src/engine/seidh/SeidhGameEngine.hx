@@ -327,7 +327,6 @@ class SeidhGameEngine extends BaseEngine {
                     character1.isActing = false;
                     character1.actionToPerform = null;
                     character1.isRunning = false;
-                    character1.isWalking = false;
                 }
             }
 

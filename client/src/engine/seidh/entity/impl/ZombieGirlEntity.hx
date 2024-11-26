@@ -48,14 +48,10 @@ class ZombieGirlEntity extends SeidhBaseEntity {
             },
             health: 10,
             movement: {
-                canWalk: true,
                 canRun: true,
                 runSpeed: defaultSpeed + additionalRndSpeed,
                 speedFactor: speedFactor,
-                movementDelay: 0.100,
-                vitality: 100,
-                vitalityConsumptionPerSec: 20,
-                vitalityRegenPerSec: 10,
+                inputDelay: 0.100,
             },
             actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,

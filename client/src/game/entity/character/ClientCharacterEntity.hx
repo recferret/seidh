@@ -112,8 +112,6 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     // ------------------------------------------------------------
 
     private function adjustRunAnimationSpeed() {
-        trace(engineEntity.getMovementSpeed(), engineEntity.getMovementSpeedFactor());
-
         animation.setRunAnimationSpeed(engineEntity.getMovementSpeedFactor());
     }
 

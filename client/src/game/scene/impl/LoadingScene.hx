@@ -7,7 +7,6 @@ import game.scene.base.BasicScene;
 
 import uuid.Uuid;
 
-
 class LoadingScene extends BasicScene {
 
     public function new() {

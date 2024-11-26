@@ -14,6 +14,7 @@ import {
   BoostTransactionSchema,
 } from '@app/seidh-common/schemas/boost/schema.boost.transaction';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { BoostSeedService } from './boost.seed.service';
 
 @Module({
   imports: [
@@ -35,6 +36,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [BoostController],
-  providers: [BoostService],
+  providers: [BoostSeedService, BoostService],
 })
 export class BoostModule {}

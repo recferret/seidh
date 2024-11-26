@@ -1,10 +1,10 @@
 package game.scene.impl.home.boost;
 
-import game.ui.text.TextUtils;
 import game.event.EventManager;
 import game.js.NativeWindowJS;
 import game.ui.dialog.Dialog;
 import game.ui.dialog.Dialog.DialogManager;
+import game.ui.text.TextUtils;
 import game.tilemap.TilemapManager;
 import game.Player.BoostBody;
 import game.Res.SeidhResource;
@@ -95,7 +95,8 @@ private class BoostItem extends h2d.Object {
         final iconBg = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.ICON_BOOST_BROWN), this);
 
         boostIcon = new h2d.Bitmap(this);
-        boostIcon.tile = boostTile;
+        priceIcon = new h2d.Bitmap(this);
+        priceIcon.setScale(0.6);
 
         nameText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y - 55, 2, Left, GameClientConfig.WhiteFontColor);
         addChild(nameText);
@@ -103,31 +104,15 @@ private class BoostItem extends h2d.Object {
         descriptionText = TextUtils.GetDefaultTextObject(iconBg.x + 78, iconBg.y - 15, 2, Left, GameClientConfig.DefaultFontColor);
         addChild(descriptionText);
 
-        if (currentLevel < 3) {
-            priceText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y + 25, 2, Left, GameClientConfig.DefaultFontColor);
-            addChild(priceText);
-
-            priceIcon = new h2d.Bitmap(
-                currencyType == CurrencyType.Coins ?
-                    TilemapManager.instance.getTile(TileType.WEALTH_COINS) :
-                    TilemapManager.instance.getTile(TileType.WEALTH_TEETH), this);
-            priceIcon.setScale(0.6);
-
-            priceText.text = Std.string(boostPrice);
-            priceIcon.setPosition(priceText.x + priceText.textWidth * 2 + 30, priceText.y + 16);
-        }
-
-        nameText.text = currentBoostName;
-        descriptionText.text = currentBoostDescription1;
+        priceText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y + 25, 2, Left, GameClientConfig.DefaultFontColor);
+        addChild(priceText);
 
         // Iteraction
         final interaction = new h2d.Interactive(450, iconBg.tile.height - 20);
         interaction.setPosition(iconBg.x - iconBg.tile.width / 2 + 20, iconBg.y - iconBg.tile.height / 2 + 10);
-
         interaction.onMove = function(event:hxd.Event) {
             clickStarted = false;
         }
-
         interaction.onPush = function(event:hxd.Event) {
             clickStarted = true;
             
@@ -144,6 +129,7 @@ private class BoostItem extends h2d.Object {
             if (clickStarted && !DialogManager.IsDialogActive) {
                 BoostContent.BoostClick(
                     root,
+                    currentBoostId,
                     nextBoostId,
                     nextBoostName,
                     nextBoostDescription1,
@@ -151,12 +137,19 @@ private class BoostItem extends h2d.Object {
                     boostPrice,
                     currencyType,
                     currentLevel,
-                    maxLevel
+                    maxLevel,
                 );
             }
             clickStarted = false;
         }
+
         addChild(interaction);
+        applyBoostData();
+    }
+
+    public function invalidate(boost:BoostBody) {
+        parseBoost(boost);
+        applyBoostData();
     }
 
     private function parseBoost(boost:BoostBody) {
@@ -293,8 +286,25 @@ private class BoostItem extends h2d.Object {
         }
     }
 
-    public function invalidate(boost:BoostBody) {
-        parseBoost(boost);
+    private function applyBoostData() {
+        nameText.text = currentBoostName;
+        descriptionText.text = currentBoostDescription1;
+
+        boostIcon.tile = boostTile;
+        priceIcon.tile = currencyType == CurrencyType.Coins ?
+            TilemapManager.instance.getTile(TileType.WEALTH_COINS) :
+            TilemapManager.instance.getTile(TileType.WEALTH_TEETH);
+
+        priceText.text = Std.string(boostPrice);
+        priceIcon.setPosition(priceText.x + priceText.textWidth * 2 + 30, priceText.y + 16);
+
+        if (currentLevel == 3) {
+            priceText.alpha = 0;
+            priceIcon.alpha = 0;
+        } else {
+            priceText.alpha = 1;
+            priceIcon.alpha = 1;
+        }
     }
 }
 
@@ -375,7 +385,7 @@ class BoostContent extends BasicHomeContent implements EventListener {
             }
 
             if (boostItem != null) {
-                boostsMap.set(boostItem.currentBoostId, boostItem);
+                boostsMap.set(boostItem.currentBoostId.split('_')[0], boostItem);
             }
         }
 
@@ -390,30 +400,38 @@ class BoostContent extends BasicHomeContent implements EventListener {
 	}
 
     public function update(dt:Float) {
-        // boostContainer.update(dt);
         boostContainer.y = contentScrollY;
     }
 
     private function invalidateBoosts(message:Dynamic) {
         for (boost in Player.instance.boosts) {
-            if (boost.levelOneId == message.accquiredBoostId || 
-                boost.levelTwoId == message.accquiredBoostId ||
-                boost.levelThreeId == message.accquiredBoostId) {
-                boostsMap.get(message.accquiredBoostId).invalidate(boost);
+            final boostObject = boostsMap.get(message.boostId);
+            var validBoost = StringTools.contains(boost.levelOneId, message.boostId);
+        
+            if (boost.levelTwoId != null && StringTools.contains(boost.levelTwoId, message.boostId)) {
+                validBoost = true;
+            }
+            if (boost.levelThreeId != null && StringTools.contains(boost.levelThreeId, message.boostId)) {
+                validBoost = true;
+            }
+
+            if (validBoost) {
+                boostObject.invalidate(boost);
             }
         }
     }
 
     public static function BoostClick(
         parent:h2d.Object,
-        boostId:String,
+        currentBoostId:String,
+        nextBoostId:String,
         name:String,
         description1:String,
         description2:String,
         price:Int,
         currencyType:CurrencyType,
         currentLevel:Int, 
-        maxLevel:Int,
+        maxLevel:Int
     ) {
         var hasEnoughMoney = true;
         var currencyTypeValue = 'coins';
@@ -430,10 +448,10 @@ class BoostContent extends BasicHomeContent implements EventListener {
         }
 
         function positiveCallback1():Void {
-            NativeWindowJS.networkBuyBoost(boostId, function callback(data:Dynamic) {
+            NativeWindowJS.networkBuyBoost(nextBoostId, function callback(data:Dynamic) {
                 if (data.success) {
                     Player.instance.setBoostData(data.boosts);
-                    EventManager.instance.notify(EventManager.EVENT_INVALIDATE_BOOSTS, { accquiredBoostId: boostId });
+                    EventManager.instance.notify(EventManager.EVENT_INVALIDATE_BOOSTS, { boostId: currentBoostId.split('_')[0] });
                 } else {
                     // TODO impl alert
                 }
@@ -450,7 +468,7 @@ class BoostContent extends BasicHomeContent implements EventListener {
                 { 
                     label: hasEnoughMoney ? 
                         'Buy it for ' + price + ' ' + currencyTypeValue + ' ?' : 
-                        'Not enough teeth!', 
+                        'Not enough ' + currencyTypeValue + '!', 
                     scale: hasEnoughMoney ? 3 : 4, 
                     color: hasEnoughMoney ? GameClientConfig.WhiteFontColor : GameClientConfig.ErrorFontColor, 
                 } : null,
