@@ -1,21 +1,5 @@
 import { GameplayType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import * as Engine from '../js/SeidhGameEngine';
-import {
-  EngineCharacterEntity,
-  CharacterEntityMinStruct,
-  CharacterActionCallbackParams,
-  PlayerInputCommand,
-  CreateCharacterMinStruct,
-  EntityType,
-  CharacterEntityFullStruct,
-  GameState,
-  EngineMode,
-  EngineConsumableEntity,
-  DeleteConsumableEntityTask,
-  ConsumableEntityStruct,
-  WinCondition,
-  UserGainings,
-} from '@app/seidh-common/seidh-common.game-types';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventGameCharacterActions } from '../events/event.game.character-actions';
 import { EventGameCreateCharacter } from '../events/event.game.create-character';
@@ -27,7 +11,25 @@ import { EventGameGameState } from '../events/event.game.game-state';
 import { EventGameDeleteConsumable } from '../events/event.game.delete-consumable';
 import { EventGameCreateConsumable } from '../events/event.game.create-consumable';
 import { EventGameInit } from '../events/event.game.init';
-import { EventGameUserGainings } from '../events/event.game.user-gainings';
+import {
+  EventGameUserGainings,
+  UserGainings,
+} from '../events/event.game.user-gainings';
+import {
+  CharacterActionCallbackParams,
+  CharacterEntityFullStruct,
+  CharacterEntityMinStruct,
+  CharacterMinStruct,
+  ConsumableEntityStruct,
+  DeleteConsumableCallback,
+  EngineCharacterEntity,
+  EngineConsumableEntity,
+  EngineMode,
+  EntityType,
+  PlayerInputCommand,
+  WinCondition,
+} from '@app/seidh-common/dto/types/types.engine';
+import { GameState } from '@app/seidh-common/schemas/game/schema.game';
 
 export class GameInstance {
   private readonly engine: Engine.SeidhGameEngine;
@@ -142,7 +144,7 @@ export class GameInstance {
     };
 
     this.engine.deleteConsumableCallback = (
-      callbackBody: DeleteConsumableEntityTask,
+      callbackBody: DeleteConsumableCallback,
     ) => {
       this.eventEmitter.emit(
         EventGameDeleteConsumable.EventName,
@@ -208,7 +210,7 @@ export class GameInstance {
   // ---------------------
 
   addPlayer(playerId: string) {
-    const struct: CreateCharacterMinStruct = {
+    const struct: CharacterMinStruct = {
       id: 'entity_' + playerId,
       ownerId: playerId,
       x: this.engine.getPlayersSpawnPoints()[0].x,

@@ -11,10 +11,22 @@ import {
   UsersUpdateGainingsServiceMessage,
   UsersUpdateGainingsPattern,
 } from '../dto/users/users.update.gainings';
+import { 
+  UsersAuthenticateServiceRequest,
+  UsersAuthenticateServiceResponse,
+  UsersAuthenticatePattern 
+} from '../dto/users/users.authenticate.msg';
 
 @Injectable()
-export class MicroserviceUser {
+export class MicroserviceUsers {
   constructor(@Inject(ServiceName.Users) private usersService: ClientProxy) {}
+
+  async authenticate(request: UsersAuthenticateServiceRequest) {
+    const response: UsersAuthenticateServiceResponse = await firstValueFrom(
+      this.usersService.send(UsersAuthenticatePattern, request),
+    );
+    return response;
+  }
 
   async getUser(request: UsersGetUserServiceRequest) {
     const result: UsersGetUserServiceResponse = await firstValueFrom(

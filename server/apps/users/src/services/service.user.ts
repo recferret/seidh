@@ -63,8 +63,6 @@ export class ServiceUser {
           };
           return character;
         }),
-
-        boostsOwned: user.boostsOwned,
       };
 
       response.user = userBody;

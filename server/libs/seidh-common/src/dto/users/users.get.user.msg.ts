@@ -1,8 +1,4 @@
-import { CharacterType } from '@app/seidh-common/schemas/character/schema.character';
-import {
-  CharacterMovementStruct,
-  CharacterActionStruct,
-} from '@app/seidh-common/seidh-common.game-types';
+import { CharacterType, CharacterMovementStruct, CharacterActionStruct } from "../types/types.character";
 
 export const UsersGetUserPattern = 'users.get.user';
 
@@ -29,8 +25,6 @@ export interface UserBody {
 
   // Chatacters
   characters: CharacterBody[];
-
-  boostsOwned: string[];
 }
 
 export interface UsersGetUserServiceRequest {

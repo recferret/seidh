@@ -10,8 +10,11 @@ import {
 } from '@app/seidh-common/schemas/game/schema.game-progress';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.user';
-import { GameConfig, GameConfigSchema } from '@app/seidh-common/schemas/game/schema.game-config';
+import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.users';
+import {
+  GameConfig,
+  GameConfigSchema,
+} from '@app/seidh-common/schemas/game/schema.game-config';
 
 @Module({
   imports: [

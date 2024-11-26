@@ -1,15 +1,15 @@
 import { Controller, Get, Session, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../guards/guard.auth';
 import { IUserSession } from './interfaces';
-import { ServiceUser } from '../services/service.user';
+import { ServiceUsers } from '../services/service.users';
 
-@Controller('user')
-export class ControllerUser {
-  constructor(private readonly serviceUser: ServiceUser) {}
+@Controller('users')
+export class ControllerUsers {
+  constructor(private readonly serviceUsers: ServiceUsers) {}
 
   @Get()
   @UseGuards(AuthGuard)
   getUser(@Session() session: IUserSession) {
-    return this.serviceUser.getUser(session.userId);
+    return this.serviceUsers.getUser(session.userId);
   }
 }

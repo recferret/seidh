@@ -9,8 +9,10 @@ import {
 } from '../dto/users/users.authenticate.msg';
 
 @Injectable()
-export class MicroserviceAuth {
-  constructor(@Inject(ServiceName.Users) private usersService: ClientProxy) {}
+export class MicroserviceReferral {
+  constructor(
+    @Inject(ServiceName.Characters) private charactersService: ClientProxy,
+  ) {}
 
   async authenticate(request: UsersAuthenticateServiceRequest) {
     const response: UsersAuthenticateServiceResponse = await firstValueFrom(

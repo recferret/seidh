@@ -1,4 +1,3 @@
 export interface IUserSession {
-    userId: string;
+  userId: string;
 }
-  

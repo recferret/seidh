@@ -79,39 +79,51 @@ class LoadingScene extends BasicScene {
 	}
 
     private function processUserCallback(data:Dynamic) {
-        Player.instance.setUserData(data);
-        initNetwork();
-        EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+        if (data != null) {
+            Player.instance.setUserData(data);
+            initNetwork();
+            EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
+        } else {
+            trace('processUserCallback error');
+        }
     }
 
     private function processBoostCallback(data:Dynamic) {
-        Player.instance.setBoostData(data);
+        if (data != null) {
+            Player.instance.setBoostData(data);
+        } else {
+            trace('processBoostCallback error');
+        }
     }
 
     private function processGetGameConfigCallback(data:Dynamic) {
-        // Mobs spawn
-        SeidhGameEngine.GAME_CONFIG.mobsMaxAtTheSameTime = data.mobsMaxAtTheSameTime;
-        SeidhGameEngine.GAME_CONFIG.mobsMaxPerGame = data.mobsMaxPerGame;
-        SeidhGameEngine.GAME_CONFIG.mobSpawnDelayMs = data.mobSpawnDelayMs;
+        if (data != null) {
+            // Mobs spawn
+            SeidhGameEngine.GAME_CONFIG.mobsMaxAtTheSameTime = data.mobsMaxAtTheSameTime;
+            SeidhGameEngine.GAME_CONFIG.mobsMaxPerGame = data.mobsMaxPerGame;
+            SeidhGameEngine.GAME_CONFIG.mobSpawnDelayMs = data.mobSpawnDelayMs;
 
-        // Exp boost
-        SeidhGameEngine.GAME_CONFIG.expLevel1Multiplier = data.expLevel1Multiplier;
-        SeidhGameEngine.GAME_CONFIG.expLevel2Multiplier = data.expLevel2Multiplier;
-        SeidhGameEngine.GAME_CONFIG.expLevel3Multiplier = data.expLevel3Multiplier;
+            // Exp boost
+            SeidhGameEngine.GAME_CONFIG.expLevel1Multiplier = data.expLevel1Multiplier;
+            SeidhGameEngine.GAME_CONFIG.expLevel2Multiplier = data.expLevel2Multiplier;
+            SeidhGameEngine.GAME_CONFIG.expLevel3Multiplier = data.expLevel3Multiplier;
 
-        // Stats boost
-        SeidhGameEngine.GAME_CONFIG.statsLevel1Multiplier = data.statsLevel1Multiplier;
-        SeidhGameEngine.GAME_CONFIG.statsLevel2Multiplier = data.statsLevel2Multiplier;
-        SeidhGameEngine.GAME_CONFIG.statsLevel3Multiplier = data.statsLevel3Multiplier;
+            // Stats boost
+            SeidhGameEngine.GAME_CONFIG.statsLevel1Multiplier = data.statsLevel1Multiplier;
+            SeidhGameEngine.GAME_CONFIG.statsLevel2Multiplier = data.statsLevel2Multiplier;
+            SeidhGameEngine.GAME_CONFIG.statsLevel3Multiplier = data.statsLevel3Multiplier;
 
-        // Wealth boost
-        SeidhGameEngine.GAME_CONFIG.wealthLevel1PickUpRangeMultiplier = data.wealthLevel1PickUpRangeMultiplier;
-        SeidhGameEngine.GAME_CONFIG.wealthLevel2PickUpRangeMultiplier = data.wealthLevel2PickUpRangeMultiplier;
-        SeidhGameEngine.GAME_CONFIG.wealthLevel3PickUpRangeMultiplier = data.wealthLevel3PickUpRangeMultiplier;
+            // Wealth boost
+            SeidhGameEngine.GAME_CONFIG.wealthLevel1PickUpRangeMultiplier = data.wealthLevel1PickUpRangeMultiplier;
+            SeidhGameEngine.GAME_CONFIG.wealthLevel2PickUpRangeMultiplier = data.wealthLevel2PickUpRangeMultiplier;
+            SeidhGameEngine.GAME_CONFIG.wealthLevel3PickUpRangeMultiplier = data.wealthLevel3PickUpRangeMultiplier;
 
-        SeidhGameEngine.GAME_CONFIG.wealthLevel1CoinsMultiplier = data.wealthLevel1CoinsMultiplier;
-        SeidhGameEngine.GAME_CONFIG.wealthLevel2CoinsMultiplier = data.wealthLevel2CoinsMultiplier;
-        SeidhGameEngine.GAME_CONFIG.wealthLevel3CoinsMultiplier = data.wealthLevel3CoinsMultiplier;
+            SeidhGameEngine.GAME_CONFIG.wealthLevel1CoinsMultiplier = data.wealthLevel1CoinsMultiplier;
+            SeidhGameEngine.GAME_CONFIG.wealthLevel2CoinsMultiplier = data.wealthLevel2CoinsMultiplier;
+            SeidhGameEngine.GAME_CONFIG.wealthLevel3CoinsMultiplier = data.wealthLevel3CoinsMultiplier;
+        } else {
+            trace('processGetGameConfigCallback error');
+        }
     }
 
 }

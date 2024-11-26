@@ -1,174 +1,76 @@
-export enum EngineMode {
-  CLIENT_SINGLEPLAYER = 1,
-  CLIENT_MULTIPLAYER = 2,
-  SERVER = 3,
-}
+// export enum EntityType {
+//   RAGNAR_LOH = 1,
+//   RAGNAR_NORM = 2,
+//   ZOMBIE_BOY = 3,
+//   ZOMBIE_GIRL = 4,
 
-export enum WinCondition {
-  KILL_MOBS = 1,
-  INFINITE = 2,
-}
+//   SMALL_COIN = 99,
+// }
 
-export enum Side {
-  LEFT = 1,
-  RIGHT = 2,
-}
+// export interface EntityShape {
+//   width: number;
+//   height: number;
+//   rectOffsetX: number;
+//   rectOffsetY: number;
+// }
 
-export enum CharacterActionType {
-  MOVE = 1,
-  ACTION_MAIN = 2,
-  ACTION_1 = 3,
-  ACTION_2 = 4,
-  ACTION_3 = 5,
-  ACTION_ULTIMATE = 6,
-}
+// export interface BaseEntityStruct {
+//   x: number;
+//   y: number;
+//   entityType: EntityType;
+//   entityShape: EntityShape;
+//   id: string;
+//   ownerId: string;
+//   rotation: number;
+// }
 
-export enum EntityType {
-  RAGNAR_LOH = 1,
-  RAGNAR_NORM = 2,
-  ZOMBIE_BOY = 3,
-  ZOMBIE_GIRL = 4,
+// export interface MeleeStruct {
+//   aoe: boolean;
+//   shape: EntityShape;
+// }
 
-  SMALL_COIN = 99,
-}
+// export interface ProjectileStruct {
+//   aoe: boolean;
+//   penetration: boolean;
+//   speed: number;
+//   travelDistance: number;
+//   projectiles: number;
+//   shape: EntityShape;
+//   aoeShape?: EntityShape;
+// }
 
-export interface UserGainings {
-  userId: string;
-  gameId: string;
-  kills: number;
-  tokens: number;
-}
+// export interface BaseEntityStruct {
+//   x: number;
+//   y: number;
+//   entityType: EntityType;
+//   entityShape: EntityShape;
+//   id: string;
+//   ownerId: string;
+//   rotation: number;
+// }
 
-export interface EntityShape {
-  width: number;
-  height: number;
-  rectOffsetX: number;
-  rectOffsetY: number;
-}
+// export interface EngineCharacterEntity {
+//   getEntityFullStruct(): CharacterEntityFullStruct;
+//   getEntityMinStruct(): CharacterEntityMinStruct;
+//   getId(): string;
+//   getOwnerId(): string;
+//   isPlayer(): boolean;
+//   isBot(): boolean;
+// }
 
-export interface BaseEntityStruct {
-  x: number;
-  y: number;
-  entityType: EntityType;
-  entityShape: EntityShape;
-  id: string;
-  ownerId: string;
-  rotation: number;
-}
+// export interface EngineProjectileEntity {}
 
-export interface ConsumableEntityStruct {
-  baseEntityStruct: BaseEntityStruct;
-  amount: number;
-}
+// export interface EngineConsumableEntity {
+//   getEntityBaseStruct(): BaseEntityStruct;
+//   amount: number;
+// }
 
-export interface CharacterMovementStruct {
-  canWalk: boolean;
-  canRun: boolean;
-  walkSpeed: number;
-  runSpeed: number;
-  movementDelay: number;
-  vitality: number;
-  vitalityConsumptionPerSec: number;
-  vitalityRegenPerSec: number;
-}
+// export interface DeleteConsumableEntityTask {
+//   entityId: string;
+//   takenByCharacterId: string;
+// }
 
-export interface MeleeStruct {
-  aoe: boolean;
-  shape: EntityShape;
-}
-
-export interface ProjectileStruct {
-  aoe: boolean;
-  penetration: boolean;
-  speed: number;
-  travelDistance: number;
-  projectiles: number;
-  shape: EntityShape;
-  aoeShape?: EntityShape;
-}
-
-export interface CharacterActionStruct {
-  actionType: CharacterActionType;
-  damage: number;
-  inputDelay: number;
-  meleeStruct?: MeleeStruct;
-  projectileStruct?: ProjectileStruct;
-}
-
-export interface CharacterEntityFullStruct {
-  base: BaseEntityStruct;
-  health: number;
-  movement: CharacterMovementStruct;
-  actionMain: CharacterActionStruct;
-  action1: CharacterActionStruct;
-  action2: CharacterActionStruct;
-  action3: CharacterActionStruct;
-  actionUltimate: CharacterActionStruct;
-}
-
-export interface CharacterEntityMinStruct {
-  id: string;
-  x: number;
-  y: number;
-  health: number;
-  side: Side;
-}
-
-export interface BaseEntityStruct {
-  x: number;
-  y: number;
-  entityType: EntityType;
-  entityShape: EntityShape;
-  id: string;
-  ownerId: string;
-  rotation: number;
-}
-
-export interface EngineCharacterEntity {
-  getEntityFullStruct(): CharacterEntityFullStruct;
-  getEntityMinStruct(): CharacterEntityMinStruct;
-  getId(): string;
-  getOwnerId(): string;
-  isPlayer(): boolean;
-  isBot(): boolean;
-}
-
-export interface EngineProjectileEntity {}
-
-export interface EngineConsumableEntity {
-  getEntityBaseStruct(): BaseEntityStruct;
-  amount: number;
-}
-
-export interface DeleteConsumableEntityTask {
-  entityId: string;
-  takenByCharacterId: string;
-}
-
-export interface CharacterActionCallbackParams {
-  entityId: string;
-  actionType: CharacterActionType;
-  shape: EntityShape;
-  hurtEntities: string[];
-  deadEntities: string[];
-}
-
-export interface CreateCharacterMinStruct {
-  id: string;
-  ownerId: string;
-  x: number;
-  y: number;
-  entityType: EntityType;
-}
-
-export interface PlayerInputCommand {
-  index?: number;
-  actionType: CharacterActionType;
-  movAngle: number;
-  userId: string;
-}
-
-export enum GameState {
-  PLAYING = 1,
-  WIN = 2,
-}
+// export enum GameState {
+//   PLAYING = 1,
+//   WIN = 2,
+// }

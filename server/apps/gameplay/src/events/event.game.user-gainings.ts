@@ -1,5 +1,11 @@
-import { UserGainings } from '@app/seidh-common/seidh-common.game-types';
 import { EventGameBase } from './event.game.base';
+
+export interface UserGainings {
+  userId: string;
+  gameId: string;
+  kills: number;
+  tokens: number;
+}
 
 export class EventGameUserGainings implements EventGameBase {
   public static readonly EventName = 'game.user-gainings';

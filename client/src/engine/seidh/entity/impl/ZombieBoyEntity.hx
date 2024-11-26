@@ -18,7 +18,7 @@ class ZombieBoyEntity extends SeidhBaseEntity {
         final defaultSpeed = 3;
         final additionalRndSpeed = MathUtils.randomIntInRange(0, 7);
 
-        var speedFactor = 10;
+        var speedFactor = 0;
 
         switch (additionalRndSpeed) {
             case 0:
@@ -42,7 +42,12 @@ class ZombieBoyEntity extends SeidhBaseEntity {
                 x: struct.x, 
                 y: struct.y,
                 entityType: EntityType.ZOMBIE_BOY,
-                entityShape: {width: 200, height: 260, rectOffsetX: 0, rectOffsetY: 0},
+                entityShape: {
+                    width: 200,
+                    height: 260,
+                    rectOffsetX: 0,
+                    rectOffsetY: 0
+                },
                 id: struct.id,
                 ownerId: struct.ownerId,
                 rotation: 0
@@ -60,7 +65,12 @@ class ZombieBoyEntity extends SeidhBaseEntity {
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: false,
-                    shape: {width: 300, height: 400, rectOffsetX: 0, rectOffsetY: 0},
+                    shape: {
+                        width: 300,
+                        height: 400,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0
+                    },
                 }
             }
         });

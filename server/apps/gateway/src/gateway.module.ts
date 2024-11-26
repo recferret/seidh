@@ -9,19 +9,17 @@ import { ControllerGameplay } from './controllers/controller.gameplay';
 import { ControllerAuth } from './controllers/controller.auth';
 import { ControllerBoost } from './controllers/controller.boost';
 import { ControllerFriends } from './controllers/controller.friends';
-import { ControllerUser } from './controllers/controller.user';
-import { ServiceAuth } from './services/service.auth';
+import { ControllerUsers } from './controllers/controller.users';
 import { ServiceBoost } from './services/service.boost';
 import { ServiceFriends } from './services/service.friends';
 import { ServiceGame } from './services/service.game';
 import { ServiceGameplay } from './services/service.gameplay';
-import { ServiceUser } from './services/service.user';
-import { MicroserviceAuth } from '@app/seidh-common/microservice/microservice.auth';
+import { ServiceUsers } from './services/service.users';
 import { MicroserviceBoost } from '@app/seidh-common/microservice/microservice.boost';
 import { MicroserviceFriends } from '@app/seidh-common/microservice/microservice.friends';
 import { MicroserviceGame } from '@app/seidh-common/microservice/microservice.game';
 import { MicroserviceGameplay } from '@app/seidh-common/microservice/microservice.gameplay';
-import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.user';
+import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
 
 @Module({
   imports: [
@@ -72,21 +70,19 @@ import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.us
     ControllerFriends,
     ControllerGame,
     ControllerGameplay,
-    ControllerUser,
+    ControllerUsers,
   ],
   providers: [
-    MicroserviceAuth,
     MicroserviceBoost,
     MicroserviceFriends,
     MicroserviceGame,
     MicroserviceGameplay,
-    MicroserviceUser,
-    ServiceAuth,
+    MicroserviceUsers,
     ServiceBoost,
     ServiceFriends,
     ServiceGame,
     ServiceGameplay,
-    ServiceUser,
+    ServiceUsers,
   ],
 })
 export class GatewayModule {}

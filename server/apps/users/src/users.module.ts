@@ -2,10 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '@app/seidh-common/schemas/user/schema.user';
 import { JwtModule } from '@nestjs/jwt';
-import {
-  Character,
-  CharacterSchema,
-} from '@app/seidh-common/schemas/character/schema.character';
 import { InternalProtocol, ServiceName } from '@app/seidh-common';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { ConfigModule } from '@nestjs/config';
@@ -21,6 +17,7 @@ import { ServiceAuth } from './services/service.auth';
 import { ServiceFriends } from './services/service.friends';
 import { ServiceUser } from './services/service.user';
 import { ProviderCrypto } from './providers/provider.crypto';
+import { MicroserviceCharacter } from '@app/seidh-common/microservice/microservice.characters';
 
 @Module({
   imports: [
@@ -28,7 +25,6 @@ import { ProviderCrypto } from './providers/provider.crypto';
     MongooseModule.forRoot(InternalProtocol.MongoUrl),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      { name: Character.name, schema: CharacterSchema },
       {
         name: GameGainingTransaction.name,
         schema: GameGainingTransactionSchema,
@@ -48,6 +44,13 @@ import { ProviderCrypto } from './providers/provider.crypto';
         },
       },
       {
+        name: ServiceName.Characters,
+        transport: Transport.NATS,
+        options: {
+          servers: [InternalProtocol.NatsUrl],
+        },
+      },
+      {
         name: ServiceName.WsGateway,
         transport: Transport.NATS,
         options: {
@@ -56,7 +59,17 @@ import { ProviderCrypto } from './providers/provider.crypto';
       },
     ]),
   ],
-  controllers: [ControllerAuth, ControllerFriends, ControllerUser],
-  providers: [ProviderCrypto, ServiceAuth, ServiceFriends, ServiceUser],
+  controllers: [
+    ControllerAuth,
+    ControllerFriends,
+    ControllerUser
+  ],
+  providers: [
+    MicroserviceCharacter,
+    ProviderCrypto,
+    ServiceAuth,
+    ServiceFriends,
+    ServiceUser,
+  ],
 })
 export class UsersModule {}

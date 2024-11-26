@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ReferralUpdateReferrerMessageRequest } from '@app/seidh-common/dto/referral/referral.update.referrer.msg';
+import {
+  ReferralServiceUpdateReferrerRequest,
+  ReferralServiceUpdateReferrerResponse,
+} from '@app/seidh-common/dto/referral/referral.update-referrer.msg';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ReferralConfig } from '@app/seidh-common/schemas/user/schema.referral';
@@ -17,37 +20,45 @@ export class ReferralService {
     return this.referralConfigModel.findOne();
   }
 
-  async updateReferrer(message: ReferralUpdateReferrerMessageRequest) {
-    const { referrer, newUser } = message;
+  async updateReferrer(request: ReferralServiceUpdateReferrerRequest) {
+    const response: ReferralServiceUpdateReferrerResponse = {
+      success: false,
+    };
 
-    if (referrer) {
-      const {
-        referrerPremiumRewardTokens,
-        referrerNoPremiumRewardTokens,
-        referralPremiumRewardTokens,
-        referralNoPremiumRewardTokens,
-      } = await this.getReferrerConfig();
+    // try {
+    //   if (request.referrer) {
+    //     const {
+    //       referrerPremiumRewardTokens,
+    //       referrerNoPremiumRewardTokens,
+    //       referralPremiumRewardTokens,
+    //       referralNoPremiumRewardTokens,
+    //     } = await this.getReferrerConfig();
 
-      referrer.friendsInvited.push(newUser._id);
+    //     referrer.friendsInvited.push(newUser._id);
 
-      if (this.isProd) {
-        // Give some bonus to the referrer
-        referrer.virtualTokenBalance += newUser.telegramPremium
-          ? referrerPremiumRewardTokens
-          : referrerNoPremiumRewardTokens;
+    //     if (this.isProd) {
+    //       // Give some bonus to the referrer
+    //       referrer.virtualTokenBalance += newUser.telegramPremium
+    //         ? referrerPremiumRewardTokens
+    //         : referrerNoPremiumRewardTokens;
 
-        // Give some bonus to the referral
-        newUser.virtualTokenBalance = newUser.telegramPremium
-          ? referralPremiumRewardTokens
-          : referralNoPremiumRewardTokens;
-      } else {
-        // Give some bonus to the referrer
-        referrer.virtualTokenBalance += referrerNoPremiumRewardTokens;
+    //       // Give some bonus to the referral
+    //       newUser.virtualTokenBalance = newUser.telegramPremium
+    //         ? referralPremiumRewardTokens
+    //         : referralNoPremiumRewardTokens;
+    //     } else {
+    //       // Give some bonus to the referrer
+    //       referrer.virtualTokenBalance += referrerNoPremiumRewardTokens;
 
-        // Give some bonus to the referral
-        newUser.virtualTokenBalance = referralNoPremiumRewardTokens;
-      }
-      return { referrer, newUser };
-    }
+    //       // Give some bonus to the referral
+    //       newUser.virtualTokenBalance = referralNoPremiumRewardTokens;
+    //     }
+    //     return { referrer, newUser };
+    //   }
+    // } catch () {
+
+    // }
+
+    return response;
   }
 }

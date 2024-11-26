@@ -146,7 +146,6 @@ export class WsGatewayController {
 
   @MessagePattern(WsGatewayUserBalancePattern)
   userBalance(data: WsGatewayUserBalanceMsg) {
-    Logger.log(data);
     this.wsGatewayWsController.broadcast(WsProtocolMessage.UserrBalance, data);
   }
 }

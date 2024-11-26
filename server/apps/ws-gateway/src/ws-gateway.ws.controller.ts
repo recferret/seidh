@@ -93,7 +93,10 @@ export class WsGatewayWsController implements OnModuleInit {
             const request: GameplayServiceDisconnectedMessage = {
               userId,
             };
-            this.gameplayService.emit(GameplayServiceDisconnectedPattern, request);
+            this.gameplayService.emit(
+              GameplayServiceDisconnectedPattern,
+              request,
+            );
 
             this.userSockets.delete(this.socketIdToUserId.get(socket.id));
             this.socketIdToUserId.delete(socket.id);

@@ -9,7 +9,6 @@ typedef UserBody = {
 	userId: String,
 	coins: Int,
 	teeth: Int,
-	boostsOwned: Array<String>,
 };
 
 typedef BoostBody = {
@@ -49,9 +48,9 @@ class Player {
 	public var userName: String;
 	public var coins: Int;
 	public var teeth: Int;
-	public var boostsOwned: Array<String>;
 
 	public final boosts = new Array<BoostBody>();
+	public final boostsOwned = new Array<String>();
 
 	private var inputIndex = 0;
 
@@ -64,21 +63,32 @@ class Player {
 		userName = 'USER 1';
 		coins = userData.coins;
 		teeth = userData.teeth;
-		boostsOwned = userData.boostsOwned;
 	}
 
 	public function setBoostData(boostData:Array<BoostBody>) {
+		boostsOwned.resize(0);
+
 		for (boost in boostData) {
 			boosts.push(boost);
+
+			if (boost.levelOneAccquired) {
+				boostsOwned.push(boost.levelOneId);
+			}
+			if (boost.levelTwoAccquired) {
+				boostsOwned.push(boost.levelTwoId);
+			}
+			if (boost.levelThreeAccquired) {
+				boostsOwned.push(boost.levelThreeId);
+			}
 		}
 	}
 
-	public function getStatsLevel() {
-		if (boostsOwned.contains(BoostContent.STATS_3))
+	public function getExpLevel() {
+		if (boostsOwned.contains(BoostContent.EXP_3))
 			return 3;
-		if (boostsOwned.contains(BoostContent.STATS_2))
+		if (boostsOwned.contains(BoostContent.EXP_2))
 			return 2;
-		if (boostsOwned.contains(BoostContent.STATS_1))
+		if (boostsOwned.contains(BoostContent.EXP_1))
 			return 1;
 		return 0;
 	}
@@ -89,6 +99,46 @@ class Player {
 		if (boostsOwned.contains(BoostContent.WEALTH_2))
 			return 2;
 		if (boostsOwned.contains(BoostContent.WEALTH_1))
+			return 1;
+		return 0;
+	}
+
+	public function getAttackLevel() {
+		if (boostsOwned.contains(BoostContent.ATTACK_3))
+			return 3;
+		if (boostsOwned.contains(BoostContent.ATTACK_2))
+			return 2;
+		if (boostsOwned.contains(BoostContent.ATTACK_1))
+			return 1;
+		return 0;
+	}
+
+	public function getMonstersLevel() {
+		if (boostsOwned.contains(BoostContent.MONSTERS_3))
+			return 3;
+		if (boostsOwned.contains(BoostContent.MONSTERS_2))
+			return 2;
+		if (boostsOwned.contains(BoostContent.MONSTERS_1))
+			return 1;
+		return 0;
+	}
+
+	public function getItemsLevel() {
+		if (boostsOwned.contains(BoostContent.ITEMS_DROP_3))
+			return 3;
+		if (boostsOwned.contains(BoostContent.ITEMS_DROP_2))
+			return 2;
+		if (boostsOwned.contains(BoostContent.ITEMS_DROP_1))
+			return 1;
+		return 0;
+	}
+
+	public function getStatsLevel() {
+		if (boostsOwned.contains(BoostContent.STATS_3))
+			return 3;
+		if (boostsOwned.contains(BoostContent.STATS_2))
+			return 2;
+		if (boostsOwned.contains(BoostContent.STATS_1))
 			return 1;
 		return 0;
 	}

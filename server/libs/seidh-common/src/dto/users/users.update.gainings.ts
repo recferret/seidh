@@ -1,4 +1,4 @@
-import { UserGainings } from '@app/seidh-common/seidh-common.game-types';
+import { UserGainings } from "apps/gameplay/src/events/event.game.user-gainings";
 
 export const UsersUpdateGainingsPattern = 'users.update.gainings';
 

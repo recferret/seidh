@@ -1,4 +1,4 @@
-import { CharacterActionType } from '@app/seidh-common/seidh-common.game-types';
+import { CharacterActionType } from '../types/types.engine';
 
 export const GameplayServiceInputPattern = 'gameplay.input';
 

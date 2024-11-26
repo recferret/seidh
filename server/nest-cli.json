@@ -86,13 +86,13 @@
         "tsConfigPath": "apps/boost/tsconfig.app.json"
       }
     },
-    "character": {
+    "characters": {
       "type": "application",
-      "root": "apps/character",
+      "root": "apps/characters",
       "entryFile": "main",
-      "sourceRoot": "apps/character/src",
+      "sourceRoot": "apps/characters/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/character/tsconfig.app.json"
+        "tsConfigPath": "apps/characters/tsconfig.app.json"
       }
     },
     "referral": {

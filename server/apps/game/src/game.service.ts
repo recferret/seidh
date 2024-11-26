@@ -14,7 +14,7 @@ import {
   GameServiceStartGameRequest,
   GameServiceStartGameResponse,
 } from '@app/seidh-common/dto/game/game.start-game.msg';
-import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.user';
+import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.users';
 import {
   Game,
   GameDocument,

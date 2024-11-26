@@ -10,4 +10,4 @@ COPY ./apps/ ./apps
 
 RUN npm i
 
-CMD npm run start:character:prod
+CMD npm run start:characters:prod
