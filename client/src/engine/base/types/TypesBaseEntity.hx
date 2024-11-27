@@ -163,8 +163,6 @@ typedef CharacterEntityMinStruct = {
 	?health:Int,
 	?side: Side,
     ?entityType:EntityType,
-	?statsModifier:Float,
-	?pickUpModifier:Float,
 }
 
 typedef CharacterEntityFullStruct = {

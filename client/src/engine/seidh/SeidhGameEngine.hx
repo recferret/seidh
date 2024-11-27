@@ -472,7 +472,7 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function spawnMobs() {
-        final player = characterEntityManager.getEntityById("entity_" + localPlayerId);
+        final player = characterEntityManager.getEntityById(localPlayerId);
         if (player != null) {
             final spawnMob = aiManager.spawnMob(player.getX(), player.getY());
             if (spawnMob.spawn) {

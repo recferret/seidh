@@ -1,5 +1,7 @@
 package game.scene.impl.game;
 
+import engine.base.types.TypesBaseEntity.CharacterActionType;
+import engine.base.types.TypesBaseEntity.EntityType;
 import engine.base.geometry.Rectangle;
 import engine.base.types.TypesBaseEngine;
 import engine.seidh.SeidhGameEngine;
@@ -36,17 +38,43 @@ class GameScene extends BasicScene implements EventListener {
 
             BasicScene.NetworkingInstance.findAndJoinGame();
 		} else if (engineMode == EngineMode.CLIENT_SINGLEPLAYER) {
-			createCharacterEntityFromMinimalStruct(
-				Player.instance.userEntityId, 
-				Player.instance.userId, 
-				Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].x), 
-				Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].y), 
-				RAGNAR_LOH,
-				1,
-				1,
-			);
+			// final playerCharacter = Player.instance.
+
+			createCharacterEntityFromFullStruct({
+				base: {
+					x: Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].x),
+					y: Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].y),
+					entityType: EntityType.RAGNAR_LOH,
+					entityShape: SeidhGameEngine.CHARACTERS_CONFIG.ragnarLoh.entityShape,
+					id: Player.instance.currentCharacter.id,
+					ownerId: Player.instance.userInfo.userId,
+				},
+				movement: {
+					canRun: SeidhGameEngine.CHARACTERS_CONFIG.ragnarLoh.movement.canRun,
+					inputDelay: SeidhGameEngine.CHARACTERS_CONFIG.ragnarLoh.movement.inputDelay,
+					runSpeed: Player.instance.currentCharacter.movement.runSpeed,
+					speedFactor: Player.instance.currentCharacter.movement.speedFactor,
+				},
+				health: Player.instance.currentCharacter.health,
+				actionMain: {
+					actionType: CharacterActionType.ACTION_MAIN,
+					damage: Player.instance.currentCharacter.actionMain.damage,
+					inputDelay: Player.instance.currentCharacter.actionMain.inputDelay,
+					meleeStruct: {
+						aoe: Player.instance.currentCharacter.actionMain.meleeStruct.aoe,
+						shape: {
+							width: Player.instance.currentCharacter.actionMain.meleeStruct.shape.width,
+							height: Player.instance.currentCharacter.actionMain.meleeStruct.shape.height,
+							rectOffsetX: Player.instance.currentCharacter.actionMain.meleeStruct.shape.rectOffsetX,
+							rectOffsetY: Player.instance.currentCharacter.actionMain.meleeStruct.shape.rectOffsetY,
+							radius: 0,
+						},
+					},
+				},
+			});
+
 			seidhGameEngine.allowMobsSpawn(true);
-			seidhGameEngine.setLocalPlayerId(Player.instance.userId);
+			seidhGameEngine.setLocalPlayerId(Player.instance.currentCharacter.id);
 		}
 
 		SoundManager.instance.playGameplayTheme();
@@ -195,7 +223,7 @@ class GameScene extends BasicScene implements EventListener {
 		for (characterStruct in payload.charactersFullStruct ) {
 			seidhGameEngine.createCharacterEntityFromFullStruct(characterStruct);
 		}
-		seidhGameEngine.setLocalPlayerId(Player.instance.userId);
+		seidhGameEngine.setLocalPlayerId(Player.instance.userInfo.userId);
 	}
 
 	private function processLoopStateEvent(payload:LoopStatePayload) {
@@ -233,7 +261,7 @@ class GameScene extends BasicScene implements EventListener {
 
 	private function processCharacterActions(payload:ActionsPayload) {
 		for (action in payload.actions) {
-			if (action.entityId != Player.instance.userEntityId) {
+			if (action.entityId != Player.instance.currentCharacter.id) {
 				seidhGameEngine.setCharacterNextActionToPerform(action.entityId, action.actionType);
 			}
 		}

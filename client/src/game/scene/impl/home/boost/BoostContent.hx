@@ -437,12 +437,12 @@ class BoostContent extends BasicHomeContent implements EventListener {
         var currencyTypeValue = 'coins';
 
         if (currencyType == CurrencyType.Coins) {
-            if (Player.instance.coins - price < 0) {
+            if (Player.instance.userInfo.coins - price < 0) {
                 hasEnoughMoney = false;
             }
         } else if (currencyType == CurrencyType.Teeth) {
             currencyTypeValue = 'teeth';
-            if (Player.instance.teeth - price < 0) {
+            if (Player.instance.userInfo.teeth - price < 0) {
                 hasEnoughMoney = false;
             }
         }

@@ -5,10 +5,38 @@ import game.scene.impl.home.boost.BoostContent.CurrencyType;
 import game.scene.impl.home.boost.BoostContent.BoostType;
 import game.js.NativeWindowJS;
 
+
+typedef UserCharacter = {
+	id: String,
+	levelCurrent: Int,
+	levelMax: Int,
+	expCurrent: Int,
+	expTillNewLevel: Int,
+	health: Int,
+	movement: {
+		runSpeed: Int,
+		speedFactor: Int,
+	},
+	actionMain: {
+		damage: Int,
+		inputDelay: Float,
+		meleeStruct: {
+			aoe: Bool,
+			shape: {
+				width: Int,
+				height: Int,
+				rectOffsetX: Int,
+				rectOffsetY: Int,
+			},
+		}
+	}
+};
+
 typedef UserBody = {
 	userId: String,
 	coins: Int,
 	teeth: Int,
+	characters: Array<UserCharacter>,
 };
 
 typedef BoostBody = {
@@ -43,11 +71,10 @@ class Player {
 
 	public static final instance: Player = new Player();
 
-	public var userId: String;
-	public var userEntityId: String;
+	// TODO move name to user struct
 	public var userName: String;
-	public var coins: Int;
-	public var teeth: Int;
+	public var currentCharacter: UserCharacter;
+	public var userInfo: UserBody; 
 
 	public final boosts = new Array<BoostBody>();
 	public final boostsOwned = new Array<String>();
@@ -57,12 +84,12 @@ class Player {
 	private function new() {
 	}
 
-	public function setUserData(userData:Dynamic) {
-		userId = userData.userId;
-		userEntityId = 'entity_' + userData.userId;
+	public function setUserData(userData:UserBody) {
 		userName = 'USER 1';
-		coins = userData.coins;
-		teeth = userData.teeth;
+
+		userInfo = userData;
+
+		currentCharacter = userData.characters[0];
 	}
 
 	public function setBoostData(boostData:Array<BoostBody>) {

@@ -63,7 +63,7 @@ class SceneManager implements EventListener {
 				currentScene = new HomeScene();
 				changeSceneCallback();
 			case EventManager.EVENT_REF_SHARE:
-				NativeWindowJS.tgShareMyRefLink(Player.instance.userId);
+				NativeWindowJS.tgShareMyRefLink(Player.instance.userInfo.userId);
 			default:
 		}
 	}

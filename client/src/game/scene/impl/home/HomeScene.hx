@@ -159,11 +159,11 @@ class HomeScene extends BasicScene implements EventListener {
 		friendsTextIcon.setPosition(100, 120);
 		
 		coinsTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_COINS), Right, 10);
-		coinsTextIcon.setText(Std.string(Player.instance.coins));
+		coinsTextIcon.setText(Std.string(Player.instance.userInfo.coins));
 		coinsTextIcon.setPosition(Main.ActualScreenWidth - 90, 80);
 
 		teethTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_TEETH), Right, 5);
-		teethTextIcon.setText(Std.string(Player.instance.teeth));
+		teethTextIcon.setText(Std.string(Player.instance.userInfo.teeth));
 		teethTextIcon.setPosition(Main.ActualScreenWidth - 90, 120);
 	}
 
@@ -471,11 +471,11 @@ class HomeScene extends BasicScene implements EventListener {
 	}
 
 	private function processUserBalanceEvent(payload:UserBalancePayload) {
-		Player.instance.coins = payload.coins;
-		Player.instance.teeth = payload.teeth;
+		Player.instance.userInfo.coins = payload.coins;
+		Player.instance.userInfo.teeth = payload.teeth;
 
-		coinsTextIcon.setText(Std.string(Player.instance.coins));
-		teethTextIcon.setText(Std.string(Player.instance.teeth));
+		coinsTextIcon.setText(Std.string(Player.instance.userInfo.coins));
+		teethTextIcon.setText(Std.string(Player.instance.userInfo.teeth));
 	}
 
 }

@@ -54,10 +54,7 @@ class LoadingScene extends BasicScene {
                 final uuid = Uuid.short().toLowerCase();
                 Player.instance.setUserData({
                     userId: uuid,
-                    characters: [{
-                        id: 'entity_' + uuid
-                    }],
-                    authToken: Uuid.short().toLowerCase(),
+                    characters: [],
                     coins: 1000,
                     teeth: 1000,
                 });

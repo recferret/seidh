@@ -86,7 +86,7 @@ abstract class BasicScene extends h2d.Scene {
 				final character = new ClientCharacterEntity(this, characterEntity);
 				clientCharacterEntities.set(character.getId(), character);
 
-				if (character.getOwnerId() == Player.instance.userId) {
+				if (character.getOwnerId() == Player.instance.userInfo.userId) {
 					playerEntity = character;
 					NativeWindowJS.trackGameStarted();
 				}
@@ -163,7 +163,7 @@ abstract class BasicScene extends h2d.Scene {
 
 				if (BasicScene.NetworkingInstance != null) {
 					for (input in seidhGameEngine.validatedInputCommands) {
-						if (input.userId == Player.instance.userId) {
+						if (input.userId == Player.instance.userInfo.userId) {
 							inputsSent++;
 							BasicScene.NetworkingInstance.input(input);
 						}
@@ -201,7 +201,7 @@ abstract class BasicScene extends h2d.Scene {
 			this.seidhGameEngine.gameStateCallback = function callback(gameState:GameState) {
 				if (gameState == GameState.WIN) {
 					NativeWindowJS.trackGameWin();
-					gameUiScene.showWinDialog(this.seidhGameEngine.getPlayerGainings(Player.instance.userId).kills);
+					gameUiScene.showWinDialog(this.seidhGameEngine.getPlayerGainings(Player.instance.userInfo.userId).kills);
 				} else {
 					haxe.Timer.delay(function delay() {
 						NativeWindowJS.trackGameLose();
@@ -382,8 +382,8 @@ abstract class BasicScene extends h2d.Scene {
 	}
 
 	private function addInputCommand(characterActionType:CharacterActionType, moveAngle:Float = 0) {
-		final userId = Player.instance.userId;
-		final userEntityId = Player.instance.userEntityId;
+		final userId = Player.instance.userInfo.userId;
+		final userEntityId = Player.instance.currentCharacter.id;
 
 		final allowInput = characterActionType == CharacterActionType.MOVE ? 
 			seidhGameEngine.checkLocalMovementInputAllowance(userEntityId) :
@@ -398,16 +398,18 @@ abstract class BasicScene extends h2d.Scene {
 	// Entities
 	// ----------------------------------
 
-	public function createCharacterEntityFromMinimalStruct(id:String, ownerId:String, x:Int, y:Int, entityType:EntityType, statsModifier:Float = 1.0, pickUpModifier:Float = 1.0) {
+	public function createCharacterEntityFromMinimalStruct(id:String, ownerId:String, x:Int, y:Int, entityType:EntityType) {
 		seidhGameEngine.createCharacterEntityFromMinimalStruct({
 			id: id, 
 			ownerId: ownerId, 
 			x: x, 
 			y: y,
 			entityType: entityType,
-			statsModifier: statsModifier,
-			pickUpModifier: pickUpModifier,
 		});
+	}
+
+	public function createCharacterEntityFromFullStruct(struct:CharacterEntityFullStruct) {
+		seidhGameEngine.createCharacterEntityFromFullStruct(struct);
 	}
 
 	function deleteCharacterByDeathAnimationEnd(characterId:String) {
