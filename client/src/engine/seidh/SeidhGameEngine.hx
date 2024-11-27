@@ -21,8 +21,8 @@ import engine.seidh.types.TypesSeidhGame;
 @:expose
 class SeidhGameEngine extends BaseEngine {
 
-    public static var ZOMBIE_DAMAGE = 5;
     public static final GameWorldSize = 5000;
+
     public static final GAME_CONFIG:GameConfig = {
         // Mobs spawn
 	    mobsMaxAtTheSameTime: 1,
@@ -47,6 +47,105 @@ class SeidhGameEngine extends BaseEngine {
         wealthLevel1CoinsMultiplier: 2,
         wealthLevel2CoinsMultiplier: 3,
         wealthLevel3CoinsMultiplier: 4,
+    };
+
+    public static final CHARACTERS_CONFIG:CharacterDefaultConfigs = {
+        ragnarLoh: {
+            type: EntityType.RAGNAR_LOH,
+            movement: {
+                canRun: false,
+                runSpeed: 40,
+                speedFactor: 10,
+                inputDelay: 0.100,
+            },
+            entityShape: {
+                width: 180,
+                height: 260,
+                rectOffsetX: 0,
+                rectOffsetY: 0,
+                radius: 150,
+            },
+            actionMain: {
+                actionType: CharacterActionType.ACTION_MAIN,
+                damage: 5,
+                inputDelay: 1,
+                meleeStruct: {
+                    aoe: true,
+                    shape: {
+                        width: 350, 
+                        height: 260, 
+                        rectOffsetX: 175 - 90, 
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
+                }
+            },
+            health: 100,
+        },
+        zombieBoy: {
+            type: EntityType.ZOMBIE_BOY,
+            movement: {
+                canRun: false,
+                runSpeed: 3,
+                speedFactor: 10,
+                inputDelay: 0.100,
+            },
+            entityShape: {
+                width: 200,
+                height: 260,
+                rectOffsetX: 0,
+                rectOffsetY: 0,
+                radius: 0,
+            },
+            actionMain: {
+                actionType: CharacterActionType.ACTION_MAIN,
+                damage: 5,
+                inputDelay: 1,
+                meleeStruct: {
+                    aoe: false,
+                    shape: {
+                        width: 200,
+                        height: 260,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
+                }
+            },
+            health: 10,
+        },
+        zombieGirl: {
+            type: EntityType.ZOMBIE_GIRL,
+            movement: {
+                canRun: false,
+                runSpeed: 3,
+                speedFactor: 10,
+                inputDelay: 0.100,
+            },
+            entityShape: {
+                width: 200,
+                height: 260,
+                rectOffsetX: 0,
+                rectOffsetY: 0,
+                radius: 0,
+            },
+            actionMain: {
+                actionType: CharacterActionType.ACTION_MAIN,
+                damage: 5,
+                inputDelay: 1,
+                meleeStruct: {
+                    aoe: false,
+                    shape: {
+                        width: 300,
+                        height: 380,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
+                }
+            },
+            health: 10,
+        },
     };
 
     private var lastDt = 0.0;
@@ -536,10 +635,6 @@ class SeidhGameEngine extends BaseEngine {
     // ---------------------------------------------------
     // Setters
     // ---------------------------------------------------
-
-    public function setZombieDamage(damage:Int) {
-        SeidhGameEngine.ZOMBIE_DAMAGE = damage;
-    }
 
     public function setGameState(gameState:GameState) {
         this.gameState = gameState;

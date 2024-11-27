@@ -448,14 +448,16 @@ class BoostContent extends BasicHomeContent implements EventListener {
         }
 
         function positiveCallback1():Void {
-            NativeWindowJS.networkBuyBoost(nextBoostId, function callback(data:Dynamic) {
-                if (data.success) {
-                    Player.instance.setBoostData(data.boosts);
-                    EventManager.instance.notify(EventManager.EVENT_INVALIDATE_BOOSTS, { boostId: currentBoostId.split('_')[0] });
-                } else {
-                    // TODO impl alert
-                }
-            });
+            if (hasEnoughMoney) {
+                NativeWindowJS.networkBuyBoost(nextBoostId, function callback(data:Dynamic) {
+                    if (data.success) {
+                        Player.instance.setBoostData(data.boosts);
+                        EventManager.instance.notify(EventManager.EVENT_INVALIDATE_BOOSTS, { boostId: currentBoostId.split('_')[0] });
+                    } else {
+                        // TODO impl alert
+                    }
+                });
+            }
         }
 
         DialogManager.ShowDialog(

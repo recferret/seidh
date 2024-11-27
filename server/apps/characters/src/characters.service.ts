@@ -165,7 +165,7 @@ export class CharactersService {
           levelMax: 10,
           expCurrent: 0,
           expTillNewLevel: 1000,
-          health: 100,
+          health: 10,
           entityShape: {
             width: 200,
             height: 260,
@@ -199,7 +199,7 @@ export class CharactersService {
           levelMax: 10,
           expCurrent: 0,
           expTillNewLevel: 1000,
-          health: 100,
+          health: 10,
           entityShape: {
             width: 200,
             height: 260,

@@ -15,7 +15,6 @@ class ZombieBoyEntity extends SeidhCharacterEntity {
 	// ------------------------------------------------
 
     public static function GenerateObjectEntity(struct:CharacterEntityMinStruct) {
-        final defaultSpeed = 3;
         final additionalRndSpeed = MathUtils.randomIntInRange(0, 7);
 
         var speedFactor = 0;
@@ -37,45 +36,26 @@ class ZombieBoyEntity extends SeidhCharacterEntity {
                 speedFactor = 15;
         }
 
-        return new CharacterEntity({
+        final entity = new CharacterEntity({
             base: {
                 x: struct.x, 
                 y: struct.y,
                 entityType: EntityType.ZOMBIE_BOY,
-                entityShape: {
-                    width: 200,
-                    height: 260,
-                    rectOffsetX: 0,
-                    rectOffsetY: 0,
-                    radius: 0,
-                },
+                entityShape: SeidhGameEngine.CHARACTERS_CONFIG.zombieBoy.entityShape,
                 id: struct.id,
                 ownerId: struct.ownerId,
                 rotation: 0
             },
-            health: 10,
-            movement: {
-                canRun: true,
-                runSpeed: defaultSpeed + additionalRndSpeed,
-                speedFactor: speedFactor,
-                inputDelay: 0.100,
-            },
-            actionMain: {
-                actionType: CharacterActionType.ACTION_MAIN,
-                damage: SeidhGameEngine.ZOMBIE_DAMAGE,
-                inputDelay: 1,
-                meleeStruct: {
-                    aoe: false,
-                    shape: {
-                        width: 300,
-                        height: 400,
-                        rectOffsetX: 0,
-                        rectOffsetY: 0,
-                        radius: 0,
-                    },
-                }
-            }
+            health: SeidhGameEngine.CHARACTERS_CONFIG.zombieBoy.health,
+            movement: SeidhGameEngine.CHARACTERS_CONFIG.zombieBoy.movement,
+            actionMain: SeidhGameEngine.CHARACTERS_CONFIG.zombieBoy.actionMain,
         });
+
+        entity.actionMain.actionType = CharacterActionType.ACTION_MAIN;
+        entity.movement.canRun = false;
+        entity.movement.runSpeed += additionalRndSpeed;
+
+        return entity;
     }
     
 }

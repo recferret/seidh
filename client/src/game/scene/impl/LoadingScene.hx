@@ -134,6 +134,9 @@ class LoadingScene extends BasicScene {
 
     private function processGetCharactersDefaultParamsCallback(data:Dynamic) {
         if (data != null) {
+            SeidhGameEngine.CHARACTERS_CONFIG.ragnarLoh = data.ragnarLoh;
+            SeidhGameEngine.CHARACTERS_CONFIG.zombieBoy = data.zombieBoy;
+            SeidhGameEngine.CHARACTERS_CONFIG.zombieGirl = data.zombieGirl;
         } else {
             trace('processGetCharactersDefaultParamsCallback error');
         }
