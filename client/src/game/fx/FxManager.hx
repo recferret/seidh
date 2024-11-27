@@ -2,8 +2,7 @@ package game.fx;
 
 import h2d.Anim;
 
-import engine.base.BaseTypesAndClasses;
-
+import engine.base.types.TypesBaseEntity;
 import game.Res.SeidhResource;
 
 // TODO rmk and use objects pool

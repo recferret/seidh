@@ -15,13 +15,15 @@ import game.scene.GameUiScene.ButtonPressed;
 import game.sound.SoundManager;
 import game.terrain.TerrainManager;
 
-import engine.base.BaseTypesAndClasses;
 import engine.base.MathUtils;
 import engine.base.core.BaseEngine.GameState;
 import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
+import engine.base.types.TypesBaseEntity;
+import engine.base.types.TypesBaseMultiplayer;
 import engine.seidh.SeidhGameEngine;
+import engine.seidh.types.TypesSeidhGame;
 
 import motion.Actuate;
 

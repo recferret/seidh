@@ -2,10 +2,11 @@ package engine.seidh.entity.base;
 
 import haxe.Int32;
 import engine.base.Utils.EngineUtils;
-import engine.base.BaseTypesAndClasses;
 import engine.base.entity.impl.EngineCharacterEntity;
+import engine.base.types.TypesBaseEntity;
+import engine.base.types.TypesBaseMultiplayer;
 
-class SeidhBaseEntity extends EngineCharacterEntity {
+class SeidhCharacterEntity extends EngineCharacterEntity {
 
     public function new(characterEntity:CharacterEntity) {
         super(characterEntity);

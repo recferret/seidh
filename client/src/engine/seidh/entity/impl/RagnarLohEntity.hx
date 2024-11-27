@@ -1,9 +1,9 @@
 package engine.seidh.entity.impl;
 
-import engine.base.BaseTypesAndClasses;
-import engine.seidh.entity.base.SeidhBaseEntity;
+import engine.base.types.TypesBaseEntity;
+import engine.seidh.entity.base.SeidhCharacterEntity;
 
-class RagnarLohEntity extends SeidhBaseEntity {
+class RagnarLohEntity extends SeidhCharacterEntity {
 
     public function new(characterEntity:CharacterEntity) {
         super(characterEntity);
@@ -48,6 +48,7 @@ class RagnarLohEntity extends SeidhBaseEntity {
                         height: 260, 
                         rectOffsetX: 175 - 90, 
                         rectOffsetY: 0,
+                        radius: 0,
                     },
                 }
             },
@@ -66,6 +67,7 @@ class RagnarLohEntity extends SeidhBaseEntity {
                         height: 10, 
                         rectOffsetX: 0, 
                         rectOffsetY: 0,
+                        radius: 0,
                     },
                 },
             },
@@ -79,8 +81,20 @@ class RagnarLohEntity extends SeidhBaseEntity {
                     speed: 10,
                     travelDistance: 200,
                     projectiles: 1,
-                    aoeShape: {width: 100, height: 100, rectOffsetX: 0, rectOffsetY: 0},
-                    shape: {width: 25, height: 25, rectOffsetX: 0, rectOffsetY: 0},
+                    aoeShape: {
+                        width: 100,
+                        height: 100,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
+                    shape: {
+                        width: 25,
+                        height: 25,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
                 },
             },
             action3: {
@@ -89,7 +103,13 @@ class RagnarLohEntity extends SeidhBaseEntity {
                 inputDelay: 3,
                 meleeStruct: {
                     aoe: true,
-                    shape: {width: 100, height: 100, rectOffsetX: 0, rectOffsetY: 0},
+                    shape: {
+                        width: 100,
+                        height: 100,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
                 }
             }
         });

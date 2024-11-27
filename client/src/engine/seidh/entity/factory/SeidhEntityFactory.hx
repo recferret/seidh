@@ -1,16 +1,16 @@
 package engine.seidh.entity.factory;
 
-import engine.base.BaseTypesAndClasses;
 import engine.base.entity.impl.EngineConsumableEntity;
+import engine.base.types.TypesBaseEntity;
 import engine.seidh.entity.impl.RagnarLohEntity;
 import engine.seidh.entity.impl.ZombieBoyEntity;
 import engine.seidh.entity.impl.ZombieGirlEntity;
-import engine.seidh.entity.base.SeidhBaseEntity;
+import engine.seidh.entity.base.SeidhCharacterEntity;
 
 class SeidhEntityFactory {
 
     public static function InitiateCharacter(struct:CharacterEntityMinStruct) {
-        var entity:SeidhBaseEntity = null;
+        var entity:SeidhCharacterEntity = null;
         switch (struct.entityType) {
             case RAGNAR_LOH:
                 entity = new RagnarLohEntity(RagnarLohEntity.GenerateObjectEntity(struct));
@@ -24,7 +24,7 @@ class SeidhEntityFactory {
     }
 
     public static function InitiateCharacterFromFullStruct(struct:CharacterEntityFullStruct) {
-        var entity:SeidhBaseEntity = null;
+        var entity:SeidhCharacterEntity = null;
         switch (struct.base.entityType) {
             case RAGNAR_LOH:
                 entity = new RagnarLohEntity(new CharacterEntity(struct));
@@ -48,6 +48,7 @@ class SeidhEntityFactory {
                 height: 50,
                 rectOffsetX: 0,
                 rectOffsetY: 40,
+                radius: 0,
             },
         }), amount);
     }
@@ -63,21 +64,23 @@ class SeidhEntityFactory {
                 height: 60,
                 rectOffsetX: 0,
                 rectOffsetY: 0,
+                radius: 0,
             },
         }), amount);
     }
 
-    public static function InitiateLosos(?id:String, x:Int, y:Int, amount:Int) {
+    public static function InitiateSalmon(?id:String, x:Int, y:Int, amount:Int) {
         return new EngineConsumableEntity(new BaseEntity({
             id: id,
             x: x,
             y: y,
-            entityType: EntityType.LOSOS,
+            entityType: EntityType.SALMON,
             entityShape: {
                 width: 80,
                 height: 65,
                 rectOffsetX: 0,
                 rectOffsetY: 0,
+                radius: 0,
             },
         }), amount);
     }

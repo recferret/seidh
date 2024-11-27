@@ -3,7 +3,6 @@ package engine.seidh;
 import engine.base.geometry.Point;
 import js.lib.Date;
 
-import engine.base.BaseTypesAndClasses;
 import engine.base.EngineConfig;
 import engine.base.MathUtils;
 import engine.base.entity.base.EngineBaseEntity;
@@ -11,8 +10,13 @@ import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.core.BaseEngine;
-import engine.seidh.entity.base.SeidhBaseEntity;
+import engine.base.types.TypesBaseEngine;
+import engine.base.types.TypesBaseEntity;
+import engine.base.types.TypesBaseMultiplayer;
+
+import engine.seidh.entity.base.SeidhCharacterEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
+import engine.seidh.types.TypesSeidhGame;
 
 @:expose
 class SeidhGameEngine extends BaseEngine {
@@ -113,7 +117,7 @@ class SeidhGameEngine extends BaseEngine {
 			final input = cast(i.playerInputCommand, PlayerInputCommand);
 			final inputInitiator = input.userId;
 			final entityId = playerToEntityMap.get(inputInitiator);
-			final entity = cast(characterEntityManager.getEntityById(entityId), SeidhBaseEntity);
+			final entity = cast(characterEntityManager.getEntityById(entityId), SeidhCharacterEntity);
 
 			if (entity == null || entity.getOwnerId() != inputInitiator) {
 				continue;
@@ -500,9 +504,7 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     public function getPlayersCount() {
-        return 
-            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length +
-            characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_NORM).length;
+        return characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length;
     }
 
     public function getPlayerGainings(playerId:String) {

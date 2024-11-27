@@ -1,7 +1,9 @@
 package game.network;
 
 import engine.base.core.BaseEngine.GameState;
-import engine.base.BaseTypesAndClasses;
+import engine.base.types.TypesBaseEntity;
+import engine.base.types.TypesBaseMultiplayer;
+
 import game.event.EventManager;
 import game.js.NativeWindowJS;
 

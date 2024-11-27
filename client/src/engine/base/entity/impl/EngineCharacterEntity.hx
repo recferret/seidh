@@ -2,10 +2,11 @@ package engine.base.entity.impl;
 
 import haxe.Int32;
 import uuid.Uuid;
-import engine.base.BaseTypesAndClasses;
+
 import engine.base.entity.base.EngineBaseEntity;
 import engine.base.geometry.Point;
 import engine.base.geometry.Line;
+import engine.base.types.TypesBaseEntity;
 
 interface GameEntityCustomUpdate {
 	public function onUpdate():Void;

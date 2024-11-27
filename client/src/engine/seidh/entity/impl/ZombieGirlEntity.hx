@@ -1,10 +1,10 @@
 package engine.seidh.entity.impl;
 
 import engine.base.MathUtils;
-import engine.base.BaseTypesAndClasses;
-import engine.seidh.entity.base.SeidhBaseEntity;
+import engine.base.types.TypesBaseEntity;
+import engine.seidh.entity.base.SeidhCharacterEntity;
 
-class ZombieGirlEntity extends SeidhBaseEntity {
+class ZombieGirlEntity extends SeidhCharacterEntity {
 
     public function new(characterEntity:CharacterEntity) {
         super(characterEntity);
@@ -41,7 +41,13 @@ class ZombieGirlEntity extends SeidhBaseEntity {
                 x: struct.x, 
                 y: struct.y,
                 entityType: EntityType.ZOMBIE_GIRL,
-                entityShape: {width: 200, height: 260, rectOffsetX: 0, rectOffsetY: 0},
+                entityShape: {
+                    width: 200,
+                    height: 260,
+                    rectOffsetX: 0,
+                    rectOffsetY: 0,
+                    radius: 0,
+                },
                 id: struct.id,
                 ownerId: struct.ownerId,
                 rotation: 0
@@ -59,7 +65,13 @@ class ZombieGirlEntity extends SeidhBaseEntity {
                 inputDelay: 1,
                 meleeStruct: {
                     aoe: false,
-                    shape: {width: 300, height: 380, rectOffsetX: 0, rectOffsetY: 0},
+                    shape: {
+                        width: 300,
+                        height: 380,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
                 }
             }
         });

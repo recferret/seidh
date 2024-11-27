@@ -1,9 +1,10 @@
 package game.entity.character;
 
 import engine.base.geometry.Rectangle;
-import engine.base.BaseTypesAndClasses;
 import engine.base.geometry.Point;
 import engine.base.entity.impl.EngineCharacterEntity;
+import engine.base.types.TypesBaseEntity;
+import engine.seidh.types.TypesSeidhEntity;
 
 import game.entity.character.animation.CharacterAnimations;
 import game.fx.FxManager;
@@ -150,8 +151,6 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
         switch (getEntityType()) {
             case RAGNAR_LOH:
                 SoundManager.instance.playVikingDeath();
-            case RAGNAR_NORM:
-                SoundManager.instance.playVikingDeath();
             case ZOMBIE_BOY:
                 SoundManager.instance.playZombieDeath();
             case ZOMBIE_GIRL:
@@ -177,8 +176,6 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
         switch (getEntityType()) {
             case RAGNAR_LOH:
         		return new Rectangle(x, y, 221, 285, 0);
-            case RAGNAR_NORM:
-		        return new Rectangle(x, y, 221, 285, 0);
             case ZOMBIE_BOY:
 		        return new Rectangle(x, y, 160, 235, 0);
             case ZOMBIE_GIRL:
@@ -192,8 +189,6 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
         switch (getEntityType()) {
             case RAGNAR_LOH:
         		return new Rectangle(x, y + 215 / 2, 221, 40, 0);
-            case RAGNAR_NORM:
-		        return new Rectangle(x, y + 215 / 2, 221, 40, 0);
             case ZOMBIE_BOY:
 		        return new Rectangle(x, y + 190 / 2, 160, 40, 0);
             case ZOMBIE_GIRL:

@@ -1,7 +1,8 @@
 package engine.base.entity.base;
 
-import engine.base.BaseTypesAndClasses.EntityType;
 import js.lib.Map;
+
+import engine.base.types.TypesBaseEntity;
 
 class EngineBaseEntityManager {
 	public final entities = new js.lib.Map<String, EngineBaseEntity>();

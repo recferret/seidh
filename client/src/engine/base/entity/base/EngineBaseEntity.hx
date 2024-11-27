@@ -3,8 +3,8 @@ package engine.base.entity.base;
 import haxe.Int32;
 
 import engine.base.geometry.Circle;
-import engine.base.BaseTypesAndClasses;
 import engine.base.geometry.Rectangle;
+import engine.base.types.TypesBaseEntity;
 
 abstract class EngineBaseEntity {
 
@@ -79,7 +79,7 @@ abstract class EngineBaseEntity {
 	}
 
 	public function isPlayer() {
-		return baseEntity.entityType == EntityType.RAGNAR_LOH || baseEntity.entityType == EntityType.RAGNAR_NORM;
+		return baseEntity.entityType == EntityType.RAGNAR_LOH;
 	}
 
 	public function isBot() {

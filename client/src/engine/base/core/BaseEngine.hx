@@ -1,7 +1,9 @@
 package engine.base.core;
 
-import engine.base.BaseTypesAndClasses;
 import engine.base.core.GameLoop;
+import engine.base.types.TypesBaseEngine;
+import engine.base.types.TypesBaseEntity;
+import engine.base.types.TypesBaseMultiplayer;
 import engine.base.entity.base.EngineBaseEntityManager;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.entity.impl.EngineConsumableEntity;
@@ -213,7 +215,7 @@ abstract class BaseEngine {
 	function processCreateCharacterQueue() {
 		for (queueTask in createCharacterEntityQueue) {
 			characterEntityManager.add(queueTask.entity);
-			if (queueTask.entity.getEntityType() == RAGNAR_LOH || queueTask.entity.getEntityType() == RAGNAR_NORM) {
+			if (queueTask.entity.getEntityType() == RAGNAR_LOH) {
 				playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
 			}
 			if (createCharacterCallback != null) {

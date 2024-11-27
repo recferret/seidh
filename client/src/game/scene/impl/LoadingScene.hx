@@ -44,6 +44,9 @@ class LoadingScene extends BasicScene {
                     function getGameConfigCallback(data:Dynamic) {
                         processGetGameConfigCallback(data);
                     },
+                    function getCharactersDefaultParamsCallback(data:Dynamic) {
+                        processGetCharactersDefaultParamsCallback(data);
+                    },
                 );
             }
         } else {
@@ -69,6 +72,9 @@ class LoadingScene extends BasicScene {
                     },
                     function getGameConfigCallback(data:Dynamic) {
                         processGetGameConfigCallback(data);
+                    },
+                    function getCharactersDefaultParamsCallback(data:Dynamic) {
+                        processGetCharactersDefaultParamsCallback(data);
                     },
                 );
             }
@@ -123,6 +129,13 @@ class LoadingScene extends BasicScene {
             SeidhGameEngine.GAME_CONFIG.wealthLevel3CoinsMultiplier = data.wealthLevel3CoinsMultiplier;
         } else {
             trace('processGetGameConfigCallback error');
+        }
+    }
+
+    private function processGetCharactersDefaultParamsCallback(data:Dynamic) {
+        if (data != null) {
+        } else {
+            trace('processGetCharactersDefaultParamsCallback error');
         }
     }
 

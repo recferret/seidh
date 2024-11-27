@@ -1,7 +1,7 @@
 package game.scene.impl.game;
 
 import engine.base.geometry.Rectangle;
-import engine.base.BaseTypesAndClasses;
+import engine.base.types.TypesBaseEngine;
 import engine.seidh.SeidhGameEngine;
 import engine.seidh.entity.factory.SeidhEntityFactory;
 
@@ -221,8 +221,8 @@ class GameScene extends BasicScene implements EventListener {
 				seidhGameEngine.createConsumableEntity(SeidhEntityFactory.InitiateCoin(consumableStruct.id, consumableStruct.x, consumableStruct.y, payload.consumableEntityStruct.amount));
 			case HEALTH_POTION:
 				seidhGameEngine.createConsumableEntity(SeidhEntityFactory.InitiateHealthPotion(consumableStruct.id, consumableStruct.x, consumableStruct.y, payload.consumableEntityStruct.amount));
-			case LOSOS:
-				seidhGameEngine.createConsumableEntity(SeidhEntityFactory.InitiateLosos(consumableStruct.id, consumableStruct.x, consumableStruct.y, payload.consumableEntityStruct.amount));
+			case SALMON:
+				seidhGameEngine.createConsumableEntity(SeidhEntityFactory.InitiateSalmon(consumableStruct.id, consumableStruct.x, consumableStruct.y, payload.consumableEntityStruct.amount));
 			default:
 		}
 	}

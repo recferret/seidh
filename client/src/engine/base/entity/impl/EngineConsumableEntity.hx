@@ -1,9 +1,9 @@
 package engine.base.entity.impl;
 
 import uuid.Uuid;
-import engine.base.BaseTypesAndClasses;
-import engine.base.entity.base.EngineBaseEntity;
 
+import engine.base.entity.base.EngineBaseEntity;
+import engine.base.types.TypesBaseEntity;
 class EngineConsumableEntity extends EngineBaseEntity {
 
 	public var amount:Int;

@@ -1,10 +1,10 @@
 package engine.seidh.entity.impl;
 
 import engine.base.MathUtils;
-import engine.base.BaseTypesAndClasses;
-import engine.seidh.entity.base.SeidhBaseEntity;
+import engine.base.types.TypesBaseEntity;
+import engine.seidh.entity.base.SeidhCharacterEntity;
 
-class ZombieBoyEntity extends SeidhBaseEntity {
+class ZombieBoyEntity extends SeidhCharacterEntity {
 
     public function new(characterEntity:CharacterEntity) {
         super(characterEntity);
@@ -46,7 +46,8 @@ class ZombieBoyEntity extends SeidhBaseEntity {
                     width: 200,
                     height: 260,
                     rectOffsetX: 0,
-                    rectOffsetY: 0
+                    rectOffsetY: 0,
+                    radius: 0,
                 },
                 id: struct.id,
                 ownerId: struct.ownerId,
@@ -69,7 +70,8 @@ class ZombieBoyEntity extends SeidhBaseEntity {
                         width: 300,
                         height: 400,
                         rectOffsetX: 0,
-                        rectOffsetY: 0
+                        rectOffsetY: 0,
+                        radius: 0,
                     },
                 }
             }

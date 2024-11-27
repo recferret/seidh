@@ -3,12 +3,10 @@ package game.entity.character.animation;
 import h2d.Anim;
 import h2d.Tile;
 
-import engine.base.BaseTypesAndClasses.CharacterAnimationState;
-import engine.base.BaseTypesAndClasses.EntityType;
-import engine.base.BaseTypesAndClasses.Side;
+import engine.base.types.TypesBaseEntity;
+import engine.seidh.types.TypesSeidhEntity;
 
 import game.event.EventManager;
-
 import game.Res.SeidhResource;
 
 class CharacterAnimation {

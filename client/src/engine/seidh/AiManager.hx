@@ -1,8 +1,8 @@
 package engine.seidh;
 
-import engine.base.BaseTypesAndClasses.EntityType;
 import engine.base.MathUtils;
 import engine.base.geometry.Point;
+import engine.base.types.TypesBaseEntity;
 
 typedef SpawnMob = {
 	spawn:Bool,

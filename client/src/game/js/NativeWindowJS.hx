@@ -1,6 +1,6 @@
 package game.js;
 
-import engine.base.BaseTypesAndClasses.CharacterActionType;
+import engine.base.types.TypesBaseEntity;
 
 enum abstract YandexMetricsGoals(String) {
 	var JoinSinglePlayerGame = 'JoinSinglePlayerGame';
@@ -17,7 +17,8 @@ extern class NativeWindowJS {
         referrerId:String,
         userCallback:Dynamic->Void,
         boostCallback:Dynamic->Void,
-        gameConfigCallback:Dynamic->Void
+        gameConfigCallback:Dynamic->Void,
+        getCharactersDefaultParamsCallback:Dynamic->Void
     ):Void;
     static function networkWsInit(callback:Dynamic->Void):Void;
     static function networkFindAndJoinGame(gameType:String):Void;

@@ -1,13 +1,15 @@
 package game.scene.impl;
 
-import game.utils.Utils;
+import hxd.Key in K;
+
+import engine.base.types.TypesBaseEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
-import engine.base.BaseTypesAndClasses.EntityType;
+
+import game.utils.Utils;
 import game.entity.character.ClientCharacterEntity;
 import game.scene.base.BasicScene;
 import game.terrain.TerrainManager;
 
-import hxd.Key in K;
 
 class MapSceneTest extends BasicScene {
 

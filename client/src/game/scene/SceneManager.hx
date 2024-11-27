@@ -1,6 +1,6 @@
 package game.scene;
 
-import engine.base.BaseTypesAndClasses;
+import engine.base.types.TypesBaseEngine;
 
 import game.event.EventManager;
 import game.js.NativeWindowJS;

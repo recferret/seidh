@@ -24,7 +24,7 @@ class ClientConsumableEntity extends BasicClientEntity<EngineConsumableEntity> {
                 bmp.setScale(2);
             case HEALTH_POTION:
                 bmp = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.POTION_RED), this);
-            case LOSOS:
+            case SALMON:
                 bmp = new h2d.Bitmap(TilemapManager.instance.getTile(TileType.SALMON), this);
             default:
         }
