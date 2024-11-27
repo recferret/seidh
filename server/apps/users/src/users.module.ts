@@ -18,6 +18,7 @@ import { ServiceFriends } from './services/service.friends';
 import { ServiceUser } from './services/service.user';
 import { ProviderCrypto } from './providers/provider.crypto';
 import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
+import { Character, CharacterSchema } from '@app/seidh-common/schemas/character/schema.character';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MicroserviceCharacters } from '@app/seidh-common/microservice/microserv
     MongooseModule.forRoot(InternalProtocol.MongoUrl),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
+      { name: Character.name, schema: CharacterSchema },
       {
         name: GameGainingTransaction.name,
         schema: GameGainingTransactionSchema,

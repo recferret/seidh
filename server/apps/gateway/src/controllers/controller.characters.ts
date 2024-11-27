@@ -10,8 +10,7 @@ export class ControllerCharacters {
 
   @Get('by-user')
   @UseGuards(AuthGuard)
-  getByUser(@Session() session: IUserSession) {
-  }
+  getByUser(@Session() session: IUserSession) {}
 
   @Get('default-params')
   @UseGuards(AuthGuard)
@@ -21,6 +20,8 @@ export class ControllerCharacters {
 
   @Get('level-up')
   @UseGuards(AuthGuard)
-  levelUp(@Session() session: IUserSession, @Body() req: CharacterServiceLevelUpRequestDto) {
-  }
+  levelUp(
+    @Session() session: IUserSession,
+    @Body() req: CharacterServiceLevelUpRequestDto,
+  ) {}
 }

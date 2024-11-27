@@ -1,6 +1,7 @@
-import { CharacterParams } from "../types/types.character";
+import { CharacterParams } from '../types/types.character';
 
-export const CharactersServiceGetDefaultParamsPattern = 'characters.get-default-params';
+export const CharactersServiceGetDefaultParamsPattern =
+  'characters.get-default-params';
 
 export interface CharactersServiceGetDefaultParamsResponse {
   success: boolean;

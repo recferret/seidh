@@ -10,7 +10,7 @@ import {
 } from '@app/seidh-common/schemas/game/schema.game-progress';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.users';
+import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
 import {
   GameConfig,
   GameConfigSchema,
@@ -36,6 +36,6 @@ import {
     ScheduleModule.forRoot(),
   ],
   controllers: [GameController],
-  providers: [MicroserviceUser, GameService],
+  providers: [MicroserviceUsers, GameService],
 })
 export class GameModule {}

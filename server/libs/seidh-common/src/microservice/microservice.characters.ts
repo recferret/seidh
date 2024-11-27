@@ -19,7 +19,7 @@ import {
 } from '../dto/characters/characters.level-up.msg';
 import {
   CharactersServiceGetDefaultParamsResponse,
-  CharactersServiceGetDefaultParamsPattern 
+  CharactersServiceGetDefaultParamsPattern,
 } from '../dto/characters/characters.get-default-params.msg';
 
 @Injectable()
@@ -43,9 +43,13 @@ export class MicroserviceCharacters {
   }
 
   async getDefaultParams() {
-    const response: CharactersServiceGetDefaultParamsResponse = await firstValueFrom(
-      this.charactersService.send(CharactersServiceGetDefaultParamsPattern, {}),
-    );
+    const response: CharactersServiceGetDefaultParamsResponse =
+      await firstValueFrom(
+        this.charactersService.send(
+          CharactersServiceGetDefaultParamsPattern,
+          {},
+        ),
+      );
     return response;
   }
 

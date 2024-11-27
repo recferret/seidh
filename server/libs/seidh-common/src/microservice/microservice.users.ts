@@ -11,10 +11,10 @@ import {
   UsersUpdateGainingsServiceMessage,
   UsersUpdateGainingsPattern,
 } from '../dto/users/users.update.gainings';
-import { 
+import {
   UsersAuthenticateServiceRequest,
   UsersAuthenticateServiceResponse,
-  UsersAuthenticatePattern 
+  UsersAuthenticatePattern,
 } from '../dto/users/users.authenticate.msg';
 
 @Injectable()

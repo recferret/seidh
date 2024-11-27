@@ -4,9 +4,7 @@ import { CharacterServiceGetDefaultParamsResponseDto } from '../dto/character/ch
 
 @Injectable()
 export class ServiceCharacters {
-  constructor(
-    private microserviceCharacters: MicroserviceCharacters,
-  ) {}
+  constructor(private microserviceCharacters: MicroserviceCharacters) {}
 
   async getDefaultParams() {
     const result = await this.microserviceCharacters.getDefaultParams();
@@ -21,7 +19,5 @@ export class ServiceCharacters {
     return response;
   }
 
-  async levelUp() {
-
-  }
+  async levelUp() {}
 }

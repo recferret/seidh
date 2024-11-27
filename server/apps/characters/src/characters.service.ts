@@ -1,8 +1,17 @@
-import { CharactersServiceCreateRequest, CharactersServiceCreateResponse } from '@app/seidh-common/dto/characters/characters.create.msg';
-import { CharactersServiceGetByIdsRequest, CharactersServiceGetByIdsResponse } from '@app/seidh-common/dto/characters/characters.get-by-ids.msg';
+import {
+  CharactersServiceCreateRequest,
+  CharactersServiceCreateResponse,
+} from '@app/seidh-common/dto/characters/characters.create.msg';
+import {
+  CharactersServiceGetByIdsRequest,
+  CharactersServiceGetByIdsResponse,
+} from '@app/seidh-common/dto/characters/characters.get-by-ids.msg';
 import { CharactersServiceGetDefaultParamsResponse } from '@app/seidh-common/dto/characters/characters.get-default-params.msg';
 import { CharactersServicelevelUpRequest } from '@app/seidh-common/dto/characters/characters.level-up.msg';
-import { CharacterType, CharacterParams } from '@app/seidh-common/dto/types/types.character';
+import {
+  CharacterType,
+  CharacterParams,
+} from '@app/seidh-common/dto/types/types.character';
 import { Character } from '@app/seidh-common/schemas/character/schema.character';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,7 +19,6 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class CharactersService {
-
   constructor(
     @InjectModel(Character.name) private characterModel: Model<Character>,
   ) {}
@@ -21,7 +29,9 @@ export class CharactersService {
     };
 
     try {
-      const charParams = this.getBasicCharacterParamsByType(request.characterType);
+      const charParams = this.getBasicCharacterParamsByType(
+        request.characterType,
+      );
       const newCharacter = await this.characterModel.create({
         type: request.characterType,
         levelCurrent: charParams.levelCurrent,
@@ -52,7 +62,11 @@ export class CharactersService {
     };
 
     try {
-      const chars = await this.characterModel.find().where('_id').in(request.ids).exec();
+      const chars = await this.characterModel
+        .find()
+        .where('_id')
+        .in(request.ids)
+        .exec();
       response.characterParams = chars.map((char) => {
         const params: CharacterParams = {
           type: char.type,
@@ -84,9 +98,15 @@ export class CharactersService {
     };
 
     try {
-      response.ragnarLoh = this.getBasicCharacterParamsByType(CharacterType.RagnarLoh);
-      response.zombieBoy = this.getBasicCharacterParamsByType(CharacterType.ZombieBoy);
-      response.zombieGirl = this.getBasicCharacterParamsByType(CharacterType.ZombieGirl);
+      response.ragnarLoh = this.getBasicCharacterParamsByType(
+        CharacterType.RagnarLoh,
+      );
+      response.zombieBoy = this.getBasicCharacterParamsByType(
+        CharacterType.ZombieBoy,
+      );
+      response.zombieGirl = this.getBasicCharacterParamsByType(
+        CharacterType.ZombieGirl,
+      );
       response.success = true;
     } catch (error) {
       Logger.log({
@@ -98,12 +118,12 @@ export class CharactersService {
     return response;
   }
 
-  async levelUp(request: CharactersServicelevelUpRequest) {
-    
-  }
+  async levelUp(request: CharactersServicelevelUpRequest) {}
 
-  private getBasicCharacterParamsByType(characterType: CharacterType): CharacterParams {
-    switch(characterType) {
+  private getBasicCharacterParamsByType(
+    characterType: CharacterType,
+  ): CharacterParams {
+    switch (characterType) {
       case CharacterType.RagnarLoh:
         return {
           type: CharacterType.RagnarLoh,
@@ -122,7 +142,7 @@ export class CharactersService {
           movement: {
             runSpeed: 40,
             speedFactor: 10,
-            inputDelay: 0.100,
+            inputDelay: 0.1,
           },
           actionMain: {
             damage: 5,
@@ -156,7 +176,7 @@ export class CharactersService {
           movement: {
             runSpeed: 3,
             speedFactor: 10,
-            inputDelay: 0.100,
+            inputDelay: 0.1,
           },
           actionMain: {
             damage: 5,
@@ -190,7 +210,7 @@ export class CharactersService {
           movement: {
             runSpeed: 3,
             speedFactor: 10,
-            inputDelay: 0.100,
+            inputDelay: 0.1,
           },
           actionMain: {
             damage: 5,
@@ -204,7 +224,7 @@ export class CharactersService {
                 rectOffsetY: 0,
               },
             },
-          }
+          },
         };
     }
   }

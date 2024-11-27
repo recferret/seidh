@@ -14,7 +14,7 @@ import {
   GameServiceStartGameRequest,
   GameServiceStartGameResponse,
 } from '@app/seidh-common/dto/game/game.start-game.msg';
-import { MicroserviceUser } from '@app/seidh-common/microservice/microservice.users';
+import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
 import {
   Game,
   GameDocument,
@@ -46,7 +46,7 @@ export class GameService implements OnModuleInit {
   private gameConfig: GameServiceGetGameConfigResponse;
 
   constructor(
-    private microserviceUser: MicroserviceUser,
+    private microserviceUsers: MicroserviceUsers,
     @InjectModel(Game.name)
     private gameModel: Model<Game>,
     @InjectModel(GameProgress.name)
@@ -330,7 +330,7 @@ export class GameService implements OnModuleInit {
     await game.save();
 
     if (game.userGainings.size > 0) {
-      await this.microserviceUser.updateGainings({
+      await this.microserviceUsers.updateGainings({
         userGainings: {
           userId: game.userIds[0],
           gameId: game.id,

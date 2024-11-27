@@ -1,4 +1,4 @@
-import { CharacterParams } from "../types/types.character";
+import { CharacterParams } from '../types/types.character';
 
 export const CharactersServiceGetByIdsPattern = 'characters.get-by-ids';
 

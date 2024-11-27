@@ -1,4 +1,8 @@
-import { CharacterType, CharacterMovementStruct, CharacterActionStruct } from "../types/types.character";
+import {
+  CharacterType,
+  CharacterMovementStruct,
+  CharacterActionStruct,
+} from '../types/types.character';
 
 export const UsersGetUserPattern = 'users.get.user';
 

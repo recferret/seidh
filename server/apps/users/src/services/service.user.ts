@@ -58,8 +58,24 @@ export class ServiceUser {
             expCurrent: c.expCurrent,
             expTillNewLevel: c.expTillNewLevel,
             health: c.health,
-            movement: c.movement,
-            actionMain: c.actionMain,
+            movement: {
+              runSpeed: c.movement.runSpeed,
+              speedFactor: c.movement.speedFactor,
+              inputDelay: c.movement.inputDelay,
+            },
+            actionMain: {
+              damage: c.actionMain.damage,
+              inputDelay: c.actionMain.inputDelay,
+              meleeStruct: {
+                aoe: c.actionMain.meleeStruct.aoe,
+                shape: {
+                  width: c.actionMain.meleeStruct.shape.width,
+                  height: c.actionMain.meleeStruct.shape.height,
+                  rectOffsetX: c.actionMain.meleeStruct.shape.rectOffsetX,
+                  rectOffsetY: c.actionMain.meleeStruct.shape.rectOffsetY,
+                },
+              },
+            },
           };
           return character;
         }),

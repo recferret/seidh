@@ -163,7 +163,6 @@ export class ServiceAuth {
     // const notTheSameUser = this.isProd
     //   ? referrer.telegramId != telegramId
     //   : referrer.login != login;
-
     // if (referrer && notTheSameUser) {
     //   const { referrer: updatedReferrer, newUser: updatedNewUser } =
     //     await firstValueFrom(

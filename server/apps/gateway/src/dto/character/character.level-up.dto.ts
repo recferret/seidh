@@ -1,6 +1,3 @@
-export class CharacterServiceLevelUpRequestDto {
-}
-  
-export class CharacterServiceLevelUpResponseDto {
-}
-  
+export class CharacterServiceLevelUpRequestDto {}
+
+export class CharacterServiceLevelUpResponseDto {}
