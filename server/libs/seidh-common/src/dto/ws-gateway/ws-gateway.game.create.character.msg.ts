@@ -1,4 +1,4 @@
-import { CharacterEntityFullStruct } from '@app/seidh-common/seidh-common.game-types';
+import { CharacterEntityFullStruct } from '@app/seidh-common/seidh-common.boost-constants';
 import { WsGatewayGameBaseMsg } from './ws-gateway.game.base.msg';
 
 export const WsGatewayGameCreateCharacterPattern =

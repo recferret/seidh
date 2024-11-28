@@ -2,6 +2,7 @@ import {
   CharacterType,
   CharacterMovementStruct,
   CharacterActionStruct,
+  CharacterEntityShape,
 } from '../types/types.character';
 
 export const UsersGetUserPattern = 'users.get.user';
@@ -15,6 +16,7 @@ export interface CharacterBody {
   expCurrent: number;
   expTillNewLevel: number;
   health: number;
+  entityShape: CharacterEntityShape;
   movement: CharacterMovementStruct;
   actionMain: CharacterActionStruct;
 }

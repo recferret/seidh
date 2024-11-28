@@ -8,6 +8,7 @@ import {
 import { UsersUpdateGainingsServiceMessage } from '@app/seidh-common/dto/users/users.update.gainings';
 import { GameGainingTransaction } from '@app/seidh-common/schemas/game/schema.game-gaining.transaction';
 import { User } from '@app/seidh-common/schemas/user/schema.user';
+import { SeidhCommonBoostConstants } from '@app/seidh-common/seidh-common.boost-constants';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
@@ -49,6 +50,8 @@ export class ServiceUser {
         teeth: user.teeth,
 
         characters: user.characters.map((c: any) => {
+          const statsMultiplier = SeidhCommonBoostConstants.GetStatsMultiplierByLevel(this.getUserStatsLevel(user.boostsOwned));
+
           const character: CharacterBody = {
             id: c.id,
             type: c.type,
@@ -57,7 +60,14 @@ export class ServiceUser {
             levelMax: c.levelMax,
             expCurrent: c.expCurrent,
             expTillNewLevel: c.expTillNewLevel,
-            health: c.health,
+            health: c.health * statsMultiplier,
+            entityShape: {
+              width: c.entityShape.width,
+              height: c.entityShape.height,
+              rectOffsetX: c.entityShape.rectOffsetX,
+              rectOffsetY: c.entityShape.rectOffsetY,
+              radius: c.entityShape.radius,
+            },
             movement: {
               runSpeed: c.movement.runSpeed,
               speedFactor: c.movement.speedFactor,
@@ -126,4 +136,64 @@ export class ServiceUser {
       );
     }
   }
+
+  private getUserExpLevel(boostsOwned: string[]) {
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_EXP_3_ID))
+			return 3;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_EXP_2_ID))
+			return 2;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_EXP_1_ID))
+			return 1;
+		return 0;
+	}
+
+	private getUserWealthLevel(boostsOwned: string[]) {
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_WEALTH_3_ID))
+			return 3;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_WEALTH_2_ID))
+			return 2;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_WEALTH_1_ID))
+			return 1;
+		return 0;
+	}
+
+	private getUserAttackLevel(boostsOwned: string[]) {
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ATTACK_3_ID))
+			return 3;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ATTACK_2_ID))
+			return 2;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ATTACK_1_ID))
+			return 1;
+		return 0;
+	}
+
+	private getUserMonstersLevel(boostsOwned: string[]) {
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_MONSTERS_3_ID))
+			return 3;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_MONSTERS_2_ID))
+			return 2;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_MONSTERS_1_ID))
+			return 1;
+		return 0;
+	}
+
+	private getUserItemsLevel(boostsOwned: string[]) {
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ITEMS_DROP_3_ID))
+			return 3;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ITEMS_DROP_2_ID))
+			return 2;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ITEMS_DROP_1_ID))
+			return 1;
+		return 0;
+	}
+
+	private getUserStatsLevel(boostsOwned: string[]) {
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_STATS_3_ID))
+			return 3;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_STATS_2_ID))
+			return 2;
+		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_STATS_1_ID))
+			return 1;
+		return 0;
+	}
 }

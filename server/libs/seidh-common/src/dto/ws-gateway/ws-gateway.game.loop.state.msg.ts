@@ -1,4 +1,4 @@
-import { CharacterEntityMinStruct } from '@app/seidh-common/seidh-common.game-types';
+import { CharacterEntityMinStruct } from '@app/seidh-common/seidh-common.boost-constants';
 import { WsGatewayGameBaseMsg } from './ws-gateway.game.base.msg';
 
 export const WsGatewayGameLoopStatePattern = 'ws-gateway.game.loop.state';

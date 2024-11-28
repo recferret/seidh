@@ -61,6 +61,7 @@ export class GameService implements OnModuleInit {
     const mobsMaxPerGame = 500;
     const mobSpawnDelayMs = 2500;
 
+    // TODO move to boosts MS
     // Exp boost
     const expLevel1Multiplier = 1.5;
     const expLevel2Multiplier = 2;

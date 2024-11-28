@@ -2,13 +2,14 @@ let _currentGameId = undefined;
 let _currentGameplayServiceId = undefined;
 let _authToken = undefined;
 
-async function networkInit(telegramInitData, login, referrerId, userCallback, boostCallback, getGameConfigCallback) {
+async function networkInit(telegramInitData, login, referrerId, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback) {
     const authResponse = await restAuthenticate(telegramInitData, login, referrerId);
     if (authResponse.success) {
         _authToken = 'Bearer ' + authResponse.authToken;
         const userResponse = await restGetUser(_authToken)
         if (userResponse.success) {
             await networkGetGameConfig(getGameConfigCallback);
+            await networkGetCharactersDefaultParams(getCharactersDefaultParamsCallback);
             await networkGetBoosts(boostCallback);
             if (userCallback) {
                 userCallback(userResponse.user);
@@ -49,14 +50,25 @@ function networkInput(actionType, movAngle) {
 // REST wrappers
 // ----------------------------------
 
-async function networkGetGameConfig(getGameConfigCallback) {
-    const gameConfigResult = await restGetGameConfig(_authToken);
-    if (gameConfigResult.success) {
-        if (getGameConfigCallback) {
-            getGameConfigCallback(gameConfigResult);
+async function networkGetGameConfig(callback) {
+    const result = await restGetGameConfig(_authToken);
+    if (result.success) {
+        if (callback) {
+            callback(result);
         }
     } else {
         console.error('Failed to get game config');
+    }
+}
+
+async function networkGetCharactersDefaultParams(callback) {
+    const result = await restGetCharactersDefaultParams(_authToken);
+    if (result.success) {
+        if (callback) {
+            callback(result);
+        }
+    } else {
+        console.error('Failed to get characters default params');
     }
 }
 

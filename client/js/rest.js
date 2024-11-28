@@ -37,11 +37,15 @@ async function restAuthenticate(telegramInitData, login, referrerId) {
 }
 
 async function restGetUser(authToken) {
-    return await _getWrapper(restUrl + 'user', authToken);
+    return await _getWrapper(restUrl + 'users', authToken);
 }
 
 async function restGetGameConfig(authToken) {
     return await _getWrapper(restUrl + 'game/config', authToken);
+}
+
+async function restGetCharactersDefaultParams(authToken) {
+    return await _getWrapper(restUrl + 'characters/default-params', authToken);
 }
 
 async function restGetBoosts(authToken) {

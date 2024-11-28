@@ -18,7 +18,10 @@ import { ServiceFriends } from './services/service.friends';
 import { ServiceUser } from './services/service.user';
 import { ProviderCrypto } from './providers/provider.crypto';
 import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
-import { Character, CharacterSchema } from '@app/seidh-common/schemas/character/schema.character';
+import {
+  Character,
+  CharacterSchema,
+} from '@app/seidh-common/schemas/character/schema.character';
 
 @Module({
   imports: [
@@ -61,11 +64,7 @@ import { Character, CharacterSchema } from '@app/seidh-common/schemas/character/
       },
     ]),
   ],
-  controllers: [
-    ControllerAuth,
-    ControllerFriends,
-    ControllerUser
-  ],
+  controllers: [ControllerAuth, ControllerFriends, ControllerUser],
   providers: [
     MicroserviceCharacters,
     ProviderCrypto,
