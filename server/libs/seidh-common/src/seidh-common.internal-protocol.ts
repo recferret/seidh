@@ -35,6 +35,6 @@ export enum ServiceName {
   Game = 'GameService',
 }
 
-export const NatsUrl = `nats://localhost:4222`;
-// export const NatsUrl = `nats://nats:4222`;
+// export const NatsUrl = `nats://localhost:4222`;
+export const NatsUrl = `nats://nats:4222`;
 // export const NatsUrl = `nats://${process.env.NATS_HOST}:${process.env.NATS_PORT}`;

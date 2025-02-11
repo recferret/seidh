@@ -6,8 +6,8 @@ export const MongoProviders = [
     useFactory: (): Promise<typeof mongoose> =>
       mongoose.connect(
         // process.env.NODE_ENV == 'production'
-        // 'mongodb://ferretrec:khlhasdg972^&*TFGy@mongodb:27017',
-        'mongodb://localhost:27017',
+        'mongodb://ferretrec:khlhasdg972^&*TFGy@mongodb:27017',
+        // 'mongodb://localhost:27017',
         { dbName: 'seidh' },
       ),
   },
