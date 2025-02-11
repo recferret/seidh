@@ -1,12 +1,16 @@
-import { Module } from '@nestjs/common';
-import { GameplayController } from './gameplay.controller';
-import { GameplayService } from './gameplay.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { InternalProtocol, ServiceName } from '@app/seidh-common';
-import { ScheduleModule } from '@nestjs/schedule';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { NatsUrl, ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { BullModule } from '@nestjs/bull';
+import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ScheduleModule } from '@nestjs/schedule';
+
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
+import { GameplayController } from './gameplay.controller';
+
+import { GameplayService } from './gameplay.service';
 
 @Module({
   imports: [
@@ -27,21 +31,21 @@ import { BullModule } from '@nestjs/bull';
         name: ServiceName.WsGateway,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.GameplayLobby,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.Users,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
     ]),

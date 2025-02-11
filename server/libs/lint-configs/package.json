@@ -1,0 +1,42 @@
+{
+  "name": "@glory/lint-configs",
+  "version": "1.0.3",
+  "description": "Configs with rules for ESLint and Prettier",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build": "tsc -b"
+  },
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "eslint-plugin-unused-imports": "2.0.0",
+    "prettier-plugin-sort-imports": "^1.8.6",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-import": "2.25.4",
+    "prettier": "^3.0.0",
+    "eslint": "8.22.0"
+  },
+  "bundleDependencies": [
+    "@trivago/prettier-plugin-sort-imports",
+    "@typescript-eslint/eslint-plugin",
+    "eslint-plugin-unused-imports",
+    "prettier-plugin-sort-imports",
+    "@typescript-eslint/parser",
+    "eslint-config-prettier",
+    "eslint-plugin-prettier",
+    "eslint-plugin-import",
+    "prettier",
+    "eslint"
+  ],
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}

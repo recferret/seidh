@@ -1,7 +1,10 @@
 import { Controller, Get, Session, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../guards/guard.auth';
-import { IUserSession } from './interfaces';
+
 import { ServiceFriends } from '../services/service.friends';
+
+import { AuthGuard } from '../guards/guard.auth';
+
+import { IUserSession } from './interfaces';
 
 @Controller('friends')
 export class ControllerFriends {

@@ -1,9 +1,9 @@
 export class GameServiceProgressGameRequestDto {
   gameId: string;
-  mobsKilled: number;
-  tokensGained: number;
+  zombiesKilled: number;
+  coinsGained: number;
 }
 
 export class GameServiceProgressGameResponseDto {
-  salt: string;
+  success: boolean;
 }

@@ -1,4 +1,5 @@
-import { CharacterEntityFullStruct } from '@app/seidh-common/seidh-common.boost-constants';
+import { CharacterEntityFullStruct } from '../../types/types.engine';
+
 import { WsGatewayGameBaseMsg } from './ws-gateway.game.base.msg';
 
 export const WsGatewayGameInitPattern = 'ws-gateway.game.init';

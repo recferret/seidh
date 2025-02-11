@@ -1,9 +1,9 @@
-import { ClientProxy } from '@nestjs/microservices';
 import { Model } from 'mongoose';
-import {
-  WsGatewayUserBalanceMsg,
-  WsGatewayUserBalancePattern,
-} from './dto/ws-gateway/ws-gateway.user.balance.msg';
+
+import { ClientProxy } from '@nestjs/microservices';
+
+import { WsGatewayUserBalanceMsg, WsGatewayUserBalancePattern } from './dto/ws-gateway/ws-gateway.user.balance.msg';
+
 import { User } from './schemas/user/schema.user';
 
 export class SeidhCommonBroadcasts {

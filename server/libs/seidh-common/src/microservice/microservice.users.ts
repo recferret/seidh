@@ -1,41 +1,82 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ServiceName } from '../seidh-common.internal-protocol';
-import { firstValueFrom } from 'rxjs';
+
+import { MicroserviceWrapper } from './microservice.utils';
+
 import {
-  UsersGetUserServiceRequest,
-  UsersGetUserServiceResponse,
-  UsersGetUserPattern,
-} from '../dto/users/users.get.user.msg';
-import {
-  UsersUpdateGainingsServiceMessage,
-  UsersUpdateGainingsPattern,
-} from '../dto/users/users.update.gainings';
-import {
-  UsersAuthenticateServiceRequest,
-  UsersAuthenticateServiceResponse,
-  UsersAuthenticatePattern,
+  UsersServiceAuthenticateResponse,
+  UsersServiceSimpleAuthPattern,
+  UsersServiceSimpleAuthRequest,
+  UsersServiceTgAuthPattern,
+  UsersServiceTgAuthRequest,
+  UsersServiceVkAuthPattern,
+  UsersServiceVkAuthRequest,
 } from '../dto/users/users.authenticate.msg';
+import {
+  UsersServiceGetUserPattern,
+  UsersServiceGetUserRequest,
+  UsersServiceGetUserResponse,
+} from '../dto/users/users.get-user.msg';
+import {
+  UsersServiceUpdateBalancePattern,
+  UsersServiceUpdateBalanceRequest,
+  UsersServiceUpdateBalanceResponse,
+} from '../dto/users/users.update-balance.msg';
+import {
+  UsersServiceUpdateKillsPattern,
+  UsersServiceUpdateKillsRequest,
+  UsersServiceUpdateKillsResponse,
+} from '../dto/users/users.update-kills.msg';
+
+import { ServiceName } from '../seidh-common.internal-protocol';
 
 @Injectable()
 export class MicroserviceUsers {
-  constructor(@Inject(ServiceName.Users) private usersService: ClientProxy) {}
+  private readonly microserviceWrapper: MicroserviceWrapper;
 
-  async authenticate(request: UsersAuthenticateServiceRequest) {
-    const response: UsersAuthenticateServiceResponse = await firstValueFrom(
-      this.usersService.send(UsersAuthenticatePattern, request),
-    );
-    return response;
+  constructor(@Inject(ServiceName.Users) usersService: ClientProxy) {
+    this.microserviceWrapper = new MicroserviceWrapper(usersService);
   }
 
-  async getUser(request: UsersGetUserServiceRequest) {
-    const result: UsersGetUserServiceResponse = await firstValueFrom(
-      this.usersService.send(UsersGetUserPattern, request),
+  async tgAuth(request: UsersServiceTgAuthRequest) {
+    return this.microserviceWrapper.request<UsersServiceTgAuthRequest, UsersServiceAuthenticateResponse>(
+      UsersServiceTgAuthPattern,
+      request,
     );
-    return result;
   }
 
-  async updateGainings(message: UsersUpdateGainingsServiceMessage) {
-    this.usersService.emit(UsersUpdateGainingsPattern, message);
+  async vkAuth(request: UsersServiceVkAuthRequest) {
+    return this.microserviceWrapper.request<UsersServiceVkAuthRequest, UsersServiceAuthenticateResponse>(
+      UsersServiceVkAuthPattern,
+      request,
+    );
+  }
+
+  async simpleAuth(request: UsersServiceSimpleAuthRequest) {
+    return this.microserviceWrapper.request<UsersServiceSimpleAuthRequest, UsersServiceAuthenticateResponse>(
+      UsersServiceSimpleAuthPattern,
+      request,
+    );
+  }
+
+  async getUser(request: UsersServiceGetUserRequest) {
+    return this.microserviceWrapper.request<UsersServiceGetUserRequest, UsersServiceGetUserResponse>(
+      UsersServiceGetUserPattern,
+      request,
+    );
+  }
+
+  async updateKills(request: UsersServiceUpdateKillsRequest) {
+    return this.microserviceWrapper.request<UsersServiceUpdateKillsRequest, UsersServiceUpdateKillsResponse>(
+      UsersServiceUpdateKillsPattern,
+      request,
+    );
+  }
+
+  async updateBalance(request: UsersServiceUpdateBalanceRequest) {
+    return this.microserviceWrapper.request<UsersServiceUpdateBalanceRequest, UsersServiceUpdateBalanceResponse>(
+      UsersServiceUpdateBalancePattern,
+      request,
+    );
   }
 }

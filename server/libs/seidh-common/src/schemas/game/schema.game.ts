@@ -1,29 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
+import { GameFinishReason, GameGainings, GameState, GameType } from '@lib/seidh-common/types/types.game';
+
 export type GameDocument = HydratedDocument<Game>;
-
-export enum GameType {
-  Single = 'Single',
-}
-
-export enum GameState {
-  Playing = 'Playing',
-  Finished = 'Finished',
-}
-
-export enum GameFinishReason {
-  Win = 'Win',
-  Lose = 'Lose',
-  Timeout = 'Timeout',
-  Closed = 'Closed',
-}
-
-export interface GameGainings {
-  kills: number;
-  tokens: number;
-}
 
 @Schema()
 export class Game {

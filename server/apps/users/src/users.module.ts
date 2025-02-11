@@ -1,40 +1,30 @@
+import { NatsUrl, ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '@app/seidh-common/schemas/user/schema.user';
-import { JwtModule } from '@nestjs/jwt';
-import { InternalProtocol, ServiceName } from '@app/seidh-common';
-import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  GameGainingTransaction,
-  GameGainingTransactionSchema,
-} from '@app/seidh-common/schemas/game/schema.game-gaining.transaction';
-import { ControllerAuth } from './controllers/controller.auth';
-import { ControllerFriends } from './controllers/controller.friends';
-import { ControllerUser } from './controllers/controller.user';
+
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
+import { MongoModule } from '@lib/seidh-common/mongo/mongo.module';
+
+import { ProviderCrypto } from './providers/provider.crypto';
+import { ProviderUsersMongo } from './providers/provider.users-mongo';
+
+import { ControllerAuth } from './api/nats/controller.auth';
+import { ControllerFriends } from './api/nats/controller.friends';
+import { ControllerUser } from './api/nats/controller.user';
+
 import { ServiceAuth } from './services/service.auth';
 import { ServiceFriends } from './services/service.friends';
 import { ServiceUser } from './services/service.user';
-import { ProviderCrypto } from './providers/provider.crypto';
-import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
-import {
-  Character,
-  CharacterSchema,
-} from '@app/seidh-common/schemas/character/schema.character';
+import { MicroserviceCharacters } from '@lib/seidh-common/microservice/microservice.characters';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(InternalProtocol.MongoUrl),
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: Character.name, schema: CharacterSchema },
-      {
-        name: GameGainingTransaction.name,
-        schema: GameGainingTransactionSchema,
-      },
-    ]),
+    MongoModule,
     PrometheusModule.register(),
     JwtModule.register({
       global: true,
@@ -45,32 +35,26 @@ import {
         name: ServiceName.Referral,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.Characters,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.WsGateway,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
     ]),
   ],
   controllers: [ControllerAuth, ControllerFriends, ControllerUser],
-  providers: [
-    MicroserviceCharacters,
-    ProviderCrypto,
-    ServiceAuth,
-    ServiceFriends,
-    ServiceUser,
-  ],
+  providers: [...ProviderUsersMongo, MicroserviceCharacters, ProviderCrypto, ServiceAuth, ServiceFriends, ServiceUser],
 })
 export class UsersModule {}

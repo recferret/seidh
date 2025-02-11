@@ -1,15 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Session,
-  UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '../guards/guard.auth';
-import { IUserSession } from './interfaces';
+import { Body, Controller, Get, Post, Session, UseGuards } from '@nestjs/common';
+
 import { ServiceBoost } from '../services/service.boost';
+
+import { AuthGuard } from '../guards/guard.auth';
+
 import { BoostsBuyRequestDto } from '../dto/boost/boosts.buy.dto';
+
+import { IUserSession } from './interfaces';
 
 @Controller('boosts')
 export class ControllerBoost {

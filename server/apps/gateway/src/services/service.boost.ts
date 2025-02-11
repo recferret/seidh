@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+
+import { MicroserviceBoost } from '@lib/seidh-common/microservice/microservice.boost';
+
 import { BoostsGetResponseDto } from '../dto/boost/boosts.get.dto';
-import { MicroserviceBoost } from '@app/seidh-common/microservice/microservice.boost';
 
 @Injectable()
 export class ServiceBoost {

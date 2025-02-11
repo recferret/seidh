@@ -1,4 +1,5 @@
-import { ConsumableEntityStruct } from '@app/seidh-common/seidh-common.boost-constants';
+import { ConsumableEntityStruct } from '@lib/seidh-common/types/types.engine';
+
 import { EventGameBase } from './event.game.base';
 
 export class EventGameCreateConsumable implements EventGameBase {

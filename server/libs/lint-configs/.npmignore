@@ -1,0 +1,86 @@
+# Ignore all test files and directories
+test/
+**/*.test.js
+**/*.spec.js
+
+# Ignore documentation
+docs/
+
+# Ignore development configuration files
+.eslintrc.js
+.prettierrc.js
+.babelrc
+
+# Ignore CI (Continuous Integration) config files
+.travis.yml
+.github/
+
+# Ignore logs and databases
+*.log
+*.sqlite
+
+# Ignore production build artifacts
+dist/
+
+# Ignore development environment files
+node_modules/
+npm-debug.log
+.yarn-integrity
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Other files and directories to ignore
+tmp/
+backup/
+secrets.json
+
+
+# compiled output
+/dist
+/node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+*.iml
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# env
+.env
+.env.stage
+.env.prod
+.env.test
+.env.build
+
+package-lock.json
+
+ormconfig.ts

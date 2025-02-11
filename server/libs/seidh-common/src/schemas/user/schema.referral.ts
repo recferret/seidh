@@ -1,5 +1,6 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type ReferralConfigDocument = HydratedDocument<ReferralConfig>;
 
@@ -18,5 +19,4 @@ export class ReferralConfig {
   referralNoPremiumRewardTokens: number;
 }
 
-export const ReferralConfigSchema =
-  SchemaFactory.createForClass(ReferralConfig);
+export const ReferralConfigSchema = SchemaFactory.createForClass(ReferralConfig);

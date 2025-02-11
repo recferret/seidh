@@ -1,41 +1,44 @@
+import { NatsUrl, ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { Module } from '@nestjs/common';
-import { GameController } from './game.controller';
-import { GameService } from './game.service';
-import { InternalProtocol, ServiceName } from '@app/seidh-common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Game, GameSchema } from '@app/seidh-common/schemas/game/schema.game';
-import {
-  GameProgress,
-  GameProgressSchema,
-} from '@app/seidh-common/schemas/game/schema.game-progress';
-import { ScheduleModule } from '@nestjs/schedule';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
-import {
-  GameConfig,
-  GameConfigSchema,
-} from '@app/seidh-common/schemas/game/schema.game-config';
+import { ScheduleModule } from '@nestjs/schedule';
+
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
+import { MongoModule } from '@lib/seidh-common/mongo/mongo.module';
+
+import { ProviderGameMongo } from './providers/provider.game-mongo';
+
+import { GameController } from './game.controller';
+
+import { GameService } from './game.service';
+import { MicroserviceCharacters } from '@lib/seidh-common/microservice/microservice.characters';
+import { MicroserviceUsers } from '@lib/seidh-common/microservice/microservice.users';
 
 @Module({
   imports: [
+    PrometheusModule.register(),
+    MongoModule,
     ClientsModule.register([
       {
         name: ServiceName.Users,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
-    ]),
-    MongooseModule.forRoot(InternalProtocol.MongoUrl),
-    MongooseModule.forFeature([
-      { name: Game.name, schema: GameSchema },
-      { name: GameProgress.name, schema: GameProgressSchema },
-      { name: GameConfig.name, schema: GameConfigSchema },
+      {
+        name: ServiceName.Characters,
+        transport: Transport.NATS,
+        options: {
+          servers: [NatsUrl],
+        },
+      },
     ]),
     ScheduleModule.forRoot(),
   ],
   controllers: [GameController],
-  providers: [MicroserviceUsers, GameService],
+  providers: [MicroserviceUsers, MicroserviceCharacters, GameService, ...ProviderGameMongo],
 })
 export class GameModule {}

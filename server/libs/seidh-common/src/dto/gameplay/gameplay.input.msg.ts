@@ -1,4 +1,4 @@
-import { CharacterActionType } from '../types/types.engine';
+import { CharacterActionType } from '../../types/types.engine';
 
 export const GameplayServiceInputPattern = 'gameplay.input';
 

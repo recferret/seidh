@@ -1,24 +1,28 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ServiceName } from '../seidh-common.internal-protocol';
-import { firstValueFrom } from 'rxjs';
+
+import { MicroserviceWrapper } from './microservice.utils';
+
 import {
-  GameplayLobbyFindGameServiceRequest,
-  GameplayLobbyFindGameServiceResponse,
-  GameplayLobbyFindGamePattern,
-} from '../dto/gameplay-lobby/gameplay-lobby.find.game.msg';
+  GameplayServiceLobbyFindGamePattern,
+  GameplayServiceLobbyFindGameRequest,
+  GameplayServiceLobbyFindGameResponse,
+} from '../dto/gameplay-lobby/gameplay-lobby.find-game.msg';
+
+import { ServiceName } from '../seidh-common.internal-protocol';
 
 @Injectable()
 export class MicroserviceGameplay {
-  constructor(
-    @Inject(ServiceName.GameplayLobby)
-    private gameplayLobbyService: ClientProxy,
-  ) {}
+  private readonly microserviceWrapper: MicroserviceWrapper;
 
-  async findGame(request: GameplayLobbyFindGameServiceRequest) {
-    const response: GameplayLobbyFindGameServiceResponse = await firstValueFrom(
-      this.gameplayLobbyService.send(GameplayLobbyFindGamePattern, request),
+  constructor(@Inject(ServiceName.GameplayLobby) gameplayLobbyService: ClientProxy) {
+    this.microserviceWrapper = new MicroserviceWrapper(gameplayLobbyService);
+  }
+
+  async findGame(request: GameplayServiceLobbyFindGameRequest) {
+    return this.microserviceWrapper.request<GameplayServiceLobbyFindGameRequest, GameplayServiceLobbyFindGameResponse>(
+      GameplayServiceLobbyFindGamePattern,
+      request,
     );
-    return response;
   }
 }

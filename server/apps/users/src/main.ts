@@ -1,9 +1,11 @@
-import { NestFactory } from '@nestjs/core';
-import { UsersModule } from './users.module';
-import { InternalProtocol, ServiceName, ServicePort } from '@app/seidh-common';
+import { NatsUrl, ServiceName, ServicePort } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
+
+import { UsersModule } from './users.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(UsersModule);
@@ -11,7 +13,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,
     options: {
-      servers: [InternalProtocol.NatsUrl],
+      servers: [NatsUrl],
       name: ServiceName.Users,
     },
   });

@@ -1,5 +1,7 @@
 import { Types } from 'mongoose';
 
+import { BasicServiceResponse } from '../basic.msg';
+
 export const ReferralServiceUpdateReferrerPattern = 'referral.update-referrer';
 
 // TODO rmk
@@ -17,7 +19,4 @@ export interface ReferralServiceUpdateReferrerRequest {
   };
 }
 
-export interface ReferralServiceUpdateReferrerResponse {
-  success: boolean;
-  message?: string;
-}
+export interface ReferralServiceUpdateReferrerResponse extends BasicServiceResponse {}

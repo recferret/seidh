@@ -1,20 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
+import { BoostType } from '@lib/seidh-common/types/types.boost';
+import { CurrencyType } from '@lib/seidh-common/types/types.user';
+
 export type BoostDocument = HydratedDocument<Boost>;
-
-export enum CurrencyType {
-  Coins = 'Coins',
-  Teeth = 'Teeth',
-  Stars = 'Stars',
-}
-
-export enum BoostType {
-  Boost = 'Boost',
-  Rune = 'Rune',
-  Scroll = 'Scroll',
-  Artifact = 'Artifact',
-}
 
 @Schema()
 export class Boost {

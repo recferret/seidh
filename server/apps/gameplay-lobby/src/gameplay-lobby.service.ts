@@ -1,22 +1,25 @@
-import { ServiceName } from '@app/seidh-common';
-import {
-  GameplayLobbyFindGameMessageRequest,
-  GameplayLobbyFindGameMessageResponse,
-  GameType,
-} from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
-import {
-  GameplayLobbyGameplayInstanceInfo,
-  GameplayLobbyUpdateGamesMessage,
-} from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.update.games.msg';
+import { ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Cron, CronExpression } from '@nestjs/schedule';
+
 import { firstValueFrom } from 'rxjs';
+
 import {
-  GameplayCreateGamePattern,
-  GameplayCreateGameMessageRequest,
-  GameplayCreateGameMessageResponse,
-} from '@app/seidh-common/dto/gameplay/gameplay.create-game.msg';
+  GameplayServiceLobbyFindGameRequest,
+  GameplayServiceLobbyFindGameResponse,
+  GameplayType,
+} from '@lib/seidh-common/dto/gameplay-lobby/gameplay-lobby.find-game.msg';
+import {
+  GameplayLobbyGameplayInstanceInfo,
+  GameplayLobbyServiceUpdateGamesMessage,
+} from '@lib/seidh-common/dto/gameplay-lobby/gameplay-lobby.update-games.msg';
+import {
+  GameplayServiceCreateGamePattern,
+  GameplayServiceCreateGameRequest,
+  GameplayServiceCreateGameResponse,
+} from '@lib/seidh-common/dto/gameplay/gameplay.create-game.msg';
 
 @Injectable()
 export class GameplayLobbyService {
@@ -24,20 +27,15 @@ export class GameplayLobbyService {
   private readonly publicGameMaxUsers: number;
   private readonly testGameMaxUsers: number;
 
-  private readonly gameplayServices = new Map<
-    string,
-    GameplayLobbyGameplayInstanceInfo
-  >();
+  private readonly gameplayServices = new Map<string, GameplayLobbyGameplayInstanceInfo>();
 
-  constructor(
-    @Inject(ServiceName.Gameplay) private gameplayService: ClientProxy,
-  ) {
+  constructor(@Inject(ServiceName.Gameplay) private gameplayService: ClientProxy) {
     this.privateGameMaxUsers = Number(process.env.PRIVATE_GAME_MAX_USERS);
     this.publicGameMaxUsers = Number(process.env.PUBLIC_GAME_MAX_USERS);
     this.testGameMaxUsers = Number(process.env.TEST_GAME_MAX_USERS);
   }
 
-  updateGames(data: GameplayLobbyUpdateGamesMessage) {
+  updateGames(data: GameplayLobbyServiceUpdateGamesMessage) {
     this.gameplayServices.set(data.gameplayServiceId, {
       gameplayServiceId: data.gameplayServiceId,
       games: data.games,
@@ -45,16 +43,16 @@ export class GameplayLobbyService {
     });
   }
 
-  async findGame(data: GameplayLobbyFindGameMessageRequest) {
-    const response: GameplayLobbyFindGameMessageResponse = {
+  async findGame(data: GameplayServiceLobbyFindGameRequest) {
+    const response: GameplayServiceLobbyFindGameResponse = {
       success: false,
     };
 
     if (this.gameplayServices.size > 0) {
       let maxUsers = this.testGameMaxUsers;
-      if (data.gameType == GameType.PrivateGame) {
+      if (data.gameplayType == GameplayType.PrivateGame) {
         maxUsers = this.privateGameMaxUsers;
-      } else if (data.gameType == GameType.PublicGame) {
+      } else if (data.gameplayType == GameplayType.PublicGame) {
         maxUsers = this.publicGameMaxUsers;
       }
 
@@ -62,7 +60,7 @@ export class GameplayLobbyService {
 
       this.gameplayServices.forEach((service) => {
         const filteredGames = service.games.filter(
-          (game) => game.gameType === data.gameType && game.users < maxUsers,
+          (game) => game.gameplayType === data.gameplayType && game.users < maxUsers,
         );
         if (filteredGames.length == 1) {
           response.success = true;
@@ -79,17 +77,13 @@ export class GameplayLobbyService {
       });
 
       if (!gameFound) {
-        const createGameRequest: GameplayCreateGameMessageRequest = {
-          gameType: data.gameType,
+        const createGameRequest: GameplayServiceCreateGameRequest = {
+          gameplayType: data.gameplayType,
         };
 
-        const createGameResponse: GameplayCreateGameMessageResponse =
-          await firstValueFrom(
-            this.gameplayService.send(
-              GameplayCreateGamePattern,
-              createGameRequest,
-            ),
-          );
+        const createGameResponse: GameplayServiceCreateGameResponse = await firstValueFrom(
+          this.gameplayService.send(GameplayServiceCreateGamePattern, createGameRequest),
+        );
 
         if (createGameResponse.success) {
           response.success = true;
@@ -115,9 +109,7 @@ export class GameplayLobbyService {
       }
     });
 
-    gameplayServicesToDrop.forEach((serviceId) =>
-      this.gameplayServices.delete(serviceId),
-    );
+    gameplayServicesToDrop.forEach((serviceId) => this.gameplayServices.delete(serviceId));
   }
 
   @Cron(CronExpression.EVERY_10_SECONDS)

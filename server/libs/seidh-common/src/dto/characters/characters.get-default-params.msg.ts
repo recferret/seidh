@@ -1,11 +1,11 @@
-import { CharacterParams } from '../types/types.character';
+import { CharacterEntityParams } from '../../types/types.character';
 
-export const CharactersServiceGetDefaultParamsPattern =
-  'characters.get-default-params';
+import { BasicServiceResponse } from '../basic.msg';
 
-export interface CharactersServiceGetDefaultParamsResponse {
-  success: boolean;
-  ragnarLoh?: CharacterParams;
-  zombieBoy?: CharacterParams;
-  zombieGirl?: CharacterParams;
+export const CharactersServiceGetDefaultParamsPattern = 'characters.get-default-params';
+
+export interface CharactersServiceGetDefaultParamsResponse extends BasicServiceResponse {
+  ragnarLoh?: CharacterEntityParams;
+  zombieBoy?: CharacterEntityParams;
+  zombieGirl?: CharacterEntityParams;
 }

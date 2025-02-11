@@ -1,7 +1,9 @@
-import { GameplayType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
 import { Injectable } from '@nestjs/common';
+
+import { MicroserviceGameplay } from '@lib/seidh-common/microservice/microservice.gameplay';
+
 import { GameplayFindGameResponseDto } from '../dto/gameplay/gameplay.find.game.dto';
-import { MicroserviceGameplay } from '@app/seidh-common/microservice/microservice.gameplay';
+import { GameplayType } from '@lib/seidh-common/dto/gameplay-lobby/gameplay-lobby.find-game.msg';
 
 @Injectable()
 export class ServiceGameplay {
@@ -14,7 +16,7 @@ export class ServiceGameplay {
     });
     const responseDto: GameplayFindGameResponseDto = {
       success: response.success,
-      reason: response.reason,
+      reason: response.message,
       gameplayServiceId: response.gameplayServiceId,
       gameId: response.gameId,
     };

@@ -1,9 +1,11 @@
-export const CharactersServicelevelUpPattern = 'characters.level-up';
+import { BasicServiceResponse } from '../basic.msg';
 
-export interface CharactersServicelevelUpRequest {
+export const CharactersServiceLevelUpPattern = 'characters.level-up';
+
+export interface CharactersServiceLevelUpRequest {
   userId: string;
+  coins?: number;
+  teeth?: number;
 }
 
-export interface CharactersServicelevelUpResponse {
-  success: boolean;
-}
+export interface CharactersServiceLevelUpResponse extends BasicServiceResponse {}

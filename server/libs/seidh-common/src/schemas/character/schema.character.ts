@@ -1,11 +1,14 @@
-import {
-  CharacterType,
-  CharacterEntityShape,
-  CharacterActionStruct,
-  CharacterMovementStruct,
-} from '@app/seidh-common/dto/types/types.character';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
+import {
+  CharacterActionStruct,
+  CharacterActionType,
+  CharacterEntityShape,
+  CharacterMovementStruct,
+  CharacterType,
+} from '@lib/seidh-common/types/types.character';
 
 export type CharacterDocument = HydratedDocument<Character>;
 
@@ -14,19 +17,19 @@ export class Character {
   @Prop({ required: true, type: String, enum: CharacterType })
   type: CharacterType;
 
-  @Prop({ required: true, default: 1 })
+  @Prop({ type: Number, required: true, default: 1 })
   levelCurrent: number;
 
-  @Prop({ required: true, default: 10 })
+  @Prop({ type: Number, required: true, default: 10 })
   levelMax: number;
 
-  @Prop({ required: true, default: 0 })
+  @Prop({ type: Number, required: true, default: 0 })
   expCurrent: number;
 
-  @Prop({ required: true, default: 0 })
-  expTillNewLevel: number;
+  @Prop({ type: Number, required: true, default: 0 })
+  expTillNextLevel: number;
 
-  @Prop({ required: true, default: 100 })
+  @Prop({ type: Number, required: true, default: 100 })
   health: number;
 
   @Prop({
@@ -46,7 +49,7 @@ export class Character {
     type: {
       runSpeed: Number,
       speedFactor: Number,
-      movementDelay: Number,
+      inputDelay: Number,
     },
   })
   movement: CharacterMovementStruct;
@@ -56,6 +59,8 @@ export class Character {
     type: {
       damage: Number,
       inputDelay: Number,
+      animDurationMs: Number,
+      actionType: { type: String, enum: CharacterActionType },
       meleeStruct: {
         aoe: Boolean,
         shape: {
@@ -68,6 +73,25 @@ export class Character {
     },
   })
   actionMain: CharacterActionStruct;
+
+  // @Prop({
+  //   required: true,
+  //   type: {
+  //     damage: Number,
+  //     inputDelay: Number,
+  //     actionType: CharacterActionType,
+  //     meleeStruct: {
+  //       aoe: Boolean,
+  //       shape: {
+  //         width: Number,
+  //         height: Number,
+  //         rectOffsetX: Number,
+  //         rectOffsetY: Number,
+  //       },
+  //     },
+  //   },
+  // })
+  // action1: CharacterActionStruct;
 }
 
 export const CharacterSchema = SchemaFactory.createForClass(Character);

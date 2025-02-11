@@ -1,0 +1,146 @@
+version: "3"
+services:
+
+  gateway:
+    build:
+      context: .
+      dockerfile: seidh.gateway.dockerfile
+    container_name: gateway
+    ports:
+      - "3004:3004"
+
+  ws-gateway:
+    build:
+      context: .
+      dockerfile: seidh.ws-gateway.dockerfile
+    container_name: ws-gateway
+    ports:
+      - "3005:3005"
+
+  # gameplay:
+  #   build:
+  #     context: .
+  #     dockerfile: seidh.gameplay.dockerfile
+  #   container_name: gameplay
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   ports:
+  #     - "3001:3001"
+
+  # gameplay-lobby:
+  #   build:
+  #     context: .
+  #     dockerfile: seidh.gameplay-lobby.dockerfile
+  #   container_name: gameplay-lobby
+  #   ports:
+  #     - "3002:3002"
+
+  users:
+    build:
+      context: .
+      dockerfile: seidh.users.dockerfile
+    container_name: users
+    depends_on:
+      - mongodb
+    ports:
+      - "3006:3006"
+
+  boosts:
+    build:
+      context: .
+      dockerfile: seidh.boosts.dockerfile
+    container_name: boosts
+    depends_on:
+      - mongodb
+    ports:
+      - "3008:3008"
+
+  characters:
+    build:
+      context: .
+      dockerfile: seidh.characters.dockerfile
+    container_name: characters
+    depends_on:
+      - mongodb
+    ports:
+      - "3009:3009"
+
+  game:
+    build:
+      context: .
+      dockerfile: seidh.game.dockerfile
+    container_name: game
+    depends_on:
+      - mongodb
+    ports:
+      - "3012:3012"            
+
+  nats:
+    image: nats
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 "
+  nats-1:
+    image: nats
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --routes=nats://ruser:T0pS3cr3t@nats:6222"
+    depends_on: ["nats"]
+  nats-2:
+    image: nats
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --routes=nats://ruser:T0pS3cr3t@nats:6222"
+    depends_on: ["nats"]
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=ferretrec
+      - MONGO_INITDB_ROOT_PASSWORD=khlhasdg972^&*TFGy
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_database:/data/db
+
+  # node_exporter:
+  #   image: quay.io/prometheus/node-exporter:latest
+  #   container_name: node_exporter
+  #   command:
+  #     - '--path.rootfs=/host'
+  #   network_mode: host
+  #   pid: host
+  #   restart: unless-stopped
+  #   volumes:
+  #     - '/:/host:ro,rslave'    
+  #   ports:
+  #     - "9100:9100"  
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - prometheus_volume:/prometheus
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=seidh-admin
+      - GF_SECURITY_ADMIN_PASSWORD=ljhsadf972gh*^TYg
+    volumes:
+      - grafana_volume:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/config.ini:/etc/grafana/config.ini
+
+volumes:
+  mongo_database:
+  prometheus_volume: {}
+  grafana_volume: {}

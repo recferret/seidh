@@ -1,23 +1,23 @@
-import {
-  UsersGetFriendsServiceRequest,
-  UsersGetFriendsServiceResponse,
-} from '@app/seidh-common/dto/users/users.get.friends.msg';
-import { User } from '@app/seidh-common/schemas/user/schema.user';
+import { User } from '@lib/seidh-common/schemas/user/schema.user';
+import { Model } from 'mongoose';
+
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+
+import {
+  UsersServiceGetFriendsRequest,
+  UsersServiceGetFriendsResponse,
+} from '@lib/seidh-common/dto/users/users.get-friends.msg';
 
 @Injectable()
 export class ServiceFriends {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async getFriends(request: UsersGetFriendsServiceRequest) {
-    const response: UsersGetFriendsServiceResponse = {
+  async getFriends(request: UsersServiceGetFriendsRequest) {
+    const response: UsersServiceGetFriendsResponse = {
       success: false,
     };
-    const user = await this.userModel
-      .findById(request.userId)
-      .populate(['friendsInvited']);
+    const user = await this.userModel.findById(request.userId).populate(['friendsInvited']);
     if (user) {
       response.success = true;
       response.friends = (

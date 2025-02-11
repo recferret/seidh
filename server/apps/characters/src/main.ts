@@ -1,18 +1,19 @@
-import { NestFactory } from '@nestjs/core';
-import { CharactersModule } from './characters.module';
-import { InternalProtocol, ServiceName, ServicePort } from '@app/seidh-common';
+import { NatsUrl, ServiceName, ServicePort } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
+import { CharactersModule } from './characters.module';
+
 async function bootstrap() {
-  const app =
-    await NestFactory.create<NestExpressApplication>(CharactersModule);
+  const app = await NestFactory.create<NestExpressApplication>(CharactersModule);
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,
     options: {
-      servers: [InternalProtocol.NatsUrl],
+      servers: [NatsUrl],
       name: ServiceName.Characters,
     },
   });

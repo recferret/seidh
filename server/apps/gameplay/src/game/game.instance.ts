@@ -1,20 +1,6 @@
-import { GameplayType } from '@app/seidh-common/dto/gameplay-lobby/gameplay-lobby.find.game.msg';
-import * as Engine from '../js/SeidhGameEngine';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventGameCharacterActions } from '../events/event.game.character-actions';
-import { EventGameCreateCharacter } from '../events/event.game.create-character';
-import { EventGameCreateProjectile } from '../events/event.game.create-projectile';
-import { EventGameDeleteCharacter } from '../events/event.game.delete-character';
-import { EventGameDeleteProjectile } from '../events/event.game.delete-projectile';
-import { EventGameLoopState } from '../events/event.game.loop-state';
-import { EventGameGameState } from '../events/event.game.game-state';
-import { EventGameDeleteConsumable } from '../events/event.game.delete-consumable';
-import { EventGameCreateConsumable } from '../events/event.game.create-consumable';
-import { EventGameInit } from '../events/event.game.init';
-import {
-  EventGameUserGainings,
-  UserGainings,
-} from '../events/event.game.user-gainings';
+
+import { GameplayType } from '@lib/seidh-common/dto/gameplay-lobby/gameplay-lobby.find-game.msg';
 import {
   CharacterActionCallbackParams,
   CharacterEntityFullStruct,
@@ -28,8 +14,21 @@ import {
   EntityType,
   PlayerInputCommand,
   WinCondition,
-} from '@app/seidh-common/dto/types/types.engine';
-import { GameState } from '@app/seidh-common/schemas/game/schema.game';
+} from '@lib/seidh-common/types/types.engine';
+
+import * as Engine from '../js/SeidhGameEngine';
+import { EventGameCharacterActions } from '../events/event.game.character-actions';
+import { EventGameCreateCharacter } from '../events/event.game.create-character';
+import { EventGameCreateConsumable } from '../events/event.game.create-consumable';
+import { EventGameCreateProjectile } from '../events/event.game.create-projectile';
+import { EventGameDeleteCharacter } from '../events/event.game.delete-character';
+import { EventGameDeleteConsumable } from '../events/event.game.delete-consumable';
+import { EventGameDeleteProjectile } from '../events/event.game.delete-projectile';
+import { EventGameGameState } from '../events/event.game.game-state';
+import { EventGameInit } from '../events/event.game.init';
+import { EventGameLoopState } from '../events/event.game.loop-state';
+import { EventGameUserGainings } from '../events/event.game.user-gainings';
+import { GameGainings, GameState } from '@lib/seidh-common/types/types.game';
 
 export class GameInstance {
   private readonly engine: Engine.SeidhGameEngine;
@@ -41,9 +40,7 @@ export class GameInstance {
   ) {
     this.engine = new Engine.engine.seidh.SeidhGameEngine(
       EngineMode.SERVER,
-      gameplayType == GameplayType.TestGame
-        ? WinCondition.INFINITE
-        : WinCondition.KILL_MOBS,
+      gameplayType == GameplayType.TestGame ? WinCondition.INFINITE : WinCondition.KILL_MOBS,
     );
 
     // TODO move to config
@@ -53,15 +50,10 @@ export class GameInstance {
     // Engine callbacks
     // -----------------------------------
 
-    this.engine.createCharacterCallback = (
-      characterEntity: EngineCharacterEntity,
-    ) => {
+    this.engine.createCharacterCallback = (characterEntity: EngineCharacterEntity) => {
       this.eventEmitter.emit(
         EventGameCreateCharacter.EventName,
-        new EventGameCreateCharacter(
-          gameId,
-          characterEntity.getEntityFullStruct(),
-        ),
+        new EventGameCreateCharacter(gameId, characterEntity.getEntityFullStruct()),
       );
 
       // Stop mobs from spwawning if there is no more players
@@ -80,59 +72,38 @@ export class GameInstance {
         }
 
         if (charactersFullStruct.length > 0) {
-          this.eventEmitter.emit(
-            EventGameInit.EventName,
-            new EventGameInit(gameId, charactersFullStruct),
-          );
+          this.eventEmitter.emit(EventGameInit.EventName, new EventGameInit(gameId, charactersFullStruct));
         }
       }
     };
 
-    this.engine.deleteCharacterCallback = (
-      characterEntity: EngineCharacterEntity,
-    ) => {
+    this.engine.deleteCharacterCallback = (characterEntity: EngineCharacterEntity) => {
       if (characterEntity.isPlayer()) {
         const userId = characterEntity.getOwnerId();
         const gainings = this.engine.getPlayerGainings(userId);
-        const playerGainings: UserGainings = {
-          userId,
-          gameId,
-          kills: gainings.kills,
-          tokens: gainings.tokens,
+        const playerGainings: GameGainings = {
+          zombiesKilled: gainings.zombiesKilled,
+          coinsGained: gainings.coinsGained,
         };
-        this.eventEmitter.emit(
-          EventGameUserGainings.EventName,
-          new EventGameUserGainings(gameId, playerGainings),
-        );
+        this.eventEmitter.emit(EventGameUserGainings.EventName, new EventGameUserGainings(gameId, playerGainings));
         this.engine.clearPlayerGainings(userId);
       }
 
       this.eventEmitter.emit(
         EventGameDeleteCharacter.EventName,
-        new EventGameDeleteCharacter(
-          gameId,
-          characterEntity.getEntityMinStruct().id,
-        ),
+        new EventGameDeleteCharacter(gameId, characterEntity.getEntityMinStruct().id),
       );
     };
 
     this.engine.createProjectileCallback = () => {
-      this.eventEmitter.emit(
-        EventGameCreateProjectile.EventName,
-        new EventGameCreateProjectile(gameId),
-      );
+      this.eventEmitter.emit(EventGameCreateProjectile.EventName, new EventGameCreateProjectile(gameId));
     };
 
     this.engine.deleteProjectileCallback = () => {
-      this.eventEmitter.emit(
-        EventGameDeleteProjectile.EventName,
-        new EventGameDeleteProjectile(gameId),
-      );
+      this.eventEmitter.emit(EventGameDeleteProjectile.EventName, new EventGameDeleteProjectile(gameId));
     };
 
-    this.engine.createConsumableCallback = (
-      consumableEntity: EngineConsumableEntity,
-    ) => {
+    this.engine.createConsumableCallback = (consumableEntity: EngineConsumableEntity) => {
       const consumableEntityStruct: ConsumableEntityStruct = {
         baseEntityStruct: consumableEntity.getEntityBaseStruct(),
         amount: consumableEntity.amount,
@@ -143,16 +114,10 @@ export class GameInstance {
       );
     };
 
-    this.engine.deleteConsumableCallback = (
-      callbackBody: DeleteConsumableCallback,
-    ) => {
+    this.engine.deleteConsumableCallback = (callbackBody: DeleteConsumableCallback) => {
       this.eventEmitter.emit(
         EventGameDeleteConsumable.EventName,
-        new EventGameDeleteConsumable(
-          gameId,
-          callbackBody.entityId,
-          callbackBody.takenByCharacterId,
-        ),
+        new EventGameDeleteConsumable(gameId, callbackBody.entityId, callbackBody.takenByCharacterId),
       );
     };
 
@@ -166,27 +131,16 @@ export class GameInstance {
       }
 
       if (charactersMinStruct.length > 0) {
-        this.eventEmitter.emit(
-          EventGameLoopState.EventName,
-          new EventGameLoopState(gameId, charactersMinStruct),
-        );
+        this.eventEmitter.emit(EventGameLoopState.EventName, new EventGameLoopState(gameId, charactersMinStruct));
       }
     };
 
-    this.engine.characterActionCallbacks = (
-      actions: CharacterActionCallbackParams[],
-    ) => {
-      this.eventEmitter.emit(
-        EventGameCharacterActions.EventName,
-        new EventGameCharacterActions(gameId, actions),
-      );
+    this.engine.characterActionCallbacks = (actions: CharacterActionCallbackParams[]) => {
+      this.eventEmitter.emit(EventGameCharacterActions.EventName, new EventGameCharacterActions(gameId, actions));
     };
 
     this.engine.gameStateCallback = (gameState: GameState) => {
-      this.eventEmitter.emit(
-        EventGameGameState.EventName,
-        new EventGameGameState(gameId, gameState),
-      );
+      this.eventEmitter.emit(EventGameGameState.EventName, new EventGameGameState(gameId, gameState));
     };
 
     setInterval(() => {

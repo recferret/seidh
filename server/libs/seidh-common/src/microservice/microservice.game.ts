@@ -1,57 +1,60 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ServiceName } from '../seidh-common.internal-protocol';
-import { firstValueFrom } from 'rxjs';
+
+import { MicroserviceWrapper } from './microservice.utils';
+
+import {
+  GameServiceFinishGamePattern,
+  GameServiceFinishGameRequest,
+  GameServiceFinishGameResponse,
+} from '../dto/game/game.finish-game.msg';
 import {
   GameServiceGetGameConfigPattern,
-  GameServiceGetGameConfigGameRequest,
   GameServiceGetGameConfigResponse,
 } from '../dto/game/game.get-game-config.msg';
-import {
-  GameServiceStartGamePattern,
-  GameServiceStartGameRequest,
-  GameServiceStartGameResponse,
-} from '../dto/game/game.start-game.msg';
 import {
   GameServiceProgressGamePattern,
   GameServiceProgressGameRequest,
   GameServiceProgressGameResponse,
 } from '../dto/game/game.progress-game.msg';
 import {
-  GameServiceFinishGamePattern,
-  GameServiceFinishGameRequest,
-  GameServiceFinishGameResponse,
-} from '../dto/game/game.finish-game.msg';
+  GameServiceStartGamePattern,
+  GameServiceStartGameRequest,
+  GameServiceStartGameResponse,
+} from '../dto/game/game.start-game.msg';
+
+import { ServiceName } from '../seidh-common.internal-protocol';
 
 @Injectable()
 export class MicroserviceGame {
-  constructor(@Inject(ServiceName.Game) private gameService: ClientProxy) {}
+  private readonly microserviceWrapper: MicroserviceWrapper;
 
-  async getGameConfig(request: GameServiceGetGameConfigGameRequest) {
-    const response: GameServiceGetGameConfigResponse = await firstValueFrom(
-      this.gameService.send(GameServiceGetGameConfigPattern, request),
-    );
-    return response;
+  constructor(@Inject(ServiceName.Game) gameService: ClientProxy) {
+    this.microserviceWrapper = new MicroserviceWrapper(gameService);
+  }
+
+  async getGameConfig() {
+    return this.microserviceWrapper.request<{}, GameServiceGetGameConfigResponse>(GameServiceGetGameConfigPattern, {});
   }
 
   async startGame(request: GameServiceStartGameRequest) {
-    const response: GameServiceStartGameResponse = await firstValueFrom(
-      this.gameService.send(GameServiceStartGamePattern, request),
+    return this.microserviceWrapper.request<GameServiceStartGameRequest, GameServiceStartGameResponse>(
+      GameServiceStartGamePattern,
+      request,
     );
-    return response;
   }
 
   async progressGame(request: GameServiceProgressGameRequest) {
-    const response: GameServiceProgressGameResponse = await firstValueFrom(
-      this.gameService.send(GameServiceProgressGamePattern, request),
+    return this.microserviceWrapper.request<GameServiceProgressGameRequest, GameServiceProgressGameResponse>(
+      GameServiceProgressGamePattern,
+      request,
     );
-    return response;
   }
 
   async finishGame(request: GameServiceFinishGameRequest) {
-    const response: GameServiceFinishGameResponse = await firstValueFrom(
-      this.gameService.send(GameServiceFinishGamePattern, request),
+    return this.microserviceWrapper.request<GameServiceFinishGameRequest, GameServiceFinishGameResponse>(
+      GameServiceFinishGamePattern,
+      request,
     );
-    return response;
   }
 }

@@ -1,23 +1,19 @@
 import { Module } from '@nestjs/common';
-import { CharactersController } from './characters.controller';
-import { CharactersService } from './characters.service';
+
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
-import { InternalProtocol } from '@app/seidh-common';
-import { MongooseModule } from '@nestjs/mongoose';
-import {
-  Character,
-  CharacterSchema,
-} from '@app/seidh-common/schemas/character/schema.character';
+
+import { MongoModule } from '@lib/seidh-common/mongo/mongo.module';
+
+import { ProviderCharactersMongo } from './providers/provider.characters-mongo';
+
+import { CharactersController } from './characters.controller';
+
+import { CharactersDataService } from './characters.data.service';
+import { CharactersService } from './characters.service';
 
 @Module({
-  imports: [
-    PrometheusModule.register(),
-    MongooseModule.forRoot(InternalProtocol.MongoUrl),
-    MongooseModule.forFeature([
-      { name: Character.name, schema: CharacterSchema },
-    ]),
-  ],
+  imports: [PrometheusModule.register(), MongoModule],
   controllers: [CharactersController],
-  providers: [CharactersService],
+  providers: [CharactersService, CharactersDataService, ...ProviderCharactersMongo],
 })
 export class CharactersModule {}

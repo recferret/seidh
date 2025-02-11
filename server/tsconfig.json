@@ -18,12 +18,51 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/seidh-common": [
-        "libs/seidh-common/src"
+      "@app/balances/*": [
+        "apps/balances/src/*"
       ],
-      "@app/seidh-common/*": [
+      "@app/boosts/*": [
+        "apps/boosts/src/*"
+      ],
+      "@app/characters/*": [
+        "apps/characters/src/*"
+      ],
+      "@app/collection/*": [
+        "apps/collection/src/*"
+      ],
+      "@app/game/*": [
+        "apps/game/src/*"
+      ],
+      "@app/gameplay/*": [
+        "apps/gameplay/src/*"
+      ],
+      "@app/gameplay-lobby/*": [
+        "apps/gameplay-lobby/src/*"
+      ],
+      "@app/gameplay-worker/*": [
+        "apps/gameplay-worker/src/*"
+      ],
+      "@app/gateway/*": [
+        "apps/gateway/src/*"
+      ],
+      "@app/referral/*": [
+        "apps/referral/src/*"
+      ],
+      "@app/tg/*": [
+        "apps/tg/src/*"
+      ],
+      "@app/users/*": [
+        "apps/users/src/*"
+      ],
+      "@app/ws-gateway/*": [
+        "apps/ws-gateway/src/*"
+      ],
+      "@lib/seidh-common/*": [
         "libs/seidh-common/src/*"
-      ]
+      ],
+      "@lib/env/*": [
+        "libs/env/src/*"
+      ],
     }
   }
 }

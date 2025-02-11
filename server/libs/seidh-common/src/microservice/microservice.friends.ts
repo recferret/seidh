@@ -1,21 +1,28 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ServiceName } from '../seidh-common.internal-protocol';
-import { firstValueFrom } from 'rxjs';
+
+import { MicroserviceWrapper } from './microservice.utils';
+
 import {
-  UsersGetFriendsServiceRequest,
-  UsersGetFriendsServiceResponse,
-  UsersGetFriendsPattern,
-} from '../dto/users/users.get.friends.msg';
+  UsersServiceGetFriendsPattern,
+  UsersServiceGetFriendsRequest,
+  UsersServiceGetFriendsResponse,
+} from '../dto/users/users.get-friends.msg';
+
+import { ServiceName } from '../seidh-common.internal-protocol';
 
 @Injectable()
 export class MicroserviceFriends {
-  constructor(@Inject(ServiceName.Users) private usersService: ClientProxy) {}
+  private readonly microserviceWrapper: MicroserviceWrapper;
 
-  async getFriends(request: UsersGetFriendsServiceRequest) {
-    const response: UsersGetFriendsServiceResponse = await firstValueFrom(
-      this.usersService.send(UsersGetFriendsPattern, request),
+  constructor(@Inject(ServiceName.Users) usersService: ClientProxy) {
+    this.microserviceWrapper = new MicroserviceWrapper(usersService);
+  }
+
+  async getFriends(request: UsersServiceGetFriendsRequest) {
+    return this.microserviceWrapper.request<UsersServiceGetFriendsRequest, UsersServiceGetFriendsResponse>(
+      UsersServiceGetFriendsPattern,
+      request,
     );
-    return response;
   }
 }

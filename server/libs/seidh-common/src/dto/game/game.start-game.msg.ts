@@ -1,10 +1,11 @@
+import { BasicServiceResponse } from '../basic.msg';
+
 export const GameServiceStartGamePattern = 'game.start-game';
 
 export interface GameServiceStartGameRequest {
   userId: string;
 }
 
-export interface GameServiceStartGameResponse {
-  success: boolean;
+export interface GameServiceStartGameResponse extends BasicServiceResponse {
   gameId?: string;
 }

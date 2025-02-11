@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+
+import { MicroserviceFriends } from '@lib/seidh-common/microservice/microservice.friends';
+
 import { FriendsGetResponseDto } from '../dto/friends/friends.dto';
-import { MicroserviceFriends } from '@app/seidh-common/microservice/microservice.friends';
 
 @Injectable()
 export class ServiceFriends {

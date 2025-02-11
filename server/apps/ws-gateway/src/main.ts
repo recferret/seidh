@@ -1,12 +1,13 @@
-import { NestFactory } from '@nestjs/core';
-import { WsGatewayModule } from './ws-gateway.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { ServiceName, ServicePort } from '@app/seidh-common';
-import { InternalProtocol } from '@app/seidh-common/seidh-common.internal-protocol';
-import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
+import { NatsUrl, ServiceName, ServicePort } from '@lib/seidh-common/seidh-common.internal-protocol';
+
+import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { NestExpressApplication } from '@nestjs/platform-express';
+
+import { WsGatewayModule } from './ws-gateway.module';
 
 async function bootstrap() {
   let httpsOptions = null;
@@ -19,15 +20,12 @@ async function bootstrap() {
     };
   }
 
-  const app = await NestFactory.create<NestExpressApplication>(
-    WsGatewayModule,
-    { httpsOptions },
-  );
+  const app = await NestFactory.create<NestExpressApplication>(WsGatewayModule, { httpsOptions });
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,
     options: {
-      servers: [InternalProtocol.NatsUrl],
+      servers: [NatsUrl],
       name: ServiceName.WsGateway,
     },
   });

@@ -1,11 +1,15 @@
+import { NatsUrl, ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { Module } from '@nestjs/common';
-import { GameplayLobbyController } from './gameplay-lobby.controller';
-import { GameplayLobbyService } from './gameplay-lobby.service';
-import { InternalProtocol, ServiceName } from '@app/seidh-common';
+import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ScheduleModule } from '@nestjs/schedule';
+
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
-import { ConfigModule } from '@nestjs/config';
+
+import { GameplayLobbyController } from './gameplay-lobby.controller';
+
+import { GameplayLobbyService } from './gameplay-lobby.service';
 
 @Module({
   imports: [
@@ -17,7 +21,7 @@ import { ConfigModule } from '@nestjs/config';
         name: ServiceName.Gameplay,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
     ]),

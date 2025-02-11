@@ -1,20 +1,18 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-  Inject,
-} from '@nestjs/common';
+import { ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
-import { ServiceName } from '@app/seidh-common';
-import {
-  UsersCheckTokenServiceRequest,
-  UsersCheckTokenServiceResponse,
-  UsersCheckTokenPattern,
-} from '@app/seidh-common/dto/users/users.check.token.msg';
+
 import { firstValueFrom } from 'rxjs';
+
 import { IUserSession } from '../controllers/interfaces';
+
+import {
+  UsersServiceCheckTokenPattern,
+  UsersServiceCheckTokenRequest,
+  UsersServiceCheckTokenResponse,
+} from '@lib/seidh-common/dto/users/users.check-token.msg';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -30,14 +28,14 @@ export class AuthGuard implements CanActivate {
       const authToken = request.headers.authorization.split(' ')[1];
       const decodedToken = await this.jwtService.verifyAsync(authToken);
 
+      // TODO RMK, no need to go to users  here
       // Check if token was refreshed
-      const checkTokenRequest: UsersCheckTokenServiceRequest = {
+      const checkTokenRequest: UsersServiceCheckTokenRequest = {
         authToken,
       };
-      const checkTokenResponse: UsersCheckTokenServiceResponse =
-        await firstValueFrom(
-          this.usersService.send(UsersCheckTokenPattern, checkTokenRequest),
-        );
+      const checkTokenResponse: UsersServiceCheckTokenResponse = await firstValueFrom(
+        this.usersService.send(UsersServiceCheckTokenPattern, checkTokenRequest),
+      );
       if (!checkTokenResponse.success) {
         throw new UnauthorizedException();
       }

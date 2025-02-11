@@ -1,4 +1,5 @@
-import { GameState } from '@app/seidh-common/seidh-common.boost-constants';
+import { GameState } from '@lib/seidh-common/types/types.game';
+
 import { WsGatewayGameBaseMsg } from './ws-gateway.game.base.msg';
 
 export const WsGatewayGameGameStatePattern = 'ws-gateway.game.game.state';

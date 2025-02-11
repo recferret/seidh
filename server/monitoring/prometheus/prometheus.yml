@@ -1,41 +1,37 @@
-global:
-  scrape_interval: 15s
-  scrape_timeout: 10s
-  evaluation_interval: 15s
-alerting:
-  alertmanagers:
-  - static_configs:
-    - targets: []
-    scheme: http
-    timeout: 10s
-    api_version: v1
+# global:
+#   scrape_interval: 15s
+#   scrape_timeout: 10s
+#   evaluation_interval: 15s
+
 scrape_configs:
-  - job_name: 'prometheus_metrics'
+  - job_name: 'prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: ['host.docker.internal:9090']
+      - targets: [
+        'prometheus:9090',
+      ]
 
-  - job_name: gameplay
-    honor_timestamps: true
-    scrape_interval: 15s
-    scrape_timeout: 10s
-    metrics_path: /metrics
-    scheme: http
-    static_configs:
-    - targets: ["host.docker.internal:3001"]
-      labels:
-        instance: 'Gameplay'
+  # - job_name: gameplay
+  #   honor_timestamps: true
+  #   scrape_interval: 15s
+  #   scrape_timeout: 10s
+  #   metrics_path: /metrics
+  #   scheme: http
+  #   static_configs:
+  #   - targets: ["host.docker.internal:3001"]
+  #     labels:
+  #       instance: 'Gameplay'
 
-  - job_name: gameplay-lobby
-    honor_timestamps: true
-    scrape_interval: 15s
-    scrape_timeout: 10s
-    metrics_path: /metrics
-    scheme: http
-    static_configs:
-    - targets: ["host.docker.internal:3002"]
-      labels:
-        instance: 'Gameplay-Lobby'
+  # - job_name: gameplay-lobby
+  #   honor_timestamps: true
+  #   scrape_interval: 15s
+  #   scrape_timeout: 10s
+  #   metrics_path: /metrics
+  #   scheme: http
+  #   static_configs:
+  #   - targets: ["host.docker.internal:3002"]
+  #     labels:
+  #       instance: 'Gameplay-Lobby'
 
   - job_name: gateway
     honor_timestamps: true
@@ -44,9 +40,9 @@ scrape_configs:
     metrics_path: /metrics
     scheme: http
     static_configs:
-    - targets: ["host.docker.internal:3003"]
+    - targets: ["gateway:3004"]
       labels:
-        instance: 'Gateway'
+        instance: 'gateway'
 
   - job_name: ws-gateway
     honor_timestamps: true
@@ -55,9 +51,9 @@ scrape_configs:
     metrics_path: /metrics
     scheme: http
     static_configs:
-    - targets: ["host.docker.internal:3004"]
+    - targets: ["ws-gateway:3005"]
       labels:
-        instance: 'WsGateway'
+        instance: 'ws-gateway'
 
   - job_name: users
     honor_timestamps: true
@@ -66,61 +62,72 @@ scrape_configs:
     metrics_path: /metrics
     scheme: http
     static_configs:
-    - targets: ["host.docker.internal:3005"]
+    - targets: ["users:3006"]
       labels:
-        instance: 'Users'
+        instance: 'users'
 
-  - job_name: tg
+  # # - job_name: tg
+  # #   honor_timestamps: true
+  # #   scrape_interval: 15s
+  # #   scrape_timeout: 10s
+  # #   metrics_path: /metrics
+  # #   scheme: http
+  # #   static_configs:
+  # #   - targets: ["host.docker.internal:3006"]
+  # #     labels:
+  # #       instance: 'TG'
+
+  - job_name: boosts
     honor_timestamps: true
     scrape_interval: 15s
     scrape_timeout: 10s
     metrics_path: /metrics
     scheme: http
     static_configs:
-    - targets: ["host.docker.internal:3006"]
+    - targets: ["boosts:3008"]
       labels:
-        instance: 'TG'
+        instance: 'boosts'
 
-  - job_name: boost
+  - job_name: characters
     honor_timestamps: true
     scrape_interval: 15s
     scrape_timeout: 10s
     metrics_path: /metrics
     scheme: http
     static_configs:
-    - targets: ["host.docker.internal:3007"]
+    - targets: ["characters:3009"]
       labels:
-        instance: 'Boost'
+        instance: 'characters'
 
-  - job_name: character
+  - job_name: game
     honor_timestamps: true
     scrape_interval: 15s
     scrape_timeout: 10s
     metrics_path: /metrics
     scheme: http
     static_configs:
-    - targets: ["host.docker.internal:3008"]
+    - targets: ["game:3012"]
       labels:
-        instance: 'Character'
+        instance: 'game'
 
-  - job_name: referral
-    honor_timestamps: true
-    scrape_interval: 15s
-    scrape_timeout: 10s
-    metrics_path: /metrics
-    scheme: http
-    static_configs:
-    - targets: ["host.docker.internal:3009"]
-      labels:
-        instance: 'Referral'
+  # - job_name: referral
+  #   honor_timestamps: true
+  #   scrape_interval: 15s
+  #   scrape_timeout: 10s
+  #   metrics_path: /metrics
+  #   scheme: http
+  #   static_configs:
+  #   - targets: ["host.docker.internal:3009"]
+  #     labels:
+  #       instance: 'Referral'
 
-  - job_name: collection
-    honor_timestamps: true
-    scrape_interval: 15s
-    scrape_timeout: 10s
-    metrics_path: /metrics
-    scheme: http
-    static_configs:
-    - targets: ["host.docker.internal:3010"]
-      labels:
-        instance: 'Collection'
+  # - job_name: collection
+  #   honor_timestamps: true
+  #   scrape_interval: 15s
+  #   scrape_timeout: 10s
+  #   metrics_path: /metrics
+  #   scheme: http
+  #   static_configs:
+  #   - targets: ["host.docker.internal:3010"]
+  #     labels:
+  #       instance: 'Collection'

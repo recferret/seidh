@@ -1,26 +1,32 @@
-import {
-  UsersAuthenticateServiceRequest,
-  UsersAuthenticateServiceResponse,
-} from '@app/seidh-common/dto/users/users.authenticate.msg';
-import {
-  UsersCheckTokenServiceRequest,
-  UsersCheckTokenServiceResponse,
-} from '@app/seidh-common/dto/users/users.check.token.msg';
+import { User, UserDocument } from '@lib/seidh-common/schemas/user/schema.user';
+import { Model, Types } from 'mongoose';
 
-import { User, UserDocument } from '@app/seidh-common/schemas/user/schema.user';
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 
 import { ProviderCrypto } from '../providers/provider.crypto';
-import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
-import { CharacterType } from '@app/seidh-common/dto/types/types.character';
+
+import { MicroserviceCharacters } from '@lib/seidh-common/microservice/microservice.characters';
+
+import {
+  UsersServiceAuthenticateResponse,
+  UsersServiceSimpleAuthRequest,
+  UsersServiceTgAuthRequest,
+  UsersServiceVkAuthRequest,
+} from '@lib/seidh-common/dto/users/users.authenticate.msg';
+import {
+  UsersServiceCheckTokenRequest,
+  UsersServiceCheckTokenResponse,
+} from '@lib/seidh-common/dto/users/users.check-token.msg';
+
+import { CharacterType } from '@lib/seidh-common/types/types.character';
+import { Platform } from '@lib/seidh-common/types/types.user';
 
 @Injectable()
 export class ServiceAuth {
-  private readonly botKey = process.env.TG_BOT_KEY;
-  private readonly isProd = process.env.NODE_ENV == 'production';
+  private readonly tgBotKey = process.env.TG_BOT_KEY;
+  private readonly vkAppKey = process.env.VK_APP_KEY;
 
   constructor(
     private jwtService: JwtService,
@@ -29,157 +35,159 @@ export class ServiceAuth {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
-  async authenticate(request: UsersAuthenticateServiceRequest) {
-    const response: UsersAuthenticateServiceResponse = {
+  async tgAuth(request: UsersServiceTgAuthRequest) {
+    const response: UsersServiceAuthenticateResponse = {
       success: false,
     };
 
     try {
-      let existingUser: UserDocument;
-      let telegramId: string;
-      let telegramName: string;
-      let telegramPremium: boolean;
-      let login: string;
+      const telegramParseResult = await this.providerCrypto.parseTelegramInitData(
+        this.tgBotKey,
+        request.telegramInitData,
+      );
 
-      if (this.isProd) {
-        const telegramParseResult = this.providerCrypto.parseTelegramInitData(
-          this.botKey,
-          request.telegramInitData,
+      let existingUser = await this.userModel.findOne({ telegramId: telegramParseResult.user.id });
+
+      if (!existingUser) {
+        const telegramName = telegramParseResult.user.username;
+
+        existingUser = await this.createAndReturnUser(telegramName, Platform.TG);
+        existingUser = await this.attachUserTgAndReturn(
+          existingUser,
+          telegramParseResult.user.id,
+          telegramParseResult.user.is_premium,
         );
-
-        if (telegramParseResult.correctHash) {
-          telegramId = telegramParseResult.userInfo.id;
-
-          if (telegramParseResult.userInfo.username) {
-            telegramName = telegramParseResult.userInfo.username;
-          } else {
-            telegramName = telegramParseResult.userInfo.first_name;
-
-            if (telegramParseResult.userInfo.last_name) {
-              telegramName += ' ' + telegramParseResult.userInfo.last_name;
-            }
-          }
-
-          telegramPremium = telegramParseResult.userInfo.is_premium;
-
-          response.success = true;
-
-          existingUser = await this.userModel.findOne({ telegramId });
-        } else {
-          return response;
-        }
-      } else {
-        login = request.login;
-        existingUser = await this.userModel.findOne({ login });
       }
 
-      if (existingUser) {
-        response.authToken = await this.jwtService.signAsync({
-          userId: existingUser.id,
-          telegramId,
-          login,
-        });
-
-        existingUser.authToken = response.authToken;
-        existingUser.telegramName = telegramName;
-        await existingUser.save();
-      } else {
-        const rsaKeyPair = await this.providerCrypto.generateNewRsaKeyPair();
-
-        const character = await this.microserviceCharacter.create({
-          characterType: CharacterType.RagnarLoh,
-        });
-
-        // const newCharacter = await this.characterModel.create({
-        //   type: CharacterType.RagnarLoh,
-        //   movement: {
-        //     runSpeed: 20,
-        //     walkSpeed: 10,
-        //   },
-        //   actionMain: {
-        //     damage: 10,
-        //   },
-        // });
-
-        const newUser = new this.userModel({
-          telegramId,
-          telegramName,
-          telegramPremium,
-          login,
-          characters: [character.characterId],
-          privateRsaKey: rsaKeyPair.privateKey,
-        });
-        const authToken = await this.jwtService.signAsync({
-          userId: newUser.id,
-          telegramId,
-          login,
-        });
-        newUser.authToken = authToken;
-
-        await newUser.save();
-
-        if (request.referrerId) {
-          await this.referralCalculation({
-            referrerId: request.referrerId,
-            telegramId,
-            login,
-            newUser,
-          });
-        }
-
-        response.authToken = authToken;
-        response.publicRsaKey = rsaKeyPair.publicKey;
-      }
-
+      const authToken = await this.refreshAndGetAuthToken(existingUser);
       response.success = true;
-    } catch (error) {
-      Logger.log({
-        msg: 'authenticate error',
-        request,
-        error,
-      });
+      response.authToken = authToken;
+    } catch (e) {
+      Logger.error(
+        {
+          request,
+        },
+        e,
+      );
     }
 
     return response;
   }
 
-  async checkToken(request: UsersCheckTokenServiceRequest) {
+  async vkAuth(request: UsersServiceVkAuthRequest) {
+    const response: UsersServiceAuthenticateResponse = {
+      success: false,
+    };
+
+    try {
+      const vkVerified = this.providerCrypto.verifyVkLaunchParams(this.vkAppKey, request.vkLaunchParams);
+
+      let existingUser = await this.userModel.findOne({ vkId: request.vkLaunchParams.vk_user_id });
+
+      if (!existingUser) {
+        existingUser = await this.createAndReturnUser(request.first_name + ' ' + request.last_name, Platform.VK);
+        existingUser = await this.attachUserVkAndReturn(existingUser, request.vkLaunchParams.vk_user_id);
+      }
+
+      const authToken = await this.refreshAndGetAuthToken(existingUser);
+      response.success = true;
+      response.authToken = authToken;
+    } catch (e) {
+      Logger.error(
+        {
+          request,
+        },
+        e,
+      );
+    }
+
+    return response;
+  }
+
+  async simpleAuth(request: UsersServiceSimpleAuthRequest) {
+    const response: UsersServiceAuthenticateResponse = {
+      success: false,
+    };
+
+    try {
+      let existingUser = await this.userModel.findOne({ userName: request.login });
+
+      if (!existingUser) {
+        existingUser = await this.createAndReturnUser(request.login, Platform.NONE);
+      }
+      const authToken = await this.refreshAndGetAuthToken(existingUser);
+      response.success = true;
+      response.authToken = authToken;
+    } catch (e) {
+      Logger.error(
+        {
+          request,
+        },
+        e,
+      );
+    }
+
+    return response;
+  }
+
+  async checkToken(request: UsersServiceCheckTokenRequest) {
     const hasUser = await this.userModel.findOne({
       authToken: request.authToken,
     });
-    const response: UsersCheckTokenServiceResponse = {
+    const response: UsersServiceCheckTokenResponse = {
       success: hasUser !== undefined,
     };
     return response;
   }
 
-  private async referralCalculation({
-    referrerId,
-    telegramId,
-    login,
-    newUser,
-  }) {
-    // const referrer = await this.userModel.findById(referrerId);
-    // const notTheSameUser = this.isProd
-    //   ? referrer.telegramId != telegramId
-    //   : referrer.login != login;
-    // if (referrer && notTheSameUser) {
-    //   const { referrer: updatedReferrer, newUser: updatedNewUser } =
-    //     await firstValueFrom(
-    //       this.referralService.send(ReferralUpdateReferrerPattern, {
-    //         referrer,
-    //         newUser,
-    //       }),
-    //     );
-    //   Object.keys(updatedReferrer).forEach((key) => {
-    //     referrer[key] = updatedReferrer[key];
-    //   });
-    //   await Promise.all([
-    //     referrer.save(),
-    //     this.userModel.findByIdAndUpdate(newUser._id, {
-    //       virtualTokenBalance: updatedNewUser.virtualTokenBalance,
-    //     }),
-    //   ]);
-    // }
+  private async createAndReturnUser(userName: string, platform: Platform) {
+    const rsaKeyPair = await this.providerCrypto.generateNewRsaKeyPair();
+    const character = await this.microserviceCharacter.create({
+      characterType: CharacterType.RagnarLoh,
+    });
+
+    if (!character || !character.success) {
+      throw new Error('Unable to creare character');
+    }
+
+    const characterId = new Types.ObjectId(character.characterId);
+    const newUser = new this.userModel({
+      userName,
+      activeCharacter: characterId,
+      characters: [characterId],
+      privateRsaKey: rsaKeyPair.privateKey,
+      platform,
+    });
+    return await newUser.save();
+  }
+
+  private async attachUserTgAndReturn(existingUser: UserDocument, telegramId: number, telegramPremium: boolean) {
+    existingUser.tgId = telegramId;
+    existingUser.tgPremium = telegramPremium;
+    return await existingUser.save();
+  }
+
+  private async attachUserVkAndReturn(existingUser: UserDocument, vkId: number) {
+    existingUser.vkId = vkId;
+    return await existingUser.save();
+  }
+
+  private async refreshAndGetAuthToken(existingUser: UserDocument) {
+    const jwtObject = {
+      userId: existingUser.id,
+      userName: existingUser.userName,
+    };
+
+    switch (existingUser.platform) {
+      case Platform.TG:
+        jwtObject['telegramId'] = existingUser.tgId;
+      case Platform.VK:
+        jwtObject['vkId'] = existingUser.vkId;
+    }
+
+    existingUser.authToken = await this.jwtService.signAsync(jwtObject);
+    await existingUser.save();
+
+    return existingUser.authToken;
   }
 }

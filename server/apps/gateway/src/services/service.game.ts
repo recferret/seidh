@@ -1,12 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
+
+import { MicroserviceGame } from '@lib/seidh-common/microservice/microservice.game';
+
+import { GameServiceFinishGameRequestDto, GameServiceFinishGameResponseDto } from '../dto/game/game.finish-game.dto';
 import { GameServiceGetGameConfigResponseDto } from '../dto/game/game.get-game-config.dto';
-import { GameServiceStartGameResponseDto } from '../dto/game/game.start-game.dto';
-import { GameServiceProgressGameRequestDto } from '../dto/game/game.progress-game.dto';
 import {
-  GameServiceFinishGameRequestDto,
-  GameServiceFinishGameResponseDto,
-} from '../dto/game/game.finish-game.dto';
-import { MicroserviceGame } from '@app/seidh-common/microservice/microservice.game';
+  GameServiceProgressGameRequestDto,
+  GameServiceProgressGameResponseDto,
+} from '../dto/game/game.progress-game.dto';
+import { GameServiceStartGameResponseDto } from '../dto/game/game.start-game.dto';
 
 @Injectable()
 export class ServiceGame {
@@ -18,7 +20,7 @@ export class ServiceGame {
     };
 
     try {
-      const response = await this.microserviceGame.getGameConfig({});
+      const response = await this.microserviceGame.getGameConfig();
       responseDto.success = response.success;
 
       if (response.success) {
@@ -37,25 +39,21 @@ export class ServiceGame {
         responseDto.statsLevel3Multiplier = response.statsLevel3Multiplier;
 
         // Wealth boost
-        responseDto.wealthLevel1PickUpRangeMultiplier =
-          response.wealthLevel1PickUpRangeMultiplier;
-        responseDto.wealthLevel2PickUpRangeMultiplier =
-          response.wealthLevel2PickUpRangeMultiplier;
-        responseDto.wealthLevel3PickUpRangeMultiplier =
-          response.wealthLevel3PickUpRangeMultiplier;
+        responseDto.wealthLevel1PickUpRangeMultiplier = response.wealthLevel1PickUpRangeMultiplier;
+        responseDto.wealthLevel2PickUpRangeMultiplier = response.wealthLevel2PickUpRangeMultiplier;
+        responseDto.wealthLevel3PickUpRangeMultiplier = response.wealthLevel3PickUpRangeMultiplier;
 
-        responseDto.wealthLevel1CoinsMultiplier =
-          response.wealthLevel1CoinsMultiplier;
-        responseDto.wealthLevel2CoinsMultiplier =
-          response.wealthLevel2CoinsMultiplier;
-        responseDto.wealthLevel3CoinsMultiplier =
-          response.wealthLevel3CoinsMultiplier;
+        responseDto.wealthLevel1CoinsMultiplier = response.wealthLevel1CoinsMultiplier;
+        responseDto.wealthLevel2CoinsMultiplier = response.wealthLevel2CoinsMultiplier;
+        responseDto.wealthLevel3CoinsMultiplier = response.wealthLevel3CoinsMultiplier;
       }
     } catch (error) {
-      Logger.error({
-        msg: 'Unable to get game config',
+      Logger.error(
+        {
+          msg: 'Unable to get game config',
+        },
         error,
-      });
+      );
     }
 
     return responseDto;
@@ -75,7 +73,16 @@ export class ServiceGame {
   }
 
   async progressGame(userId: string, req: GameServiceProgressGameRequestDto) {
-    Logger.log(userId, req);
+    const response = await this.microserviceGame.progressGame({
+      userId,
+      gameId: req.gameId,
+      zombiesKilled: req.zombiesKilled,
+      coinsGained: req.coinsGained,
+    });
+    const responseDto: GameServiceProgressGameResponseDto = {
+      success: response.success,
+    };
+    return responseDto;
   }
 
   async finishGame(userId: string, req: GameServiceFinishGameRequestDto) {
@@ -83,6 +90,8 @@ export class ServiceGame {
       userId,
       gameId: req.gameId,
       reason: req.reason,
+      zombiesKilled: req.zombiesKilled,
+      coinsGained: req.coinsGained,
     });
     const responseDto: GameServiceFinishGameResponseDto = {
       success: response.success,

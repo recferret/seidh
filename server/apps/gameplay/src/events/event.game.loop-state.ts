@@ -1,4 +1,5 @@
-import { CharacterEntityMinStruct } from '@app/seidh-common/seidh-common.boost-constants';
+import { CharacterEntityMinStruct } from '@lib/seidh-common/types/types.engine';
+
 import { EventGameBase } from './event.game.base';
 
 export class EventGameLoopState implements EventGameBase {

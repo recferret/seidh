@@ -1,20 +1,20 @@
+import { ReferralConfig, ReferralConfigSchema } from '@lib/seidh-common/schemas/user/schema.referral';
+
 import { Module } from '@nestjs/common';
-import { ReferralController } from './referral.controller';
-import { ReferralService } from './referral.service';
-import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { MongooseModule } from '@nestjs/mongoose';
-import { InternalProtocol } from '@app/seidh-common';
-import {
-  ReferralConfig,
-  ReferralConfigSchema,
-} from '@app/seidh-common/schemas/user/schema.referral';
+
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
+import { MongoModule } from '@lib/seidh-common/mongo/mongo.module';
+
+import { ReferralController } from './referral.controller';
+
+import { ReferralService } from './referral.service';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(InternalProtocol.MongoUrl),
-    MongooseModule.forFeature([
-      { name: ReferralConfig.name, schema: ReferralConfigSchema },
-    ]),
+    MongoModule,
+    MongooseModule.forFeature([{ name: ReferralConfig.name, schema: ReferralConfigSchema }]),
     PrometheusModule.register(),
   ],
   controllers: [ReferralController],

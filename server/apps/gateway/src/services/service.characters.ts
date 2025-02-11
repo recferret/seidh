@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
+
+import { MicroserviceCharacters } from '@lib/seidh-common/microservice/microservice.characters';
+
 import { CharacterServiceGetDefaultParamsResponseDto } from '../dto/character/character.get-default-params.dto';
+import { CharacterServiceLevelUpResponseDto } from '../dto/character/character.level-up.dto';
 
 @Injectable()
 export class ServiceCharacters {
@@ -19,5 +22,13 @@ export class ServiceCharacters {
     return response;
   }
 
-  async levelUp() {}
+  async levelUp(userId: string) {
+    const result = await this.microserviceCharacters.levelUp({ userId });
+
+    const response: CharacterServiceLevelUpResponseDto = {
+      success: result.success,
+    };
+
+    return response;
+  }
 }

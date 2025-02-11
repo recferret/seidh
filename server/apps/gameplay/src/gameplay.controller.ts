@@ -1,37 +1,34 @@
-import {
-  CanActivate,
-  Controller,
-  ExecutionContext,
-  Injectable,
-  UseGuards,
-} from '@nestjs/common';
-import { GameplayService } from './gameplay.service';
+import { WsGameEvent } from '@lib/seidh-common/seidh-common.internal-protocol';
+
+import { CanActivate, Controller, ExecutionContext, Injectable, UseGuards } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+
 import { Observable } from 'rxjs';
-import { WsGameEvent } from '@app/seidh-common';
-import {
-  GameplayServiceJoinGamePattern,
-  GameplayServiceJoinGameMessage,
-} from '@app/seidh-common/dto/gameplay/gameplay.join-game.msg';
-import {
-  GameplayServiceInputPattern,
-  GameplayServiceInputMessage,
-} from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
-import { Config } from './main';
-import {
-  GameplayServiceDisconnectedPattern,
-  GameplayServiceDisconnectedMessage,
-} from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+
+import { GameplayService } from './gameplay.service';
+
 import {
   GameplayServiceCreateGamePattern,
   GameplayServiceCreateGameRequest,
-} from '@app/seidh-common/dto/gameplay/gameplay.create-game.msg';
+} from '@lib/seidh-common/dto/gameplay/gameplay.create-game.msg';
+import {
+  GameplayServiceDisconnectedMessage,
+  GameplayServiceDisconnectedPattern,
+} from '@lib/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+import {
+  GameplayServiceInputMessage,
+  GameplayServiceInputPattern,
+} from '@lib/seidh-common/dto/gameplay/gameplay.input.msg';
+import {
+  GameplayServiceJoinGameMessage,
+  GameplayServiceJoinGamePattern,
+} from '@lib/seidh-common/dto/gameplay/gameplay.join-game.msg';
+
+import { Config } from './main';
 
 @Injectable()
 class InstanceIdGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request: WsGameEvent = context.switchToRpc().getData();
     return request.gameplayServiceId == Config.GAMEPLAY_INSTANCE_ID;
   }
@@ -39,9 +36,7 @@ class InstanceIdGuard implements CanActivate {
 
 @Injectable()
 class PlayerGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request: WsGameEvent = context.switchToRpc().getData();
     return request.userId && GameplayService.ConnectedUsers.has(request.userId);
   }

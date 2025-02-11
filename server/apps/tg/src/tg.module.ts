@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
-import { TgController } from './tg.controller';
-import { TgService } from './tg.service';
+
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
+import { ApiModule } from './api/api.module';
+import { EnvModule } from '@lib/env/env.module';
+
+import { TgService } from './tg.service';
+
 @Module({
-  imports: [PrometheusModule.register()],
-  controllers: [TgController],
+  imports: [PrometheusModule.register(), EnvModule, ApiModule],
+  controllers: [],
   providers: [TgService],
 })
 export class TgModule {}

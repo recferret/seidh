@@ -1,10 +1,12 @@
 import { Controller } from '@nestjs/common';
-import { ReferralService } from './referral.service';
 import { MessagePattern } from '@nestjs/microservices';
+
+import { ReferralService } from './referral.service';
+
 import {
   ReferralServiceUpdateReferrerPattern,
   ReferralServiceUpdateReferrerRequest,
-} from '@app/seidh-common/dto/referral/referral.update-referrer.msg';
+} from '@lib/seidh-common/dto/referral/referral.update-referrer.msg';
 
 @Controller()
 export class ReferralController {

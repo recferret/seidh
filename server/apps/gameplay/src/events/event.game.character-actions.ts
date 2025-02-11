@@ -1,4 +1,5 @@
-import { CharacterActionCallbackParams } from '@app/seidh-common/seidh-common.boost-constants';
+import { CharacterActionCallbackParams } from '@lib/seidh-common/types/types.engine';
+
 import { EventGameBase } from './event.game.base';
 
 export class EventGameCharacterActions implements EventGameBase {

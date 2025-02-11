@@ -13,7 +13,7 @@ export enum ServicePort {
   WsGateway = 3005,
   Users = 3006,
   TG = 3007,
-  Boost = 3008,
+  Boosts = 3008,
   Characters = 3009,
   Referral = 3010,
   Collection = 3011,
@@ -35,12 +35,6 @@ export enum ServiceName {
   Game = 'GameService',
 }
 
-export class InternalProtocol {
-  // TODO add redis url
-
-  public static readonly NatsUrl = 'nats://0.0.0.0:4222';
-  public static readonly MongoUrl = 'mongodb://localhost:27017/seidh';
-
-  // public static readonly NatsUrl = 'nats://nats:4222';
-  // public static readonly MongoUrl = 'mongodb://ferretrec:khlhasdg972^&*TFGy@mongodb:27017';
-}
+export const NatsUrl = `nats://localhost:4222`;
+// export const NatsUrl = `nats://nats:4222`;
+// export const NatsUrl = `nats://${process.env.NATS_HOST}:${process.env.NATS_PORT}`;

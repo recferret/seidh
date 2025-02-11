@@ -1,11 +1,13 @@
+import { ReferralConfig } from '@lib/seidh-common/schemas/user/schema.referral';
+import { Model } from 'mongoose';
+
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+
 import {
   ReferralServiceUpdateReferrerRequest,
   ReferralServiceUpdateReferrerResponse,
-} from '@app/seidh-common/dto/referral/referral.update-referrer.msg';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { ReferralConfig } from '@app/seidh-common/schemas/user/schema.referral';
+} from '@lib/seidh-common/dto/referral/referral.update-referrer.msg';
 
 @Injectable()
 export class ReferralService {
@@ -20,7 +22,7 @@ export class ReferralService {
     return this.referralConfigModel.findOne();
   }
 
-  async updateReferrer(request: ReferralServiceUpdateReferrerRequest) {
+  async updateReferrer(_request: ReferralServiceUpdateReferrerRequest) {
     const response: ReferralServiceUpdateReferrerResponse = {
       success: false,
     };

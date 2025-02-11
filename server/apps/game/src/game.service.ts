@@ -1,56 +1,51 @@
-import {
-  GameServiceFinishGameRequest,
-  GameServiceFinishGameResponse,
-} from '@app/seidh-common/dto/game/game.finish-game.msg';
-import {
-  GameServiceGetGameConfigGameRequest,
-  GameServiceGetGameConfigResponse,
-} from '@app/seidh-common/dto/game/game.get-game-config.msg';
-import {
-  GameServiceProgressGameRequest,
-  GameServiceProgressGameResponse,
-} from '@app/seidh-common/dto/game/game.progress-game.msg';
-import {
-  GameServiceStartGameRequest,
-  GameServiceStartGameResponse,
-} from '@app/seidh-common/dto/game/game.start-game.msg';
-import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
-import {
-  Game,
-  GameDocument,
-  GameFinishReason,
-  GameGainings,
-  GameState,
-  GameType,
-} from '@app/seidh-common/schemas/game/schema.game';
-import { GameConfig } from '@app/seidh-common/schemas/game/schema.game-config';
-import { GameProgress } from '@app/seidh-common/schemas/game/schema.game-progress';
+import { Game, GameDocument } from '@lib/seidh-common/schemas/game/schema.game';
+import { GameConfig } from '@lib/seidh-common/schemas/game/schema.game-config';
+import { Model } from 'mongoose';
+
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Model } from 'mongoose';
 
-interface IGameProgress {
-  gameId: string;
-  userId: string;
-  mobsSpawned: number;
-  mobsKilled: number;
-  tokensGained: number;
+import { MicroserviceCharacters } from '@lib/seidh-common/microservice/microservice.characters';
+import { MicroserviceUsers } from '@lib/seidh-common/microservice/microservice.users';
+
+import {
+  GameServiceFinishGameRequest,
+  GameServiceFinishGameResponse,
+} from '@lib/seidh-common/dto/game/game.finish-game.msg';
+import { GameServiceGetGameConfigResponse } from '@lib/seidh-common/dto/game/game.get-game-config.msg';
+import {
+  GameServiceProgressGameRequest,
+  GameServiceProgressGameResponse,
+} from '@lib/seidh-common/dto/game/game.progress-game.msg';
+import {
+  GameServiceStartGameRequest,
+  GameServiceStartGameResponse,
+} from '@lib/seidh-common/dto/game/game.start-game.msg';
+
+import { GameFinishReason, GameState, GameType } from '@lib/seidh-common/types/types.game';
+import { BalanceOperationType, BalanceUpdateReason } from '@lib/seidh-common/types/types.user';
+
+// ONLY SINGLE PLAYER LOGIC HERE
+
+interface CachedGame {
   lastUpdateTime: number;
+  userId: string;
+  userZombieKills: number;
+  userCoinsGained: number;
 }
 
 @Injectable()
 export class GameService implements OnModuleInit {
-  private readonly gameProgressByPlayerCache = new Map<string, IGameProgress>();
-
   private gameConfig: GameServiceGetGameConfigResponse;
+
+  private cachedGames = new Map<string, CachedGame>();
 
   constructor(
     private microserviceUsers: MicroserviceUsers,
+    private microserviceCharacters: MicroserviceCharacters,
     @InjectModel(Game.name)
     private gameModel: Model<Game>,
-    @InjectModel(GameProgress.name)
-    private gameProgressModel: Model<GameProgress>,
     @InjectModel(GameConfig.name)
     private gameConfigModel: Model<GameConfig>,
   ) {}
@@ -61,26 +56,6 @@ export class GameService implements OnModuleInit {
     const mobsMaxPerGame = 500;
     const mobSpawnDelayMs = 2500;
 
-    // TODO move to boosts MS
-    // Exp boost
-    const expLevel1Multiplier = 1.5;
-    const expLevel2Multiplier = 2;
-    const expLevel3Multiplier = 3;
-
-    // Stats boost
-    const statsLevel1Multiplier = 1.2;
-    const statsLevel2Multiplier = 1.5;
-    const statsLevel3Multiplier = 2;
-
-    // Wealth boost
-    const wealthLevel1PickUpRangeMultiplier = 1.2;
-    const wealthLevel2PickUpRangeMultiplier = 2;
-    const wealthLevel3PickUpRangeMultiplier = 2.5;
-
-    const wealthLevel1CoinsMultiplier = 2;
-    const wealthLevel2CoinsMultiplier = 3;
-    const wealthLevel3CoinsMultiplier = 4;
-
     const gameConfig = await this.gameConfigModel.find();
     if (!gameConfig || gameConfig.length == 0) {
       await this.gameConfigModel.create({
@@ -88,25 +63,6 @@ export class GameService implements OnModuleInit {
         mobsMaxAtTheSameTime,
         mobsMaxPerGame,
         mobSpawnDelayMs,
-
-        // Exp boost
-        expLevel1Multiplier,
-        expLevel2Multiplier,
-        expLevel3Multiplier,
-
-        // Stats boost
-        statsLevel1Multiplier,
-        statsLevel2Multiplier,
-        statsLevel3Multiplier,
-
-        // Wealth boost
-        wealthLevel1PickUpRangeMultiplier,
-        wealthLevel2PickUpRangeMultiplier,
-        wealthLevel3PickUpRangeMultiplier,
-
-        wealthLevel1CoinsMultiplier,
-        wealthLevel2CoinsMultiplier,
-        wealthLevel3CoinsMultiplier,
       });
     }
 
@@ -117,41 +73,17 @@ export class GameService implements OnModuleInit {
       mobsMaxAtTheSameTime,
       mobsMaxPerGame,
       mobSpawnDelayMs,
-
-      // Exp boost
-      expLevel1Multiplier,
-      expLevel2Multiplier,
-      expLevel3Multiplier,
-
-      // Stats boost
-      statsLevel1Multiplier,
-      statsLevel2Multiplier,
-      statsLevel3Multiplier,
-
-      // Wealth boost
-      wealthLevel1PickUpRangeMultiplier,
-      wealthLevel2PickUpRangeMultiplier,
-      wealthLevel3PickUpRangeMultiplier,
-
-      wealthLevel1CoinsMultiplier,
-      wealthLevel2CoinsMultiplier,
-      wealthLevel3CoinsMultiplier,
     };
 
-    const existingGames = await this.gameModel.find({
-      type: GameType.Single,
-      state: GameState.Playing,
-    });
-
-    if (existingGames && existingGames.length > 0) {
-      for (const existingGame of existingGames) {
-        await this.finishExistingGame(existingGame, GameFinishReason.Timeout);
-      }
-    }
+    await this.finishExistingGames(GameFinishReason.Timeout);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getGameConfig(request: GameServiceGetGameConfigGameRequest) {
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async finishOutdatedGames() {
+    await this.finishExistingGames(GameFinishReason.Timeout);
+  }
+
+  async getGameConfig() {
     return this.gameConfig;
   }
 
@@ -168,22 +100,37 @@ export class GameService implements OnModuleInit {
       });
 
       if (existingGame) {
-        await this.finishExistingGame(existingGame, GameFinishReason.Closed);
+        const chachedGame = this.cachedGames.get(existingGame.id);
+
+        if (chachedGame) {
+          await this.finishExistingGame(
+            existingGame,
+            GameFinishReason.Closed,
+            request.userId,
+            chachedGame.userZombieKills,
+            chachedGame.userCoinsGained,
+          );
+        } else {
+          Logger.error({
+            msg: 'GameService startGame, no chachedGame, finish without gainings',
+            request,
+          });
+          await this.finishExistingGame(existingGame, GameFinishReason.Closed, request.userId, 0, 0);
+        }
       }
 
       const game = await this.gameModel.create({
         type: GameType.Single,
         userIds: [request.userId],
+        userGainings: {},
       });
 
       if (game) {
-        this.gameProgressByPlayerCache.set(request.userId, {
-          gameId: game.id,
-          userId: request.userId,
-          mobsSpawned: 0,
-          mobsKilled: 0,
-          tokensGained: 0,
+        this.cachedGames.set(game.id, {
           lastUpdateTime: Date.now(),
+          userId: request.userId,
+          userZombieKills: 0,
+          userCoinsGained: 0,
         });
 
         response.success = true;
@@ -192,11 +139,13 @@ export class GameService implements OnModuleInit {
         return response;
       }
     } catch (error) {
-      Logger.error({
-        msg: 'GameService startGame error',
-        request,
+      Logger.error(
+        {
+          msg: 'GameService startGame error',
+          request,
+        },
         error,
-      });
+      );
     }
 
     return response;
@@ -207,70 +156,30 @@ export class GameService implements OnModuleInit {
       success: false,
     };
 
-    const existingGame = await this.gameModel.findById(request.gameId);
-    const gameProgressCache = this.gameProgressByPlayerCache.get(
-      request.userId,
-    );
-    gameProgressCache.lastUpdateTime = Date.now();
+    try {
+      const cachedGame = this.cachedGames.get(request.gameId);
 
-    if (existingGame && gameProgressCache) {
-      let logicErrorString = undefined;
+      // TODO add log
 
-      // Check total mobs spawned
-      if (
-        gameProgressCache.mobsSpawned + request.mobsSpawned <
-        this.gameConfig.mobsMaxAtTheSameTime
-      ) {
-        gameProgressCache.mobsSpawned += request.mobsSpawned;
-
-        // Check mobs killed
-        if (
-          gameProgressCache.mobsKilled + request.mobsKilled <
-          gameProgressCache.mobsSpawned
-        ) {
-          gameProgressCache.mobsKilled += request.mobsKilled;
-
-          // Check tokens gained
-          if (
-            gameProgressCache.tokensGained + request.tokensGained <=
-            gameProgressCache.mobsSpawned
-          ) {
-            gameProgressCache.tokensGained += request.tokensGained;
-          } else {
-            logicErrorString = 'progressGame, update tokens gained error';
-          }
-        } else {
-          logicErrorString = 'progressGame, update mobs killed error';
-        }
+      if (cachedGame) {
+        cachedGame.lastUpdateTime = Date.now();
+        cachedGame.userZombieKills += request.zombiesKilled;
+        cachedGame.userCoinsGained += request.coinsGained;
+        response.success = true;
       } else {
-        logicErrorString = 'progressGame, update mobs spawned error';
-      }
-
-      if (logicErrorString) {
         Logger.error({
-          msg: logicErrorString,
-          gameProgressCache,
+          msg: 'GameService progressGame error, no such cached game',
           request,
         });
-      } else {
-        const gameProgress = await this.gameProgressModel.create({
-          userId: request.userId,
-          gameId: request.gameId,
-          mobsSpawned: request.mobsSpawned,
-          mobsKilled: request.mobsKilled,
-          tokensGained: request.tokensGained,
-        });
-
-        existingGame.gameProgress.push(gameProgress._id);
-        existingGame.userGainings.set(request.userId, {
-          kills: gameProgressCache.mobsKilled,
-          tokens: gameProgressCache.tokensGained,
-        } as GameGainings);
-
-        await existingGame.save();
-
-        response.success = true;
       }
+    } catch (error) {
+      Logger.error(
+        {
+          msg: 'GameService progressGame error',
+          request,
+        },
+        error,
+      );
     }
 
     return response;
@@ -281,64 +190,143 @@ export class GameService implements OnModuleInit {
       success: false,
     };
 
-    const existingGame = await this.gameModel.findById(request.gameId);
-    const gameProgressCache = this.gameProgressByPlayerCache.get(
-      request.userId,
-    );
-
-    if (existingGame && gameProgressCache) {
-      if (
-        request.reason == GameFinishReason.Win &&
-        gameProgressCache.mobsSpawned == this.gameConfig.mobsMaxAtTheSameTime &&
-        gameProgressCache.mobsKilled == this.gameConfig.mobsMaxAtTheSameTime
-      ) {
-        gameProgressCache.mobsKilled == this.gameConfig.mobsMaxAtTheSameTime;
+    try {
+      const game = await this.gameModel.findById(request.gameId);
+      const gameFinished = await this.finishExistingGame(
+        game,
+        request.reason,
+        request.userId,
+        request.zombiesKilled,
+        request.coinsGained,
+      );
+      this.cachedGames.delete(request.gameId);
+      response.success = gameFinished;
+      if (!response.success) {
+        Logger.error({
+          msg: 'GameService finishGame error, unable to finish',
+          request,
+        });
       }
-
-      await this.finishExistingGame(existingGame, request.reason);
+    } catch (error) {
+      Logger.error(
+        {
+          msg: 'GameService finishGame error',
+          request,
+        },
+        error,
+      );
     }
-
-    this.gameProgressByPlayerCache.delete(request.userId);
 
     return response;
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  async finishOutdatedGames() {
-    const now = Date.now();
-    const outdatedGames: IGameProgress[] = [];
+  private async finishGameForUser(gameId: string, userId: string, zombiesKilled: number, coinsGained: number) {
+    if (zombiesKilled > 0) {
+      const addExpResponse = await this.microserviceCharacters.addExp({
+        userId,
+        gameId,
+        zombiesKilled,
+      });
 
-    this.gameProgressByPlayerCache.forEach((v) => {
-      if (v.lastUpdateTime < now) {
-        outdatedGames.push(v);
+      if (!addExpResponse.success) {
+        Logger.error({
+          msg: 'GameService finishGame error, unable to add exp',
+          request: {
+            userId,
+            gameId,
+            zombiesKilled,
+          },
+        });
+        return false;
       }
-    });
 
-    for (const outdatedGame of outdatedGames) {
-      const existingGame = await this.gameModel.findById(outdatedGame.gameId);
-      await this.finishExistingGame(existingGame, GameFinishReason.Timeout);
+      const updateKillsResponse = await this.microserviceUsers.updateKills({
+        userId,
+        zombiesKilled,
+      });
 
-      this.gameProgressByPlayerCache.delete(outdatedGame.userId);
+      if (!updateKillsResponse.success) {
+        Logger.error({
+          msg: 'GameService finishGame error, unable to update kills',
+          request: {
+            userId,
+            gameId,
+            zombiesKilled,
+          },
+        });
+        return false;
+      }
     }
+
+    if (coinsGained > 0) {
+      const updateBalanceResponse = await this.microserviceUsers.updateBalance({
+        userId,
+        operation: BalanceOperationType.ADD,
+        reason: BalanceUpdateReason.GAME_FINISH,
+        coins: coinsGained,
+      });
+
+      if (!updateBalanceResponse.success) {
+        Logger.error({
+          msg: 'GameService finishGame error, unable to update balance',
+          request: {
+            userId,
+            gameId,
+            operation: BalanceOperationType.ADD,
+            reason: BalanceUpdateReason.GAME_FINISH,
+            coins: coinsGained,
+          },
+        });
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private async finishExistingGame(
     game: GameDocument,
     reason: GameFinishReason,
+    userId: string,
+    zombiesKilled: number,
+    coinsGained: number,
   ) {
-    game.state = GameState.Finished;
-    game.finishReason = reason;
-    await game.save();
+    if (game && game.state == GameState.Playing) {
+      const finishedForUser = await this.finishGameForUser(game.id, userId, zombiesKilled, coinsGained);
+      if (finishedForUser) {
+        game.state = GameState.Finished;
+        game.finishReason = reason;
+        game.userGainings.set(userId, {
+          zombiesKilled,
+          coinsGained,
+        });
+        await game.save();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
 
-    if (game.userGainings.size > 0) {
-      await this.microserviceUsers.updateGainings({
-        userGainings: {
-          userId: game.userIds[0],
-          gameId: game.id,
-          kills: game.userGainings.get(game.userIds[0]).kills,
-          tokens: game.userGainings.get(game.userIds[0]).tokens,
-        },
-      });
+  private async finishExistingGames(reason: GameFinishReason) {
+    const existingGames = await this.gameModel.find({
+      type: GameType.Single,
+      state: GameState.Playing,
+    });
+
+    if (existingGames) {
+      for (const existingGame of existingGames) {
+        const cachedGame = this.cachedGames.get(existingGame.id);
+        if (cachedGame && cachedGame.lastUpdateTime + 10000 < Date.now()) {
+          await this.finishExistingGame(
+            existingGame,
+            reason,
+            cachedGame.userId,
+            cachedGame.userZombieKills,
+            cachedGame.userCoinsGained,
+          );
+        }
+      }
     }
   }
 }

@@ -1,9 +1,11 @@
-import { NestFactory } from '@nestjs/core';
-import { GatewayModule } from './gateway.module';
-import { ServicePort } from '@app/seidh-common';
-import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ServicePort } from '@lib/seidh-common/seidh-common.internal-protocol';
+
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+
+import { GatewayModule } from './gateway.module';
 
 async function bootstrap() {
   let httpsOptions = null;
@@ -17,6 +19,7 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(GatewayModule, { httpsOptions });
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   await app.listen(ServicePort.Gateway);
 

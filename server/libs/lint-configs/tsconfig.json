@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2017",
+    "outDir": "./dist",
+    "baseUrl": "./",
+
+    "forceConsistentCasingInFileNames": false,
+    "allowSyntheticDefaultImports": true,
+    "noFallthroughCasesInSwitch": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictBindCallApply": false,
+    "strictNullChecks": false,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "incremental": true,
+    "sourceMap": true,
+    "declaration": true
+  }
+}

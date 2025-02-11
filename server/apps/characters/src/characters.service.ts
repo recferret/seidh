@@ -1,26 +1,45 @@
+import { AddExpTransaction } from '@lib/seidh-common/schemas/character/schema.add-exp-transaction';
+import { Character } from '@lib/seidh-common/schemas/character/schema.character';
+import { CharacterParams } from '@lib/seidh-common/schemas/character/schema.character-params';
+import { LevelUpTransaction } from '@lib/seidh-common/schemas/character/schema.level-up-transaction';
+import { User } from '@lib/seidh-common/schemas/user/schema.user';
+import { Model } from 'mongoose';
+
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+
+import { CharactersDataService } from './characters.data.service';
+
+import { SeidhCommonBoostsUtils } from '@lib/seidh-common/seidh-common.boosts-utils';
+
+import {
+  CharactersServiceAddExpRequest,
+  CharactersServiceAddExpResponse,
+} from '@lib/seidh-common/dto/characters/characters.add-exp.msg';
 import {
   CharactersServiceCreateRequest,
   CharactersServiceCreateResponse,
-} from '@app/seidh-common/dto/characters/characters.create.msg';
+} from '@lib/seidh-common/dto/characters/characters.create.msg';
 import {
   CharactersServiceGetByIdsRequest,
   CharactersServiceGetByIdsResponse,
-} from '@app/seidh-common/dto/characters/characters.get-by-ids.msg';
-import { CharactersServiceGetDefaultParamsResponse } from '@app/seidh-common/dto/characters/characters.get-default-params.msg';
-import { CharactersServicelevelUpRequest } from '@app/seidh-common/dto/characters/characters.level-up.msg';
+} from '@lib/seidh-common/dto/characters/characters.get-by-ids.msg';
+import { CharactersServiceGetDefaultParamsResponse } from '@lib/seidh-common/dto/characters/characters.get-default-params.msg';
 import {
-  CharacterType,
-  CharacterParams,
-} from '@app/seidh-common/dto/types/types.character';
-import { Character } from '@app/seidh-common/schemas/character/schema.character';
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+  CharactersServiceLevelUpRequest,
+  CharactersServiceLevelUpResponse,
+} from '@lib/seidh-common/dto/characters/characters.level-up.msg';
+
+import { CharacterType } from '@lib/seidh-common/types/types.character';
 
 @Injectable()
 export class CharactersService {
   constructor(
+    private readonly charactersDataService: CharactersDataService,
     @InjectModel(Character.name) private characterModel: Model<Character>,
+    @InjectModel(AddExpTransaction.name) private addExpTransactionModel: Model<AddExpTransaction>,
+    @InjectModel(LevelUpTransaction.name) private levelUpTransactionModel: Model<LevelUpTransaction>,
+    @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   async create(request: CharactersServiceCreateRequest) {
@@ -29,15 +48,13 @@ export class CharactersService {
     };
 
     try {
-      const charParams = this.getBasicCharacterParamsByType(
-        request.characterType,
-      );
+      const charParams = this.charactersDataService.getCharacterParamsByType(request.characterType);
       const newCharacter = await this.characterModel.create({
         type: request.characterType,
         levelCurrent: charParams.levelCurrent,
         levelMax: charParams.levelMax,
         expCurrent: charParams.expCurrent,
-        expTillNewLevel: charParams.expTillNewLevel,
+        expTillNextLevel: charParams.expTillNextLevel,
         health: charParams.health,
         entityShape: charParams.entityShape,
         movement: charParams.movement,
@@ -45,12 +62,15 @@ export class CharactersService {
       });
 
       response.characterId = newCharacter.id;
+      response.success = true;
     } catch (error) {
-      Logger.log({
-        msg: 'CharactersService create',
-        request,
+      Logger.error(
+        {
+          msg: 'CharactersService create',
+          request,
+        },
         error,
-      });
+      );
     }
 
     return response;
@@ -62,18 +82,14 @@ export class CharactersService {
     };
 
     try {
-      const chars = await this.characterModel
-        .find()
-        .where('_id')
-        .in(request.ids)
-        .exec();
+      const chars = await this.characterModel.find().where('_id').in(request.ids).exec();
       response.characterParams = chars.map((char) => {
         const params: CharacterParams = {
           type: char.type,
           levelCurrent: char.levelCurrent,
           levelMax: char.levelMax,
           expCurrent: char.expCurrent,
-          expTillNewLevel: char.expTillNewLevel,
+          expTillNextLevel: char.expTillNextLevel,
           health: char.health,
           entityShape: char.entityShape,
           movement: char.movement,
@@ -84,7 +100,8 @@ export class CharactersService {
       response.success = true;
     } catch (error) {
       Logger.log({
-        msg: 'CharactersService getDefaultParams',
+        msg: 'CharactersService getByIds',
+        request,
         error,
       });
     }
@@ -98,15 +115,9 @@ export class CharactersService {
     };
 
     try {
-      response.ragnarLoh = this.getBasicCharacterParamsByType(
-        CharacterType.RagnarLoh,
-      );
-      response.zombieBoy = this.getBasicCharacterParamsByType(
-        CharacterType.ZombieBoy,
-      );
-      response.zombieGirl = this.getBasicCharacterParamsByType(
-        CharacterType.ZombieGirl,
-      );
+      response.ragnarLoh = this.charactersDataService.getCharacterParamsByType(CharacterType.RagnarLoh);
+      response.zombieBoy = this.charactersDataService.getCharacterParamsByType(CharacterType.ZombieBoy);
+      response.zombieGirl = this.charactersDataService.getCharacterParamsByType(CharacterType.ZombieGirl);
       response.success = true;
     } catch (error) {
       Logger.log({
@@ -118,114 +129,110 @@ export class CharactersService {
     return response;
   }
 
-  async levelUp(request: CharactersServicelevelUpRequest) {}
+  async addExp(request: CharactersServiceAddExpRequest) {
+    const response: CharactersServiceAddExpResponse = {
+      success: false,
+    };
 
-  private getBasicCharacterParamsByType(
-    characterType: CharacterType,
-  ): CharacterParams {
-    switch (characterType) {
-      case CharacterType.RagnarLoh:
-        return {
-          type: CharacterType.RagnarLoh,
-          levelCurrent: 1,
-          levelMax: 10,
-          expCurrent: 0,
-          expTillNewLevel: 1000,
-          health: 100,
-          entityShape: {
-            width: 180,
-            height: 260,
-            rectOffsetX: 0,
-            rectOffsetY: 0,
-            radius: 150,
-          },
-          movement: {
-            runSpeed: 40,
-            speedFactor: 10,
-            inputDelay: 0.1,
-          },
-          actionMain: {
-            damage: 5,
-            inputDelay: 1,
-            meleeStruct: {
-              aoe: true,
-              shape: {
-                width: 350,
-                height: 260,
-                rectOffsetX: 175 - 90,
-                rectOffsetY: 0,
-              },
-            },
-          },
-        };
-      case CharacterType.ZombieBoy:
-        return {
-          type: CharacterType.ZombieBoy,
-          levelCurrent: 1,
-          levelMax: 10,
-          expCurrent: 0,
-          expTillNewLevel: 1000,
-          health: 10,
-          entityShape: {
-            width: 200,
-            height: 260,
-            rectOffsetX: 0,
-            rectOffsetY: 0,
-            radius: 0,
-          },
-          movement: {
-            runSpeed: 3,
-            speedFactor: 10,
-            inputDelay: 0.1,
-          },
-          actionMain: {
-            damage: 5,
-            inputDelay: 1,
-            meleeStruct: {
-              aoe: true,
-              shape: {
-                width: 300,
-                height: 400,
-                rectOffsetX: 0,
-                rectOffsetY: 0,
-              },
-            },
-          },
-        };
-      case CharacterType.ZombieGirl:
-        return {
-          type: CharacterType.ZombieGirl,
-          levelCurrent: 1,
-          levelMax: 10,
-          expCurrent: 0,
-          expTillNewLevel: 1000,
-          health: 10,
-          entityShape: {
-            width: 200,
-            height: 260,
-            rectOffsetX: 0,
-            rectOffsetY: 0,
-            radius: 0,
-          },
-          movement: {
-            runSpeed: 3,
-            speedFactor: 10,
-            inputDelay: 0.1,
-          },
-          actionMain: {
-            damage: 5,
-            inputDelay: 1,
-            meleeStruct: {
-              aoe: true,
-              shape: {
-                width: 300,
-                height: 400,
-                rectOffsetX: 0,
-                rectOffsetY: 0,
-              },
-            },
-          },
-        };
+    try {
+      const user = await this.userModel.findById(request.userId);
+      const character = await this.characterModel.findById(user.activeCharacter);
+
+      if (character.levelCurrent < character.levelMax) {
+        const expLevel = SeidhCommonBoostsUtils.GetUserExpLevel(user.boostsOwned);
+        const expMultiplier = SeidhCommonBoostsUtils.GetExpMultiplierByLevel(expLevel);
+        const expToAdd = request.zombiesKilled * this.charactersDataService.getExpPerZombieKill() * expMultiplier;
+
+        await this.addExpTransactionModel.create({
+          user,
+          character,
+          expToAdd,
+          currentExp: character.expCurrent,
+        });
+
+        character.expCurrent += expToAdd;
+
+        if (character.expCurrent >= character.expTillNextLevel) {
+          character.expCurrent = character.expTillNextLevel;
+        }
+
+        await character.save();
+        response.success = true;
+      }
+    } catch (error) {
+      Logger.error(
+        {
+          msg: 'CharactersService addExp',
+          request,
+        },
+        error,
+      );
     }
+
+    return response;
+  }
+
+  async levelUp(request: CharactersServiceLevelUpRequest) {
+    const response: CharactersServiceLevelUpResponse = {
+      success: false,
+    };
+
+    try {
+      const user = await this.userModel.findById(request.userId);
+      const character = await this.characterModel.findById(user.activeCharacter);
+
+      if (character.levelCurrent < character.levelMax && character.expCurrent >= character.expTillNextLevel) {
+        const nextLevelData = this.charactersDataService.getNextLevelData(character.levelCurrent + 1);
+
+        if (user.coins >= nextLevelData.coinsPrice && user.teeth >= nextLevelData.teethPrice) {
+          character.expCurrent = 0;
+          character.levelCurrent++;
+          character.expTillNextLevel = this.charactersDataService.getNextLevelData(
+            character.levelCurrent,
+          ).expTillNextLevel;
+
+          await character.save();
+          await this.levelUpTransactionModel.create({
+            user,
+            character,
+            level: character.levelCurrent,
+            coinsSpent: request.coins,
+            teethSpent: request.coins,
+          });
+
+          response.success = true;
+        } else {
+          Logger.error({
+            msg: 'CharactersService levelUp error, not enough coins or teeth',
+            request,
+            character: {
+              id: character.id,
+              currentLevel: character.levelCurrent,
+              expCurrent: character.expCurrent,
+              expTillNextLevel: character.expTillNextLevel,
+            },
+          });
+        }
+      } else {
+        Logger.error({
+          msg: 'CharactersService levelUp error, not enough exp',
+          request,
+          character: {
+            id: character.id,
+            currentLevel: character.levelCurrent,
+            expCurrent: character.expCurrent,
+            expTillNextLevel: character.expTillNextLevel,
+          },
+        });
+      }
+    } catch (error) {
+      Logger.log({
+        msg: 'CharactersService levelUp',
+        request,
+        error,
+      });
+    }
+
+    return response;
   }
 }

@@ -1,18 +1,31 @@
-import { SeidhCommonBroadcasts, ServiceName } from '@app/seidh-common';
-import {
-  UsersGetUserServiceRequest,
-  UsersGetUserServiceResponse,
-  UserBody,
-  CharacterBody,
-} from '@app/seidh-common/dto/users/users.get.user.msg';
-import { UsersUpdateGainingsServiceMessage } from '@app/seidh-common/dto/users/users.update.gainings';
-import { GameGainingTransaction } from '@app/seidh-common/schemas/game/schema.game-gaining.transaction';
-import { User } from '@app/seidh-common/schemas/user/schema.user';
-import { SeidhCommonBoostConstants } from '@app/seidh-common/seidh-common.boost-constants';
+import { UserBalanceTransaction } from '@lib/seidh-common/schemas/user/schema.balance.transaction';
+import { User } from '@lib/seidh-common/schemas/user/schema.user';
+import { SeidhCommonBroadcasts } from '@lib/seidh-common/seidh-common.broadcasts';
+import { ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+import { Model } from 'mongoose';
+
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+
+import { SeidhCommonBoostsUtils } from '@lib/seidh-common/seidh-common.boosts-utils';
+
+import {
+  CharacterBody,
+  UserBody,
+  UsersServiceGetUserRequest,
+  UsersServiceGetUserResponse,
+} from '@lib/seidh-common/dto/users/users.get-user.msg';
+import {
+  UsersServiceUpdateBalanceRequest,
+  UsersServiceUpdateBalanceResponse,
+} from '@lib/seidh-common/dto/users/users.update-balance.msg';
+import {
+  UsersServiceUpdateKillsRequest,
+  UsersServiceUpdateKillsResponse,
+} from '@lib/seidh-common/dto/users/users.update-kills.msg';
+
+import { BalanceOperationType } from '@lib/seidh-common/types/types.user';
 
 @Injectable()
 export class ServiceUser {
@@ -20,38 +33,31 @@ export class ServiceUser {
 
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
-    @InjectModel(GameGainingTransaction.name)
-    private gameGainingTransactionModel: Model<GameGainingTransaction>,
+    @InjectModel(UserBalanceTransaction.name)
+    private UserBalanceTransactionModel: Model<UserBalanceTransaction>,
     @Inject(ServiceName.WsGateway) wsGatewayService: ClientProxy,
   ) {
-    this.seidhCommonBroadcasts = new SeidhCommonBroadcasts(
-      userModel,
-      wsGatewayService,
-    );
+    this.seidhCommonBroadcasts = new SeidhCommonBroadcasts(userModel, wsGatewayService);
   }
 
-  async getUser(request: UsersGetUserServiceRequest) {
-    const response: UsersGetUserServiceResponse = {
+  async getUser(request: UsersServiceGetUserRequest) {
+    const response: UsersServiceGetUserResponse = {
       success: false,
     };
 
     try {
-      const user = await this.userModel
-        .findById(request.userId)
-        .populate(['characters']);
+      const user = await this.userModel.findById(request.userId).populate(['characters']);
 
       const userBody: UserBody = {
         userId: user.id,
 
-        telegramName: user.telegramName,
-        telegramPremium: user.telegramPremium,
+        userName: user.userName,
+        telegramPremium: user.tgPremium,
 
         coins: user.coins,
         teeth: user.teeth,
 
         characters: user.characters.map((c: any) => {
-          const statsMultiplier = SeidhCommonBoostConstants.GetStatsMultiplierByLevel(this.getUserStatsLevel(user.boostsOwned));
-
           const character: CharacterBody = {
             id: c.id,
             type: c.type,
@@ -59,8 +65,8 @@ export class ServiceUser {
             levelCurrent: c.levelCurrent,
             levelMax: c.levelMax,
             expCurrent: c.expCurrent,
-            expTillNewLevel: c.expTillNewLevel,
-            health: c.health * statsMultiplier,
+            expTillNextLevel: c.expTillNextLevel,
+            health: c.health,
             entityShape: {
               width: c.entityShape.width,
               height: c.entityShape.height,
@@ -76,6 +82,8 @@ export class ServiceUser {
             actionMain: {
               damage: c.actionMain.damage,
               inputDelay: c.actionMain.inputDelay,
+              actionType: c.actionMain.actionType,
+              animDurationMs: 100,
               meleeStruct: {
                 aoe: c.actionMain.meleeStruct.aoe,
                 shape: {
@@ -87,6 +95,20 @@ export class ServiceUser {
               },
             },
           };
+
+          // Apply boosts
+          const wealthLevel = SeidhCommonBoostsUtils.GetUserWealthLevel(user.boostsOwned);
+          const statsLevel = SeidhCommonBoostsUtils.GetUserStatsLevel(user.boostsOwned);
+
+          const wealthRadiusMultiplier = SeidhCommonBoostsUtils.GetWealthRadiusMultiplierByLevel(wealthLevel);
+          const statsMultiplier = SeidhCommonBoostsUtils.GetStatsMultiplierByLevel(statsLevel);
+
+          character.entityShape.radius *= wealthRadiusMultiplier;
+
+          character.health *= statsMultiplier;
+          character.movement.runSpeed *= statsMultiplier;
+          character.actionMain.damage *= statsMultiplier;
+
           return character;
         }),
       };
@@ -100,100 +122,98 @@ export class ServiceUser {
     return response;
   }
 
-  async updateGainings(message: UsersUpdateGainingsServiceMessage) {
-    const user = await this.userModel.findById(message.userGainings.userId);
-    if (user) {
-      const tokensToAdd = message.userGainings.tokens;
-      const expToAdd = message.userGainings.kills;
+  async updateKills(request: UsersServiceUpdateKillsRequest) {
+    const response: UsersServiceUpdateKillsResponse = {
+      success: false,
+    };
 
-      // if (user.hasCoinBoost1) {
-      //   tokensToAdd *= 2;
-      // } else if (user.hasCoinBoost2) {
-      //   tokensToAdd *= 3;
-      // }
-
-      // if (user.hasExpBoost1) {
-      //   expToAdd *= 1.5;
-      // } else if (user.hasExpBoost2) {
-      //   expToAdd *= 2;
-      // }
-
-      user.coins += tokensToAdd;
-      user.kills += message.userGainings.kills;
-
-      await user.save();
-      await this.gameGainingTransactionModel.create({
-        user,
-        gameId: message.userGainings.gameId,
-        exp: expToAdd,
-        kills: message.userGainings.kills,
-        tokens: tokensToAdd,
-      });
-      await this.seidhCommonBroadcasts.notifyBalanceUpdate(user.id);
-    } else {
+    try {
+      const user = await this.userModel.findById(request.userId);
+      if (user) {
+        user.monsterKills += request.zombiesKilled;
+        await user.save();
+        response.success = true;
+      } else {
+        Logger.error(`updateKills. user ${request.userId} not found`);
+      }
+    } catch (error) {
       Logger.error(
-        `updateGainings. user ${message.userGainings.userId} not found`,
+        {
+          message: 'updateKills error',
+          request,
+        },
+        error,
       );
     }
+
+    return response;
   }
 
-  private getUserExpLevel(boostsOwned: string[]) {
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_EXP_3_ID))
-			return 3;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_EXP_2_ID))
-			return 2;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_EXP_1_ID))
-			return 1;
-		return 0;
-	}
+  async updateBalance(request: UsersServiceUpdateBalanceRequest) {
+    const response: UsersServiceUpdateBalanceResponse = {
+      success: false,
+    };
 
-	private getUserWealthLevel(boostsOwned: string[]) {
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_WEALTH_3_ID))
-			return 3;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_WEALTH_2_ID))
-			return 2;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_WEALTH_1_ID))
-			return 1;
-		return 0;
-	}
+    try {
+      if (!request.coins && !request.teeth) {
+        return response;
+      }
 
-	private getUserAttackLevel(boostsOwned: string[]) {
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ATTACK_3_ID))
-			return 3;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ATTACK_2_ID))
-			return 2;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ATTACK_1_ID))
-			return 1;
-		return 0;
-	}
+      const user = await this.userModel.findById(request.userId);
+      if (user) {
+        const wealthLevel = SeidhCommonBoostsUtils.GetUserWealthLevel(user.boostsOwned);
 
-	private getUserMonstersLevel(boostsOwned: string[]) {
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_MONSTERS_3_ID))
-			return 3;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_MONSTERS_2_ID))
-			return 2;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_MONSTERS_1_ID))
-			return 1;
-		return 0;
-	}
+        if (request.coins) {
+          if (request.operation == BalanceOperationType.ADD) {
+            const wealthCoinsMultiplier = SeidhCommonBoostsUtils.GetWealthCoinsMultiplierByLevel(wealthLevel);
+            user.coins += request.coins * wealthCoinsMultiplier;
+          } else {
+            if (user.coins - request.coins >= 0) {
+              user.coins -= request.coins;
+            } else {
+              return response;
+            }
+          }
+        }
 
-	private getUserItemsLevel(boostsOwned: string[]) {
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ITEMS_DROP_3_ID))
-			return 3;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ITEMS_DROP_2_ID))
-			return 2;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_ITEMS_DROP_1_ID))
-			return 1;
-		return 0;
-	}
+        if (request.teeth) {
+          if (request.operation == BalanceOperationType.ADD) {
+            user.teeth += request.teeth;
+          } else {
+            if (user.teeth - request.teeth >= 0) {
+              user.teeth -= request.teeth;
+            } else {
+              return response;
+            }
+          }
+        }
 
-	private getUserStatsLevel(boostsOwned: string[]) {
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_STATS_3_ID))
-			return 3;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_STATS_2_ID))
-			return 2;
-		if (boostsOwned.includes(SeidhCommonBoostConstants.BOOST_STATS_1_ID))
-			return 1;
-		return 0;
-	}
+        await user.save();
+        await this.UserBalanceTransactionModel.create({
+          user,
+          balanceUpdateReason: request.reason,
+          balanceOperationType: request.operation,
+          currentWealthLevel: wealthLevel,
+          coins: request.coins,
+          teeth: request.teeth,
+        });
+
+        await this.seidhCommonBroadcasts.notifyBalanceUpdate(user.id);
+
+        response.success = true;
+      } else {
+        Logger.error(`updateBalance. user ${request.userId} not found`);
+      }
+    } catch (error) {
+      Logger.error(
+        {
+          message: 'updateBalance error',
+          request,
+        },
+        error,
+      );
+    }
+
+    return response;
+  }
 }

@@ -1,13 +1,27 @@
-export const UsersAuthenticatePattern = 'users.authenticate';
+import { VkLaunchParams } from '@lib/seidh-common/types/types.vk';
 
-export interface UsersAuthenticateServiceRequest {
+import { BasicServiceResponse } from '../basic.msg';
+
+export const UsersServiceTgAuthPattern = 'users.auth-tg';
+export const UsersServiceVkAuthPattern = 'users.auth-vk';
+export const UsersServiceSimpleAuthPattern = 'users.auth-simple';
+
+export interface UsersServiceTgAuthRequest {
   telegramInitData?: string;
-  login?: string;
   referrerId?: string;
 }
 
-export interface UsersAuthenticateServiceResponse {
-  success: boolean;
+export interface UsersServiceVkAuthRequest {
+  vkLaunchParams: VkLaunchParams;
+  first_name?: string;
+  last_name?: string;
+}
+
+export interface UsersServiceSimpleAuthRequest {
+  login: string;
+}
+
+export interface UsersServiceAuthenticateResponse extends BasicServiceResponse {
   authToken?: string;
   publicRsaKey?: string;
 }

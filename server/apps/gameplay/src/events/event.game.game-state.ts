@@ -1,4 +1,5 @@
-import { GameState } from '@app/seidh-common/seidh-common.boost-constants';
+import { GameState } from '@lib/seidh-common/types/types.game';
+
 import { EventGameBase } from './event.game.base';
 
 export class EventGameGameState implements EventGameBase {

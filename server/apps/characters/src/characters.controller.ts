@@ -1,19 +1,25 @@
 import { Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
+
 import { CharactersService } from './characters.service';
+
+import {
+  CharactersServiceAddExpPattern,
+  CharactersServiceAddExpRequest,
+} from '@lib/seidh-common/dto/characters/characters.add-exp.msg';
 import {
   CharactersServiceCreatePattern,
   CharactersServiceCreateRequest,
-} from '@app/seidh-common/dto/characters/characters.create.msg';
+} from '@lib/seidh-common/dto/characters/characters.create.msg';
 import {
   CharactersServiceGetByIdsPattern,
   CharactersServiceGetByIdsRequest,
-} from '@app/seidh-common/dto/characters/characters.get-by-ids.msg';
+} from '@lib/seidh-common/dto/characters/characters.get-by-ids.msg';
+import { CharactersServiceGetDefaultParamsPattern } from '@lib/seidh-common/dto/characters/characters.get-default-params.msg';
 import {
-  CharactersServicelevelUpPattern,
-  CharactersServicelevelUpRequest,
-} from '@app/seidh-common/dto/characters/characters.level-up.msg';
-import { MessagePattern } from '@nestjs/microservices';
-import { CharactersServiceGetDefaultParamsPattern } from '@app/seidh-common/dto/characters/characters.get-default-params.msg';
+  CharactersServiceLevelUpPattern,
+  CharactersServiceLevelUpRequest,
+} from '@lib/seidh-common/dto/characters/characters.level-up.msg';
 
 @Controller()
 export class CharactersController {
@@ -34,8 +40,13 @@ export class CharactersController {
     return this.charactersService.getDefaultParams();
   }
 
-  @MessagePattern(CharactersServicelevelUpPattern)
-  levelUp(request: CharactersServicelevelUpRequest) {
+  @MessagePattern(CharactersServiceAddExpPattern)
+  addExp(request: CharactersServiceAddExpRequest) {
+    return this.charactersService.addExp(request);
+  }
+
+  @MessagePattern(CharactersServiceLevelUpPattern)
+  levelUp(request: CharactersServiceLevelUpRequest) {
     return this.charactersService.levelUp(request);
   }
 }

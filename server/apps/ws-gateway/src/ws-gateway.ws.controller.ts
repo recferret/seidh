@@ -1,31 +1,27 @@
+import { ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
 import { Server, Socket } from 'socket.io';
-import {
-  ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+
 import { Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
-import { ServiceName } from '@app/seidh-common';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+
 import { FindGameDto } from './dto/find.game.dto';
 import { InputDto } from './dto/input.dto';
 import {
-  GameplayServiceJoinGameMessage,
-  GameplayServiceJoinGamePattern,
-} from '@app/seidh-common/dto/gameplay/gameplay.join-game.msg';
-import { WsGatewayGameBaseMsg } from '@app/seidh-common/dto/ws-gateway/ws-gateway.game.base.msg';
-import {
   GameplayServiceDisconnectedMessage,
   GameplayServiceDisconnectedPattern,
-} from '@app/seidh-common/dto/gameplay/gameplay.disconnected.msg';
+} from '@lib/seidh-common/dto/gameplay/gameplay.disconnected.msg';
 import {
   GameplayServiceInputMessage,
   GameplayServiceInputPattern,
-} from '@app/seidh-common/dto/gameplay/gameplay.input.msg';
-import { WsGatewayBaseMsg } from '@app/seidh-common/dto/ws-gateway/ws-gateway.base.msg';
+} from '@lib/seidh-common/dto/gameplay/gameplay.input.msg';
+import {
+  GameplayServiceJoinGameMessage,
+  GameplayServiceJoinGamePattern,
+} from '@lib/seidh-common/dto/gameplay/gameplay.join-game.msg';
+import { WsGatewayBaseMsg } from '@lib/seidh-common/dto/ws-gateway/ws-gateway.base.msg';
+import { WsGatewayGameBaseMsg } from '@lib/seidh-common/dto/ws-gateway/ws-gateway.game.base.msg';
 
 export enum WsProtocolMessage {
   // Client -> Server
@@ -73,19 +69,14 @@ export class WsGatewayWsController implements OnModuleInit {
   async onModuleInit() {
     this.server.on('connection', async (socket: Socket) => {
       try {
-        const decodedToken = await this.jwtService.verifyAsync(
-          socket.handshake.auth.authToken.split(' ')[1],
-        );
+        const decodedToken = await this.jwtService.verifyAsync(socket.handshake.auth.authToken.split(' ')[1]);
         const userId = decodedToken.userId;
 
         this.socketIdToUserId.set(socket.id, userId);
         this.userSockets.set(userId, socket);
 
         socket.on('disconnect', () => {
-          Logger.log(
-            'Socket disconnected, userId:',
-            this.socketIdToUserId.get(socket.id),
-          );
+          Logger.log('Socket disconnected, userId:', this.socketIdToUserId.get(socket.id));
 
           const userId = this.socketIdToUserId.get(socket.id);
 
@@ -93,10 +84,7 @@ export class WsGatewayWsController implements OnModuleInit {
             const request: GameplayServiceDisconnectedMessage = {
               userId,
             };
-            this.gameplayService.emit(
-              GameplayServiceDisconnectedPattern,
-              request,
-            );
+            this.gameplayService.emit(GameplayServiceDisconnectedPattern, request);
 
             this.userSockets.delete(this.socketIdToUserId.get(socket.id));
             this.socketIdToUserId.delete(socket.id);
@@ -116,10 +104,7 @@ export class WsGatewayWsController implements OnModuleInit {
   // ----------------------------------------------
 
   @SubscribeMessage(WsProtocolMessage.FindGame)
-  async handleFindGame(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: FindGameDto,
-  ) {
+  async handleFindGame(@ConnectedSocket() client: Socket, @MessageBody() data: FindGameDto) {
     const userId = this.socketIdToUserId.get(client.id);
     const request: GameplayServiceJoinGameMessage = {
       userId,
@@ -131,10 +116,7 @@ export class WsGatewayWsController implements OnModuleInit {
   }
 
   @SubscribeMessage(WsProtocolMessage.Input)
-  async handleInput(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: InputDto,
-  ) {
+  async handleInput(@ConnectedSocket() client: Socket, @MessageBody() data: InputDto) {
     const userId = this.socketIdToUserId.get(client.id);
     const request: GameplayServiceInputMessage = {
       userId,
@@ -150,10 +132,7 @@ export class WsGatewayWsController implements OnModuleInit {
   // Server -> Client
   // ----------------------------------------------
 
-  gameBroadcast(
-    wsProtocolMessage: WsProtocolMessage,
-    data: WsGatewayGameBaseMsg,
-  ) {
+  gameBroadcast(wsProtocolMessage: WsProtocolMessage, data: WsGatewayGameBaseMsg) {
     if (data.targetUserId) {
       const socket = this.userSockets.get(data.targetUserId);
       if (socket && socket.connected) {
@@ -174,10 +153,7 @@ export class WsGatewayWsController implements OnModuleInit {
       for (const [userId, socket] of this.userSockets) {
         if (socket && socket.connected) {
           // Skip excluded users and users that are not in the game
-          if (
-            (data.excludeUserId && data.excludeUserId == userId) ||
-            !this.userIdToGameId.has(userId)
-          ) {
+          if ((data.excludeUserId && data.excludeUserId == userId) || !this.userIdToGameId.has(userId)) {
             continue;
           }
 

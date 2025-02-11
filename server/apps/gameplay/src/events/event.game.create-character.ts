@@ -1,4 +1,5 @@
-import { CharacterEntityFullStruct } from '@app/seidh-common/seidh-common.boost-constants';
+import { CharacterEntityFullStruct } from '@lib/seidh-common/types/types.engine';
+
 import { EventGameBase } from './event.game.base';
 
 export class EventGameCreateCharacter implements EventGameBase {
@@ -6,10 +7,7 @@ export class EventGameCreateCharacter implements EventGameBase {
   gameId: string;
   characterEntityFullStruct: CharacterEntityFullStruct;
 
-  constructor(
-    gameId: string,
-    characterEntityFullStruct: CharacterEntityFullStruct,
-  ) {
+  constructor(gameId: string, characterEntityFullStruct: CharacterEntityFullStruct) {
     this.gameId = gameId;
     this.characterEntityFullStruct = characterEntityFullStruct;
   }

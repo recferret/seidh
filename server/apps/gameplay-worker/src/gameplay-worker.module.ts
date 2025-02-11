@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
+import { Module } from '@nestjs/common';
+
 import { GameplayWorkerConsumer } from './gameplay-worker.consumer';
 
 @Module({

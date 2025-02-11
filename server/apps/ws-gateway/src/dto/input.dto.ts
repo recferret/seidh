@@ -1,4 +1,4 @@
-import { CharacterActionType } from '@app/seidh-common/seidh-common.boost-constants';
+import { CharacterActionType } from '@lib/seidh-common/types/types.engine';
 
 export class InputDto {
   actionType: CharacterActionType;

@@ -1,4 +1,4 @@
-import { BoostBody } from '@app/seidh-common/dto/boost/boost.get.boosts.msg';
+import { BoostBody } from '@lib/seidh-common/dto/boosts/boosts.get.msg';
 
 export class BoostsBuyRequestDto {
   boostId: string;

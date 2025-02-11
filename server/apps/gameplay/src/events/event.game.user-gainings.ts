@@ -1,19 +1,14 @@
-import { EventGameBase } from './event.game.base';
+import { GameGainings } from '@lib/seidh-common/types/types.game';
 
-export interface UserGainings {
-  userId: string;
-  gameId: string;
-  kills: number;
-  tokens: number;
-}
+import { EventGameBase } from './event.game.base';
 
 export class EventGameUserGainings implements EventGameBase {
   public static readonly EventName = 'game.user-gainings';
   gameId: string;
-  userGainings: UserGainings;
+  gameGainings: GameGainings;
 
-  constructor(gameId: string, userGainings: UserGainings) {
+  constructor(gameId: string, gameGainings: GameGainings) {
     this.gameId = gameId;
-    this.userGainings = userGainings;
+    this.gameGainings = gameGainings;
   }
 }

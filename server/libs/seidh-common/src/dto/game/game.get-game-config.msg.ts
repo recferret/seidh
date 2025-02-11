@@ -1,10 +1,8 @@
+import { BasicServiceResponse } from '../basic.msg';
+
 export const GameServiceGetGameConfigPattern = 'game.get-game-config';
 
-export interface GameServiceGetGameConfigGameRequest {}
-
-export interface GameServiceGetGameConfigResponse {
-  success: boolean;
-
+export interface GameServiceGetGameConfigResponse extends BasicServiceResponse {
   // Mobs spawn
   mobsMaxAtTheSameTime?: number;
   mobsMaxPerGame?: number;

@@ -1,28 +1,35 @@
+import { NatsUrl, ServiceName } from '@lib/seidh-common/seidh-common.internal-protocol';
+
 import { Module } from '@nestjs/common';
-import { InternalProtocol, ServiceName } from '@app/seidh-common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { JwtModule } from '@nestjs/jwt';
-import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { ConfigModule } from '@nestjs/config';
-import { ControllerGame } from './controllers/controller.game';
-import { ControllerGameplay } from './controllers/controller.gameplay';
+import { JwtModule } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
 import { ControllerAuth } from './controllers/controller.auth';
 import { ControllerBoost } from './controllers/controller.boost';
+import { ControllerCharacters } from './controllers/controller.characters';
 import { ControllerFriends } from './controllers/controller.friends';
+import { ControllerGame } from './controllers/controller.game';
+import { ControllerGameplay } from './controllers/controller.gameplay';
+import { ControllerTg } from './controllers/controller.tg';
 import { ControllerUsers } from './controllers/controller.users';
+
 import { ServiceBoost } from './services/service.boost';
+import { ServiceCharacters } from './services/service.characters';
 import { ServiceFriends } from './services/service.friends';
 import { ServiceGame } from './services/service.game';
 import { ServiceGameplay } from './services/service.gameplay';
+import { ServiceTg } from './services/service.tg';
 import { ServiceUsers } from './services/service.users';
-import { MicroserviceBoost } from '@app/seidh-common/microservice/microservice.boost';
-import { MicroserviceFriends } from '@app/seidh-common/microservice/microservice.friends';
-import { MicroserviceGame } from '@app/seidh-common/microservice/microservice.game';
-import { MicroserviceGameplay } from '@app/seidh-common/microservice/microservice.gameplay';
-import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
-import { ControllerCharacters } from './controllers/controller.characters';
-import { ServiceCharacters } from './services/service.characters';
-import { MicroserviceCharacters } from '@app/seidh-common/microservice/microservice.characters';
+import { MicroserviceBoost } from '@lib/seidh-common/microservice/microservice.boost';
+import { MicroserviceCharacters } from '@lib/seidh-common/microservice/microservice.characters';
+import { MicroserviceFriends } from '@lib/seidh-common/microservice/microservice.friends';
+import { MicroserviceGame } from '@lib/seidh-common/microservice/microservice.game';
+import { MicroserviceGameplay } from '@lib/seidh-common/microservice/microservice.gameplay';
+import { MicroserviceTg } from '@lib/seidh-common/microservice/microservice.tg';
+import { MicroserviceUsers } from '@lib/seidh-common/microservice/microservice.users';
 
 @Module({
   imports: [
@@ -37,35 +44,42 @@ import { MicroserviceCharacters } from '@app/seidh-common/microservice/microserv
         name: ServiceName.Game,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.GameplayLobby,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.Boost,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.Users,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
         },
       },
       {
         name: ServiceName.Characters,
         transport: Transport.NATS,
         options: {
-          servers: [InternalProtocol.NatsUrl],
+          servers: [NatsUrl],
+        },
+      },
+      {
+        name: ServiceName.TG,
+        transport: Transport.NATS,
+        options: {
+          servers: [NatsUrl],
         },
       },
     ]),
@@ -82,6 +96,7 @@ import { MicroserviceCharacters } from '@app/seidh-common/microservice/microserv
     ControllerGameplay,
     ControllerUsers,
     ControllerCharacters,
+    ControllerTg,
   ],
   providers: [
     MicroserviceBoost,
@@ -90,12 +105,14 @@ import { MicroserviceCharacters } from '@app/seidh-common/microservice/microserv
     MicroserviceGameplay,
     MicroserviceUsers,
     MicroserviceCharacters,
+    MicroserviceTg,
     ServiceBoost,
     ServiceFriends,
     ServiceGame,
     ServiceGameplay,
     ServiceUsers,
     ServiceCharacters,
+    ServiceTg,
   ],
 })
 export class GatewayModule {}

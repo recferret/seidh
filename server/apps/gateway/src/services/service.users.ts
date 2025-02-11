@@ -1,17 +1,40 @@
-import { MicroserviceUsers } from '@app/seidh-common/microservice/microservice.users';
 import { Injectable } from '@nestjs/common';
+
+import { MicroserviceUsers } from '@lib/seidh-common/microservice/microservice.users';
+
+import { AuthResponseDto, AuthSimpleRequestDto, AuthTgRequestDto, AuthVkRequestDto } from '../dto/auth/auth.dto';
 import { UserGetUserResponseDto } from '../dto/user/user.get.user.dto';
-import { AuthRequestDto, AuthResponseDto } from '../dto/auth/auth.dto';
 
 @Injectable()
 export class ServiceUsers {
   constructor(private microserviceUsers: MicroserviceUsers) {}
 
-  async authenticate(req: AuthRequestDto) {
-    const result = await this.microserviceUsers.authenticate({
+  async tgAuth(req: AuthTgRequestDto) {
+    const result = await this.microserviceUsers.tgAuth({
       telegramInitData: req.telegramInitData,
+      // referrerId: req.referrerId,
+    });
+
+    const response: AuthResponseDto = {
+      success: result.success,
+      authToken: result.authToken,
+    };
+    return response;
+  }
+
+  async vkAuth(req: AuthVkRequestDto) {
+    const result = await this.microserviceUsers.vkAuth(req);
+
+    const response: AuthResponseDto = {
+      success: result.success,
+      authToken: result.authToken,
+    };
+    return response;
+  }
+
+  async simpleAuth(req: AuthSimpleRequestDto) {
+    const result = await this.microserviceUsers.simpleAuth({
       login: req.login,
-      referrerId: req.referrerId,
     });
 
     const response: AuthResponseDto = {

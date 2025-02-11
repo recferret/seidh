@@ -1,30 +1,29 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import {
-  GameServiceStartGamePattern,
-  GameServiceStartGameRequest,
-} from '@app/seidh-common/dto/game/game.start-game.msg';
+
+import { GameService } from './game.service';
+
 import {
   GameServiceFinishGamePattern,
   GameServiceFinishGameRequest,
-} from '@app/seidh-common/dto/game/game.finish-game.msg';
-import { GameService } from './game.service';
+} from '@lib/seidh-common/dto/game/game.finish-game.msg';
+import { GameServiceGetGameConfigPattern } from '@lib/seidh-common/dto/game/game.get-game-config.msg';
 import {
   GameServiceProgressGamePattern,
   GameServiceProgressGameRequest,
-} from '@app/seidh-common/dto/game/game.progress-game.msg';
+} from '@lib/seidh-common/dto/game/game.progress-game.msg';
 import {
-  GameServiceGetGameConfigPattern,
-  GameServiceGetGameConfigGameRequest,
-} from '@app/seidh-common/dto/game/game.get-game-config.msg';
+  GameServiceStartGamePattern,
+  GameServiceStartGameRequest,
+} from '@lib/seidh-common/dto/game/game.start-game.msg';
 
 @Controller()
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @MessagePattern(GameServiceGetGameConfigPattern)
-  getGameConfig(request: GameServiceGetGameConfigGameRequest) {
-    return this.gameService.getGameConfig(request);
+  getGameConfig() {
+    return this.gameService.getGameConfig();
   }
 
   @MessagePattern(GameServiceStartGamePattern)
