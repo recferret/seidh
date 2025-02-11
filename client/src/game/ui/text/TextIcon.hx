@@ -10,7 +10,7 @@ class TextIcon extends h2d.Object {
     public function new(parent:h2d.Object, tile:h2d.Tile, textAlign:Align, tileOffsetY:Float) {
         super(parent);
 
-        text = TextUtils.GetDefaultTextObject(0, 0, 1.8, textAlign, GameClientConfig.DefaultFontColor);
+        text = TextUtils.GetDefaultTextObject(0, 0, 1, textAlign, GameClientConfig.DefaultFontColor);
         addChild(text);
 
         icon = new h2d.Bitmap(tile);

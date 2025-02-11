@@ -12,6 +12,7 @@ function defaultTask(cb) {
             'js/telegram.js',
             'js/telemetree.js', 
             'js/ton.js',
+            'js/vk.js',
             'game.js',
         ])
         .pipe(concat('bundle.js'))

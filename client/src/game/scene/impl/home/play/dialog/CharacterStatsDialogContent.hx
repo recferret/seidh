@@ -8,9 +8,9 @@ class CharacterStatsDialog extends h2d.Object {
         super();
 
         final titleText = TextUtils.GetDefaultTextObject(
-            Main.ActualScreenWidth / 2,
-            Main.ActualScreenHeight / 2 - 210,
-            3,
+            DeviceInfo.TargetPortraitScreenWidth / 2,
+            DeviceInfo.TargetPortraitScreenHeight / 2 - 210,
+            1.5,
             Center,
             GameClientConfig.WhiteFontColor
         );
@@ -23,9 +23,9 @@ class CharacterStatsDialog extends h2d.Object {
 
         // Default
         final lvlText = TextUtils.GetDefaultTextObject(
-            Main.ActualScreenWidth / 2,
-            Main.ActualScreenHeight / 2 - 160,
-            2.5,
+            DeviceInfo.TargetPortraitScreenWidth / 2,
+            DeviceInfo.TargetPortraitScreenHeight / 2 - 150,
+            1,
             Center,
             GameClientConfig.WhiteFontColor
         );
@@ -38,9 +38,9 @@ class CharacterStatsDialog extends h2d.Object {
 
         // Default
         final healthText = TextUtils.GetDefaultTextObject(
-            Main.ActualScreenWidth / 2 - 215,
-            Main.ActualScreenHeight / 2 - 110,
-            2.5,
+            DeviceInfo.TargetPortraitScreenWidth / 2 - 215,
+            DeviceInfo.TargetPortraitScreenHeight / 2 - 110,
+            1,
             Left,
             GameClientConfig.DefaultFontColor
         );
@@ -50,9 +50,9 @@ class CharacterStatsDialog extends h2d.Object {
         if (levelUp) {
             // Upgrade
             final healthText = TextUtils.GetDefaultTextObject(
-                Main.ActualScreenWidth / 2 - 40,
-                Main.ActualScreenHeight / 2 - 110,
-                2.5,
+                DeviceInfo.TargetPortraitScreenWidth / 2 - 40,
+                DeviceInfo.TargetPortraitScreenHeight / 2 - 110,
+                1,
                 Left,
                 GameClientConfig.UpgradeFontColor
             );
@@ -66,9 +66,9 @@ class CharacterStatsDialog extends h2d.Object {
 
         // Default
         final damageText = TextUtils.GetDefaultTextObject(
-            Main.ActualScreenWidth / 2 - 215,
-            Main.ActualScreenHeight / 2 - 60,
-            2.5,
+            DeviceInfo.TargetPortraitScreenWidth / 2 - 215,
+            DeviceInfo.TargetPortraitScreenHeight / 2 - 70,
+            1,
             Left,
             GameClientConfig.DefaultFontColor
         );
@@ -78,9 +78,9 @@ class CharacterStatsDialog extends h2d.Object {
         if (levelUp) {
             // Upgrade
             final damageText = TextUtils.GetDefaultTextObject(
-                Main.ActualScreenWidth / 2 - 40,
-                Main.ActualScreenHeight / 2 - 60,
-                2.5,
+                DeviceInfo.TargetPortraitScreenWidth / 2 - 40,
+                DeviceInfo.TargetPortraitScreenHeight / 2 - 70,
+                1,
                 Left,
                 GameClientConfig.UpgradeFontColor
             );
@@ -94,9 +94,9 @@ class CharacterStatsDialog extends h2d.Object {
 
         // Default
         final attackSpeedText = TextUtils.GetDefaultTextObject(
-            Main.ActualScreenWidth / 2 - 215,
-            Main.ActualScreenHeight / 2 - 10,
-            2.5,
+            DeviceInfo.TargetPortraitScreenWidth / 2 - 215,
+            DeviceInfo.TargetPortraitScreenHeight / 2,
+            1,
             Left,
             GameClientConfig.DefaultFontColor
         );
@@ -106,9 +106,9 @@ class CharacterStatsDialog extends h2d.Object {
         if (levelUp) {
             // Upgrade
             final attackSpeedText = TextUtils.GetDefaultTextObject(
-                Main.ActualScreenWidth / 2 + 30,
-                Main.ActualScreenHeight / 2 - 10,
-                2.5,
+                DeviceInfo.TargetPortraitScreenWidth / 2 + 20,
+                DeviceInfo.TargetPortraitScreenHeight / 2,
+                1,
                 Left,
                 GameClientConfig.UpgradeFontColor
             );
@@ -122,9 +122,9 @@ class CharacterStatsDialog extends h2d.Object {
 
         // Default
         final movementSpeedText = TextUtils.GetDefaultTextObject(
-            Main.ActualScreenWidth / 2 - 215,
-            Main.ActualScreenHeight / 2 + 40,
-            2.5,
+            DeviceInfo.TargetPortraitScreenWidth / 2 - 215,
+            DeviceInfo.TargetPortraitScreenHeight / 2 + 30,
+            1,
             Left,
             GameClientConfig.DefaultFontColor
         );
@@ -134,9 +134,9 @@ class CharacterStatsDialog extends h2d.Object {
         if (levelUp) {
             // Upgrade
             final movementSpeedText = TextUtils.GetDefaultTextObject(
-                Main.ActualScreenWidth / 2 + 110,
-                Main.ActualScreenHeight / 2 + 40,
-                2.5,
+                DeviceInfo.TargetPortraitScreenWidth / 2 + 100,
+                DeviceInfo.TargetPortraitScreenHeight / 2 + 30,
+                1,
                 Left,
                 GameClientConfig.UpgradeFontColor
             );

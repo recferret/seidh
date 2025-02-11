@@ -1,12 +1,13 @@
 package game.scene.impl.home;
 
+import h2d.filter.Displacement;
+import h2d.Bitmap;
+import h3d.Engine;
+
 import engine.base.MathUtils;
 import engine.base.geometry.Point;
 
-import h2d.filter.Displacement;
-import h2d.Bitmap;
-
-import game.js.NativeWindowJS;
+import game.analytics.Analytics;
 import game.event.EventManager;
 import game.network.Networking.UserBalancePayload;
 import game.scene.base.BasicScene;
@@ -39,26 +40,26 @@ class HomeScene extends BasicScene implements EventListener {
 	private var homeSceneContent:HomeSceneContent;
 	private var pageContent:BasicHomeContent;
 
+    private var titleText:h2d.Text;
 	private var usernameText:h2d.Text;
 	private var friendsTextIcon:TextIcon;
 	private var coinsTextIcon:TextIcon;
 	private var teethTextIcon:TextIcon;
 
-    private var titleBitmap:h2d.Bitmap;
-    private var homeTitleTile:h2d.Tile;
-	private var collectionTitleTile:h2d.Tile;
-    private var friendsTitleTile:h2d.Tile;
-    private var storeTitleTile:h2d.Tile;
     private var screenDarknessDisplacementTile:h2d.Tile;
 
 	private var inTouch = false;
 	private var touchStarted = false;
 	private var lastTouchPos = new Point(0, 0);
 	private var timeSinceLastTouch = 0.0;
-	private final touchActivationTime = 0.100; 
+	private final touchActivationTime = 0.100;
+
+	private var contentObject:h2d.Object;
+	private final contentObjectOffsetX = 0.0;
+	private final contentObjectOffsetY = 0.0;
 
 	public function new() {
-		super(null, function callback(params: BasicSceneClickCallback) {
+		super(function callback(params: BasicSceneClickCallback) {
 			if (homeSceneContent == HomeSceneContent.HomeBoostContent) {
 				if (!touchStarted) {
 					touchStarted = true;
@@ -75,15 +76,19 @@ class HomeScene extends BasicScene implements EventListener {
 					if (params.y > lastTouchPos.y) {
 						pageContent.contentScrollY += touchPosDiff.y;
 					} else if (params.y < lastTouchPos.y) {
-						pageContent.contentScrollY -= touchPosDiff.y;
+						if (DeviceInfo.ActualScreenHeight >= 1280) {
+							if (BoostContent.LastCardPosY - 100 > DeviceInfo.JsScreenParams.screenHeight) {
+								pageContent.contentScrollY -= touchPosDiff.y;
+							}
+						} else {
+							if (BoostContent.LastCardPosY > DeviceInfo.JsScreenParams.screenHeight) {
+								pageContent.contentScrollY -= touchPosDiff.y;
+							}
+						}
 					}
 
 					if (pageContent.contentScrollY > 0) {
 						pageContent.contentScrollY = 0;
-					}
-
-					if (pageContent.contentScrollY < -1980) {
-						pageContent.contentScrollY = -1980;
 					}
 				}
 
@@ -91,6 +96,33 @@ class HomeScene extends BasicScene implements EventListener {
 				lastTouchPos.y = params.y;
 			}
 		});
+
+		contentObject = new h2d.Object(this);
+
+		if (!DeviceInfo.IsMobile) {
+			contentObjectOffsetX = DeviceInfo.ActualScreenWidth / 2 - (720 / 2);
+			contentObjectOffsetY = DeviceInfo.ActualScreenHeight / 2 - (1280 / 2);
+
+			final intContentObjectOffsetX = Std.int(contentObjectOffsetX);
+			final intContentObjectOffsetY = Std.int(contentObjectOffsetY);
+
+			final topBlackEmptySpaceBitmap = new h2d.Bitmap(h2d.Tile.fromColor(0x0000000, DeviceInfo.ActualScreenWidth, intContentObjectOffsetY));
+			topBlackEmptySpaceBitmap.setPosition(0, 0);
+			addChild(topBlackEmptySpaceBitmap);
+
+			final bottomBlackEmptySpaceBitmap = new h2d.Bitmap(h2d.Tile.fromColor(0x0000000, DeviceInfo.ActualScreenWidth, intContentObjectOffsetY));
+			bottomBlackEmptySpaceBitmap.setPosition(0, DeviceInfo.ActualScreenHeight - intContentObjectOffsetY);
+			addChild(bottomBlackEmptySpaceBitmap);
+
+			final leftBlackEmptySpaceBitmap = new h2d.Bitmap(h2d.Tile.fromColor(0x0000000, intContentObjectOffsetX, DeviceInfo.ActualScreenHeight));
+			leftBlackEmptySpaceBitmap.setPosition(0, 0);
+			addChild(leftBlackEmptySpaceBitmap);
+
+			final rightBlackEmptySpaceBitmap = new h2d.Bitmap(h2d.Tile.fromColor(0x0000000, intContentObjectOffsetX, DeviceInfo.ActualScreenHeight));
+			rightBlackEmptySpaceBitmap.setPosition(DeviceInfo.ActualScreenWidth - intContentObjectOffsetX, 0);
+			addChild(rightBlackEmptySpaceBitmap);
+		}
+		contentObject.setPosition(contentObjectOffsetX, contentObjectOffsetY);
 
 		setSceneContent(HomeSceneContent.HomePlayContent);
 		generateBackground();
@@ -103,14 +135,29 @@ class HomeScene extends BasicScene implements EventListener {
 	}
 
 	// --------------------------------------
-	// Impl
+	// Abstraction
 	// --------------------------------------
 
-	public function start() {}
+	public function absOnEvent(event:hxd.Event) {}
 
-	public function customUpdate(dt:Float, fps:Float) {
+	public function absStart() {}
+
+	public function absOnResize(w:Int, h:Int) {}
+
+	public function absRender(e:Engine) {}
+
+	public function absDestroy() {}
+
+	public function absUpdate(dt:Float, fps:Float) {
 		if (pageContent != null) {
-			screenDarknessDisplacementTile.scrollDiscrete(1 * dt, 7 * dt);
+			var discreteX = 1.0;
+			var discreteY = 7.0;
+
+			if (DeviceInfo.IsMobile && DeviceInfo.ScreenOrientation == 'landscape') {
+				discreteX = discreteY = 5.0;
+			}
+
+			screenDarknessDisplacementTile.scrollDiscrete(discreteX * dt, discreteY * dt);
 			pageContent.update(dt);
 
 			if (touchStarted) {
@@ -141,65 +188,52 @@ class HomeScene extends BasicScene implements EventListener {
 	// --------------------------------------
 
 	private function headerItems() {
-        homeTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_HOME);
-		collectionTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_COLLECTION);
-		friendsTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_FRIENDS);
-		storeTitleTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_STORE);
+		final tgFullscreenOffsetY = DeviceInfo.IsMobile ? 80 : 0;
 
-		titleBitmap = new h2d.Bitmap(this);
-		titleBitmap.setPosition(Main.ActualScreenWidth / 2, 100);
-		titleBitmap.tile = homeTitleTile;
+		titleText = TextUtils.GetDefaultTextObject(
+			DeviceInfo.TargetPortraitScreenWidth / 2 + contentObjectOffsetX,
+			70 + contentObjectOffsetY,
+			1.5,
+			Center,
+			GameClientConfig.DefaultFontColor,
+		);
+		titleText.text = 'HOME';
+		addChild(titleText);
 
-		usernameText = TextUtils.GetDefaultTextObject(80, 70, 2, Left, GameClientConfig.DefaultFontColor);
-		usernameText.text = Player.instance.userName;
+		usernameText = TextUtils.GetDefaultTextObject(
+			80 + contentObjectOffsetX,
+			70 + contentObjectOffsetY + tgFullscreenOffsetY,
+			1,
+			Left,
+			GameClientConfig.DefaultFontColor,
+		);
+		usernameText.text = Player.instance.userInfo.userName;
         addChild(usernameText);
 
 		friendsTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_FRIENDS), Left, 10);
 		friendsTextIcon.setText('0/0');
-		friendsTextIcon.setPosition(100, 120);
+		friendsTextIcon.setPosition(
+			100 + contentObjectOffsetX,
+			120 + contentObjectOffsetY + tgFullscreenOffsetY,
+		);
 		
 		coinsTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_COINS), Right, 10);
 		coinsTextIcon.setText(Std.string(Player.instance.userInfo.coins));
-		coinsTextIcon.setPosition(Main.ActualScreenWidth - 90, 80);
+		coinsTextIcon.setPosition(
+			DeviceInfo.TargetPortraitScreenWidth - 90 + contentObjectOffsetX,
+			80 + contentObjectOffsetY + tgFullscreenOffsetY,
+		);
 
 		teethTextIcon = new TextIcon(this, TilemapManager.instance.getTile(TileType.WEALTH_TEETH), Right, 5);
 		teethTextIcon.setText(Std.string(Player.instance.userInfo.teeth));
-		teethTextIcon.setPosition(Main.ActualScreenWidth - 90, 120);
+		teethTextIcon.setPosition(
+			DeviceInfo.TargetPortraitScreenWidth - 90 + contentObjectOffsetX,
+			120 + contentObjectOffsetY + tgFullscreenOffsetY,
+		);
 	}
 
 	private function frame() {
-        final frameHeader = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_HEADER), this);
-        frameHeader.setPosition(Main.ActualScreenWidth / 2, frameHeader.tile.height / 2);
-
-        final frameFooter = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FOOTER), this);
-        frameFooter.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight - frameFooter.tile.height / 2);
-
-		// Frames left
-		final leftSideFrameTop = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FRAME), this);
-		leftSideFrameTop.setPosition(leftSideFrameTop.tile.width / 2, frameHeader.tile.height + (leftSideFrameTop.tile.height * 1) / 2);
-
-		for (i in 2...7) {
-			final leftSideFrameMiddle = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FRAME), this);
-			leftSideFrameMiddle.setPosition(leftSideFrameMiddle.tile.width / 2, frameHeader.tile.height + (leftSideFrameMiddle.tile.height * i) / 2);
-		}
-
-		final leftSideFrameBottom = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FRAME), this);
-		leftSideFrameBottom.setPosition(leftSideFrameBottom.tile.width / 2, Main.ActualScreenHeight - frameFooter.tile.height + 1 - (leftSideFrameBottom.tile.height * 1) / 2);
-		
-		// Frames right
-		final rightSideFrameTop = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FRAME), this);
-		rightSideFrameTop.tile.flipX();
-		rightSideFrameTop.setPosition(Main.ActualScreenWidth - rightSideFrameTop.tile.width / 2, frameHeader.tile.height + (rightSideFrameTop.tile.height * 1) / 2);
-
-		for (i in 2...7) {
-			final rightSideFrameMiddle = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FRAME), this);
-			rightSideFrameMiddle.tile.flipX();
-			rightSideFrameMiddle.setPosition(Main.ActualScreenWidth - rightSideFrameMiddle.tile.width / 2, frameHeader.tile.height + (rightSideFrameMiddle.tile.height * i) / 2);
-		}
-
-		final rightSideFrameBottom = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_FRAME), this);
-		rightSideFrameBottom.tile.flipX();
-		rightSideFrameBottom.setPosition(Main.ActualScreenWidth - rightSideFrameBottom.tile.width / 2, Main.ActualScreenHeight - frameFooter.tile.height + 1 - (rightSideFrameBottom.tile.height * 1) / 2);
+		new HomeFrame(this, contentObjectOffsetX, contentObjectOffsetY);
 	}
 
 	private function bottomButtons() {
@@ -207,8 +241,8 @@ class HomeScene extends BasicScene implements EventListener {
 		// Bottom bar buttons
 		// ---------------------------------------------------
 
-		final menuButtonWidth = Std.int(Main.ActualScreenWidth / 6) + 10;
-		final buttonBottomPosY = Main.ActualScreenHeight - 84;
+		final menuButtonWidth = Std.int(DeviceInfo.TargetPortraitScreenWidth / 6) + 10;
+		final buttonBottomPosY = DeviceInfo.TargetPortraitScreenHeight - 84;
 
 		final homeTileOn = Res.instance.getTileResource(SeidhResource.UI_HOME_HOME_YAY);
 		final homeTileOff = Res.instance.getTileResource(SeidhResource.UI_HOME_HOME_NAY);
@@ -228,11 +262,16 @@ class HomeScene extends BasicScene implements EventListener {
 		final bottomButtonFriends = new h2d.Bitmap(friendsTileOff, this);
 
 		// Home button
-
-		bottomButtonHome.setPosition(menuButtonWidth + 11,  buttonBottomPosY);
+		bottomButtonHome.setPosition(
+			(menuButtonWidth + 9) + contentObjectOffsetX, 
+			buttonBottomPosY + contentObjectOffsetY + 6,
+		);
 
 		final interactionHome = new h2d.Interactive(bottomButtonHome.tile.width, bottomButtonHome.tile.height);
-		interactionHome.setPosition(menuButtonWidth - bottomButtonHome.tile.width / 2, buttonBottomPosY - bottomButtonHome.tile.height / 2);
+		interactionHome.setPosition(
+			menuButtonWidth - bottomButtonHome.tile.width / 2 + contentObjectOffsetX,
+			buttonBottomPosY - bottomButtonHome.tile.height / 2 + contentObjectOffsetY,
+		);
 		addChild(interactionHome);
 
 		interactionHome.onPush = function(event : hxd.Event) {
@@ -247,10 +286,10 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionHome.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomePlayContent) {
-				titleBitmap.tile = homeTitleTile;
+				titleText.text = 'HOME';
 
 				SoundManager.instance.playButton1();
-				NativeWindowJS.trackHomeClick();
+				Analytics.instance.trackHomeClick();
 
 				bottomButtonBoost.tile = boostTileOff;
 				bottomButtonCollection.tile = collectionTileOff;
@@ -260,11 +299,16 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 
 		// Boost button
-
-		bottomButtonBoost.setPosition((menuButtonWidth + 13) * 2, buttonBottomPosY);
+		bottomButtonBoost.setPosition(
+			(menuButtonWidth + 13) * 2 + contentObjectOffsetX,
+			buttonBottomPosY + contentObjectOffsetY + 6,
+		);
 
 		final interactionBoost = new h2d.Interactive(bottomButtonBoost.tile.width, bottomButtonBoost.tile.height);
-		interactionBoost.setPosition(menuButtonWidth * 2.2 - bottomButtonBoost.tile.width / 2, buttonBottomPosY - bottomButtonBoost.tile.height / 2);
+		interactionBoost.setPosition(
+			menuButtonWidth * 2.2 - bottomButtonBoost.tile.width / 2 + contentObjectOffsetX, 
+			buttonBottomPosY - bottomButtonBoost.tile.height / 2 + contentObjectOffsetY,
+		);
 		addChild(interactionBoost);
 
 		interactionBoost.onPush = function(event : hxd.Event) {
@@ -279,10 +323,10 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionBoost.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeBoostContent) {
-				titleBitmap.tile = storeTitleTile;
+				titleText.text = 'BOOSTS';
 
 				SoundManager.instance.playButton1();
-				NativeWindowJS.trackBoostsClick();
+				Analytics.instance.trackBoostsClick();
 
 				bottomButtonHome.tile = homeTileOff;
 				bottomButtonCollection.tile = collectionTileOff;
@@ -292,11 +336,16 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 
 		// Collection button
-
-		bottomButtonCollection.setPosition((menuButtonWidth + 14) * 3, buttonBottomPosY);
+		bottomButtonCollection.setPosition(
+			(menuButtonWidth + 14) * 3 + contentObjectOffsetX, 
+			buttonBottomPosY + contentObjectOffsetY + 6,
+		);
 
 		final interactionCollection = new h2d.Interactive(bottomButtonCollection.tile.width, bottomButtonCollection.tile.height);
-		interactionCollection.setPosition(menuButtonWidth * 3.4 - bottomButtonCollection.tile.width / 2, buttonBottomPosY - bottomButtonCollection.tile.height / 2);
+		interactionCollection.setPosition(
+			menuButtonWidth * 3.4 - bottomButtonCollection.tile.width / 2 + contentObjectOffsetX, 
+			buttonBottomPosY - bottomButtonCollection.tile.height / 2 + contentObjectOffsetY,
+		);
 		addChild(interactionCollection);
 
 		interactionCollection.onPush = function(event : hxd.Event) {
@@ -311,10 +360,10 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionCollection.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeCollectionContent) {
-				titleBitmap.tile = collectionTitleTile;
+				titleText.text = 'COLLECTION';
 
 				SoundManager.instance.playButton1();
-				NativeWindowJS.trackCollectionClick();
+				Analytics.instance.trackCollectionClick();
 
 				bottomButtonHome.tile = homeTileOff;
 				bottomButtonBoost.tile = boostTileOff;
@@ -324,11 +373,16 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 
 		// Friends button
-
-		bottomButtonFriends.setPosition((menuButtonWidth + 15) * 4, buttonBottomPosY);
+		bottomButtonFriends.setPosition(
+			(menuButtonWidth + 15) * 4 + contentObjectOffsetX,
+			buttonBottomPosY + contentObjectOffsetY + 6,
+		);
 
 		final interactionFriends = new h2d.Interactive(bottomButtonFriends.tile.width, bottomButtonFriends.tile.height);
-		interactionFriends.setPosition(menuButtonWidth * 4.6 - bottomButtonFriends.tile.width / 2, buttonBottomPosY - bottomButtonFriends.tile.height / 2);
+		interactionFriends.setPosition(
+			menuButtonWidth * 4.6 - bottomButtonFriends.tile.width / 2 + contentObjectOffsetX,
+			buttonBottomPosY - bottomButtonFriends.tile.height / 2 + contentObjectOffsetY,
+		);
 		addChild(interactionFriends);
 
 		interactionFriends.onPush = function(event : hxd.Event) {
@@ -343,10 +397,10 @@ class HomeScene extends BasicScene implements EventListener {
 		}
 		interactionFriends.onClick = function(event : hxd.Event) {
 			if (!DialogManager.IsDialogActive && this.homeSceneContent != HomeSceneContent.HomeFriendsContent) {
-				titleBitmap.tile = friendsTitleTile;
+				titleText.text = 'FRIENDS';
 
 				SoundManager.instance.playButton1();
-				NativeWindowJS.trackFriendsClick();
+				Analytics.instance.trackFriendsClick();
 
 				bottomButtonHome.tile = homeTileOff;
 				bottomButtonBoost.tile = boostTileOff;
@@ -360,7 +414,7 @@ class HomeScene extends BasicScene implements EventListener {
         screenDarknessDisplacementTile = Res.instance.getTileResource(SeidhResource.FX_NORMALMAP);
 
 		final backgroundObject = new h2d.Object();
-		addChildAt(backgroundObject, 0);
+		contentObject.addChildAt(backgroundObject, 0);
 
 		// ------------------------------------
         // Grass
@@ -382,7 +436,10 @@ class HomeScene extends BasicScene implements EventListener {
                 }
 
                 final grass = new h2d.Bitmap(groundTile, backgroundObject);
-                grass.setPosition(grass.tile.width / 2 + (x * grass.tile.width), grass.tile.height / 2 + (y * grass.tile.height));
+                grass.setPosition(
+					grass.tile.width / 2 + (x * grass.tile.width),
+					grass.tile.height / 2 + (y * grass.tile.height),
+				);
             }
         }
 
@@ -390,7 +447,7 @@ class HomeScene extends BasicScene implements EventListener {
         // Trees
         // ------------------------------------
 
-        function placeTree(x:Float, y:Float) {
+        inline function placeTree(x:Float, y:Float) {
             final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
                 new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_1)) : 
                 new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_TREE_2));
@@ -412,7 +469,7 @@ class HomeScene extends BasicScene implements EventListener {
         // Weed
         // ------------------------------------
 
-        function placeWeed(x:Float, y:Float) {
+        inline function placeWeed(x:Float, y:Float) {
             final treeBitmap = MathUtils.randomIntInRange(1, 2) == 1 ? 
                 new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_1)) : 
                 new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.TERRAIN_WEED_2));
@@ -429,12 +486,19 @@ class HomeScene extends BasicScene implements EventListener {
         // Shadow
         // ------------------------------------
 
-        final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), this);
-        final darknessScaleRatio = Main.ActualScreenHeight / 1280;
-        darkness.scaleY = darknessScaleRatio;
+        final darkness = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_DARKNESS), contentObject);
+
+		if (DeviceInfo.IsMobile) {
+			if (DeviceInfo.ScreenOrientation == 'landscape') {
+				darkness.scaleY = DeviceInfo.ActualScreenWidth / 1280;
+				darkness.rotate(MathUtils.degreeToRads(90));
+			} else {
+				darkness.scaleY = DeviceInfo.ActualScreenHeight / 1280;
+			}
+		}
 
         darkness.filter = new Displacement(screenDarknessDisplacementTile, 14, 14);
-        darkness.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
+        darkness.setPosition(DeviceInfo.TargetPortraitScreenWidth / 2, DeviceInfo.TargetPortraitScreenHeight / 2);
 	}
 
 	// --------------------------------------
@@ -446,27 +510,23 @@ class HomeScene extends BasicScene implements EventListener {
 			this.homeSceneContent = homeSceneContent;
 
 			if (pageContent != null) {
-				removeChild(pageContent);
+				contentObject.removeChild(pageContent);
 				pageContent = null;
 			}
 
 			switch (homeSceneContent) {
 				case HomePlayContent:
-					NativeWindowJS.trackHomeClick();
 					pageContent = playContent;
 				case HomeBoostContent:
-					NativeWindowJS.trackBoostsClick();
 					pageContent = boostContent;
 				case HomeCollectionContent:
-					NativeWindowJS.trackCollectionClick();
 					pageContent = collectionContent;
 				case HomeFriendsContent:
-					NativeWindowJS.trackFriendsClick();
 					pageContent = friendsContent;
 				default:
 			}
 
-			addChildAt(pageContent, 1);
+			contentObject.addChildAt(pageContent, 1);
 		}
 	}
 

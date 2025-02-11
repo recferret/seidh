@@ -1,6 +1,7 @@
 package game.scene.impl.home.collection;
 
-import hxd.res.DefaultFont;
+import game.ui.text.TextUtils;
+import game.analytics.Analytics;
 
 import game.js.NativeWindowJS;
 import game.sound.SoundManager;
@@ -23,16 +24,16 @@ class WalletButton extends h2d.Object {
         w = bmp.tile.width * scaleX;
         h = bmp.tile.height * scaleY;
 
-        final font : h2d.Font = DefaultFont.get();
-        final tf = new h2d.Text(font);
-        tf.text = boostLabel;
-        tf.textColor = GameClientConfig.DefaultFontColor;
-        tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
-        tf.textAlign = Center;
-        tf.setScale(4);
-        tf.setPosition(0, -35);
+        // final font : h2d.Font = DefaultFont.get();
+        // final tf = new h2d.Text(font);
+        // tf.text = boostLabel;
+        // tf.textColor = GameClientConfig.DefaultFontColor;
+        // tf.dropShadow = { dx : 0.5, dy : 0.5, color : 0xFF0000, alpha : 0.8 };
+        // tf.textAlign = Center;
+        // tf.setScale(4);
+        // tf.setPosition(0, -35);
 
-        addChild(tf);
+        // addChild(tf);
         
         interaction = new h2d.Interactive(w, h);
         interaction.onPush = function(event : hxd.Event) {
@@ -43,16 +44,16 @@ class WalletButton extends h2d.Object {
         }
         interaction.onClick = function(event : hxd.Event) {
             if (type == 'connect_wallet') {
-                NativeWindowJS.trackWalletConnectClick();
+                Analytics.instance.trackWalletConnectClick();
 
                 NativeWindowJS.tonConnect(function callback(address:String) {
-                    NativeWindowJS.trackWalletConnected(address);
+                    Analytics.instance.trackWalletConnected(address);
                     Player.instance.saveWalletAddress(address);
                     parent.removeChild(interaction);
                     parent.removeChild(this);
                 });
             } else if (type == 'mint_ragnar') {
-                NativeWindowJS.trackMintRagnarClick();
+                Analytics.instance.trackMintRagnarClick();
                 NativeWindowJS.tonMintRagnar();
             } else if (type == 'disconnect_wallet') {
                 // TODO analytics
@@ -68,22 +69,22 @@ class WalletButton extends h2d.Object {
 
     public function setPosTop() {
         setPosition(
-            Main.ActualScreenWidth / 2 ,
+            DeviceInfo.TargetPortraitScreenWidth / 2 ,
             400
         );
         interaction.setPosition(
-            Main.ActualScreenWidth / 2 - w / 2,
+            DeviceInfo.TargetPortraitScreenWidth / 2 - w / 2,
             370 - h / 2
         );
     }
 
     public function setPosBelowTop() {
         setPosition(
-            Main.ActualScreenWidth / 2 ,
+            DeviceInfo.TargetPortraitScreenWidth / 2 ,
             570
         );
         interaction.setPosition(
-            Main.ActualScreenWidth / 2 - w / 2,
+            DeviceInfo.TargetPortraitScreenWidth / 2 - w / 2,
             570 - h / 2
         );
     }
@@ -109,8 +110,8 @@ class CollectionContent extends BasicHomeContent {
         //     buyRagnar.setPosBelowTop();
         // }
 
-        final ragnarDudeBitmap = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE), this);
-        ragnarDudeBitmap.setPosition(Main.ActualScreenWidth / 2, 570);
+        // final ragnarDudeBitmap = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE), this);
+        // ragnarDudeBitmap.setPosition(Main.ActualScreenWidth / 2, 570);
 
         // final tf = new h2d.Text(DefaultFont.get());
         // tf.text = "2000 / 2000 NFT Ragnars!";
@@ -121,10 +122,14 @@ class CollectionContent extends BasicHomeContent {
         // tf.setPosition(Main.ActualScreenWidth / 2, 670);
         // addChild(tf);
 
-        final soonTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_SOON);
-        final soonBitmap = new h2d.Bitmap(this);
-		soonBitmap.setPosition(Main.ActualScreenWidth / 2, 800);
-		soonBitmap.tile = soonTile;
+        // final soonTile = Res.instance.getTileResource(SeidhResource.UI_HOME_TITLE_SOON);
+        // final soonBitmap = new h2d.Bitmap(this);
+		// soonBitmap.setPosition(Main.ActualScreenWidth / 2, Main.ActualScreenHeight / 2);
+		// soonBitmap.tile = soonTile;
+
+        final soonText = TextUtils.GetDefaultTextObject(DeviceInfo.TargetPortraitScreenWidth / 2, DeviceInfo.TargetPortraitScreenHeight / 2, 1.5, Center, GameClientConfig.DefaultFontColor);
+		soonText.text = 'SOON !!!';
+		addChild(soonText);
     }
 
     public function update(dt:Float) {

@@ -1,5 +1,6 @@
 package engine.seidh;
 
+import engine.seidh.entity.impl.GlamrEntity;
 import engine.base.geometry.Point;
 import js.lib.Date;
 
@@ -24,10 +25,10 @@ class SeidhGameEngine extends BaseEngine {
     public static final GameWorldSize = 5000;
 
     public static final GAME_CONFIG:GameConfig = {
-        // Mobs spawn
-	    mobsMaxAtTheSameTime: 1,
-        mobsMaxPerGame: 0,
-        mobSpawnDelayMs: 0,
+        // Monsters spawn
+	    monstersMaxAtTheSameTime: 1,
+        monstersMaxPerGame: 0,
+        monstersSpawnDelayMs: 0,
 
         // Exp boost
         expLevel1Multiplier: 1.5,
@@ -49,135 +50,41 @@ class SeidhGameEngine extends BaseEngine {
         wealthLevel3CoinsMultiplier: 4,
     };
 
-    public static final CHARACTERS_CONFIG:CharacterDefaultConfigs = {
-        ragnarLoh: {
-            type: EntityType.RAGNAR_LOH,
-            movement: {
-                canRun: false,
-                runSpeed: 40,
-                speedFactor: 10,
-                inputDelay: 0.100,
-            },
-            entityShape: {
-                width: 180,
-                height: 260,
-                rectOffsetX: 0,
-                rectOffsetY: 0,
-                radius: 150,
-            },
-            actionMain: {
-                actionType: CharacterActionType.ACTION_MAIN,
-                damage: 5,
-                inputDelay: 1,
-                meleeStruct: {
-                    aoe: true,
-                    shape: {
-                        width: 350, 
-                        height: 260, 
-                        rectOffsetX: 175 - 90, 
-                        rectOffsetY: 0,
-                        radius: 0,
-                    },
-                }
-            },
-            health: 100,
-        },
-        zombieBoy: {
-            type: EntityType.ZOMBIE_BOY,
-            movement: {
-                canRun: false,
-                runSpeed: 3,
-                speedFactor: 10,
-                inputDelay: 0.100,
-            },
-            entityShape: {
-                width: 200,
-                height: 260,
-                rectOffsetX: 0,
-                rectOffsetY: 0,
-                radius: 0,
-            },
-            actionMain: {
-                actionType: CharacterActionType.ACTION_MAIN,
-                damage: 5,
-                inputDelay: 1,
-                meleeStruct: {
-                    aoe: false,
-                    shape: {
-                        width: 200,
-                        height: 260,
-                        rectOffsetX: 0,
-                        rectOffsetY: 0,
-                        radius: 0,
-                    },
-                }
-            },
-            health: 10,
-        },
-        zombieGirl: {
-            type: EntityType.ZOMBIE_GIRL,
-            movement: {
-                canRun: false,
-                runSpeed: 3,
-                speedFactor: 10,
-                inputDelay: 0.100,
-            },
-            entityShape: {
-                width: 200,
-                height: 260,
-                rectOffsetX: 0,
-                rectOffsetY: 0,
-                radius: 0,
-            },
-            actionMain: {
-                actionType: CharacterActionType.ACTION_MAIN,
-                damage: 5,
-                inputDelay: 1,
-                meleeStruct: {
-                    aoe: false,
-                    shape: {
-                        width: 300,
-                        height: 380,
-                        rectOffsetX: 0,
-                        rectOffsetY: 0,
-                        radius: 0,
-                    },
-                }
-            },
-            health: 10,
-        },
-    };
-
     private var lastDt = 0.0;
     private var framesPassed = 0;
     private var timePassed = 0.0;
+    private var msPassed = 0;
     private var secondsPassed = 0;
     private final secondsToSurvive = 60;
 
     private var winCondition:WinCondition;
+    private var gameStage = GameStage.KILL_MONSTERS;
 
     private final aiManager:AiManager;
 
-    private final playerZombieKills = new Map<String, Int>();
-    private final playerTokensAccquired = new Map<String, Int>();
-    private final playerExpGained = new Map<String, Int>();
+    private var glamr:GlamrEntity;
+
+    private final playerZombiesKilled = new Map<String, Int>();
+    private final playerCoinsGained = new Map<String, Int>();
     private final lineColliders = new Array<engine.base.geometry.Line>();
+
+    public var gameId:String;
 
     public var characterActionCallbacks:Array<CharacterActionCallbackParams>->Void;
     public var gameStateCallback:GameState->Void;
+    public var gameStageCallback:GameStage->Void;
     public var oneSecondCallback:Void->Void;
-
+    
     public final playersSpawnPoints = [
         new Point(2500, 2500)
     ];
 
-
     public static function main() {}
 
-    public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.SURVIVE) {
+    public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.INFINITE) {
 	    super(engineMode);
 
-        aiManager = new AiManager();
+        aiManager = new AiManager(winCondition);
 
         this.winCondition = winCondition;
 
@@ -186,25 +93,25 @@ class SeidhGameEngine extends BaseEngine {
 		addLineCollider(0, 0, 0, GameWorldSize);
 		addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
 
-        oneSecondTimer();
-    }
-
-    // ---------------------------------------------------
-    // Create entity helpers
-    // ---------------------------------------------------
+        oneTenthOfASecondTimer();
 
         // createConsumable(struct.x + 300, struct.y);
         // createConsumable(struct.x + 400, struct.y);
         // createConsumable(struct.x + 500, struct.y);
         // createConsumable(struct.x + 600, struct.y);
         // createConsumable(struct.x + 700, struct.y);
+    }
+
+    // ---------------------------------------------------
+    // Create entity helpers
+    // ---------------------------------------------------
 
     public function createCharacterEntityFromMinimalStruct(struct:CharacterEntityMinStruct) {
-        createCharacterEntity(SeidhEntityFactory.InitiateCharacter(struct));
+        addToCharacterCreateQueue(SeidhEntityFactory.InitiateCharacter(struct));
     }
 
     public function createCharacterEntityFromFullStruct(struct:CharacterEntityFullStruct) {
-        createCharacterEntity(SeidhEntityFactory.InitiateCharacterFromFullStruct(struct));
+        addToCharacterCreateQueue(SeidhEntityFactory.InitiateCharacterFromFullStruct(struct));
     }
 
     // ---------------------------------------------------
@@ -250,7 +157,7 @@ class SeidhGameEngine extends BaseEngine {
                 if (projectile.allowMovement) {
                     projectile.update(dt);
                 } else {
-                    deleteProjectileEntity(projectile.getId());
+                    addToProjectileDeleteQueue(projectile.getId());
                 }
             }
 
@@ -292,6 +199,10 @@ class SeidhGameEngine extends BaseEngine {
                 final character1Id = character1.getId();
                 final character1OwnerId = character1.getOwnerId();
 
+                if (character1.getEntityType() == EntityType.GLAMR && glamr == null) {
+                    glamr = cast(character1, GlamrEntity);
+                }
+
                 if (character1.isAlive) {
                     character1.update(dt);
 
@@ -304,19 +215,19 @@ class SeidhGameEngine extends BaseEngine {
                             if (characterPickUpCircle.getCenter().distance(consumable.getBodyRectangle().getCenter()) < characterPickUpCircle.r + 10) {
                                 if (characterPickUpCircle.containsRect(consumable.getBodyRectangle())) {
                                     if (consumable.getEntityType() == EntityType.COIN) {
-                                        // Increase tokens accquired
-                                        final currentBalance = playerTokensAccquired.get(character1OwnerId);
-                                        if (currentBalance != null) {
-                                            playerTokensAccquired.set(character1OwnerId, currentBalance + 1);
+                                        // Increase coins accquired
+                                        final coinsGained = playerCoinsGained.get(character1OwnerId);
+                                        if (coinsGained != null) {
+                                            playerCoinsGained.set(character1OwnerId, coinsGained + 1);
                                         } else {
-                                            playerTokensAccquired.set(character1OwnerId, 1);
+                                            playerCoinsGained.set(character1OwnerId, 1);
                                         }
                                     } else {
                                         // Give health
                                         character1.addHealth(consumable.amount);
                                     }
 
-                                    deleteConsumableEntity(consumable.getId(), character1Id);
+                                    addToConsumableDeleteQueue(consumable.getId(), character1Id);
                                 }
                             }
                         }
@@ -356,159 +267,252 @@ class SeidhGameEngine extends BaseEngine {
                     }
 
                     // Perform character action
-                    if (character1.isActing) {
-                        final hurtEntities = new Array<String>();
-                        final deadEntities = new Array<String>();
+                    if (character1.actionState == CharacterActionState.IN_QUEUE) {
+                        character1.actionState = CharacterActionState.IN_PROGRESS;
 
-                        var actionShape:ShapeStruct = null;
-                        if (character1.actionToPerform.projectileStruct != null) {
-                            createProjectileEntity(createProjectileByCharacter(character1));
-                            actionShape = character1.actionToPerform.projectileStruct.shape;
-                        } else if (character1.actionToPerform.meleeStruct != null) {
-                            actionShape = character1.actionToPerform.meleeStruct.shape;
-                        }
-
-                        for (e2 in characterEntityManager.entities) {
-                            final character2 = cast(e2, EngineCharacterEntity);
-                            // TODO add distance check here
-                            if (character2.isAlive && character1Id != character2.getId()) {
-                                final characterHasActionRect = character1.getCurrentActionRect() != null;
-                                final chatacterHitsAnother = character1.getCurrentActionRect().containsRect(character2.getBodyRectangle()); 
-                                final skipBotToBotAttack = character1.isBot() && character2.isBot();
-                                if (characterHasActionRect && chatacterHitsAnother && !skipBotToBotAttack) {
-                                    if (allowServerLogic) {
-                                        final health = character2.subtractHealth(character1.actionToPerform.damage);
-                                        if (health == 0) {
-                                            // Zombie killed
-                                            if (character2.isBot()) {
-                                                aiManager.mobKilled();
-
-                                                // Update player kills
-                                                final currentKills = playerZombieKills.get(character1OwnerId);
-                                                if (currentKills != null) {
-                                                    playerZombieKills.set(character1OwnerId, currentKills + 1);
-                                                } else {
-                                                    playerZombieKills.set(character1OwnerId, 1);
-                                                }
-
-                                                // Update current player character exp
-                                                final currentExp = playerExpGained.get(character1OwnerId);
-                                                if (currentExp != null) {
-                                                    playerExpGained.set(character1OwnerId, currentExp + 1);
-                                                } else {
-                                                    playerExpGained.set(character1OwnerId, 1);
-                                                }
-
-                                                // Create a new random consumable
-                                                createConsumable(
-                                                    Std.int(character2.getBodyRectangle().x), 
-                                                    Std.int(character2.getBodyRectangle().y)
-                                                );
-                                            }
-                                            character2.isAlive = false;
-                                            deadEntities.push(character2.getId());
-                                            deleteCharacterEntity(character2.getId());
-                                        } else {
-                                            hurtEntities.push(character2.getId());
-                                        }
-                                    } else {
-                                        hurtEntities.push(character2.getId());
-                                    }
-                                }
-                            }
-                        }
-
-                        characterActionCallbackParams.push({
+                        final callbackParams:CharacterActionCallbackParams = {
                             entityId: character1.getId(),
                             actionType: character1.actionToPerform.actionType,
-                            shape: actionShape,
-                            hurtEntities: hurtEntities,
-                            deadEntities: deadEntities,
-                        });
+                            actionEffect: character1.actionToPerform.actionEffect,
+                            playActionAnim: false,
+                            playEffectAnim: false,
+                        };
+
+                        if (character1.actionToPerform.actionEffect == CharacterActionEffect.ATTACK) {
+                            function performAttack() {                               
+                                final hurtEntities = new Array<String>();
+                                final deadEntities = new Array<String>();
+
+                                var actionShape:ShapeStruct = null;
+                                if (character1.actionToPerform.projectileStruct != null) {
+                                    addToProjectileCreateQueue(createProjectileByCharacter(character1));
+                                    actionShape = character1.actionToPerform.projectileStruct.shape;
+                                } else if (character1.actionToPerform.meleeStruct != null) {
+                                    actionShape = character1.actionToPerform.meleeStruct.shape;
+                                }
+
+                                for (e2 in characterEntityManager.entities) {
+                                    final character2 = cast(e2, EngineCharacterEntity);
+                                    // TODO add distance check here
+                                    if (character2.isAlive && character1Id != character2.getId()) {
+                                        final characterHasActionRect = character1.getActionRect(true) != null;
+                                        final chatacterHitsAnother = character1.getActionRect(true).containsRect(character2.getBodyRectangle()); 
+                                        final skipBotToBotAttack = !character1.isPlayer() && !character2.isPlayer();
+                                        if (characterHasActionRect && chatacterHitsAnother && !skipBotToBotAttack) {
+                                            if (allowServerLogic) {
+                                                final health = character2.subtractHealth(character1.actionToPerform.damage);
+                                                if (health == 0) {
+                                                    if (character2.isPlayer() && character2.getOwnerId() == localPlayerId) {
+                                                        setGameState(GameState.LOSE);
+                                                    }
+
+                                                    if (character2.isBoss()) {
+                                                        aiManager.setBossKilled();
+                                                    }
+
+                                                    if (character2.isMonster()) {
+                                                        aiManager.monsterKilled();
+
+                                                        if (glamr != null) {
+                                                            glamr.monsterKilled();
+                                                        }
+
+                                                        // Update player kills
+                                                        final zombieKills = playerZombiesKilled.get(character1OwnerId);
+                                                        if (zombieKills != null) {
+                                                            playerZombiesKilled.set(character1OwnerId, zombieKills + 1);
+                                                        } else {
+                                                            playerZombiesKilled.set(character1OwnerId, 1);
+                                                        }
+
+                                                        createRandomConsumable(
+                                                            Std.int(character2.getBodyRectangle().x), 
+                                                            Std.int(character2.getBodyRectangle().y),
+                                                        );
+                                                    }
+
+                                                    character2.isAlive = false;
+                                                    deadEntities.push(character2.getId());
+                                                    addToCharacterDeleteQueue(character2.getId());
+                                                } else {
+                                                    hurtEntities.push(character2.getId());
+                                                }
+                                            } else {
+                                                hurtEntities.push(character2.getId());
+                                            }
+                                        }
+                                    }
+
+                                    callbackParams.shape = actionShape;
+                                    callbackParams.damage = character1.actionToPerform.damage;
+                                    callbackParams.hurtEntities = hurtEntities;
+                                    callbackParams.deadEntities = deadEntities;
+                                }
+                            }
+
+                            if (character1.actionToPerform.performDelayMs == 0) {
+                                performAttack();
+
+                                character1.canChangeState = true;
+                                character1.actionState = CharacterActionState.READY;
+                                character1.actionToPerform = null;
+
+                                callbackParams.playActionAnim = true;
+                                callbackParams.playEffectAnim = true;
+
+                                characterActionCallbackParams.push(callbackParams);
+                            } else {
+                                // Visuals only
+                                callbackParams.playActionAnim = true;
+                                sendCharacterActionCallbacks([callbackParams]);
+
+                                // Action itself
+                                haxe.Timer.delay(function callback() {
+                                    performAttack();
+        
+                                    character1.canChangeState = true;
+                                    character1.actionState = CharacterActionState.READY;
+                                    character1.actionToPerform = null;
+        
+                                    callbackParams.playEffectAnim = true;
+                                    sendCharacterActionCallbacks([callbackParams]);
+                                }, character1.actionToPerform.performDelayMs);
+                            }
+                        } else if (character1.actionToPerform.actionEffect == CharacterActionEffect.SUMMON) {
+                            if (character1.getEntityType() == GLAMR) {
+                                haxe.Timer.delay(function callback() {
+                                    final glamr = cast(character1, GlamrEntity);
+                                    final monsters = aiManager.spawnMonstersAroundPoint(character1.getX(), character1.getY(), glamr.monstersToSpawn);
+                                    for (monster in monsters) {
+                                        addToCharacterCreateQueue(SeidhEntityFactory.InitiateCharacter(
+                                            {
+                                                x: monster.positionX,
+                                                y: monster.positionY,
+                                                entityType: monster.entityType,
+                                            }
+                                        ));
+                                        glamr.monsterSpawned();
+                                    }
+
+                                    // TODO Refactor how actions are working
+                                    if (character1.actionToPerform.postDelayMs != 0) {
+                                        haxe.Timer.delay(function callback() {
+                                            character1.canChangeState = true;
+                                            character1.actionState = CharacterActionState.READY;
+                                            character1.actionToPerform = null;
+                                        }, character1.actionToPerform.postDelayMs);
+                                    } else {
+                                        character1.canChangeState = true;
+                                        character1.actionState = CharacterActionState.READY;
+                                        character1.actionToPerform = null;
+                                    }
+
+                                    callbackParams.playActionAnim = true;
+
+                                    sendCharacterActionCallbacks([callbackParams]);
+                                }, character1.actionToPerform.performDelayMs);
+                            }
+                        }
                     }
 
-                    character1.isActing = false;
-                    character1.actionToPerform = null;
                     character1.isRunning = false;
                 }
             }
 
-            if (characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
-                characterActionCallbacks(characterActionCallbackParams);
-            }
+            sendCharacterActionCallbacks(characterActionCallbackParams);
 
-            if (winCondition != WinCondition.INFINITE) {
-                if (winCondition == WinCondition.KILL_MOBS && aiManager.allMobsKilled() && allowServerLogic) {
-                    gameState = GameState.WIN;
-                    if (gameStateCallback != null) {
-                        gameStateCallback(gameState);
-                    }
-                }
+            spawnMonsters();
+
+            if (winCondition != WinCondition.INFINITE && allowServerLogic && aiManager.allMonstersKilled()) {
+                setGameState(GameState.WIN);
             }
 
             recentEngineLoopTime = Date.now() - beginTime;
-
-            spawnMobs();
-        } else if (gameState == GameState.LOSE) {
-            lose();
         }
     }
 
     public function customDestroy() {
         // clear callbacks
+        aiManager.cleanMonsters();
+        aiManager.setAllowSpawnMonsters(false);
+
         characterActionCallbacks = null;
+        gameStateCallback = null;
+        oneSecondCallback = null;
     }
 
     // ---------------------------------------------------
-    // Custom logic
+    // General
     // ---------------------------------------------------
+
+    public function sendCharacterActionCallbacks(characterActionCallbackParams:Array<CharacterActionCallbackParams>) {
+        if (characterActionCallbacks != null && characterActionCallbackParams.length > 0) {
+            characterActionCallbacks(characterActionCallbackParams);
+        }
+    }
 
 	public function addLineCollider(x1:Int, y1:Int, x2:Int, y2:Int) {
 		lineColliders.push(new engine.base.geometry.Line(x1, y1, x2, y2));
 	}
 
-    public function allowMobsSpawn(allowSpawnMobs:Bool) {
-        aiManager.allowMobsSpawn(allowSpawnMobs);
+    public function setAllowSpawnMonsters(allowSpawnMonsters:Bool) {
+        aiManager.setAllowSpawnMonsters(allowSpawnMonsters);
     }
 
-    public function spawnMobs() {
-        final player = characterEntityManager.getEntityById(localPlayerId);
-        if (player != null) {
-            final spawnMob = aiManager.spawnMob(player.getX(), player.getY());
-            if (spawnMob.spawn) {
-                createCharacterEntity(SeidhEntityFactory.InitiateCharacter(
-                    {
-                        x: spawnMob.positionX,
-                        y: spawnMob.positionY,
-                        entityType: spawnMob.entityType,
-                    }
-                ));
-            }
-        }
-    }
-
-    public function cleanAllMobs() {
+    public function cleanAllMonsters() {
         for (entity in characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY)) {
             characterEntityManager.delete(entity.getId());
         };
         for (entity in characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL)) {
             characterEntityManager.delete(entity.getId());
         };
-        aiManager.cleanAllMobs();
+        aiManager.cleanMonsters();
     }
 
     public function clearPlayerGainings(playerId:String) {
-        playerZombieKills.remove(playerId);
-        playerTokensAccquired.remove(playerId);
-        playerExpGained.remove(playerId);
+        playerZombiesKilled.remove(playerId);
+        playerCoinsGained.remove(playerId);
     }
 
-    public function lose() {
-        if (gameState == GameState.LOSE) {
-            if (gameStateCallback != null) {
-                gameStateCallback(gameState);
+    public function createRandomConsumable(x:Int, y:Int) {
+        var entityType = EntityType.COIN;
+        final rnd = MathUtils.randomIntInRange(1, 40);
+        if (rnd == 1) {
+            entityType = EntityType.SALMON;
+        } else if (rnd < 6) {
+            entityType = EntityType.HEALTH_POTION;
+        }
+        createConsumable(x, y, entityType);
+    }
+
+    public function createConsumable(x:Int, y:Int, entityType:EntityType) {
+        switch (entityType) {
+            case EntityType.COIN:
+                addToConsumableCreateQueue(SeidhEntityFactory.InitiateCoin(x, y, 1));
+            case EntityType.HEALTH_POTION:
+                addToConsumableCreateQueue(SeidhEntityFactory.InitiateHealthPotion(x, y, 20));
+            case EntityType.SALMON:
+                addToConsumableCreateQueue(SeidhEntityFactory.InitiateSalmon(x, y, 50));
+            default:
+        }
+    }
+
+    private function spawnMonsters() {
+        final player = characterEntityManager.getEntityById(playerToEntityMap.get(localPlayerId));
+        if (player != null) {
+            final spawnMonster = aiManager.spawnMonster(player.getX(), player.getY());
+            if (spawnMonster.spawn) {
+                if (spawnMonster.entityType == EntityType.GLAMR) {
+                    gameStageCallback(GameStage.KILL_BOSS);
+                }
+                addToCharacterCreateQueue(SeidhEntityFactory.InitiateCharacter(
+                    {
+                        x: spawnMonster.positionX,
+                        y: spawnMonster.positionY,
+                        entityType: spawnMonster.entityType,
+                    }
+                ));
             }
-            gameState = GameState.ENDED;
         }
     }
 
@@ -546,32 +550,24 @@ class SeidhGameEngine extends BaseEngine {
         return nearestPlayer;
     }
 
-    private function createConsumable(x:Int, y:Int) {
-        final rnd = MathUtils.randomIntInRange(1, 40);
-        if (rnd == 1) {
-            createConsumableEntity(SeidhEntityFactory.InitiateCoin(x, y, 25));
-        } else if (rnd < 6) {
-            createConsumableEntity(SeidhEntityFactory.InitiateHealthPotion(x, y, 10));
-        } else {
-            createConsumableEntity(SeidhEntityFactory.InitiateCoin(x, y, 1));
-        }
-    }
-
-    private function oneSecondTimer() {
+    private function oneTenthOfASecondTimer() {
         haxe.Timer.delay(function delay() {
             if (gameState == GameState.PLAYING) {
                 if (winCondition == WinCondition.SURVIVE && secondsPassed >= secondsToSurvive) {
                     setGameState(GameState.WIN);
                 } else {
-                    secondsPassed++;
-                    if (oneSecondCallback != null) {
-                        oneSecondCallback();
+                    if (msPassed++ == 10) {
+                        msPassed = 0;
+                        secondsPassed++;
+                        if (oneSecondCallback != null) {
+                            oneSecondCallback();
+                        }
+                        aiManager.secondPassed();
                     }
-                    aiManager.secondPassed();
-                    oneSecondTimer();
+                    oneTenthOfASecondTimer();
                 }
             }
-        }, 1000);
+        }, 100);
     }
 
     // ---------------------------------------------------
@@ -594,27 +590,39 @@ class SeidhGameEngine extends BaseEngine {
         return playersSpawnPoints;
     }
 
-    public function getMobsSpawnPoints() {
-        return aiManager.getMobsSpawnPoints();
+    public function getMonstersSpawnPoints() {
+        return aiManager.getMonstersSpawnPoints();
     }
 
-    public function getMobsMax() {
-        return aiManager.getMobsMax();
+    public function getMonstersMax() {
+        return aiManager.getMonstersMax();
+    }
+
+    public function getMonstersLeft() {
+        return aiManager.getMonstersLeft();
     }
 
     public function getPlayersCount() {
         return characterEntityManager.getEntitiesByEntityType(EntityType.RAGNAR_LOH).length;
     }
 
+    public function getGameProgress(playerId:String) {
+        final gainings = getPlayerGainings(playerId);
+        return {
+            monstersSpawned: aiManager.getMonstersSpawned(),
+            zombiesKilled: gainings.zombiesKilled,
+            coinsGained: gainings.coinsGained,
+        }
+    }
+
     public function getPlayerGainings(playerId:String) {
         return {
-            kills: playerZombieKills.exists(playerId) ? playerZombieKills.get(playerId) : 0,
-            tokens: playerTokensAccquired.exists(playerId) ? playerTokensAccquired.get(playerId) : 0,
-            exp: playerExpGained.exists(playerId) ? playerExpGained.get(playerId) : 0,
+            zombiesKilled: playerZombiesKilled.exists(playerId) ? playerZombiesKilled.get(playerId) : 0,
+            coinsGained: playerCoinsGained.exists(playerId) ? playerCoinsGained.get(playerId) : 0,
         };
     }
 
-    public function getMobsCount() {
+    public function getMonstersCount() {
         return 
             characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_BOY).length +
             characterEntityManager.getEntitiesByEntityType(EntityType.ZOMBIE_GIRL).length;
@@ -643,8 +651,8 @@ class SeidhGameEngine extends BaseEngine {
         }
     }
 
-    public function setMobsMax(mobsMax:Int) {
-        aiManager.setMobsMax(mobsMax);
+    public function setMonstersMax(monstersMax:Int) {
+        aiManager.setMonstersMax(monstersMax);
     }
 
     public function setWinCondition(winCondition:WinCondition) {

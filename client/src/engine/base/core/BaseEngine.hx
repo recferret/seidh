@@ -27,17 +27,17 @@ typedef CreateProjectileEntityTask = {
 }
 
 enum abstract GameState(Int) {
+	var PREPARING = 0;
 	var PLAYING = 1;
 	var WIN = 2;
     var LOSE = 3;
-	var ENDED = 4;
 }
 
 @:expose
 abstract class BaseEngine {
 	final gameLoop:GameLoop;
 
-    public var gameState = GameState.PLAYING;
+    public var gameState = GameState.PREPARING;
 
 	public var tick:Int;
 
@@ -63,14 +63,14 @@ abstract class BaseEngine {
 	public var validatedInputCommands = new Array<PlayerInputCommand>();
 
 	// Both chars, projectiles and coins has lots of common, need some better abstraction
-	private var createCharacterEntityQueue = new Array<CreateCharacterEntityTask>();
-	private var deleteCharacterEntityQueue = new Array<String>();
+	private var characterCreateQueue = new Array<CreateCharacterEntityTask>();
+	private var characterDeleteQueue = new Array<String>();
 
-	private var createConsumableEntityQueue = new Array<CreateConsumableEntityTask>();
-	private var deleteConsumableEntityQueue = new Array<DeleteConsumableEntityTask>();
+	private var consumableCreateQueue = new Array<CreateConsumableEntityTask>();
+	private var consumableDeleteQueue = new Array<DeleteConsumableEntityTask>();
 
-	private var createProjectileEntityQueue = new Array<CreateProjectileEntityTask>();
-	private var deleteProjectileEntityQueue = new Array<String>();
+	private var projectileCreateQueue = new Array<CreateProjectileEntityTask>();
+	private var projectileDeleteQueue = new Array<String>();
 
 	var localPlayerId:String;
 
@@ -95,14 +95,14 @@ abstract class BaseEngine {
 			}
 			ticksSinceLastPop++;
 
-			processCreateCharacterQueue();
-			processDeleteCharacterQueue();
+			processCharacterCreateQueue();
+			processCharacterDeleteQueue();
 
-			processCreateConsumableQueue();
-			processDeleteConsumableQueue();
+			processConsumableCreateQueue();
+			processConsumableDeleteQueue();
 
-			processCreateProjectileQueue();
-			processDeleteProjectileQueue();
+			processProjectileCreateQueue();
+			processProjectileDeleteQueue();
 
 			// Update all entities
 			engineLoopUpdate(dt);
@@ -120,6 +120,8 @@ abstract class BaseEngine {
 		});
 
 		okLoopTime = Std.int(1000 / gameLoop.targetFps);
+
+		gameState = GameState.PLAYING;
 	}
 
 	// -----------------------------------
@@ -136,18 +138,18 @@ abstract class BaseEngine {
 	// Character entity management
 	// -----------------------------------
 
-	function createCharacterEntity(entity:EngineCharacterEntity) {
-		createCharacterEntityQueue.push({
+	function addToCharacterCreateQueue(entity:EngineCharacterEntity) {
+		characterCreateQueue.push({
 			entity: entity
 		});
 	}
 
-	public function deleteCharacterEntityByOwnerId(ownerId:String) {
-		deleteCharacterEntityQueue.push(getCharacterEntityIdByOwnerId(ownerId));
+	public function addToCharacterDeleteQueueByOwnerId(ownerId:String) {
+		characterDeleteQueue.push(getCharacterEntityIdByOwnerId(ownerId));
 	}
 
-	public function deleteCharacterEntity(entityId:String) {
-		deleteCharacterEntityQueue.push(entityId);
+	public function addToCharacterDeleteQueue(entityId:String) {
+		characterDeleteQueue.push(entityId);
 	}
 
 	public function getCharacterEntityById(id:String) {
@@ -212,21 +214,21 @@ abstract class BaseEngine {
 		return result;
 	}
 
-	function processCreateCharacterQueue() {
-		for (queueTask in createCharacterEntityQueue) {
+	function processCharacterCreateQueue() {
+		for (queueTask in characterCreateQueue) {
 			characterEntityManager.add(queueTask.entity);
-			if (queueTask.entity.getEntityType() == RAGNAR_LOH) {
+			if (queueTask.entity.isPlayer()) {
 				playerToEntityMap.set(queueTask.entity.getOwnerId(), queueTask.entity.getId());
 			}
 			if (createCharacterCallback != null) {
 				createCharacterCallback(queueTask.entity);
 			}
 		}
-		createCharacterEntityQueue = [];
+		characterCreateQueue = [];
 	}
 
-	function processDeleteCharacterQueue() {
-		for (entityId in deleteCharacterEntityQueue) {
+	function processCharacterDeleteQueue() {
+		for (entityId in characterDeleteQueue) {
 			final entity = cast (characterEntityManager.getEntityById(entityId), EngineCharacterEntity);
 			if (entity != null) {
 				if (deleteCharacterCallback != null) {
@@ -234,44 +236,37 @@ abstract class BaseEngine {
 				}
 				playerToEntityMap.remove(entity.getOwnerId());
 				characterEntityManager.delete(entity.getId());
-
-				// Game lose if player died
-				if (localPlayerId != null) {
-					if (localPlayerId == entity.getOwnerId()) {
-						gameState = GameState.LOSE;
-					}
-				}
 			}
 		}
-		deleteCharacterEntityQueue = [];
+		characterDeleteQueue = [];
 	}
 
 	// -----------------------------------
 	// Projectiles
 	// -----------------------------------
 
-	function createProjectileEntity(entity:EngineProjectileEntity) {
-		createProjectileEntityQueue.push({
+	function addToProjectileCreateQueue(entity:EngineProjectileEntity) {
+		projectileCreateQueue.push({
 			entity: entity
 		});
 	}
 
-	function deleteProjectileEntity(entityId:String) {
-		deleteProjectileEntityQueue.push(entityId);
+	function addToProjectileDeleteQueue(entityId:String) {
+		projectileDeleteQueue.push(entityId);
 	}
 
-	function processCreateProjectileQueue() {
-		for (queueTask in createProjectileEntityQueue) {
+	function processProjectileCreateQueue() {
+		for (queueTask in projectileCreateQueue) {
 			projectileEntityManager.add(queueTask.entity);
 			if (createProjectileCallback != null) {
 				createProjectileCallback(queueTask.entity);
 			}
 		}
-		createProjectileEntityQueue = [];
+		projectileCreateQueue = [];
 	}
 
-	function processDeleteProjectileQueue() {
-		for (entityId in deleteProjectileEntityQueue) {
+	function processProjectileDeleteQueue() {
+		for (entityId in projectileDeleteQueue) {
 			final entity = cast (projectileEntityManager.getEntityById(entityId), EngineProjectileEntity);
 			if (entity != null) {
 				if (deleteProjectileCallback != null) {
@@ -280,35 +275,36 @@ abstract class BaseEngine {
 				projectileEntityManager.delete(entity.getId());
 			}
 		}
-		deleteProjectileEntityQueue = [];
+		projectileDeleteQueue = [];
 	}
 
 	// -----------------------------------
 	// Consumables
 	// -----------------------------------
 
-	public function createConsumableEntity(entity:EngineConsumableEntity) {
-		createConsumableEntityQueue.push({
+	// Add to queue
+	public function addToConsumableCreateQueue(entity:EngineConsumableEntity) {
+		consumableCreateQueue.push({
 			entity: entity
 		});
 	}
 
-	public function deleteConsumableEntity(entityId:String, takenByCharacterId:String) {
-		deleteConsumableEntityQueue.push({entityId: entityId, takenByCharacterId: takenByCharacterId});
+	public function addToConsumableDeleteQueue(entityId:String, takenByCharacterId:String) {
+		consumableDeleteQueue.push({entityId: entityId, takenByCharacterId: takenByCharacterId});
 	}
 
-	function processCreateConsumableQueue() {
-		for (queueTask in createConsumableEntityQueue) {
+	function processConsumableCreateQueue() {
+		for (queueTask in consumableCreateQueue) {
 			consumableEntityManager.add(queueTask.entity);
 			if (createConsumableCallback != null) {
 				createConsumableCallback(queueTask.entity);
 			}
 		}
-		createConsumableEntityQueue = [];
+		consumableCreateQueue = [];
 	}
 
-	function processDeleteConsumableQueue() {
-		for (task in deleteConsumableEntityQueue) {
+	function processConsumableDeleteQueue() {
+		for (task in consumableDeleteQueue) {
 			final entity = cast (consumableEntityManager.getEntityById(task.entityId), EngineConsumableEntity);
 			if (entity != null) {
 				if (deleteConsumableCallback != null) {
@@ -317,7 +313,7 @@ abstract class BaseEngine {
 				consumableEntityManager.delete(task.entityId);
 			}
 		}
-		deleteConsumableEntityQueue = [];
+		consumableDeleteQueue = [];
 	}
 
 	// -----------------------------------
@@ -379,6 +375,8 @@ abstract class BaseEngine {
 		postLoopCallback = null;
 		createCharacterCallback = null;
 		deleteCharacterCallback = null;
+		createConsumableCallback = null;
+		deleteConsumableCallback = null;
 		createProjectileCallback = null;
 		deleteProjectileCallback = null;
 

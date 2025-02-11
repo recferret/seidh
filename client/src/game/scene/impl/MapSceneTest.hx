@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import h3d.Engine;
 import hxd.Key in K;
 
 import engine.base.types.TypesBaseEntity;
@@ -14,6 +15,7 @@ import game.terrain.TerrainManager;
 class MapSceneTest extends BasicScene {
 
 	private var characters:Array<ClientCharacterEntity> = new Array<ClientCharacterEntity>();
+	private var terrainManager:TerrainManager;
 
 	private var cameraOffsetX = 0;
 	private var cameraOffsetY = 0;
@@ -26,33 +28,45 @@ class MapSceneTest extends BasicScene {
 		camera.setScale(0.35, 0.35);
 		camera.setPosition(1200, 1200);
 
-		// characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter(null, null, 2100, 2650, EntityType.RAGNAR_LOH)));
-
 		var zombieX = 2500;
 		var zombieY = 1550;
+
+		characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter({
+			x: zombieX,
+			y: zombieY,
+			entityType: EntityType.RAGNAR_LOH,
+		})));
+
+
 		// for (x in 1...11) {
-			for (y in 1...11) {
-				characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter({
-						x: zombieX,
-						y: zombieY,
-						entityType: EntityType.ZOMBIE_BOY,
-					})
-				));
-				zombieY += 200;
-			}
+			// for (y in 1...11) {
+			// 	characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter({
+			// 			x: zombieX,
+			// 			y: zombieY,
+			// 			entityType: EntityType.ZOMBIE_BOY,
+			// 		})
+			// 	));
+			// 	zombieY += 200;
+			// }
 			zombieX += 200;
 			zombieY = 2650;
 		// }
 	}	
 
 	// --------------------------------------
-	// Impl
+	// Abstraction
 	// --------------------------------------
 
-	public function start() {
-	}
+    public function absOnEvent(event:hxd.Event) {
+    }
 
-	public function customUpdate(dt:Float, fps:Float) {
+    public function absOnResize(w:Int, h:Int) {
+    }
+
+	public function absStart() {
+    }
+
+	public function absUpdate(dt:Float, fps:Float) {
 		final camLeft = K.isDown(K.LEFT);
 		final camRight = K.isDown(K.RIGHT);
 		final camUp = K.isDown(K.UP);
@@ -97,8 +111,9 @@ class MapSceneTest extends BasicScene {
         }
 
 		final characterToEnvIntersections = new Array<Dynamic>();
+		final processedTerrainEntities = new Array<Int>();
 
-		for (index => character in characters) {
+		for (character in characters) {
 			characterToEnvIntersections.push(character);
 
 			Utils.DrawRect(debugGraphics, character.getRect(), GameClientConfig.BlueColor);
@@ -107,27 +122,31 @@ class MapSceneTest extends BasicScene {
 			// final ragnarBottom = character.getBottomRect().getCenter();
 			final characterRect = character.getRect();
 
-			for (index => terrain in terrainManager.terrainArray) {
-				// final treeBottom = tree.getBottomRect().getCenter();
-				final terrainRect = terrain.getRect();
+			for (terrain in terrainManager.terrainArray) {
+				if (!processedTerrainEntities.contains(terrain.getId())) {
+					processedTerrainEntities.push(terrain.getId());
 
-				Utils.DrawRect(debugGraphics, terrain.getRect(), GameClientConfig.BlueColor);
-				Utils.DrawRect(debugGraphics, terrain.getBottomRect(), GameClientConfig.GreenColor);
+					// final treeBottom = tree.getBottomRect().getCenter();
+					final terrainRect = terrain.getRect();
 
-				if (terrainRect.getCenter().distance(characterRect.getCenter()) < 200) {
-					if (terrainRect.intersectsWithRect(characterRect)) {
-						characterToEnvIntersections.push(terrain);
-					}
+					Utils.DrawRect(debugGraphics, terrain.getRect(), GameClientConfig.BlueColor);
+					Utils.DrawRect(debugGraphics, terrain.getBottomRect(), GameClientConfig.GreenColor);
 
-					if (characterToEnvIntersections.length > 1) {
-						characterToEnvIntersections.sort((a, b) -> {
-							final aBottom = a.getBottomRect().getCenter();
-							final bBottom = b.getBottomRect().getCenter();
-							return aBottom.y - bBottom.y;
-						});
+					if (terrainRect.getCenter().distance(characterRect.getCenter()) < 200) {
+						if (terrainRect.intersectsWithRect(characterRect)) {
+							characterToEnvIntersections.push(terrain);
+						}
 
-						for (index => env in characterToEnvIntersections) {
-							env.zOrder = index;
+						if (characterToEnvIntersections.length > 1) {
+							characterToEnvIntersections.sort((a, b) -> {
+								final aBottom = a.getBottomRect().getCenter();
+								final bBottom = b.getBottomRect().getCenter();
+								return aBottom.y - bBottom.y;
+							});
+
+							for (index => env in characterToEnvIntersections) {
+								env.zOrder = index;
+							}
 						}
 					}
 				}
@@ -136,5 +155,12 @@ class MapSceneTest extends BasicScene {
 
 		sortObjectsByZOrder();
 	}
+
+    public function absRender(e:Engine) {
+    }
+    
+    public function absDestroy() {
+    }
+
 
 }

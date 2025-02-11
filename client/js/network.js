@@ -2,13 +2,27 @@ let _currentGameId = undefined;
 let _currentGameplayServiceId = undefined;
 let _authToken = undefined;
 
-async function networkInit(telegramInitData, login, referrerId, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback) {
-    const authResponse = await restAuthenticate(telegramInitData, login, referrerId);
+async function networkInitTg(telegramInitData, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback) {
+    const authResponse = await restAuthenticateTg(telegramInitData);
+    await _networkInit(authResponse, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback);
+}
+
+async function networkInitVk(vkAuthRequest, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback) {
+    const authResponse = await restAuthenticateVk(vkAuthRequest);
+    await _networkInit(authResponse, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback);
+}
+
+async function networkInitSimple(login, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback) {
+    const authResponse = await restAuthenticateSimple(login);
+    await _networkInit(authResponse, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback);
+}
+
+async function _networkInit(authResponse, userCallback, boostCallback, getGameConfigCallback, getCharactersDefaultParamsCallback) {
     if (authResponse.success) {
         _authToken = 'Bearer ' + authResponse.authToken;
         const userResponse = await restGetUser(_authToken)
         if (userResponse.success) {
-            await networkGetGameConfig(getGameConfigCallback);
+            await networkGameGetConfig(getGameConfigCallback);
             await networkGetCharactersDefaultParams(getCharactersDefaultParamsCallback);
             await networkGetBoosts(boostCallback);
             if (userCallback) {
@@ -50,47 +64,55 @@ function networkInput(actionType, movAngle) {
 // REST wrappers
 // ----------------------------------
 
-async function networkGetGameConfig(callback) {
-    const result = await restGetGameConfig(_authToken);
-    if (result.success) {
-        if (callback) {
-            callback(result);
-        }
-    } else {
-        console.error('Failed to get game config');
+async function networkGameGetConfig(callback) {
+    const result = await restGameGetConfig(_authToken);
+    if (callback) {
+        callback(result);
+    }
+}
+
+async function networkGameStart(callback) {
+    const result = await restGameStart(_authToken);
+    if (callback) {
+        callback(result);
+    }
+}
+
+async function networkGameProgress(callback, gameId, mobsSpawned, zombiesKilled, coinsGained) {
+    const result = await restGameProgress(_authToken, {
+        gameId, mobsSpawned, zombiesKilled, coinsGained
+    });
+    if (callback) {
+        callback(result);
+    }
+}
+
+async function networkGameFinish(callback, gameId, reason, mobsSpawned, zombiesKilled, coinsGained) {
+    const result = await restGameFinish(_authToken, {
+        gameId, reason, mobsSpawned, zombiesKilled, coinsGained
+    });
+    if (callback) {
+        callback(result);
     }
 }
 
 async function networkGetCharactersDefaultParams(callback) {
     const result = await restGetCharactersDefaultParams(_authToken);
-    if (result.success) {
-        if (callback) {
-            callback(result);
-        }
-    } else {
-        console.error('Failed to get characters default params');
+    if (callback) {
+        callback(result);
     }
 }
 
 async function networkGetBoosts(callback) {
     const boostsResult = await restGetBoosts(_authToken);
-    if (boostsResult.success) {
-        if (callback) {
-            callback(boostsResult.boosts);
-        }
-    } else {
-        console.error('Failed to get boosts');
+    if (callback) {
+        callback(boostsResult.boosts);
     }
 }
 
 async function networkBuyBoost(boostId, callback) {
     const buyBoostResult = await restBuyBoost(_authToken, boostId);
-    if (buyBoostResult.success) {
-        if (callback) {
-            callback(buyBoostResult);
-        }
-    } else {
-        tgShowAlert('Failed to buy boost');
+    if (callback) {
+        callback(buyBoostResult);
     }
-
 }

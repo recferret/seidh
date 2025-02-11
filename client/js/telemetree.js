@@ -1,11 +1,11 @@
 let _telemetreeBuilder = undefined;
 
-function telemetreeInit(isTelegramContext) {
+function telemetreeInit() {
     _telemetreeBuilder = telemetree({
-        projectId: "864fd7b7-b5d7-4789-86f5-1026d65a9715",
-        apiKey: "55e1bee8-e53e-4bc5-9742-a2fb156b437b",
-        appName: "Seidh-game",
-        isTelegramContext, 
+        projectId: "eb91268b-934f-4c6a-b819-fef11d12cdd2",
+        apiKey: "ab8a9a1f-3b03-4a37-ae2d-f1965ac540c4",
+        appName: "verynimbleferret",
+        isTelegramContext: true, 
     });
 }
 
@@ -14,8 +14,9 @@ function telemetreeInit(isTelegramContext) {
 // -----------------------------------------
 
 function trackHomeClick() {
-    if (_telemetreeBuilder)
+    if (_telemetreeBuilder) {
         _telemetreeBuilder.track('home_click');
+    }
 }
 
 function trackBoostsClick() {
@@ -42,19 +43,45 @@ function trackPlayClick() {
         _telemetreeBuilder.track('play_click');
 }
 
-function trackLvlUpClick() {
+function trackCharacterInfoClick() {
     if (_telemetreeBuilder)
-        _telemetreeBuilder.track('lvl_up_click');
+        _telemetreeBuilder.track('character_info_click');
 }
 
-function trackChangeCharacterClick() {
+function trackCharacterLvlUpClick() {
     if (_telemetreeBuilder)
-        _telemetreeBuilder.track('change_character_click');
+        _telemetreeBuilder.track('character_lvl_up_click');
+}
+
+function trackCharacterChangeClick() {
+    if (_telemetreeBuilder)
+        _telemetreeBuilder.track('character_change_click');
 }
 
 // -----------------------------------------
 // Boost screen events
 // -----------------------------------------
+
+function trackBoostClick(boostId, owned, coins, teeth) {
+    if (_telemetreeBuilder)
+        _telemetreeBuilder.track('boost_click', {
+            boostId, owned, coins, teeth,
+        });
+}
+
+function trackBoostDialogClick(boostId, action, owned, coins, teeth) {
+    if (_telemetreeBuilder)
+        _telemetreeBuilder.track('boost_dialog_click', {
+            boostId, action, owned, coins, teeth,
+        });
+}
+
+function trackBoostBuyResult(boostId, success) {
+    if (_telemetreeBuilder)
+        _telemetreeBuilder.track('boost_buy_result', {
+            boostId, success,
+        });
+}
 
 // -----------------------------------------
 // Collection screen events
@@ -90,17 +117,30 @@ function trackInviteFriendClick() {
 // Gameplay events
 // -----------------------------------------
 
-function trackGameStarted() {
+function trackGameStarted(gameId) {
     if (_telemetreeBuilder)
-        _telemetreeBuilder.track('game_started');
+        _telemetreeBuilder.track('game_started', {
+            gameId,
+        });
 }
 
-function trackGameWin() {
+function trackGameClosed(gameId) {
     if (_telemetreeBuilder)
-        _telemetreeBuilder.track('game_win');
+        _telemetreeBuilder.track('game_closed', {
+            gameId,
+        });
 }
 
-function trackGameLose() {
+function trackGameWin(gameId) {
     if (_telemetreeBuilder)
-        _telemetreeBuilder.track('game_lose');
+        _telemetreeBuilder.track('game_win', {
+            gameId,
+        });
+}
+
+function trackGameLose(gameId) {
+    if (_telemetreeBuilder)
+        _telemetreeBuilder.track('game_lose', {
+            gameId,
+        });
 }

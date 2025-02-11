@@ -6,16 +6,22 @@ import engine.base.types.TypesBaseEntity.CharacterMovementStruct;
 import engine.base.types.TypesBaseEntity.CharacterActionStruct;
 
 enum abstract WinCondition(Int) {
-	var KILL_MOBS = 1;
-	var INFINITE = 2;
-	var SURVIVE = 3;
+	var KILL_MONSTERS = 1;
+	var KILL_MONSTERS_AND_BOSS = 2;
+	var INFINITE = 3;
+	var SURVIVE = 4;
+}
+
+enum abstract GameStage(Int) {
+	var KILL_MONSTERS = 1;
+	var KILL_BOSS = 2;
 }
 
 typedef GameConfig = {
-	// Mobs spawn
-	mobsMaxAtTheSameTime: Int,
-	mobsMaxPerGame: Int,
-	mobSpawnDelayMs: Int,
+	// Monsters spawn
+	monstersMaxAtTheSameTime: Int,
+	monstersMaxPerGame: Int,
+	monstersSpawnDelayMs: Int,
 
 	// Exp boost
 	expLevel1Multiplier: Float,
@@ -42,6 +48,8 @@ typedef CharacterDefaultConfig = {
 	entityShape: ShapeStruct,
 	movement: CharacterMovementStruct,
 	actionMain: CharacterActionStruct,
+	?action1: CharacterActionStruct,
+	?action2: CharacterActionStruct,
 	health:Int,
 };
 
@@ -49,4 +57,5 @@ typedef CharacterDefaultConfigs = {
 	ragnarLoh: CharacterDefaultConfig,
 	zombieBoy: CharacterDefaultConfig,
 	zombieGirl: CharacterDefaultConfig,
+	glamr: CharacterDefaultConfig,
 };

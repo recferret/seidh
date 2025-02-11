@@ -5,7 +5,6 @@ import game.scene.impl.home.boost.BoostContent.CurrencyType;
 import game.scene.impl.home.boost.BoostContent.BoostType;
 import game.js.NativeWindowJS;
 
-
 typedef UserCharacter = {
 	id: String,
 	levelCurrent: Int,
@@ -16,6 +15,7 @@ typedef UserCharacter = {
 	movement: {
 		runSpeed: Int,
 		speedFactor: Int,
+		inputDelay: Float,
 	},
 	actionMain: {
 		damage: Int,
@@ -34,6 +34,7 @@ typedef UserCharacter = {
 
 typedef UserBody = {
 	userId: String,
+	userName: String,
 	coins: Int,
 	teeth: Int,
 	characters: Array<UserCharacter>,
@@ -69,12 +70,12 @@ typedef BoostBody = {
 class Player {
 	private final WalletAddressKey = 'WalletAddress';
 
-	public static final instance: Player = new Player();
+	public static final instance:Player = new Player();
 
-	// TODO move name to user struct
-	public var userName: String;
-	public var currentCharacter: UserCharacter;
-	public var userInfo: UserBody; 
+	public var currentGameId:String;
+
+	public var currentCharacter:UserCharacter;
+	public var userInfo:UserBody; 
 
 	public final boosts = new Array<BoostBody>();
 	public final boostsOwned = new Array<String>();
@@ -82,13 +83,43 @@ class Player {
 	private var inputIndex = 0;
 
 	private function new() {
+		userInfo = {
+			userId: 'player_1',
+			userName: 'User 1',
+			coins: 1000,
+			teeth: 1000,
+			characters: [{
+				id: 'entity_1',
+				levelCurrent: 1,
+				levelMax: 10,
+				expCurrent: 0,
+				expTillNewLevel: 100,
+				health: 100,
+				movement: {
+					runSpeed: 40,
+					speedFactor: 1,
+					inputDelay: 1,
+				},
+				actionMain: {
+					damage: 5,
+					inputDelay: 1,
+					meleeStruct: {
+						aoe: true,
+						shape: {
+							width: 100,
+							height: 100,
+							rectOffsetX: 0,
+							rectOffsetY: 0,
+						},
+					}
+				}
+			}],
+		};
+		currentCharacter = userInfo.characters[0];
 	}
 
 	public function setUserData(userData:UserBody) {
-		userName = 'USER 1';
-
 		userInfo = userData;
-
 		currentCharacter = userData.characters[0];
 	}
 

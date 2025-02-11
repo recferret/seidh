@@ -1,11 +1,12 @@
 package game.scene.impl;
 
+import h3d.Engine;
+import game.analytics.Analytics;
 import engine.seidh.SeidhGameEngine;
+
 import game.js.NativeWindowJS;
 import game.event.EventManager;
 import game.scene.base.BasicScene;
-
-import uuid.Uuid;
 
 class LoadingScene extends BasicScene {
 
@@ -14,77 +15,109 @@ class LoadingScene extends BasicScene {
     }
 
 	// --------------------------------------
-	// Impl
+	// Abstraction
 	// --------------------------------------
 
-	public function start() {
-        if (GameClientConfig.instance.Production && (GameClientConfig.instance.TelegramAuth || GameClientConfig.instance.TelegramTestAuth)) {
-            final tgInitData = GameClientConfig.instance.TelegramAuth ? 
-                NativeWindowJS.tgGetInitData() :
-                GameClientConfig.instance.TelegramInitData;
-            if (tgInitData == null || tgInitData.length == 0) {
-                if (GameClientConfig.instance.Analytics) 
-                    NativeWindowJS.telemetreeInit(false);
-            } else {
-                if (GameClientConfig.instance.Analytics) {
-                    NativeWindowJS.tgInitAnalytics();
-                    NativeWindowJS.telemetreeInit(true);
-                }
-
-                final tgUnsafeData = NativeWindowJS.tgGetInitDataUnsafe();
-                final startParam = tgUnsafeData.start_param;
-
-                NativeWindowJS.networkInit(tgInitData, null, startParam, 
-                    function userCallback(data:Dynamic) {
-                        processUserCallback(data);
-                    },
-                    function boostCallback(data:Dynamic) {
-                        processBoostCallback(data);
-                    },
-                    function getGameConfigCallback(data:Dynamic) {
-                        processGetGameConfigCallback(data);
-                    },
-                    function getCharactersDefaultParamsCallback(data:Dynamic) {
-                        processGetCharactersDefaultParamsCallback(data);
-                    },
-                );
-            }
-        } else {
-            if (GameClientConfig.instance.Serverless) {
-                final uuid = Uuid.short().toLowerCase();
-                Player.instance.setUserData({
-                    userId: uuid,
-                    characters: [],
-                    coins: 1000,
-                    teeth: 1000,
-                });
-                EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
-            } else {
-                NativeWindowJS.networkInit(null, GameClientConfig.instance.TestLogin, GameClientConfig.instance.TestReferrerId, 
-                    function userCallback(data:Dynamic) {
-                        processUserCallback(data);
-                    },
-                    function boostCallback(data:Dynamic) {
-                        processBoostCallback(data);
-                    },
-                    function getGameConfigCallback(data:Dynamic) {
-                        processGetGameConfigCallback(data);
-                    },
-                    function getCharactersDefaultParamsCallback(data:Dynamic) {
-                        processGetCharactersDefaultParamsCallback(data);
-                    },
-                );
-            }
-        };
+    public function absOnEvent(event:hxd.Event) {
     }
 
-	public function customUpdate(dt:Float, fps:Float) {
+    public function absOnResize(w:Int, h:Int) {
+    }
+
+	public function absStart() {
+        if (GameClientConfig.instance.Analytics) {
+            // NativeWindowJS.tgInitAnalytics();
+            // NativeWindowJS.telemetreeInit();
+            // Analytics.instance.telemetreeInit();
+        }
+
+        switch (GameClientConfig.instance.Platform) {
+            case 'VK':
+                vkInit();
+            case 'TG':
+                tgInit();
+            default:
+                simpleInit();
+        }
+    }
+
+	public function absUpdate(dt:Float, fps:Float) {
 	}
+
+    public function absRender(e:Engine) {
+    }
+    
+    public function absDestroy() {
+    }
+
+    // --------------------------------------
+	// Networking
+	// --------------------------------------
+
+    // TODO implement different requests
+    private function vkInit() {
+        NativeWindowJS.vkGetAppParams(function callback(data:Dynamic) {
+            NativeWindowJS.networkInitVk(data, 
+                function userCallback(data:Dynamic) {
+                    processUserCallback(data);
+                },
+                function boostCallback(data:Dynamic) {
+                    processBoostCallback(data);
+                },
+                function getGameConfigCallback(data:Dynamic) {
+                    processGetGameConfigCallback(data);
+                },
+                function getCharactersDefaultParamsCallback(data:Dynamic) {
+                    processGetCharactersDefaultParamsCallback(data);
+                },
+            );
+        });
+    }
+
+    private function tgInit() {
+        // final tgUnsafeData = NativeWindowJS.tgGetInitDataUnsafe();
+        // final startParam = tgUnsafeData.start_param;
+
+        NativeWindowJS.networkInitTg(NativeWindowJS.tgGetInitData(), 
+            function userCallback(data:Dynamic) {
+                processUserCallback(data);
+            },
+            function boostCallback(data:Dynamic) {
+                processBoostCallback(data);
+            },
+            function getGameConfigCallback(data:Dynamic) {
+                processGetGameConfigCallback(data);
+            },
+            function getCharactersDefaultParamsCallback(data:Dynamic) {
+                processGetCharactersDefaultParamsCallback(data);
+            },
+        );
+    }
+
+    private function simpleInit() {
+        NativeWindowJS.networkInitSimple(GameClientConfig.instance.TestLogin, 
+            function userCallback(data:Dynamic) {
+                processUserCallback(data);
+            },
+            function boostCallback(data:Dynamic) {
+                processBoostCallback(data);
+            },
+            function getGameConfigCallback(data:Dynamic) {
+                processGetGameConfigCallback(data);
+            },
+            function getCharactersDefaultParamsCallback(data:Dynamic) {
+                processGetCharactersDefaultParamsCallback(data);
+            },
+        );
+    }
+
+    // --------------------------------------
+	// Response callbacks
+	// --------------------------------------
 
     private function processUserCallback(data:Dynamic) {
         if (data != null) {
             Player.instance.setUserData(data);
-            initNetwork();
             EventManager.instance.notify(EventManager.EVENT_HOME_SCENE, {});
         } else {
             trace('processUserCallback error');
@@ -102,9 +135,9 @@ class LoadingScene extends BasicScene {
     private function processGetGameConfigCallback(data:Dynamic) {
         if (data != null) {
             // Mobs spawn
-            SeidhGameEngine.GAME_CONFIG.mobsMaxAtTheSameTime = data.mobsMaxAtTheSameTime;
-            SeidhGameEngine.GAME_CONFIG.mobsMaxPerGame = data.mobsMaxPerGame;
-            SeidhGameEngine.GAME_CONFIG.mobSpawnDelayMs = data.mobSpawnDelayMs;
+            SeidhGameEngine.GAME_CONFIG.monstersMaxAtTheSameTime = data.monstersMaxAtTheSameTime;
+            SeidhGameEngine.GAME_CONFIG.monstersMaxPerGame = data.monstersMaxPerGame;
+            SeidhGameEngine.GAME_CONFIG.monstersSpawnDelayMs = data.monstersSpawnDelayMs;
 
             // Exp boost
             SeidhGameEngine.GAME_CONFIG.expLevel1Multiplier = data.expLevel1Multiplier;
@@ -131,9 +164,9 @@ class LoadingScene extends BasicScene {
 
     private function processGetCharactersDefaultParamsCallback(data:Dynamic) {
         if (data != null) {
-            SeidhGameEngine.CHARACTERS_CONFIG.ragnarLoh = data.ragnarLoh;
-            SeidhGameEngine.CHARACTERS_CONFIG.zombieBoy = data.zombieBoy;
-            SeidhGameEngine.CHARACTERS_CONFIG.zombieGirl = data.zombieGirl;
+            // SeidhGameEngine.CHARACTERS_CONFIG.ragnarLoh = data.ragnarLoh;
+            // SeidhGameEngine.CHARACTERS_CONFIG.zombieBoy = data.zombieBoy;
+            // SeidhGameEngine.CHARACTERS_CONFIG.zombieGirl = data.zombieGirl;
         } else {
             trace('processGetCharactersDefaultParamsCallback error');
         }

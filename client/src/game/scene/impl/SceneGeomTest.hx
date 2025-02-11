@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import h3d.Engine;
 import h2d.col.Point;
 import hxd.Window;
 
@@ -10,7 +11,6 @@ import engine.base.geometry.Line;
 import game.scene.base.BasicScene;
 import game.utils.Utils;
 
-
 class SceneGeomTest extends BasicScene {
 	// Two rect collides with each other
 	private final rect1 = new Rectangle(200, 200, 300, 300, 0);
@@ -20,27 +20,29 @@ class SceneGeomTest extends BasicScene {
 
 	public function new() {
 		super(null);
-
-		// camera.setPosition(1280 / 2, 720 / 2);
-
-		// camera.scale(0.5, 0.5);
 	}
 
 	// --------------------------------------
-	// Impl
+	// Abstraction
 	// --------------------------------------
 
-	public function start() {
-	}
+    public function absOnEvent(event:hxd.Event) {
+    }
 
-	public function customUpdate(dt:Float, fps:Float) {
+    public function absOnResize(w:Int, h:Int) {
+    }
+
+	public function absStart() {
+    }
+
+	public function absUpdate(dt:Float, fps:Float) {
 		// ------------------------------------------
 		// Two rect collide test
 		// ------------------------------------------
 		rect2.r += MathUtils.degreeToRads(0.1);
-		var collideRectColor = GameConfig.GreenColor;
+		var collideRectColor = GameClientConfig.GreenColor;
 		if (rect1.intersectsWithRect(rect2)) {
-			collideRectColor = GameConfig.RedColor;
+			collideRectColor = GameClientConfig.RedColor;
 		}
 		Utils.DrawRect(debugGraphics, rect1, collideRectColor);
 		Utils.DrawRect(debugGraphics, rect2, collideRectColor);
@@ -52,15 +54,21 @@ class SceneGeomTest extends BasicScene {
 		final mouseToCameraPos = new Point(mousePos.x, mousePos.y);
 		camera.sceneToCamera(mouseToCameraPos);
 		final cursorToMouseRectLine = new Line(mouseToCameraPos.x, mouseToCameraPos.y, mouseRect.x, mouseRect.y);
-		var mouseRectColor = GameConfig.YellowColor;
+		var mouseRectColor = GameClientConfig.YellowColor;
 		if (mouseRect.getLines().lineB.intersectsWithLine(cursorToMouseRectLine)
 			|| mouseRect.getLines().lineD.intersectsWithLine(cursorToMouseRectLine)) {
-			mouseRectColor = GameConfig.RedColor;
+			mouseRectColor = GameClientConfig.RedColor;
 		}
 		Utils.DrawRect(debugGraphics, mouseRect, mouseRectColor);
-		debugGraphics.lineStyle(3, GameConfig.YellowColor);
+		debugGraphics.lineStyle(3, GameClientConfig.YellowColor);
 		debugGraphics.moveTo(cursorToMouseRectLine.x1, cursorToMouseRectLine.y1);
 		debugGraphics.lineTo(cursorToMouseRectLine.x2, cursorToMouseRectLine.y2);
 	}
+
+    public function absRender(e:Engine) {
+    }
+    
+    public function absDestroy() {
+    }
 
 }

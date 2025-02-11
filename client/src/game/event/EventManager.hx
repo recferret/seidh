@@ -27,6 +27,11 @@ class EventManager {
 	public static final EVENT_REF_SHARE = 'EVENT_REF_SHARE';
 	public static final EVENT_CHARACTER_DEATH_ANIM_END = 'EVENT_CHARACTER_DEATH_ANIM_END';
 	public static final EVENT_INVALIDATE_BOOSTS = 'EVENT_INVALIDATE_BOOSTS';
+	public static final EVENT_PLAYER_MAIN_ACTION = 'EVENT_PLAYER_MAIN_ACTION';
+	public static final EVENT_PLAYER_MOVE = 'EVENT_PLAYER_MOVE';
+
+	public static final EVENT_SPAWN_CHARACTER = 'EVENT_SPAWN_CHARACTER';
+	public static final EVENT_SPAWN_CONSUMABLE = 'EVENT_SPAWN_CONSUMABLE';
 
 	private final listeners = new Map<String, List<EventListener>>();
 
@@ -36,8 +41,8 @@ class EventManager {
 
 	public function subscribe(eventType:String, listener:EventListener) {
 		if (listeners.exists(eventType)) {
-			final users = listeners.get(eventType);
-			users.add(listener);
+			final ls = listeners.get(eventType);
+			ls.add(listener);
 		} else {
 			final newList = new List();
 			newList.add(listener);
@@ -46,8 +51,10 @@ class EventManager {
 	}
 
 	public function unsubscribe(eventType:String, listener:EventListener) {
-		final users = listeners.get(eventType);
-		users.remove(listener);
+		final ls = listeners.get(eventType);
+		if (ls != null) {
+			ls.remove(listener);
+		}
 	}
 
 	public function notify(eventType:String, params:Dynamic) {

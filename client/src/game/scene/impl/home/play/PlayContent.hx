@@ -1,5 +1,8 @@
 package game.scene.impl.home.play;
 
+import game.ui.button.Button;
+import game.ui.bar.FilledBar;
+import game.analytics.Analytics;
 import h2d.filter.Displacement;
 
 import game.scene.impl.home.play.dialog.CharacterStatsDialogContent.CharacterStatsDialog;
@@ -9,8 +12,6 @@ import game.js.NativeWindowJS;
 import game.Res.SeidhResource;
 import game.sound.SoundManager;
 import game.event.EventManager;
-
-import motion.Actuate;
 
 class Bunny extends h2d.Object {
 
@@ -59,7 +60,7 @@ class PlayContent extends BasicHomeContent {
 
     // private final leftRagnar:h2d.Bitmap;
     // private final rightRagnar:h2d.Bitmap;
-    private final centralRagnar:h2d.Bitmap;
+    private final centralRagnar:h2d.Anim;
 
     private final ragnarBaseTile:h2d.Tile;
     // private final ragnarNormTile:h2d.Tile;
@@ -71,28 +72,40 @@ class PlayContent extends BasicHomeContent {
         // ------------------------------------
         // Bunnies
         // ------------------------------------
-
         leftBunny = new Bunny(this);
-        leftBunny.setPosition(leftBunny.getWidth(), Main.ActualScreenHeight / 1.55);
+        var leftBunnyX = leftBunny.getWidth();
+        leftBunny.setPosition(leftBunnyX, DeviceInfo.TargetPortraitScreenHeight / 1.55);
 
         rightBunny = new Bunny(this);
-        rightBunny.setPosition(Main.ActualScreenWidth - rightBunny.getWidth(), Main.ActualScreenHeight / 1.55);
+        var rightBunnyX = DeviceInfo.TargetPortraitScreenWidth - rightBunny.getWidth();
+        rightBunny.setPosition(rightBunnyX, DeviceInfo.TargetPortraitScreenHeight / 1.55);
         rightBunny.flipX();
 
         // ------------------------------------
         // Ragnars
         // ------------------------------------
 
-        ragnarBaseTile = Res.instance.getTileResource(SeidhResource.RAGNAR_BASE);
+        ragnarBaseTile = Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE);
+
+        var th = 332;
+        var tw = 332;
+        final idleTiles = [];
+
+        for(x in 0 ... Std.int(ragnarBaseTile.width / tw)) {
+            final tile = ragnarBaseTile.sub(x * tw, 0, tw, th).center();
+            tile.dx += 30;
+            idleTiles.push(tile);
+        }
+
         // ragnarNormTile = Res.instance.getTileResource(SeidhResource.RAGNAR_NORM);
         // ragnarDudeTile = Res.instance.getTileResource(SeidhResource.RAGNAR_DUDE);
 
         leftRagnarPosX = 100;
-        leftRagnarPosY = Main.ActualScreenHeight / 2.5;
-        centralRagnarPosX = Main.ActualScreenWidth / 2;
-        centralRagnarPosY = Main.ActualScreenHeight / 2;
-        rightRagnarPosX = Main.ActualScreenWidth - ragnarBaseTile.width / 2 - 20;
-        rightRagnarPosY = Main.ActualScreenHeight / 2.5;
+        leftRagnarPosY = DeviceInfo.TargetPortraitScreenHeight / 2.5;
+        centralRagnarPosX = DeviceInfo.TargetPortraitScreenWidth / 2;
+        centralRagnarPosY = DeviceInfo.TargetPortraitScreenHeight / 2;
+        rightRagnarPosX = DeviceInfo.TargetPortraitScreenWidth - ragnarBaseTile.width / 2 - 20;
+        rightRagnarPosY = DeviceInfo.TargetPortraitScreenHeight / 2.5;
 
         // leftRagnar = new h2d.Bitmap(ragnarNormTile, this);
         // leftRagnar.setPosition(leftRagnarPosX, leftRagnarPosY);
@@ -100,81 +113,65 @@ class PlayContent extends BasicHomeContent {
         // rightRagnar = new h2d.Bitmap(ragnarDudeTile, this);
         // rightRagnar.setPosition(rightRagnarPosX, rightRagnarPosY);
 
-        centralRagnar = new h2d.Bitmap(ragnarBaseTile, this);
+        // TODO fix copy/paste
+
+        centralRagnar = new h2d.Anim(this);
+        centralRagnar.play(idleTiles);
+        centralRagnar.speed = 10;
+
         centralRagnar.setPosition(centralRagnarPosX, centralRagnarPosY);
 
         // ------------------------------------
-        // Buttons
+        // Play button
         // ------------------------------------
 
-        // Play button
-        final playButtonInactiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_PLAY_NAY);
-        final playButtonActiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_PLAY_YAY);
-
-        final playButton = new h2d.Bitmap(playButtonActiveTile, this);
-        playButton.setPosition(
-            Main.ActualScreenWidth / 2, 
-            340
-        );
-
-        final playButtonInteractive = new h2d.Interactive(playButtonActiveTile.width, playButtonActiveTile.height);
-        playButtonInteractive.setPosition(
-            Main.ActualScreenWidth / 2 - playButtonActiveTile.width / 2, 
-            Main.ActualScreenHeight / 5 - playButtonActiveTile.height / 2
-        );
-        playButtonInteractive.onPush = function(event : hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
-                playButton.tile = playButtonInactiveTile;
-			}
-        }
-        playButtonInteractive.onRelease = function(event : hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
-                playButton.tile = playButtonActiveTile;
-			}
-        }
-        playButtonInteractive.onClick = function(event : hxd.Event) {
+        final playButton = new Button(ButtonType.BIG, 'Play', function callback() {
             if (!DialogManager.IsDialogActive) {
                 SoundManager.instance.playButton2();
                 NativeWindowJS.trackPlayClick();
-                EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
+                NativeWindowJS.networkGameStart(function gameStartCallback(data:Dynamic) {
+                    if (data.success) {
+                        Player.instance.currentGameId = data.gameId;
+                        EventManager.instance.notify(EventManager.EVENT_HOME_PLAY, {});
+                    } else {
+                        trace('START GAME ERROR');
+                    }
+                });
 			}
-        }
-        addChild(playButtonInteractive);
+        });
+        playButton.updatePosition(
+            DeviceInfo.TargetPortraitScreenWidth / 2, 
+            340,
+        );
+        addChild(playButton);
 
-        // Lvl button
-        final lvlButtonInactiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_LVL_NAY);
-        final lvlButtonActiveTile = Res.instance.getTileResource(SeidhResource.UI_HOME_LVL_YAY);
-        
-        final lvlButton = new h2d.Bitmap(lvlButtonActiveTile, this);
-        lvlButton.setPosition(
-            Main.ActualScreenWidth / 2, 
-            Main.ActualScreenHeight * 0.8
-        );
-        
-        final lvlButtonInteractive = new h2d.Interactive(lvlButtonActiveTile.width, lvlButtonActiveTile.height);
-        lvlButtonInteractive.setPosition(
-            Main.ActualScreenWidth / 2 - lvlButtonActiveTile.width / 2, 
-            Main.ActualScreenHeight * 0.8 - lvlButtonActiveTile.height / 2
-        );
-        lvlButtonInteractive.onPush = function(event : hxd.Event) {
+        // ------------------------------------
+        // Exp bar
+        // ------------------------------------
+
+        final expBar = new FilledBar(GameClientConfig.XpBarColor, true);
+        expBar.setPosition(DeviceInfo.TargetPortraitScreenWidth / 2, DeviceInfo.TargetPortraitScreenHeight * 0.68);
+        expBar.updateText('Level 0');
+        expBar.updateBar(Player.instance.currentCharacter.expCurrent, Player.instance.currentCharacter.expTillNewLevel);
+        addChild(expBar);
+
+        // ------------------------------------
+        // Char info and level button
+        // ------------------------------------
+
+        final charInfoButton = new Button(ButtonType.BIG, 'Info', function callback() {
             if (!DialogManager.IsDialogActive) {
-                lvlButton.tile = lvlButtonInactiveTile;
+                SoundManager.instance.playButton2();
+                Analytics.instance.trackCharacterLvlUpClick();
+                // TODO get pos, not hardcode it
+                DialogManager.ShowCustomDialog(this, new CharacterStatsDialog(true), 'UP');
 			}
-        }
-        lvlButtonInteractive.onRelease = function(event : hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
-                lvlButton.tile = lvlButtonActiveTile;
-			}
-        }
-        lvlButtonInteractive.onClick = function(event : hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
-                final xxx = new CharacterStatsDialog(true);
-                DialogManager.ShowCustomDialog(this, xxx, 'UP');
-            }
-            // SoundManager.instance.playButton2();
-            // NativeWindowJS.trackLvlUpClick();
-        }
-        addChild(lvlButtonInteractive);
+        });
+        charInfoButton.updatePosition(
+            DeviceInfo.TargetPortraitScreenWidth / 2, 
+            DeviceInfo.TargetPortraitScreenHeight * 0.75
+        );
+        addChild(charInfoButton);
 
         // Prev button
         // final prevRagnarButton = new h2d.Bitmap(Res.instance.getTileResource(SeidhResource.UI_HOME_ARROW_LEFT), this);

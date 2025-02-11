@@ -26,7 +26,7 @@ class SoundManager {
     private function new() {
     }
 
-    public function initiate() {
+    public function init() {
         if (!initiated) {
             if (hxd.res.Sound.supportedFormat(Mp3)) {
                 final manager = hxd.snd.Manager.get();

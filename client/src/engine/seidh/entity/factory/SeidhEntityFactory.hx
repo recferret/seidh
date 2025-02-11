@@ -2,6 +2,7 @@ package engine.seidh.entity.factory;
 
 import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.types.TypesBaseEntity;
+import engine.seidh.entity.impl.GlamrEntity;
 import engine.seidh.entity.impl.RagnarLohEntity;
 import engine.seidh.entity.impl.ZombieBoyEntity;
 import engine.seidh.entity.impl.ZombieGirlEntity;
@@ -18,6 +19,8 @@ class SeidhEntityFactory {
                 entity = new ZombieBoyEntity(ZombieBoyEntity.GenerateObjectEntity(struct));
             case ZOMBIE_GIRL:
                 entity = new ZombieGirlEntity(ZombieGirlEntity.GenerateObjectEntity(struct));
+            case GLAMR:
+                entity = new GlamrEntity(GlamrEntity.GenerateObjectEntity(struct));
             default:
         }
         return entity;
@@ -32,6 +35,8 @@ class SeidhEntityFactory {
                 entity = new ZombieBoyEntity(new CharacterEntity(struct));
             case ZOMBIE_GIRL:
                 entity = new ZombieGirlEntity(new CharacterEntity(struct));
+            case GLAMR:
+                entity = new GlamrEntity(new CharacterEntity(struct));
             default:
         }
         return entity;

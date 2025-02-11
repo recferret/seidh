@@ -4,18 +4,34 @@ import engine.base.geometry.Rectangle;
 
 class ClientTerrainEntity extends h2d.Bitmap {
 
-    public function new(s2d:h2d.Scene, tile:h2d.Tile) {
+    private final id:Int;
+    private final terrainType:String;
+
+    public function new(tile:h2d.Tile, id:Int, terrainType:String) {
         super(tile);
 
-        s2d.addChild(this);
+        this.id = id;
+        this.terrainType = terrainType;
+    }
+
+    public function getId() {
+        return id;
     }
 
     public function getRect() {
-        return new Rectangle(x + tile.width / 2, y + tile.height / 2, tile.width, tile.height, 0);
+        if (terrainType != 'tree') {
+            return new Rectangle(x + tile.width / 2, y + tile.height / 2, tile.width, tile.height, 0);
+        } else {
+            return new Rectangle(x, y, tile.width, tile.height, 0);
+        }
     }
 
     public function getBottomRect() {
-        return new Rectangle(x + tile.width / 2, y + tile.height - 30, tile.width, 40, 0);
+        if (terrainType != 'tree') {
+            return new Rectangle(x + tile.width / 2, y + tile.height - 30, tile.width, 40, 0);
+        } else {
+            return new Rectangle(x, y + tile.height / 2 - 30, tile.width, 40, 0);
+        }
     }
 
 }

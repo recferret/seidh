@@ -43,9 +43,9 @@ private class BoostCard extends h2d.Object {
         footer.tile.flipY();
         footer.setPosition(0, size * bodyTile.height - 20);
 
-        final labelText = TextUtils.GetDefaultTextObject(0, 0, 4, Center, GameClientConfig.WhiteFontColor);
+        final labelText = TextUtils.GetDefaultTextObject(0, 0, 1.2, Center, GameClientConfig.WhiteFontColor);
         labelText.text = label;
-        labelText.setPosition(0, -42);
+        labelText.setPosition(0, -30);
         addChild(labelText);
 
         fui = new h2d.Flow(this);
@@ -64,6 +64,7 @@ private class BoostCard extends h2d.Object {
 private class BoostItem extends h2d.Object {
 
     public var currentBoostId = '';
+    public var currentBoostType:BoostType;
     private var currentBoostName = '';
     private var currentBoostDescription1 = '';
     private var currentBoostDescription2 = null;
@@ -98,49 +99,62 @@ private class BoostItem extends h2d.Object {
         priceIcon = new h2d.Bitmap(this);
         priceIcon.setScale(0.6);
 
-        nameText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y - 55, 2, Left, GameClientConfig.WhiteFontColor);
+        nameText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y - 55, 1, Left, GameClientConfig.WhiteFontColor);
         addChild(nameText);
 
-        descriptionText = TextUtils.GetDefaultTextObject(iconBg.x + 78, iconBg.y - 15, 2, Left, GameClientConfig.DefaultFontColor);
+        descriptionText = TextUtils.GetDefaultTextObject(iconBg.x + 78, iconBg.y - 15, 1, Left, GameClientConfig.DefaultFontColor);
         addChild(descriptionText);
 
-        priceText = TextUtils.GetDefaultTextObject(iconBg.x + 80, iconBg.y + 25, 2, Left, GameClientConfig.DefaultFontColor);
+        priceText = TextUtils.GetDefaultTextObject(iconBg.x + 78, iconBg.y + 25, 1, Left, GameClientConfig.DefaultFontColor);
         addChild(priceText);
 
         // Iteraction
+        var onMoveEvents = 0;
+
         final interaction = new h2d.Interactive(450, iconBg.tile.height - 20);
         interaction.setPosition(iconBg.x - iconBg.tile.width / 2 + 20, iconBg.y - iconBg.tile.height / 2 + 10);
         interaction.onMove = function(event:hxd.Event) {
-            clickStarted = false;
-        }
-        interaction.onPush = function(event:hxd.Event) {
-            clickStarted = true;
-            
-            if (!DialogManager.IsDialogActive) {
-                setScale(0.9);
-            }
-        }
-        interaction.onRelease = function(event:hxd.Event) {
-            if (!DialogManager.IsDialogActive) {
-                setScale(1);
-            }
+            onMoveEvents++;
         }
         interaction.onClick = function(event:hxd.Event) {
-            if (clickStarted && !DialogManager.IsDialogActive) {
-                BoostContent.BoostClick(
-                    root,
-                    currentBoostId,
-                    nextBoostId,
-                    nextBoostName,
-                    nextBoostDescription1,
-                    nextBoostDescription2,
-                    boostPrice,
-                    currencyType,
-                    currentLevel,
-                    maxLevel,
-                );
+            if (onMoveEvents < 9 && !DialogManager.IsDialogActive) {
+                setScale(0.9);
+
+                haxe.Timer.delay(function delay() {
+                    setScale(1);
+                }, 100);
+
+                haxe.Timer.delay(function delay() {
+                    if (boost.boostType == BoostType.Rune || boost.boostType == BoostType.Scroll) {
+                        BoostContent.BoostClick(
+                            root,
+                            currentBoostId,
+                            nextBoostId,
+                            nextBoostName,
+                            nextBoostDescription1,
+                            nextBoostDescription2,
+                            boostPrice,
+                            currencyType,
+                            currentLevel,
+                            maxLevel,
+                        );
+                    } else {
+                        BoostContent.BoostClick(
+                            root,
+                            currentBoostId,
+                            nextBoostId,
+                            currentBoostName,
+                            currentBoostDescription1,
+                            currentBoostDescription2,
+                            boostPrice,
+                            currencyType,
+                            currentLevel,
+                            maxLevel,
+                        );
+                    }
+                }, 200);
             }
-            clickStarted = false;
+            onMoveEvents = 0;
         }
 
         addChild(interaction);
@@ -154,6 +168,8 @@ private class BoostItem extends h2d.Object {
 
     private function parseBoost(boost:BoostBody) {
         maxLevel = 3;
+
+        currentBoostType = boost.boostType;
 
         if (boost.boostType == BoostType.Rune || boost.boostType == BoostType.Scroll) {
             if (!boost.levelOneAccquired) {
@@ -296,7 +312,7 @@ private class BoostItem extends h2d.Object {
             TilemapManager.instance.getTile(TileType.WEALTH_TEETH);
 
         priceText.text = Std.string(boostPrice);
-        priceIcon.setPosition(priceText.x + priceText.textWidth * 2 + 30, priceText.y + 16);
+        priceIcon.setPosition(priceText.x + priceText.textWidth + 30, priceText.y + 18);
 
         if (currentLevel == 3) {
             priceText.alpha = 0;
@@ -353,18 +369,20 @@ class BoostContent extends BasicHomeContent implements EventListener {
     public static final ARTIFACT_1 = 'ARTIFACT_1';
 
     final boostContainer: h2d.Object;
+    final artifactsCard: BoostCard;
 
     public final boostsMap = new Map<String, BoostItem>();
+    public static var LastCardPosY:Float;
 
     public function new() {
 	    super(true);
 
         boostContainer = new h2d.Object(this);
 
-        final boostCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 350, 50, 'CONSUMABLES', 12);
-        final runesCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 1100, 45, 'RUNES', 20);
-        final scrollsCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 2250, 50, 'SCROLLS', 12);
-        final artifactsCard = new BoostCard(boostContainer, Main.ActualScreenWidth / 2, 3000, 50, 'ARTIFACTS', 6);
+        final boostCard = new BoostCard(boostContainer, DeviceInfo.TargetPortraitScreenWidth / 2, 350, 50, 'CONSUMABLES', 12);
+        final runesCard = new BoostCard(boostContainer, DeviceInfo.TargetPortraitScreenWidth / 2, 1100, 45, 'RUNES', 20);
+        final scrollsCard = new BoostCard(boostContainer, DeviceInfo.TargetPortraitScreenWidth / 2, 2250, 50, 'SCROLLS', 12);
+        artifactsCard = new BoostCard(boostContainer, DeviceInfo.TargetPortraitScreenWidth / 2, 3000, 50, 'ARTIFACTS', 6);
 
         for (boost in Player.instance.boosts) {
             var boostItem:BoostItem = null;
@@ -401,6 +419,7 @@ class BoostContent extends BasicHomeContent implements EventListener {
 
     public function update(dt:Float) {
         boostContainer.y = contentScrollY;
+        BoostContent.LastCardPosY = artifactsCard.getAbsPos().y;
     }
 
     private function invalidateBoosts(message:Dynamic) {
@@ -424,7 +443,7 @@ class BoostContent extends BasicHomeContent implements EventListener {
     public static function BoostClick(
         parent:h2d.Object,
         currentBoostId:String,
-        nextBoostId:String,
+        newBoostId:String,
         name:String,
         description1:String,
         description2:String,
@@ -449,7 +468,7 @@ class BoostContent extends BasicHomeContent implements EventListener {
 
         function positiveCallback1():Void {
             if (hasEnoughMoney) {
-                NativeWindowJS.networkBuyBoost(nextBoostId, function callback(data:Dynamic) {
+                NativeWindowJS.networkBuyBoost(newBoostId, function callback(data:Dynamic) {
                     if (data.success) {
                         Player.instance.setBoostData(data.boosts);
                         EventManager.instance.notify(EventManager.EVENT_INVALIDATE_BOOSTS, { boostId: currentBoostId.split('_')[0] });
@@ -463,15 +482,15 @@ class BoostContent extends BasicHomeContent implements EventListener {
         DialogManager.ShowDialog(
 			parent, 
 			DialogType.MEDIUM, 
-			{ label: name, scale: 4, color: GameClientConfig.WhiteFontColor, },
-			{ label: description1, scale: 3, color: GameClientConfig.DefaultFontColor, },
-            description2 != null ? { label: description2, scale: 3, color: GameClientConfig.DefaultFontColor, } : null,
+			{ label: name, scale: 1.2, color: GameClientConfig.WhiteFontColor, },
+			{ label: description1, scale: 1, color: GameClientConfig.DefaultFontColor, },
+            description2 != null ? { label: description2, scale: 1, color: GameClientConfig.DefaultFontColor, } : null,
 			currentLevel < 3 ? 
                 { 
                     label: hasEnoughMoney ? 
                         'Buy it for ' + price + ' ' + currencyTypeValue + ' ?' : 
                         'Not enough ' + currencyTypeValue + '!', 
-                    scale: hasEnoughMoney ? 3 : 4, 
+                    scale: hasEnoughMoney ? 1 : 1.4, 
                     color: hasEnoughMoney ? GameClientConfig.WhiteFontColor : GameClientConfig.ErrorFontColor, 
                 } : null,
             {

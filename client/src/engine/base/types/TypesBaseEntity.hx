@@ -16,6 +16,19 @@ enum abstract CharacterActionType(Int) {
 	var ACTION_ULTIMATE = 6;
 }
 
+enum abstract CharacterActionEffect(Int) {
+	var ATTACK = 1;
+	var BUFF = 2;
+	var SUMMON = 3;
+	var TELEPORT = 4;
+}
+
+enum abstract CharacterActionState(Int) {
+	var READY = 1;
+	var IN_QUEUE = 2;
+	var IN_PROGRESS = 3;
+}
+
 typedef MeleeStruct = {
 	aoe:Bool,
 	shape: ShapeStruct,
@@ -40,18 +53,25 @@ typedef CharacterMovementStruct = {
 
 typedef CharacterActionStruct = {
 	actionType:CharacterActionType,
-	damage:Int,
+	actionEffect:CharacterActionEffect,
+	?damage:Int,
 	inputDelay:Float,
+	performDelayMs:Int,
+	postDelayMs:Int,
 	?meleeStruct:MeleeStruct,
 	?projectileStruct:ProjectileStruct,
 }
 
 typedef CharacterActionCallbackParams = { 
-    entityId:String, 
-    actionType:CharacterActionType, 
-    shape:ShapeStruct, 
-    hurtEntities: Array<String>,
-    deadEntities: Array<String>,
+    entityId:String,
+	playActionAnim:Bool,
+	playEffectAnim:Bool,
+    actionType:CharacterActionType,
+    actionEffect:CharacterActionEffect,
+    ?damage:Int,
+    ?shape:ShapeStruct,
+    ?hurtEntities: Array<String>,
+    ?deadEntities: Array<String>,
 };
 
 // -----------------------------
@@ -74,8 +94,8 @@ class EntityShape {
 	}
 
 	public function toRect(x:Float, y:Float, rotation:Float, side:Side) {
-		final sideOffset = side == RIGHT ? 0 : -shape.width / 2;
-		return new Rectangle(x + this.shape.rectOffsetX + sideOffset, y + this.shape.rectOffsetY, shape.width, shape.height, rotation);
+		final sideOffset = side == RIGHT ? shape.rectOffsetX : -shape.rectOffsetX;
+		return new Rectangle(x + sideOffset, y + this.shape.rectOffsetY, shape.width, shape.height, rotation);
 	}
 
 	public function toJson() {
@@ -101,6 +121,7 @@ enum abstract EntityType(Int) {
 	var RAGNAR_LOH = 1;
 	var ZOMBIE_BOY = 2;
 	var ZOMBIE_GIRL = 3;
+	var GLAMR = 4;
 
 	var COIN = 90;
 	var HEALTH_POTION = 91;

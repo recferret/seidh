@@ -40,12 +40,9 @@ abstract class EngineBaseEntity {
 	public function getBodyRectangle(rotated:Bool = false) {
 		final shapeWidth = baseEntity.entityShape.width;
 		final shapeHeight = baseEntity.entityShape.height;
-		final rectOffsetX = baseEntity.entityShape.rectOffsetX;
-		final rectOffsetY = baseEntity.entityShape.rectOffsetY;
 		final x = baseEntity.x;
 		final y = baseEntity.y;
-		return new Rectangle(x + 0, y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
-		// return new Rectangle(x + (baseEntity.side == Side.RIGHT ? -rectOffsetX : rectOffsetX), y + rectOffsetY, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
+		return new Rectangle(x, y, shapeWidth, shapeHeight, rotated ? baseEntity.rotation : 0);
 	}
 
 	public function getBodyCircle() {
@@ -82,8 +79,12 @@ abstract class EngineBaseEntity {
 		return baseEntity.entityType == EntityType.RAGNAR_LOH;
 	}
 
-	public function isBot() {
+	public function isMonster() {
 		return baseEntity.entityType == EntityType.ZOMBIE_BOY || baseEntity.entityType == EntityType.ZOMBIE_GIRL;
+	}
+
+	public function isBoss() {
+		return return baseEntity.entityType == EntityType.GLAMR;
 	}
 
     // ------------------------------------------------

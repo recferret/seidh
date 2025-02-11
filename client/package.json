@@ -5,12 +5,17 @@
   "main": "common.js",
   "scripts": {
     "build:stage": "npx gulp & npx terser ./build/bundle.js --compress ecma=2015,computed_props=false -o ./build/stage/netlify/bundle.min.js",
-    "build:prod": "npx gulp & npx terser ./build/bundle.js --compress ecma=2015,computed_props=false -o ./build/prod/yandex/bundle.min.js"
+    "build:prod": "npx gulp & npx terser ./build/bundle.js --compress ecma=2015,computed_props=false -o ./build/prod/yandex/bundle.min.js",
+    "prod:update-version": "node ./update-version.js",
+    "prod:publish": " npx netlify deploy --dir ./build/prod/netlify/ --site seidh-game.com --prod"
   },
   "author": "Andrey Sokolov",
   "license": "ISC",
   "devDependencies": {
     "gulp": "^5.0.0",
     "gulp-concat": "^2.6.1"
+  },
+  "dependencies": {
+    "netlify-cli": "^17.37.2"
   }
 }

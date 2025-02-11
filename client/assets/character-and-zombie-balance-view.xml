@@ -1,0 +1,87 @@
+<vbox style="padding-top:70px; padding-left:10px;">
+    <style>
+        .button {
+            font-size: 20px;
+        }
+    </style>
+
+    <hbox>
+
+        <vbox>
+            <vbox>
+                <label id="movementSpeedLabel" text="Movement speed" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="movementSpeedSlider" pos="50" min="0" max="100"/>
+            </vbox>
+
+            <vbox style="padding-top:10px">
+                <label id="movementInputDelayLabel" text="Movement speed input delay" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="movementInputDelaySlider" pos="0.1" min="0" max="1" step="0.01"/>
+            </vbox>
+
+            <vbox style="padding-top:40px">
+                <label id="actionMainWidthLabel" text="Action main width" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="actionMainWidthSlider" pos="350" min="100" max="500"/>
+            </vbox>
+
+            <vbox style="padding-top:10px">
+                <label id="actionMainHeightLabel" text="Action main height" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="actionMainHeightSlider" pos="260" min="100" max="500"/>
+            </vbox>
+
+            <vbox style="padding-top:10px">
+                <label id="actionMainOffsetXLabel" text="Action main offset X" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="actionMainOffsetXSlider" pos="85" min="-300" max="300"/>
+            </vbox>
+
+            <vbox style="padding-top:10px">
+                <label id="actionMainOffsetYLabel" text="Action main offset Y" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="actionMainOffsetYSlider" pos="0" min="-300" max="300"/>
+            </vbox>
+
+            <vbox style="padding-top:10px">
+                <label id="actionMainInputDelayLabel" text="Action main input delay" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="actionMainInputDelaySlider" pos="1" min="0" max="3" step="0.1"/>
+            </vbox>
+
+            <vbox style="padding-top:10px">
+                <label id="actionMainDamageLabel" text="Action main damage" style="font-size: 32px; font-bold: true; color: white;" />
+                <slider id="actionMainDamageSlider" pos="5" min="0" max="100" step="1"/>
+            </vbox>
+        </vbox>
+
+        <hbox>
+            <vbox style="padding-left:20px">
+                <button text="Spawn zombie" id="spawnZombieButton" style="font-size: 32px; font-bold: true;" />
+                <vbox style="padding-top:10px">
+                    <label id="zombiesMaxLabel" text="Zombies max" style="font-size: 32px; font-bold: true; color: white;" />
+                    <slider id="zombiesMaxSlider" pos="100" min="0" max="200"/>
+                </vbox>
+                <vbox style="padding-top:10px">
+                    <label id="zombiesSpawnDelayLabel" text="Zombies spawn delay" style="font-size: 32px; font-bold: true; color: white;" />
+                    <slider id="zombiesSpawnDelaySlider" pos="2" min="0" max="3" step="0.1" />
+                </vbox>
+                <vbox style="padding-top:10px">
+                    <label id="zombieHealthLabel" text="Zombie health" style="font-size: 32px; font-bold: true; color: white;" />
+                    <slider id="zombieHealthSlider" pos="10" min="0" max="100" />
+                </vbox>
+                <vbox style="padding-top:10px">
+                    <label id="zombieSpeedLabel" text="Zombie speed" style="font-size: 32px; font-bold: true; color: white;" />
+                    <slider id="zombieSpeedSlider" pos="10" min="0" max="100" />
+                </vbox>
+                <vbox style="padding-top:10px">
+                    <label id="zombieDamageLabel" text="Zombie damage" style="font-size: 32px; font-bold: true; color: white;" />
+                    <slider id="zombieDamageSlider" pos="5" min="0" max="100" />
+                </vbox>
+            </vbox>
+
+            <vbox>
+                <checkbox id="aiEnabledCheckbox" text="AI enabled" style="font-size: 32px; font-bold: true; color: white;" selected="true" />
+                <checkbox id="aiMovementCheckbox" text="AI movement" style="font-size: 32px; font-bold: true; color: white;"/>
+                <checkbox id="aiActionCheckbox" text="AI action" style="font-size: 32px; font-bold: true; color: white;"/>
+                <checkbox id="zombieSpawnCheckbox" text="Zombie spawn" style="font-size: 32px; font-bold: true; color: white;" selected="false"/>
+            </vbox>
+        </hbox>
+
+    </hbox>
+
+</vbox>

@@ -1,28 +1,37 @@
-const restUrl = 'http://localhost:3004/';
-const socketUrl = 'ws://localhost:3005/';
+// const restUrl = 'http://localhost:3004/';
+// const socketUrl = 'ws://localhost:3005/';
+ 
+// const restUrl = 'https://192.168.1.22:3004/';
+// const socketUrl = 'wss://192.168.1.22:3005/';
 
-// const restUrl = 'https://192.168.1.14:3003/';
-// const socketUrl = 'wss://192.168.1.14:3004/';
-
-// const restUrl = 'https://api.seidh-game.com/';
-// const socketUrl = 'wss://api.seidh-game.com/';
+const restUrl = 'https://api.seidh-game.com/';
+const socketUrl = 'wss://api.seidh-game.com/';
 
 function getAppConfig() {
     return {
-        Production: true,
-        DebugDraw: true,
+        // Production: true,
+        DebugDraw: false,
         PlayMusic: false,
         PlaySounds: false,
-        TelegramAuth: false,
-        TelegramTestAuth: false,
-        TelegramInitData: 'query_id=AAFEJ_ExAwAAAEQn8TGuddzY&user=%7B%22id%22%3A7280338756%2C%22first_name%22%3A%22Sofia%22%2C%22last_name%22%3A%22%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1718130576&hash=97bac32b6a9134e02cf7f91045d82db5908c3b1d62baddbaf2d20e84280e363c',
+        // TelegramAuth: true,
+        // TelegramTestAuth: false,
+        // TelegramInitData: 'query_id=AAFEJ_ExAwAAAEQn8TGuddzY&user=%7B%22id%22%3A7280338756%2C%22first_name%22%3A%22Sofia%22%2C%22last_name%22%3A%22%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1718130576&hash=97bac32b6a9134e02cf7f91045d82db5908c3b1d62baddbaf2d20e84280e363c',
         Analytics: false,
-        Serverless: false,
-        // TestLogin: _makeId(),
-        TestLogin: 'User123',
+        TestLogin: _makeId(),
+        // TestLogin: 'User1231',
         TestReferrerId: '',
-        JoinGameType: 'TestGame', 
+        JoinGameType: 'TestGame',
     }
+}
+
+function getPlatform() {
+    if (window.vkBridge != null) {
+        return 'VK';
+    }
+    if (window.Telegram != null) {
+        return 'TG';
+    }
+    return 'NONE';
 }
 
 function _makeId() {
@@ -37,8 +46,41 @@ function _makeId() {
     return result;
 }
 
-function getMobile() {
-    return new MobileDetect(window.navigator.userAgent).mobile();
+function isMobile() {
+    const mobileRE = /(android|bb\d+|meego).+mobile|armv7l|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|redmi|series[46]0|samsungbrowser.*mobile|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i
+    const notMobileRE = /CrOS/
+    
+    const tabletRE = /android|ipad|playbook|silk/i
+    
+    function isMobile (opts) {
+      if (!opts) opts = {}
+      let ua = opts.ua
+      if (!ua && typeof navigator !== 'undefined') ua = navigator.userAgent
+      if (ua && ua.headers && typeof ua.headers['user-agent'] === 'string') {
+        ua = ua.headers['user-agent']
+      }
+      if (typeof ua !== 'string') return false
+    
+      let result =
+        (mobileRE.test(ua) && !notMobileRE.test(ua)) ||
+        (!!opts.tablet && tabletRE.test(ua))
+    
+      if (
+        !result &&
+        opts.tablet &&
+        opts.featureDetect &&
+        navigator &&
+        navigator.maxTouchPoints > 1 &&
+        ua.indexOf('Macintosh') !== -1 &&
+        ua.indexOf('Safari') !== -1
+      ) {
+        result = true
+      }
+    
+      return result
+    }
+
+    return isMobile();
 }
 
 function getCanvasAndDpr() {
@@ -111,16 +153,7 @@ function getScreenParams() {
     const pageWidth = document.documentElement.scrollWidth;
     const pageHeight = document.documentElement.scrollHeight;
     const dpr = window.devicePixelRatio;
-
-    let orientation = undefined;
-
-    if (window.matchMedia("(orientation: portrait)").matches) {
-        orientation = 'portrait';
-    }
-      
-    if (window.matchMedia("(orientation: landscape)").matches) {
-        orientation = 'landscape';
-    }
+    const orientation = screenHeight > screenWidth ? 'portrait' : 'landscape';
 
     return {
         screenWidth, 
@@ -139,3 +172,31 @@ function getScreenParams() {
         dpr
     };
 }
+
+function listenForScreenOrientationChange(callback) {
+    window.addEventListener("orientationchange", (event) => {
+        if (callback != null) {
+            const portrait = event.target.screen.orientation.angle == 0;
+            if (portrait) {
+                canvas.width = canvasWidth ;
+                canvas.height = canvasHeight;
+                canvas.style.width = canvasStyleWidth;
+                canvas.style.height = canvasStyleHeight;
+            } else {
+                canvas.width = canvasHeight;
+                canvas.height = canvasWidth;
+                canvas.style.width = canvasStyleHeight;
+                canvas.style.height = canvasStyleWidth;
+            }
+            callback();
+        }
+    });
+}
+
+const canvas = document.getElementById('webgl');
+
+const canvasWidth = canvas.width;
+const canvasHeight = canvas.height;
+const canvasStyleWidth = canvas.style.width;
+const canvasStyleHeight = canvas.style.height;
+const isPortraitByDefault = window.innerHeight > window.innerWidth;

@@ -1,5 +1,6 @@
 package engine.base.entity.impl;
 
+import haxe.Timer;
 import haxe.Int32;
 import uuid.Uuid;
 
@@ -34,8 +35,12 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public var isAlive = true;
 	public var isCollides = true;
 	public var canMove = false;
+	public var canChangeState = true;
 	public var performMoveNextUpdate = false;
 	public var intersectsWithCharacter = false;
+
+	public var spawned = false;
+	public var spawnDelay = 500;
 
 	public var killerId:String;
 
@@ -63,6 +68,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public var isActing = false;
 	public var actionToPerform:CharacterActionStruct;
+	public var actionState = CharacterActionState.READY;
+	// public var actionInProgress = false;
 
 	private var lastActionMainInputCheck = 0.0;
 	private var lastAction1InputCheck = 0.0;
@@ -80,7 +87,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// Callbacks
 	// ------------------------------------------------
 
-	public var customUpdate:GameEntityCustomUpdate;
+	// TODO need ?
+	// public var customUpdate:GameEntityCustomUpdate;
 	public var customCollide:GameEntityCustomCollide;
 
 	public function new(characterEntity:CharacterEntity) {
@@ -100,6 +108,18 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			baseEntity.ownerId = Uuid.short();
 		}
 
+		if (
+			characterEntity.entityType == EntityType.GLAMR || 
+			characterEntity.entityType == EntityType.ZOMBIE_BOY ||
+			characterEntity.entityType == EntityType.ZOMBIE_GIRL
+		) {
+			Timer.delay(function callback() {
+				spawned = true;
+			}, spawnDelay);
+		} else {
+			spawned = true;
+		}
+
 		actionMain = this.characterEntity.actionMain;
 		action1 = this.characterEntity.action1;
 		action2 = this.characterEntity.action2;
@@ -110,6 +130,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// ------------------------------------------------
 	// Abstract
 	// ------------------------------------------------
+
+	public abstract function absUpdate(dt:Float):Void;
 
 	public abstract function canPerformMove():Bool;
 
@@ -124,36 +146,10 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public function update(dt:Float) {
 		lastDeltaTime = dt;
 
-		if (customUpdate != null)
-			customUpdate.onUpdate();
+		absUpdate(dt);
 
-		// Ai
-		if (hasTargetObject() && !isPlayer()) {
-			// Rotate bot in the target direction
-			final angleBetweenEntities = MathUtils.angleBetweenPoints(getBodyRectangle().getCenter(), targetObjectEntity.getBodyRectangle().getCenter());
-			baseEntity.rotation = angleBetweenEntities;
-
-			// Bot line sight for debug
-			final l = getForwardLookingLine(botForwardLookingLineLength);
-			botForwardLookingLine.x1 = l.x1;
-			botForwardLookingLine.y1 = l.y1; 
-			botForwardLookingLine.x2 = l.x2;
-			botForwardLookingLine.y2 = l.y2;
-
-			if (ifTargetInAttackRange()) {
-				performMoveNextUpdate = false;
-				if (EngineConfig.AI_ATTACK_ENABLED) {
-					aiMeleeAttack();
-				}
-			} else {
-				performMoveNextUpdate = true;
-			}
-		}
-
-		move();
-
-		if (customUpdate != null)
-			customUpdate.postUpdate();
+		if (spawned)
+			move();
 
 		updateHash();
 	}
@@ -242,7 +238,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// ------------------------------------------------
 
 	public function move() {
-		if (canMove && performMoveNextUpdate) {
+		if (canMove && performMoveNextUpdate && (isPlayer() || EngineConfig.AI_MOVEMENT_ENABLED)) {
 			final speed = characterEntity.movement.runSpeed;
 			dx = speed * Math.cos(baseEntity.rotation);
 			dy = speed * Math.sin(baseEntity.rotation);
@@ -303,7 +299,7 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	}
 
 	public function setNextActionToPerform(characterActionType:CharacterActionType) {
-		isActing = true;
+		actionState = CharacterActionState.IN_QUEUE;
 		switch (characterActionType) {
 			case CharacterActionType.ACTION_MAIN:
 				actionToPerform = actionMain;
@@ -338,12 +334,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// AI
 	// ------------------------------------------------
 
-	public function aiMeleeAttack() {
-		if (checkLocalActionInput(CharacterActionType.ACTION_MAIN)) {
-			setNextActionToPerform(CharacterActionType.ACTION_MAIN);
-		}
-	}
-
 	// ------------------------------------------------
 	// Getters
 	// ------------------------------------------------
@@ -356,9 +346,9 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public function getEntityMinStruct() {
 		return characterEntity.toMinStruct();
 	}
-	
-	public function getCurrentActionRect() {
-		final action = actionToPerform;
+
+	public function getActionRect(current:Bool) {
+		final action = current ? actionToPerform :characterEntity.actionMain;
 
 		if (action == null)
 			return null;
@@ -366,8 +356,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 			final shape = new EntityShape(action.meleeStruct.shape);
 
 			final rect = shape.toRect(
-				getBodyRectangle().getCenter().x,
-				getBodyRectangle().getCenter().y,
+				getX(),
+				getY(),
 				0, 
 				characterEntity.side
 			);
@@ -409,6 +399,24 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 
 	public function getShape() {
 		return characterEntity.entityShape;
+	}
+
+	// ------------------------------------------------
+	// Adjust setters
+	// ------------------------------------------------
+
+	public function adjustMovement(speed:Int, inputDelay:Float) {
+		characterEntity.movement.runSpeed = speed;
+		characterEntity.movement.inputDelay = inputDelay;
+	}
+
+	public function adjustActionMain(width:Int, height:Int, offsetX:Int, offsetY:Int, inputDelay:Float, damage:Int) {
+		characterEntity.actionMain.meleeStruct.shape.width = width;
+		characterEntity.actionMain.meleeStruct.shape.height = height;
+		characterEntity.actionMain.meleeStruct.shape.rectOffsetX = offsetX;
+		characterEntity.actionMain.meleeStruct.shape.rectOffsetY = offsetY;
+		characterEntity.actionMain.inputDelay = inputDelay;
+		characterEntity.actionMain.damage = damage;
 	}
 
 	// ------------------------------------------------
