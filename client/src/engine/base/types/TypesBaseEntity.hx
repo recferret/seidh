@@ -1,5 +1,6 @@
 package engine.base.types;
 
+import haxe.Int32;
 import haxe.Json;
 import engine.base.geometry.Rectangle;
 
@@ -17,10 +18,11 @@ enum abstract CharacterActionType(Int) {
 }
 
 enum abstract CharacterActionEffect(Int) {
-	var ATTACK = 1;
-	var BUFF = 2;
-	var SUMMON = 3;
-	var TELEPORT = 4;
+	var MELEE_ATTACK = 1;
+	var RANGE_ATTACK = 2;
+	var BUFF = 3;
+	var SUMMON = 4;
+	var TELEPORT = 5;
 }
 
 enum abstract CharacterActionState(Int) {
@@ -31,15 +33,16 @@ enum abstract CharacterActionState(Int) {
 
 typedef MeleeStruct = {
 	aoe:Bool,
+	damage:Int,
 	shape: ShapeStruct,
 }
 
 typedef ProjectileStruct = {
 	aoe:Bool,
-	penetration:Bool,
+	damage:Int,
+	penetrating:Bool,
 	speed:Float,
 	travelDistance:Float,
-	projectiles:Int,
 	shape: ShapeStruct,
 	?aoeShape: ShapeStruct,
 }
@@ -54,7 +57,6 @@ typedef CharacterMovementStruct = {
 typedef CharacterActionStruct = {
 	actionType:CharacterActionType,
 	actionEffect:CharacterActionEffect,
-	?damage:Int,
 	inputDelay:Float,
 	performDelayMs:Int,
 	postDelayMs:Int,
@@ -117,15 +119,20 @@ enum abstract Side(Int) {
 	var RIGHT = 2;
 }
 
-enum abstract EntityType(Int) {
-	var RAGNAR_LOH = 1;
-	var ZOMBIE_BOY = 2;
-	var ZOMBIE_GIRL = 3;
-	var GLAMR = 4;
+enum abstract EntityType(String) {
+	var RAGNAR_LOH = 'RAGNAR_LOH';
+	var RAGNAR_BEAST = 'RAGNAR_BEAST';
 
-	var COIN = 90;
-	var HEALTH_POTION = 91;
-	var SALMON = 92;
+	var ZOMBIE_BOY = 'ZOMBIE_BOY';
+	var ZOMBIE_GIRL = 'ZOMBIE_GIRL';
+	var GLAMR = 'GLAMR';
+
+	var PROJECTILE_AXE = 'PROJECTILE_AXE';
+	var PROJECTILE_SWORD = 'PROJECTILE_SWORD';
+
+	var COIN = 'COIN';
+	var HEALTH_POTION = 'HEALTH_POTION';
+	var SALMON = 'SALMON';
 }
 
 // Base
@@ -158,6 +165,10 @@ class BaseEntity {
 		this.id = struct.id;
 		this.ownerId = struct.ownerId;
 		this.rotation = struct.rotation;
+
+		if (this.rotation == null) {
+			this.rotation = 0;
+		}
 	}
 
 	public function getBaseStruct() {

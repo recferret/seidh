@@ -18,6 +18,7 @@ class EngineProjectileEntity extends EngineBaseEntity {
     public function new(projectileEntity:ProjectileEntity) {
 		super(projectileEntity);
 
+		// CAST
         this.projectileEntity = projectileEntity;
 
 		if (baseEntity.id == null) {
@@ -38,7 +39,7 @@ class EngineProjectileEntity extends EngineBaseEntity {
 	public function calculateAndGetFrameMoveStep(dt:Float) {
 		final dx = projectileEntity.projectile.speed * Math.cos(baseEntity.rotation) * dt;
 		final dy = projectileEntity.projectile.speed * Math.sin(baseEntity.rotation) * dt;
-		traveledDistance += (dx + dy);
+		traveledDistance += Math.abs(dx + dy);
 
 		if (traveledDistance > projectileEntity.projectile.travelDistance) {
 			allowMovement = false;
@@ -49,6 +50,26 @@ class EngineProjectileEntity extends EngineBaseEntity {
 			dy: dy,
 			allowMovement: allowMovement
 		}
+	}
+
+	public function getFrameStep(dt:Float) {
+		final dx = projectileEntity.projectile.speed * Math.cos(baseEntity.rotation) * dt;
+		final dy = projectileEntity.projectile.speed * Math.sin(baseEntity.rotation) * dt;
+
+		return {
+			dx: dx,
+			dy: dy,
+		}
+	}
+
+	// getters
+
+	public function getDamage() {
+		return projectileEntity.projectile.damage;
+	}
+
+	public function isPenetrating() {
+		return projectileEntity.projectile.penetrating;
 	}
 
 }

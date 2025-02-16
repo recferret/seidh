@@ -23,13 +23,13 @@ class CharacterEntityConfig {
             },
             actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,
-                actionEffect: CharacterActionEffect.ATTACK,
-                damage: 5,
+                actionEffect: CharacterActionEffect.MELEE_ATTACK,
                 inputDelay: 1,
                 performDelayMs: 100,
                 postDelayMs: 0,
                 meleeStruct: {
                     aoe: true,
+                    damage: 5,
                     shape: {
                         width: 350, 
                         height: 260, 
@@ -37,10 +37,50 @@ class CharacterEntityConfig {
                         rectOffsetY: 0,
                         radius: 0,
                     },
-                }
+                },
             },
             health: 100,
         },
+
+        ragnarBeast: {
+            type: EntityType.RAGNAR_BEAST,
+            movement: {
+                canRun: false,
+                runSpeed: 40,
+                speedFactor: 10,
+                inputDelay: 0.100,
+            },
+            entityShape: {
+                width: 180,
+                height: 260,
+                rectOffsetX: 0,
+                rectOffsetY: 0,
+                radius: 150,
+            },
+            actionMain: {
+                actionType: CharacterActionType.ACTION_MAIN,
+                actionEffect: CharacterActionEffect.RANGE_ATTACK,
+                inputDelay: 1,
+                performDelayMs: 0,
+                postDelayMs: 0,
+                projectileStruct: {
+                    aoe: false,
+                    damage: 10,
+                    penetrating: true,
+                    speed: 700,
+                    travelDistance: 700,
+                    shape: {
+                        width: 50,
+                        height: 50,
+                        rectOffsetX: 0,
+                        rectOffsetY: 0,
+                        radius: 0,
+                    },
+                },
+            },
+            health: 150,
+        },
+
         zombieBoy: {
             type: EntityType.ZOMBIE_BOY,
             movement: {
@@ -58,13 +98,13 @@ class CharacterEntityConfig {
             },
             actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,
-                actionEffect: CharacterActionEffect.ATTACK,
-                damage: 1,
+                actionEffect: CharacterActionEffect.MELEE_ATTACK,
                 inputDelay: 1,
                 performDelayMs: 100,
                 postDelayMs: 0,
                 meleeStruct: {
                     aoe: false,
+                    damage: 1,
                     shape: {
                         width: 260,
                         height: 260,
@@ -76,6 +116,7 @@ class CharacterEntityConfig {
             },
             health: 10,
         },
+
         zombieGirl: {
             type: EntityType.ZOMBIE_GIRL,
             movement: {
@@ -93,13 +134,13 @@ class CharacterEntityConfig {
             },
             actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,
-                actionEffect: CharacterActionEffect.ATTACK,
-                damage: 1,
+                actionEffect: CharacterActionEffect.MELEE_ATTACK,
                 inputDelay: 1,
                 performDelayMs: 100,
                 postDelayMs: 0,
                 meleeStruct: {
                     aoe: false,
+                    damage: 1,
                     shape: {
                         width: 260,
                         height: 260,
@@ -128,13 +169,13 @@ class CharacterEntityConfig {
             },
             actionMain: {
                 actionType: CharacterActionType.ACTION_MAIN,
-                actionEffect: CharacterActionEffect.ATTACK,
-                damage: 8,
+                actionEffect: CharacterActionEffect.MELEE_ATTACK,
                 inputDelay: 3,
                 performDelayMs: 500,
                 postDelayMs: 0,
                 meleeStruct: {
                     aoe: true,
+                    damage: 8,
                     shape: {
                         width: 450,
                         height: 400,

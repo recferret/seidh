@@ -1,22 +1,23 @@
 package engine.seidh;
 
-import engine.seidh.entity.impl.GlamrEntity;
-import engine.base.geometry.Point;
 import js.lib.Date;
 
-import engine.base.EngineConfig;
 import engine.base.MathUtils;
-import engine.base.entity.base.EngineBaseEntity;
+import engine.base.core.BaseEngine;
 import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.entity.impl.EngineCharacterEntity;
 import engine.base.entity.impl.EngineProjectileEntity;
-import engine.base.core.BaseEngine;
+import engine.base.geometry.Point;
 import engine.base.types.TypesBaseEngine;
 import engine.base.types.TypesBaseEntity;
 import engine.base.types.TypesBaseMultiplayer;
 
+import engine.seidh.ai.AiManager;
+import engine.seidh.core.update.character.CharacterUpdate;
 import engine.seidh.entity.base.SeidhCharacterEntity;
+import engine.seidh.entity.impl.GlamrEntity;
 import engine.seidh.entity.factory.SeidhEntityFactory;
+import engine.seidh.core.update.character.AiUpdate;
 import engine.seidh.types.TypesSeidhGame;
 
 @:expose
@@ -60,8 +61,6 @@ class SeidhGameEngine extends BaseEngine {
     private var winCondition:WinCondition;
     private var gameStage = GameStage.KILL_MONSTERS;
 
-    private final aiManager:AiManager;
-
     private var glamr:GlamrEntity;
 
     private final playerZombiesKilled = new Map<String, Int>();
@@ -79,27 +78,104 @@ class SeidhGameEngine extends BaseEngine {
         new Point(2500, 2500)
     ];
 
+    // Update 
+    private final allowServerLogic:Bool;
+    private final aiManager:AiManager;
+
+    private final aiUpdate:AiUpdate;
+    private final characterUpdate:CharacterUpdate;
+
     public static function main() {}
 
     public function new(engineMode:EngineMode, winCondition:WinCondition = WinCondition.INFINITE) {
 	    super(engineMode);
 
+        this.winCondition = winCondition;
+        this.allowServerLogic = engineMode == EngineMode.SERVER || engineMode == EngineMode.CLIENT_SINGLEPLAYER;
+
+		lineColliders.push(new engine.base.geometry.Line(0, 0, GameWorldSize, 0));
+		lineColliders.push(new engine.base.geometry.Line(0, GameWorldSize, GameWorldSize, GameWorldSize));
+		lineColliders.push(new engine.base.geometry.Line(0, 0, 0, GameWorldSize));
+		lineColliders.push(new engine.base.geometry.Line(GameWorldSize, 0, GameWorldSize, GameWorldSize));
+
         aiManager = new AiManager(winCondition);
 
-        this.winCondition = winCondition;
+        aiUpdate = new AiUpdate(allowServerLogic);
+        characterUpdate = new CharacterUpdate(allowServerLogic, lineColliders);
 
-		addLineCollider(0, 0, GameWorldSize, 0);
-		addLineCollider(0, GameWorldSize, GameWorldSize, GameWorldSize);
-		addLineCollider(0, 0, 0, GameWorldSize);
-		addLineCollider(GameWorldSize, 0, GameWorldSize, GameWorldSize);
+        characterUpdate.setConsumablePickUpCallback(function callback(params:Array<PickedUpConsumable>) {
+            for (pickUp in params) {
+                final consumable_ = consumableEntityManager.getEntityById(pickUp.consumableId);
+                final consumable = cast(consumable_, EngineConsumableEntity);
+
+                final character_ = characterEntityManager.getEntityById(pickUp.characterId);
+                final character = cast(character_, EngineCharacterEntity);
+
+                if (consumable.getEntityType() == EntityType.COIN) {
+                    final coinsGained = playerCoinsGained.get(character.getOwnerId());
+                    if (coinsGained != null) {
+                        playerCoinsGained.set(character.getOwnerId(), coinsGained + 1);
+                    } else {
+                        playerCoinsGained.set(character.getOwnerId(), 1);
+                    }
+                } else {
+                    character.addHealth(consumable.amount);
+                }
+
+                addToConsumableDeleteQueue(pickUp.consumableId, pickUp.characterId);
+            }
+        });
+
+        characterUpdate.setCharacterActionCallback(function callback(params:Array<CharacterActionCallbackParams>) {
+            sendCharacterActionCallbacks(params);
+        });
+
+        characterUpdate.setCreateProjectileCallback(function callback(params:CreateProjectileCallbackParams) {
+            final character_ = characterEntityManager.getEntityById(params.characterId);
+            final character = cast(character_, EngineCharacterEntity);
+
+            addToProjectileCreateQueue(createProjectileByCharacter(character));
+        });
+
+        characterUpdate.setPlayerKilledCallback(function callback(params:CharacterKilledCallbackParams) {
+            if (params.characterId == localPlayerId) {
+                setGameState(GameState.LOSE);
+            }
+
+            addToCharacterDeleteQueue(params.characterId);
+        });
+
+        characterUpdate.setBossKilledCallback(function callback(params:CharacterKilledCallbackParams) {
+            aiManager.setBossKilled();
+            addToCharacterDeleteQueue(params.characterId);
+        });
+
+        characterUpdate.setMonsterKilledCallback(function callback(params:CharacterKilledCallbackParams) {
+            final character_ = characterEntityManager.getEntityById(params.characterId);
+            final character = cast(character_, EngineCharacterEntity);
+
+            aiManager.monsterKilled();
+
+            if (glamr != null) {
+                glamr.monsterKilled();
+            }
+
+            final zombieKills = playerZombiesKilled.get(params.killerOwnerId);
+            if (zombieKills != null) {
+                playerZombiesKilled.set(params.killerOwnerId, zombieKills + 1);
+            } else {
+                playerZombiesKilled.set(params.killerOwnerId, 1);
+            }
+
+            addToCharacterDeleteQueue(params.characterId);
+
+            createRandomConsumable(
+                Std.int(character.getBodyRectangle().x), 
+                Std.int(character.getBodyRectangle().y),
+            );
+        });
 
         oneTenthOfASecondTimer();
-
-        // createConsumable(struct.x + 300, struct.y);
-        // createConsumable(struct.x + 400, struct.y);
-        // createConsumable(struct.x + 500, struct.y);
-        // createConsumable(struct.x + 600, struct.y);
-        // createConsumable(struct.x + 700, struct.y);
     }
 
     // ---------------------------------------------------
@@ -149,8 +225,6 @@ class SeidhGameEngine extends BaseEngine {
             framesPassed++;
             timePassed += dt;
 
-            final characterActionCallbackParams = new Array<CharacterActionCallbackParams>();
-
             for (e in projectileEntityManager.entities) {
                 final projectile = cast(e, EngineProjectileEntity);
 
@@ -161,271 +235,248 @@ class SeidhGameEngine extends BaseEngine {
                 }
             }
 
-            // AI
-            final allowServerLogic = engineMode == EngineMode.SERVER || engineMode == EngineMode.CLIENT_SINGLEPLAYER;
+            aiUpdate.update(dt, characterEntityManager.getEntities());
 
-            if (allowServerLogic && EngineConfig.AI_ENABLED) {
-                for (e1 in characterEntityManager.entities) {
-                    final character1 = cast(e1, EngineCharacterEntity);
-                    
-                    if (character1.isAlive && !character1.isPlayer()) {
-                        // Find and set nearest player as a target
-                        final targetPlayer = getNearestPlayer(character1);
-                        if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
-                            character1.setTargetObject(targetPlayer, true);
-                        } else {
-                            character1.clearTargetObject();
-                        }
+            // TODO move projectiles here
 
-                        // Restrict movement through objects
-                        for (e2 in characterEntityManager.entities) {
-                            final character2 = cast(e2, EngineCharacterEntity);
-                            if (!character1.intersectsWithCharacter && character1.getId() != character2.getId() && character2.isAlive && !character2.isPlayer()) {
-                                if (character2.getBodyRectangle().intersectsWithLine(character1.botForwardLookingLine)) {
-                                    character1.intersectsWithCharacter = true;
-                                    character1.canMove = false;
-                                }
-                            }
-                        }
+            characterUpdate.update(
+                dt,
+                characterEntityManager.getEntities(),
+                projectileEntityManager.getEntities(),
+                consumableEntityManager.getEntities(),
+            );
 
-                        character1.intersectsWithCharacter = false;
-                        character1.canMove = true;
-                    }
-                }
-            }
+            // for (e in characterEntityManager.entities) {
+            //     final character1 = cast(e, EngineCharacterEntity);
+            //     final character1Id = character1.getId();
+            //     final character1OwnerId = character1.getOwnerId();
 
-            for (e in characterEntityManager.entities) {
-                final character1 = cast(e, EngineCharacterEntity);
-                final character1Id = character1.getId();
-                final character1OwnerId = character1.getOwnerId();
+            //     if (character1.getEntityType() == EntityType.GLAMR && glamr == null) {
+            //         glamr = cast(character1, GlamrEntity);
+            //     }
 
-                if (character1.getEntityType() == EntityType.GLAMR && glamr == null) {
-                    glamr = cast(character1, GlamrEntity);
-                }
+            //     if (character1.isAlive) {
+            //         character1.update(dt);
 
-                if (character1.isAlive) {
-                    character1.update(dt);
+            //         if (character1.isPlayer()) {
+            //             for (c in consumableEntityManager.entities) {
+            //                 final consumable = cast(c, EngineConsumableEntity);
 
-                    if (character1.isPlayer()) {
-                        for (c in consumableEntityManager.entities) {
-                            final consumable = cast(c, EngineConsumableEntity);
+            //                 // Pick up items
+            //                 final characterPickUpCircle = character1.getBodyCircle();
+            //                 if (characterPickUpCircle.getCenter().distance(consumable.getBodyRectangle().getCenter()) < characterPickUpCircle.r + 10) {
+            //                     if (characterPickUpCircle.containsRect(consumable.getBodyRectangle())) {
+            //                         if (consumable.getEntityType() == EntityType.COIN) {
+            //                             // Increase coins accquired
+            //                             final coinsGained = playerCoinsGained.get(character1OwnerId);
+            //                             if (coinsGained != null) {
+            //                                 playerCoinsGained.set(character1OwnerId, coinsGained + 1);
+            //                             } else {
+            //                                 playerCoinsGained.set(character1OwnerId, 1);
+            //                             }
+            //                         } else {
+            //                             // Give health
+            //                             character1.addHealth(consumable.amount);
+            //                         }
 
-                            // Pick up items
-                            final characterPickUpCircle = character1.getBodyCircle();
-                            if (characterPickUpCircle.getCenter().distance(consumable.getBodyRectangle().getCenter()) < characterPickUpCircle.r + 10) {
-                                if (characterPickUpCircle.containsRect(consumable.getBodyRectangle())) {
-                                    if (consumable.getEntityType() == EntityType.COIN) {
-                                        // Increase coins accquired
-                                        final coinsGained = playerCoinsGained.get(character1OwnerId);
-                                        if (coinsGained != null) {
-                                            playerCoinsGained.set(character1OwnerId, coinsGained + 1);
-                                        } else {
-                                            playerCoinsGained.set(character1OwnerId, 1);
-                                        }
-                                    } else {
-                                        // Give health
-                                        character1.addHealth(consumable.amount);
-                                    }
+            //                         addToConsumableDeleteQueue(consumable.getId(), character1Id);
+            //                     }
+            //                 }
+            //             }
 
-                                    addToConsumableDeleteQueue(consumable.getId(), character1Id);
-                                }
-                            }
-                        }
+            //             // Restrict border movement
+            //             var intersectsWithLine = false;
+            //             for (line in lineColliders) {
+            //                 if (character1.getForwardLookingLine(character1.playerForwardLookingLineLength).intersectsWithLine(line)) {
+            //                     intersectsWithLine = true;
+            //                     break;
+            //                 }
+            //             }
 
-                        // Restrict border movement
-                        var intersectsWithLine = false;
-                        for (line in lineColliders) {
-                            if (character1.getForwardLookingLine(character1.playerForwardLookingLineLength).intersectsWithLine(line)) {
-                                intersectsWithLine = true;
-                                break;
-                            }
-                        }
+            //             if (intersectsWithLine) {
+            //                 character1.canMove = false;
+            //             } else {
+            //                 character1.canMove = true;
+            //             }
+            //         }
 
-                        if (intersectsWithLine) {
-                            character1.canMove = false;
-                        } else {
-                            character1.canMove = true;
-                        }
-                    }
+            //         // Check projectile collisions against characters
+            //         for (e in projectileEntityManager.entities) {
+            //             final projectile = cast(e, EngineProjectileEntity);
 
-                    // Check projectile collisions against characters
-                    for (e in projectileEntityManager.entities) {
-                        final projectile = cast(e, EngineProjectileEntity);
+            //             // Skip self collision
+            //             if (projectile.getOwnerId() != character1OwnerId) {
+            //                 final projectileRect = projectile.getBodyRectangle();
+            //                 final characterRect = character1.getBodyRectangle();
 
-                        // Skip self collision
-                        if (projectile.getOwnerId() != character1OwnerId) {
-                            final projectileRect = projectile.getBodyRectangle();
-                            final characterRect = character1.getBodyRectangle();
+            //                 // Skip far collisions
+            //                 if (projectileRect.getCenter().distance(characterRect.getCenter()) < characterRect.w) {
+            //                     // TODO hit by projectile
+            //                     // TODO rename allowMovement
+            //                     projectile.allowMovement = false;
+            //                 }
+            //             }
+            //         }
 
-                            // Skip far collisions
-                            if (projectileRect.getCenter().distance(characterRect.getCenter()) < characterRect.w) {
-                                // TODO hit by projectile
-                                // TODO rename allowMovement
-                                projectile.allowMovement = false;
-                            }
-                        }
-                    }
+            //         // Perform character action
+            //         if (character1.actionState == CharacterActionState.IN_QUEUE) {
+            //             character1.actionState = CharacterActionState.IN_PROGRESS;
 
-                    // Perform character action
-                    if (character1.actionState == CharacterActionState.IN_QUEUE) {
-                        character1.actionState = CharacterActionState.IN_PROGRESS;
+            //             final callbackParams:CharacterActionCallbackParams = {
+            //                 entityId: character1.getId(),
+            //                 actionType: character1.actionToPerform.actionType,
+            //                 actionEffect: character1.actionToPerform.actionEffect,
+            //                 playActionAnim: false,
+            //                 playEffectAnim: false,
+            //             };
 
-                        final callbackParams:CharacterActionCallbackParams = {
-                            entityId: character1.getId(),
-                            actionType: character1.actionToPerform.actionType,
-                            actionEffect: character1.actionToPerform.actionEffect,
-                            playActionAnim: false,
-                            playEffectAnim: false,
-                        };
+            //             if (character1.actionToPerform.actionEffect == CharacterActionEffect.MELEE_ATTACK ||
+            //                 character1.actionToPerform.actionEffect == CharacterActionEffect.RANGE_ATTACK) {
+                                
+            //                 function performAttack() {                               
+            //                     final hurtEntities = new Array<String>();
+            //                     final deadEntities = new Array<String>();
 
-                        if (character1.actionToPerform.actionEffect == CharacterActionEffect.ATTACK) {
-                            function performAttack() {                               
-                                final hurtEntities = new Array<String>();
-                                final deadEntities = new Array<String>();
+            //                     if (character1.actionToPerform.actionEffect == CharacterActionEffect.MELEE_ATTACK) {
+            //                         final actionShape = character1.actionToPerform.meleeStruct.shape;
 
-                                var actionShape:ShapeStruct = null;
-                                if (character1.actionToPerform.projectileStruct != null) {
-                                    addToProjectileCreateQueue(createProjectileByCharacter(character1));
-                                    actionShape = character1.actionToPerform.projectileStruct.shape;
-                                } else if (character1.actionToPerform.meleeStruct != null) {
-                                    actionShape = character1.actionToPerform.meleeStruct.shape;
-                                }
+            //                         for (e2 in characterEntityManager.entities) {
+            //                             final character2 = cast(e2, EngineCharacterEntity);
+            //                             // TODO add distance check here
+            //                             if (character2.isAlive && character1Id != character2.getId()) {
+            //                                 final characterHasActionRect = character1.getActionRect(true) != null;
+            //                                 final chatacterHitsAnother = character1.getActionRect(true).containsRect(character2.getBodyRectangle()); 
+            //                                 final skipBotToBotAttack = !character1.isPlayer() && !character2.isPlayer();
+            //                                 if (characterHasActionRect && chatacterHitsAnother && !skipBotToBotAttack) {
+            //                                     if (allowServerLogic) {
+            //                                         final health = character2.subtractHealth(character1.actionToPerform.damage);
+            //                                         if (health == 0) {
+            //                                             if (character2.isPlayer() && character2.getOwnerId() == localPlayerId) {
+            //                                                 setGameState(GameState.LOSE);
+            //                                             }
+    
+            //                                             if (character2.isBoss()) {
+            //                                                 aiManager.setBossKilled();
+            //                                             }
+    
+            //                                             if (character2.isMonster()) {
+            //                                                 aiManager.monsterKilled();
+    
+            //                                                 if (glamr != null) {
+            //                                                     glamr.monsterKilled();
+            //                                                 }
+    
+            //                                                 // Update player kills
+            //                                                 final zombieKills = playerZombiesKilled.get(character1OwnerId);
+            //                                                 if (zombieKills != null) {
+            //                                                     playerZombiesKilled.set(character1OwnerId, zombieKills + 1);
+            //                                                 } else {
+            //                                                     playerZombiesKilled.set(character1OwnerId, 1);
+            //                                                 }
+    
+            //                                                 createRandomConsumable(
+            //                                                     Std.int(character2.getBodyRectangle().x), 
+            //                                                     Std.int(character2.getBodyRectangle().y),
+            //                                                 );
+            //                                             }
+    
+            //                                             character2.isAlive = false;
+            //                                             deadEntities.push(character2.getId());
+            //                                             addToCharacterDeleteQueue(character2.getId());
+            //                                         } else {
+            //                                             hurtEntities.push(character2.getId());
+            //                                         }
+            //                                     } 
+            //                                     // else {
+            //                                     //     hurtEntities.push(character2.getId());
+            //                                     // }
+            //                                 }
+            //                             }
+    
+            //                             callbackParams.shape = actionShape;
+            //                             callbackParams.damage = character1.actionToPerform.damage;
+            //                             callbackParams.hurtEntities = hurtEntities;
+            //                             callbackParams.deadEntities = deadEntities;
+            //                         }
+            //                     } else {
+            //                         addToProjectileCreateQueue(createProjectileByCharacter(character1));
+            //                     }
+            //                 }
 
-                                for (e2 in characterEntityManager.entities) {
-                                    final character2 = cast(e2, EngineCharacterEntity);
-                                    // TODO add distance check here
-                                    if (character2.isAlive && character1Id != character2.getId()) {
-                                        final characterHasActionRect = character1.getActionRect(true) != null;
-                                        final chatacterHitsAnother = character1.getActionRect(true).containsRect(character2.getBodyRectangle()); 
-                                        final skipBotToBotAttack = !character1.isPlayer() && !character2.isPlayer();
-                                        if (characterHasActionRect && chatacterHitsAnother && !skipBotToBotAttack) {
-                                            if (allowServerLogic) {
-                                                final health = character2.subtractHealth(character1.actionToPerform.damage);
-                                                if (health == 0) {
-                                                    if (character2.isPlayer() && character2.getOwnerId() == localPlayerId) {
-                                                        setGameState(GameState.LOSE);
-                                                    }
+            //                 if (character1.actionToPerform.performDelayMs == 0) {
+            //                     performAttack();
 
-                                                    if (character2.isBoss()) {
-                                                        aiManager.setBossKilled();
-                                                    }
+            //                     character1.canChangeState = true;
+            //                     character1.actionState = CharacterActionState.READY;
+            //                     character1.actionToPerform = null;
 
-                                                    if (character2.isMonster()) {
-                                                        aiManager.monsterKilled();
+            //                     callbackParams.playActionAnim = true;
+            //                     callbackParams.playEffectAnim = true;
 
-                                                        if (glamr != null) {
-                                                            glamr.monsterKilled();
-                                                        }
+            //                     characterActionCallbackParams.push(callbackParams);
+            //                 } else {
+            //                     // Visuals only
+            //                     callbackParams.playActionAnim = true;
+            //                     sendCharacterActionCallbacks([callbackParams]);
 
-                                                        // Update player kills
-                                                        final zombieKills = playerZombiesKilled.get(character1OwnerId);
-                                                        if (zombieKills != null) {
-                                                            playerZombiesKilled.set(character1OwnerId, zombieKills + 1);
-                                                        } else {
-                                                            playerZombiesKilled.set(character1OwnerId, 1);
-                                                        }
-
-                                                        createRandomConsumable(
-                                                            Std.int(character2.getBodyRectangle().x), 
-                                                            Std.int(character2.getBodyRectangle().y),
-                                                        );
-                                                    }
-
-                                                    character2.isAlive = false;
-                                                    deadEntities.push(character2.getId());
-                                                    addToCharacterDeleteQueue(character2.getId());
-                                                } else {
-                                                    hurtEntities.push(character2.getId());
-                                                }
-                                            } else {
-                                                hurtEntities.push(character2.getId());
-                                            }
-                                        }
-                                    }
-
-                                    callbackParams.shape = actionShape;
-                                    callbackParams.damage = character1.actionToPerform.damage;
-                                    callbackParams.hurtEntities = hurtEntities;
-                                    callbackParams.deadEntities = deadEntities;
-                                }
-                            }
-
-                            if (character1.actionToPerform.performDelayMs == 0) {
-                                performAttack();
-
-                                character1.canChangeState = true;
-                                character1.actionState = CharacterActionState.READY;
-                                character1.actionToPerform = null;
-
-                                callbackParams.playActionAnim = true;
-                                callbackParams.playEffectAnim = true;
-
-                                characterActionCallbackParams.push(callbackParams);
-                            } else {
-                                // Visuals only
-                                callbackParams.playActionAnim = true;
-                                sendCharacterActionCallbacks([callbackParams]);
-
-                                // Action itself
-                                haxe.Timer.delay(function callback() {
-                                    performAttack();
+            //                     // Action itself
+            //                     haxe.Timer.delay(function callback() {
+            //                         performAttack();
         
-                                    character1.canChangeState = true;
-                                    character1.actionState = CharacterActionState.READY;
-                                    character1.actionToPerform = null;
+            //                         character1.canChangeState = true;
+            //                         character1.actionState = CharacterActionState.READY;
+            //                         character1.actionToPerform = null;
         
-                                    callbackParams.playEffectAnim = true;
-                                    sendCharacterActionCallbacks([callbackParams]);
-                                }, character1.actionToPerform.performDelayMs);
-                            }
-                        } else if (character1.actionToPerform.actionEffect == CharacterActionEffect.SUMMON) {
-                            if (character1.getEntityType() == GLAMR) {
-                                haxe.Timer.delay(function callback() {
-                                    final glamr = cast(character1, GlamrEntity);
-                                    final monsters = aiManager.spawnMonstersAroundPoint(character1.getX(), character1.getY(), glamr.monstersToSpawn);
-                                    for (monster in monsters) {
-                                        addToCharacterCreateQueue(SeidhEntityFactory.InitiateCharacter(
-                                            {
-                                                x: monster.positionX,
-                                                y: monster.positionY,
-                                                entityType: monster.entityType,
-                                            }
-                                        ));
-                                        glamr.monsterSpawned();
-                                    }
+            //                         callbackParams.playEffectAnim = true;
+            //                         sendCharacterActionCallbacks([callbackParams]);
+            //                     }, character1.actionToPerform.performDelayMs);
+            //                 }
+            //             } else if (character1.actionToPerform.actionEffect == CharacterActionEffect.SUMMON) {
+            //                 if (character1.getEntityType() == GLAMR) {
+            //                     haxe.Timer.delay(function callback() {
+            //                         final glamr = cast(character1, GlamrEntity);
+            //                         final monsters = aiManager.spawnMonstersAroundPoint(character1.getX(), character1.getY(), glamr.monstersToSpawn);
+            //                         for (monster in monsters) {
+            //                             addToCharacterCreateQueue(SeidhEntityFactory.InitiateCharacter(
+            //                                 {
+            //                                     x: monster.positionX,
+            //                                     y: monster.positionY,
+            //                                     entityType: monster.entityType,
+            //                                 }
+            //                             ));
+            //                             glamr.monsterSpawned();
+            //                         }
 
-                                    // TODO Refactor how actions are working
-                                    if (character1.actionToPerform.postDelayMs != 0) {
-                                        haxe.Timer.delay(function callback() {
-                                            character1.canChangeState = true;
-                                            character1.actionState = CharacterActionState.READY;
-                                            character1.actionToPerform = null;
-                                        }, character1.actionToPerform.postDelayMs);
-                                    } else {
-                                        character1.canChangeState = true;
-                                        character1.actionState = CharacterActionState.READY;
-                                        character1.actionToPerform = null;
-                                    }
+            //                         // TODO Refactor how actions are working
+            //                         if (character1.actionToPerform.postDelayMs != 0) {
+            //                             haxe.Timer.delay(function callback() {
+            //                                 character1.canChangeState = true;
+            //                                 character1.actionState = CharacterActionState.READY;
+            //                                 character1.actionToPerform = null;
+            //                             }, character1.actionToPerform.postDelayMs);
+            //                         } else {
+            //                             character1.canChangeState = true;
+            //                             character1.actionState = CharacterActionState.READY;
+            //                             character1.actionToPerform = null;
+            //                         }
 
-                                    callbackParams.playActionAnim = true;
+            //                         callbackParams.playActionAnim = true;
 
-                                    sendCharacterActionCallbacks([callbackParams]);
-                                }, character1.actionToPerform.performDelayMs);
-                            }
-                        }
-                    }
+            //                         sendCharacterActionCallbacks([callbackParams]);
+            //                     }, character1.actionToPerform.performDelayMs);
+            //                 }
+            //             }
+            //         }
 
-                    character1.isRunning = false;
-                }
-            }
+            //         character1.isRunning = false;
+            //     }
+            // }
 
-            sendCharacterActionCallbacks(characterActionCallbackParams);
+            // sendCharacterActionCallbacks(characterActionCallbackParams);
 
             spawnMonsters();
 
-            if (winCondition != WinCondition.INFINITE && allowServerLogic && aiManager.allMonstersKilled()) {
-                setGameState(GameState.WIN);
-            }
+            checkWinCondition();
 
             recentEngineLoopTime = Date.now() - beginTime;
         }
@@ -450,10 +501,6 @@ class SeidhGameEngine extends BaseEngine {
             characterActionCallbacks(characterActionCallbackParams);
         }
     }
-
-	public function addLineCollider(x1:Int, y1:Int, x2:Int, y2:Int) {
-		lineColliders.push(new engine.base.geometry.Line(x1, y1, x2, y2));
-	}
 
     public function setAllowSpawnMonsters(allowSpawnMonsters:Bool) {
         aiManager.setAllowSpawnMonsters(allowSpawnMonsters);
@@ -517,37 +564,19 @@ class SeidhGameEngine extends BaseEngine {
     }
 
     private function createProjectileByCharacter(character:EngineCharacterEntity) {
-        // final ownerRect = character.getBodyRectangle();
-        // final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
-        //     base: {
-        //         x: Std.int(ownerRect.getCenter().x),
-        //         y: Std.int(ownerRect.getCenter().y),
-        //         entityType: EntityType.PROJECTILE_MAGIC_ARROW,
-        //         entityShape: character.actionToPerform.projectileStruct.shape,
-        //         ownerId: character.getOwnerId(),
-        //         rotation: character.getRotation(),
-        //     },
-	    //     projectile: character.actionToPerform.projectileStruct
-        // }));
-        // return projectileEntity;
-        return null;
-    }
-
-    private function getNearestPlayer(entity:EngineBaseEntity) {
-        var nearestPlayer:EngineBaseEntity = null;
-        var nearestPlayerDistance:Float = 0.0;
-
-        for (targetEntity in characterEntityManager.entities) {
-            if (targetEntity.isPlayer()) {
-                final dist = entity.getBodyRectangle().getCenter().distance(targetEntity.getBodyRectangle().getCenter());
-                if (nearestPlayer == null || dist < nearestPlayerDistance) {
-                    nearestPlayer = targetEntity;
-                    nearestPlayerDistance = dist;
-                }
-            }
-        }
-
-        return nearestPlayer;
+        final ownerRect = character.getBodyRectangle();
+        final projectileEntity = new EngineProjectileEntity(new ProjectileEntity({
+            base: {
+                x: Std.int(ownerRect.getCenter().x),
+                y: Std.int(ownerRect.getCenter().y),
+                entityType: EntityType.PROJECTILE_AXE,
+                entityShape: character.actionToPerform.projectileStruct.shape,
+                ownerId: character.getOwnerId(),
+                rotation: character.getRotation(),
+            },
+	        projectile: character.actionToPerform.projectileStruct
+        }));
+        return projectileEntity;
     }
 
     private function oneTenthOfASecondTimer() {
@@ -568,6 +597,12 @@ class SeidhGameEngine extends BaseEngine {
                 }
             }
         }, 100);
+    }
+
+    private function checkWinCondition() {
+        if (winCondition != WinCondition.INFINITE && allowServerLogic && aiManager.allMonstersKilled()) {
+            setGameState(GameState.WIN);
+        }
     }
 
     // ---------------------------------------------------

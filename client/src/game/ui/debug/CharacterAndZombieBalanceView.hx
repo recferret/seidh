@@ -1,10 +1,10 @@
 package game.ui.debug;
 
+import engine.seidh.SeidhConfig;
 #if debug
 import haxe.ui.containers.VBox;
 #end
 
-import engine.base.EngineConfig;
 import engine.base.types.TypesBaseEntity;
 import engine.seidh.entity.CharacterEntityConfig;
 
@@ -60,19 +60,19 @@ class CharacterAndZombieBalanceView extends VBox {
         GameClientConfig.instance.CharacterActionMainDamage = actionMainDamage;
 
         // AI
-        EngineConfig.AI_ENABLED = aiEnabledCheckbox.selected;
-        EngineConfig.AI_MOVEMENT_ENABLED = aiMovementCheckbox.selected;
-        EngineConfig.AI_ACTION_ENABLED = aiActionCheckbox.selected;
+        SeidhConfig.AI_ENABLED = aiEnabledCheckbox.selected;
+        SeidhConfig.AI_MOVEMENT_ENABLED = aiMovementCheckbox.selected;
+        SeidhConfig.AI_ACTION_ENABLED = aiActionCheckbox.selected;
 
-        EngineConfig.MONSTERS_SPAWN_ENABLED = zombieSpawnCheckbox.selected;
+        SeidhConfig.MONSTERS_SPAWN_ENABLED = zombieSpawnCheckbox.selected;
 
         final maxZombies = Std.int(zombiesMaxSlider.pos);
         zombiesMaxLabel.htmlText = 'Max zombies: ' + maxZombies + '/' + zombiesMaxSlider.max;
-        EngineConfig.MONSTERS_MAX = maxZombies;
+        SeidhConfig.MONSTERS_MAX = maxZombies;
 
         final zombiesSpawnDelay = zombiesSpawnDelaySlider.pos;
         zombiesSpawnDelayLabel.htmlText = 'Zombies spawn delay: ' + zombiesSpawnDelay + '/' + zombiesSpawnDelaySlider.max;
-        EngineConfig.MONSTERS_SPAWN_DELAY = zombiesSpawnDelay;
+        SeidhConfig.MONSTERS_SPAWN_DELAY = zombiesSpawnDelay;
 
         final zombieHealth = Std.int(zombieHealthSlider.pos);
         zombieHealthLabel.htmlText = 'Zombie health: ' + zombieHealth + '/' + zombieHealthSlider.max;
@@ -86,8 +86,8 @@ class CharacterAndZombieBalanceView extends VBox {
 
         final zombieDamage = Std.int(zombieDamageSlider.pos);
         zombieDamageLabel.htmlText = 'Zombie damage: ' + zombieDamage + '/' + zombieDamageSlider.max;
-        CharacterEntityConfig.CHARACTERS_CONFIG.zombieBoy.actionMain.damage = zombieDamage;
-        CharacterEntityConfig.CHARACTERS_CONFIG.zombieGirl.actionMain.damage = zombieDamage;
+        CharacterEntityConfig.CHARACTERS_CONFIG.zombieBoy.actionMain.meleeStruct.damage = zombieDamage;
+        CharacterEntityConfig.CHARACTERS_CONFIG.zombieGirl.actionMain.meleeStruct.damage = zombieDamage;
     }
 }
 #end

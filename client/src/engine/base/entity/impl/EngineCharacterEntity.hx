@@ -24,14 +24,6 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	// General
 	// ------------------------------------------------
 
-	private var characterEntity:CharacterEntity;
-	private var maxHealth:Int;
-
-	private var targetObjectEntity:EngineBaseEntity;
-	private var randomizedTargetPos = new Point();
-
-	private var lastDeltaTime:Float;
-
 	public var isAlive = true;
 	public var isCollides = true;
 	public var canMove = false;
@@ -50,6 +42,14 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	public var botForwardLookingLine:Line;
 	
 	private final botAttackRange = 200;
+
+	private var characterEntity:CharacterEntity;
+	private var maxHealth:Int;
+
+	private var targetObjectEntity:EngineBaseEntity;
+	private var randomizedTargetPos = new Point();
+
+	private var lastDeltaTime:Float;
 
 	// ------------------------------------------------
 	// Movement
@@ -82,6 +82,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 	private final action2:CharacterActionStruct;
 	private final action3:CharacterActionStruct;
 	private final actionUltimate:CharacterActionStruct;
+
+	private final hitByProjectiles = new Array<String>();
 
 	// ------------------------------------------------
 	// Callbacks
@@ -315,6 +317,20 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		}
 	}
 
+	// ------------------------------------------------
+	// Combat
+	// ------------------------------------------------
+
+	public function wasHitByProjectile(projectileId:String) {
+		return hitByProjectiles.contains(projectileId);
+	}
+
+	public function hitByProjectile(projectileId:String) {
+		if (!hitByProjectiles.contains(projectileId)) {
+			hitByProjectiles.push(projectileId);
+		}
+	}
+
 	public function addHealth(add:Int) {
 		characterEntity.health += add;
 		if (characterEntity.health > maxHealth) {
@@ -415,8 +431,8 @@ abstract class EngineCharacterEntity extends EngineBaseEntity {
 		characterEntity.actionMain.meleeStruct.shape.height = height;
 		characterEntity.actionMain.meleeStruct.shape.rectOffsetX = offsetX;
 		characterEntity.actionMain.meleeStruct.shape.rectOffsetY = offsetY;
+		characterEntity.actionMain.meleeStruct.damage = damage;
 		characterEntity.actionMain.inputDelay = inputDelay;
-		characterEntity.actionMain.damage = damage;
 	}
 
 	// ------------------------------------------------

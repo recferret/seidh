@@ -1,5 +1,7 @@
 package game.scene.impl.game;
 
+import game.entity.character.ClientCharacterFactory;
+import game.entity.projectile.ClientProjectileEntity;
 import engine.seidh.types.TypesSeidhGame;
 import engine.seidh.types.TypesSeidhGame.GameStage;
 import h3d.Engine;
@@ -49,9 +51,10 @@ class GameScene extends BasicScene implements EventListener {
 	public static final LAYER_CHARACTERS_AND_BOOSTS = 3;
 	public static final LAYER_EFFECTS = 4;
 
+	public static var FxManager:FxManager;
+
 	private var seidhGameEngine:SeidhGameEngine;
 	private var terrainManager:TerrainManager;
-	private var fxManager:FxManager;
 
 	private var gameUiScene:GameUiScene;
 	private var playerEntity:ClientCharacterEntity;
@@ -60,6 +63,8 @@ class GameScene extends BasicScene implements EventListener {
 	
 	private var clientCharacterEntities = new Map<String, ClientCharacterEntity>();
 	private var clientConsumableEntities = new Map<String, ClientConsumableEntity>();
+	private var clientProjectileEntities = new Map<String, ClientProjectileEntity>();
+
 	private var charactersToDelete: Array<String> = [];
 	private var monstersSpawned = 0;
 	private var inputsSent = 0;
@@ -71,8 +76,9 @@ class GameScene extends BasicScene implements EventListener {
 		// Init
 		// -------------------------------------------
 
+		GameScene.FxManager = new FxManager(this);
+
 		terrainManager = new TerrainManager(this);
-		fxManager = new FxManager(this);
 
 		seidhGameEngine = new SeidhGameEngine(engineMode, winCondition);
 		seidhGameEngine.gameId = Player.instance.currentGameId;
@@ -85,7 +91,7 @@ class GameScene extends BasicScene implements EventListener {
 		// -------------------------------------------
 
 		seidhGameEngine.createCharacterCallback = function callback(characterEntity:EngineCharacterEntity) {
-			final character = new ClientCharacterEntity(this, characterEntity);
+			final character = ClientCharacterFactory.InitiateCharacter(this, characterEntity); 
 			clientCharacterEntities.set(character.getId(), character);
 
 			if (character.getOwnerId() == Player.instance.userInfo.userId) {
@@ -105,17 +111,16 @@ class GameScene extends BasicScene implements EventListener {
 		};
 
 		seidhGameEngine.createProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
-			// final projectile = new ClientProjectileEntity(this);
-			// projectile.initiateEngineEntity(projectileEntity);
-			// clientProjectileEntities.set(projectileEntity.getId(), projectile);
+			final projectile = new ClientProjectileEntity(this, projectileEntity);
+			clientProjectileEntities.set(projectileEntity.getId(), projectile);
 		};
 
 		seidhGameEngine.deleteProjectileCallback = function callback(projectileEntity:EngineProjectileEntity) {
-			// final projectile = clientProjectileEntities.get(projectileEntity.getId());
-			// if (projectile != null) {
-			// 	clientProjectileEntities.remove(projectileEntity.getId());
-			// 	removeChild(projectile);
-			// }
+			final projectile = clientProjectileEntities.get(projectileEntity.getId());
+			if (projectile != null) {
+				clientProjectileEntities.remove(projectileEntity.getId());
+				removeChild(projectile);
+			}
 		};
 
 		seidhGameEngine.createConsumableCallback = function callback(consumableEntity:EngineConsumableEntity) {
@@ -146,10 +151,10 @@ class GameScene extends BasicScene implements EventListener {
 					if (consumable.getEntityType() == EntityType.COIN) {
 						final gainings = seidhGameEngine.getPlayerGainings(playerEntity.getOwnerId());
 						gameUiScene.addCoins(gainings.coinsGained);
-						fxManager.coinText(character.x, character.y, 1.5, character.getSide(), consumable.getConsumableAmount());
+						FxManager.coinText(character.x, character.y, 1.5, character.getSide(), consumable.getConsumableAmount());
 					} else {
 						gameUiScene.addHealth();
-						fxManager.healText(character.x, character.y, 2.0, character.getSide(), consumable.getConsumableAmount());
+						FxManager.healText(character.x, character.y, 2.0, character.getSide(), consumable.getConsumableAmount());
 					}
 				}
 			}
@@ -184,11 +189,11 @@ class GameScene extends BasicScene implements EventListener {
 
 					// Play effects
 					if (param.playEffectAnim) {
-						if (param.actionEffect == CharacterActionEffect.ATTACK) {
+						if (param.actionEffect == CharacterActionEffect.MELEE_ATTACK) {
 							switch (clientEntity.getEntityType()) {
 								case RAGNAR_LOH:
 									final fxPosX = clientEntity.getSide() == RIGHT ? clientEntity.x + 50 : clientEntity.x - 50;
-									fxManager.ragnarAttack(fxPosX, clientEntity.y, clientEntity.getSide());
+									FxManager.ragnarAttack(fxPosX, clientEntity.y, clientEntity.getSide());
 									SoundManager.instance.playVikingHit();
 								case ZOMBIE_BOY:
 									SoundManager.instance.playZombieHit();
@@ -197,7 +202,7 @@ class GameScene extends BasicScene implements EventListener {
 								case GLAMR:
 									final fxPosX = clientEntity.getSide() == RIGHT ? clientEntity.x + 170 : clientEntity.x - 170;
 									final fxPosY = clientEntity.y + 30;
-									fxManager.glamrEyeAttack(fxPosX, fxPosY, clientEntity.getSide());
+									FxManager.glamrEyeAttack(fxPosX, fxPosY, clientEntity.getSide());
 								default:
 							}
 						}
@@ -207,14 +212,14 @@ class GameScene extends BasicScene implements EventListener {
 						for (entity in param.hurtEntities) {
 							final clientEntity = clientCharacterEntities.get(entity);
 							if (clientEntity != null) {
-								fxManager.damageText(clientEntity.x, clientEntity.y, 2.0, clientEntity.getSide(), param.damage);
+								FxManager.damageText(clientEntity.x, clientEntity.y, 2.0, clientEntity.getSide(), param.damage);
 							}
 						}
 						for (value in param.deadEntities) {
 							final clientEntity = clientCharacterEntities.get(value);
 							if (clientEntity != null) {
 								clientEntity.fxDeath();
-								fxManager.damageText(clientEntity.x, clientEntity.y, 2.0, clientEntity.getSide(), param.damage);
+								FxManager.damageText(clientEntity.x, clientEntity.y, 2.0, clientEntity.getSide(), param.damage);
 							}
 						}
 					}
@@ -269,40 +274,35 @@ class GameScene extends BasicScene implements EventListener {
 			EventManager.instance.subscribe(EventManager.EVENT_SPAWN_CHARACTER, this);
 			EventManager.instance.subscribe(EventManager.EVENT_SPAWN_CONSUMABLE, this);
 
+			final ragnar = CharacterEntityConfig.CHARACTERS_CONFIG.ragnarBeast;
+
 			createCharacterEntityFromFullStruct({
 				base: {
 					x: Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].x),
 					y: Std.int(seidhGameEngine.getPlayersSpawnPoints()[0].y),
-					entityType: EntityType.RAGNAR_LOH,
-					entityShape: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.entityShape,
+					entityType: ragnar.type,
+					entityShape: ragnar.entityShape,
 					id: Player.instance.currentCharacter.id,
 					ownerId: Player.instance.userInfo.userId,
 				},
 				movement: {
-					canRun: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.movement.canRun,
-					inputDelay: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.movement.inputDelay,
-					runSpeed: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.movement.runSpeed,
-					speedFactor: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.movement.speedFactor,
+					canRun: ragnar.movement.canRun,
+					inputDelay: ragnar.movement.inputDelay,
+					runSpeed: ragnar.movement.runSpeed,
+					speedFactor: ragnar.movement.speedFactor,
 				},
-				health: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.health,
-				actionMain: {
-					actionType: CharacterActionType.ACTION_MAIN,
-					actionEffect: CharacterActionEffect.ATTACK,
-					damage: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.damage,
-					inputDelay: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.inputDelay,
-					performDelayMs: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.performDelayMs,
-					postDelayMs: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.postDelayMs,
-					meleeStruct: {
-						aoe: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.meleeStruct.aoe,
-						shape: {
-							width: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.meleeStruct.shape.width,
-							height: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.meleeStruct.shape.height,
-							rectOffsetX:CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.meleeStruct.shape.rectOffsetX,
-							rectOffsetY: CharacterEntityConfig.CHARACTERS_CONFIG.ragnarLoh.actionMain.meleeStruct.shape.rectOffsetY,
-							radius: 0,
-						},
-					},
-				},
+				health: ragnar.health,
+				actionMain: ragnar.actionMain,				
+				// actionMain: {
+				// 	actionType: CharacterActionType.ACTION_MAIN,
+				// 	actionEffect: CharacterActionEffect.MELEE_ATTACK,
+				// 	damage: ragnar.actionMain.damage,
+				// 	inputDelay: ragnar.actionMain.inputDelay,
+				// 	performDelayMs: ragnar.actionMain.performDelayMs,
+				// 	postDelayMs: ragnar.actionMain.postDelayMs,
+				// 	projectileStruct: ragnar.actionMain.projectileStruct,
+				// 	meleeStruct: ragnar.actionMain.meleeStruct,
+				// },
 			});
 
 			seidhGameEngine.setAllowSpawnMonsters(true);
@@ -529,6 +529,10 @@ class GameScene extends BasicScene implements EventListener {
 			consumable.update(dt, fps);
 		}
 
+		for (projectile in clientProjectileEntities) {
+			projectile.update(dt, fps);
+		}
+
 		if (GameClientConfig.instance.DebugDraw) {
 			for (line in seidhGameEngine.getLineColliders()) {
 				Utils.DrawLine(
@@ -646,7 +650,7 @@ class GameScene extends BasicScene implements EventListener {
 			if (character != null) {
 				clientCharacterEntities.remove(characterId);
 				if (!character.isPlayer()) {
-					fxManager.remains(character.x, character.y, character.getEntityType(), character.getSide());
+					FxManager.remains(character.x, character.y, character.getEntityType(), character.getSide());
 					removeChild(character);
 				}
 			}
@@ -761,24 +765,25 @@ class GameScene extends BasicScene implements EventListener {
 				speedFactor: characterConfig.movement.speedFactor,
 			},
 			health: characterConfig.health,
-			actionMain: {
-				actionType: CharacterActionType.ACTION_MAIN,
-				actionEffect: CharacterActionEffect.ATTACK,
-				damage: characterConfig.actionMain.damage,
-				inputDelay: characterConfig.actionMain.inputDelay,
-				performDelayMs: characterConfig.actionMain.performDelayMs,
-				postDelayMs: characterConfig.actionMain.postDelayMs,
-				meleeStruct: {
-					aoe: characterConfig.actionMain.meleeStruct.aoe,
-					shape: {
-						width: characterConfig.actionMain.meleeStruct.shape.width,
-						height: characterConfig.actionMain.meleeStruct.shape.height,
-						rectOffsetX: characterConfig.actionMain.meleeStruct.shape.rectOffsetX,
-						rectOffsetY: characterConfig.actionMain.meleeStruct.shape.rectOffsetY,
-						radius: 0,
-					},
-				},
-			},
+			actionMain: characterConfig.actionMain,
+			// actionMain: {
+			// 	actionType: CharacterActionType.ACTION_MAIN,
+			// 	actionEffect: CharacterActionEffect.,
+			// 	damage: characterConfig.actionMain.damage,
+			// 	inputDelay: characterConfig.actionMain.inputDelay,
+			// 	performDelayMs: characterConfig.actionMain.performDelayMs,
+			// 	postDelayMs: characterConfig.actionMain.postDelayMs,
+			// 	meleeStruct: {
+			// 		aoe: characterConfig.actionMain.meleeStruct.aoe,
+			// 		shape: {
+			// 			width: characterConfig.actionMain.meleeStruct.shape.width,
+			// 			height: characterConfig.actionMain.meleeStruct.shape.height,
+			// 			rectOffsetX: characterConfig.actionMain.meleeStruct.shape.rectOffsetX,
+			// 			rectOffsetY: characterConfig.actionMain.meleeStruct.shape.rectOffsetY,
+			// 			radius: 0,
+			// 		},
+			// 	},
+			// },
 			action1: characterConfig.action1,
 			action2: characterConfig.action2,
 		});

@@ -8,17 +8,15 @@ import engine.seidh.types.TypesSeidhEntity;
 
 import game.entity.character.animation.CharacterAnimations;
 import game.scene.impl.game.GameScene;
-import game.sound.SoundManager;
 import game.utils.Utils;
 
 import hxd.Math;
 
-class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
+abstract class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 
-    public var animation:CharacterAnimation;
+    public final animation:CharacterAnimation;
 
-    var targetServerPosition = new Point();
-	var BaseGameScene(default, null):Int;
+    final targetServerPosition = new Point();
 
     public function new(s2d:h2d.Scene, engineEntity:EngineCharacterEntity) {
         super();
@@ -30,22 +28,18 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
 
         animation = CharacterAnimations.LoadCharacterAnimation(this, engineEntity.getId(), engineEntity.getEntityType());
         animation.setSide(engineEntity.getSide());
-
-        switch (engineEntity.getEntityType()) {
-            case EntityType.ZOMBIE_BOY:
-                animation.setAnimationState(CharacterAnimationState.SPAWN);
-                adjustRunAnimationSpeed();
-            case EntityType.ZOMBIE_GIRL:
-                animation.setAnimationState(CharacterAnimationState.SPAWN);
-                adjustRunAnimationSpeed();
-            case EntityType.GLAMR:
-                animation.setAnimationState(CharacterAnimationState.SPAWN);
-            default:
-        }
     }
 
     // ------------------------------------------------
     // Abstraction
+    // ------------------------------------------------
+
+    public abstract function fxDeath():Void;
+    public abstract function getRect():Rectangle;
+    public abstract function getBottomRect():Rectangle;
+
+    // ------------------------------------------------
+    // Abstract implemenation
     // ------------------------------------------------
 
     public function update(dt:Float, fps:Float) {
@@ -137,19 +131,6 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
         animation.setRunAnimationSpeed(engineEntity.getMovementSpeedFactor());
     }
 
-    public function fxDeath() {
-        switch (getEntityType()) {
-            case RAGNAR_LOH:
-                SoundManager.instance.playVikingDeath();
-            case ZOMBIE_BOY:
-                SoundManager.instance.playZombieDeath();
-            case ZOMBIE_GIRL:
-                SoundManager.instance.playZombieDeath();
-            default:
-        }
-        animation.setAnimationState(DEATH);
-    }
-
     // ------------------------------------------------
     // Getters
     // ------------------------------------------------
@@ -161,36 +142,6 @@ class ClientCharacterEntity extends BasicClientEntity<EngineCharacterEntity> {
     public function getOwnerId() {
         return engineEntity.getOwnerId();
     }
-
-    public function getRect() {
-        switch (getEntityType()) {
-            case RAGNAR_LOH:
-        		return new Rectangle(x, y, 221, 285, 0);
-            case ZOMBIE_BOY:
-		        return new Rectangle(x, y, 160, 235, 0);
-            case ZOMBIE_GIRL:
-		        return new Rectangle(x, y, 160, 235, 0);
-            case GLAMR:
-                return new Rectangle(x, y, 160, 235, 0);
-            default:
-                return null;
-        }
-	}
-
-    public function getBottomRect() {
-        switch (getEntityType()) {
-            case RAGNAR_LOH:
-        		return new Rectangle(x, y + 215 / 2, 221, 40, 0);
-            case ZOMBIE_BOY:
-		        return new Rectangle(x, y + 190 / 2, 160, 40, 0);
-            case ZOMBIE_GIRL:
-		        return new Rectangle(x, y + 190 / 2, 160, 40, 0);
-            case GLAMR:
-                return new Rectangle(x, y + 190 / 2, 160, 40, 0);
-            default:
-                return null;
-        }
-	}
 
     public function getBodyRectangle() {
 		return engineEntity.getBodyRectangle();

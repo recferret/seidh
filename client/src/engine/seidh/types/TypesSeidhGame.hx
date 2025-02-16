@@ -55,6 +55,7 @@ typedef CharacterDefaultConfig = {
 
 typedef CharacterDefaultConfigs = {
 	ragnarLoh: CharacterDefaultConfig,
+	ragnarBeast: CharacterDefaultConfig,
 	zombieBoy: CharacterDefaultConfig,
 	zombieGirl: CharacterDefaultConfig,
 	glamr: CharacterDefaultConfig,

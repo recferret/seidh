@@ -14,6 +14,14 @@ class EngineBaseEntityManager {
 		entities.clear();
 	}
 
+	public function getEntities() {
+		final result = new Array<EngineBaseEntity>();
+		entities.forEach((value, key, map) -> {
+			result.push(value);
+		});
+		return result;
+	}
+
 	public function getChangedEntities() {
 		final result = new Array<EngineBaseEntity>();
 		entities.forEach((value, key, map) -> {

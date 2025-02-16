@@ -2,7 +2,6 @@ package engine.seidh.entity.base;
 
 import haxe.Int32;
 
-import engine.base.EngineConfig;
 import engine.base.MathUtils;
 import engine.base.Utils.EngineUtils;
 import engine.base.entity.impl.EngineCharacterEntity;
@@ -61,7 +60,7 @@ abstract class SeidhCharacterEntity extends EngineCharacterEntity {
 		if (hasTargetObject() && !isPlayer() && canChangeState) {
 			if (ifTargetInAttackRange()) {
 				performMoveNextUpdate = false;
-				if (EngineConfig.AI_ACTION_ENABLED && canChangeState) {
+				if (SeidhConfig.AI_ACTION_ENABLED && canChangeState) {
 					if (checkLocalActionInput(CharacterActionType.ACTION_MAIN)) {
 						canChangeState = false;
 						setNextActionToPerform(CharacterActionType.ACTION_MAIN);
@@ -74,7 +73,7 @@ abstract class SeidhCharacterEntity extends EngineCharacterEntity {
 	}
 
 	public function aiApplyAction1() {
-		if (EngineConfig.AI_ACTION_ENABLED && actionState == CharacterActionState.READY) {
+		if (SeidhConfig.AI_ACTION_ENABLED && actionState == CharacterActionState.READY) {
 			if (checkLocalActionInput(CharacterActionType.ACTION_1)) {
 				setNextActionToPerform(CharacterActionType.ACTION_1);
 			}
@@ -82,7 +81,7 @@ abstract class SeidhCharacterEntity extends EngineCharacterEntity {
 	}
 
 	public function aiApplyAction2() {
-		if (EngineConfig.AI_ACTION_ENABLED && actionState == CharacterActionState.READY) {
+		if (SeidhConfig.AI_ACTION_ENABLED && actionState == CharacterActionState.READY) {
 			if (checkLocalActionInput(CharacterActionType.ACTION_2)) {
 				setNextActionToPerform(CharacterActionType.ACTION_2);
 			}

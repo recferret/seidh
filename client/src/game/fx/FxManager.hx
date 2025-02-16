@@ -41,4 +41,8 @@ class FxManager {
         fxPool.addRemains(x, y, entityType, side);
     }
 
+    public function bloodTrail(x:Float, y:Float) {
+        fxPool.addBloodTrail(x, y);
+    }
+
 }

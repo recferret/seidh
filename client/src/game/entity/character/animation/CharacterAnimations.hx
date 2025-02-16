@@ -202,9 +202,10 @@ class CharacterAnimation {
 
 class CharacterAnimations {
 
-    public static function LoadCharacterAnimation(parent:h2d.Object, characterId:String, entrityType:EntityType) {
+    public static function LoadCharacterAnimation(parent:h2d.Object, characterId:String, entityType:EntityType) {
         final animation = new CharacterAnimation(parent, characterId);
 
+        // TODO move to some constants or what?
         var th = 332;
         var tw = 332;
 
@@ -216,12 +217,17 @@ class CharacterAnimations {
         var action1Tile:h2d.Tile = null;
         var action2Tile:h2d.Tile = null;
 
-        switch (entrityType) {
+        switch (entityType) {
             case EntityType.RAGNAR_LOH:
-                idleTile = Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE);
-                runTile = Res.instance.getTileResource(SeidhResource.RAGNAR_RUN);
-                deathTile = Res.instance.getTileResource(SeidhResource.RAGNAR_DEATH);
-                actionMainTile = Res.instance.getTileResource(SeidhResource.RAGNAR_ATTACK);
+                idleTile = Res.instance.getTileResource(SeidhResource.RAGNAR_LOH_IDLE);
+                runTile = Res.instance.getTileResource(SeidhResource.RAGNAR_LOH_RUN);
+                deathTile = Res.instance.getTileResource(SeidhResource.RAGNAR_LOH_DEATH);
+                actionMainTile = Res.instance.getTileResource(SeidhResource.RAGNAR_LOH_ATTACK);
+            case EntityType.RAGNAR_BEAST:
+                idleTile = Res.instance.getTileResource(SeidhResource.RAGNAR_BEAST_IDLE);
+                runTile = Res.instance.getTileResource(SeidhResource.RAGNAR_BEAST_RUN);
+                deathTile = Res.instance.getTileResource(SeidhResource.RAGNAR_BEAST_DEATH);
+                actionMainTile = Res.instance.getTileResource(SeidhResource.RAGNAR_BEAST_ATTACK);
             case EntityType.ZOMBIE_BOY:
                 idleTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_IDLE);
                 runTile = Res.instance.getTileResource(SeidhResource.ZOMBIE_BOY_RUN);
@@ -250,7 +256,7 @@ class CharacterAnimations {
         final idleTiles = [];
         for(x in 0 ... Std.int(idleTile.width / tw)) {
             final tile = idleTile.sub(x * tw, 0, tw, th).center();
-            if (entrityType == EntityType.RAGNAR_LOH) {
+            if (entityType == EntityType.RAGNAR_LOH) {
                 tile.dx += 30;
             }
             idleTiles.push(tile);

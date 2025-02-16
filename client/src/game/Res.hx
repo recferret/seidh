@@ -1,5 +1,6 @@
 package game;
 
+import engine.base.types.TypesBaseEntity.EntityType;
 import hxd.net.BinaryLoader;
 
 enum SeidhResource {
@@ -25,10 +26,15 @@ enum SeidhResource {
     // RAGNAR
     // ------------------------------------
     
-    RAGNAR_IDLE;
-    RAGNAR_RUN;
-    RAGNAR_ATTACK;
-    RAGNAR_DEATH;
+    RAGNAR_LOH_IDLE;
+    RAGNAR_LOH_RUN;
+    RAGNAR_LOH_ATTACK;
+    RAGNAR_LOH_DEATH;
+
+    RAGNAR_BEAST_IDLE;
+    RAGNAR_BEAST_RUN;
+    RAGNAR_BEAST_ATTACK;
+    RAGNAR_BEAST_DEATH;
 
     // ------------------------------------
     // SOUND
@@ -212,10 +218,15 @@ class Res {
         // RAGNAR
         // ------------------------------------
             
-        tileResMap.set(RAGNAR_IDLE, hxd.Res.ragnar.RAGNAR_IDLE.toTile().center());
-        tileResMap.set(RAGNAR_RUN, hxd.Res.ragnar.RAGNAR_RUN.toTile().center());
-        tileResMap.set(RAGNAR_ATTACK, hxd.Res.ragnar.RAGNAR_ATTACK.toTile().center());
-        tileResMap.set(RAGNAR_DEATH, hxd.Res.ragnar.RAGNAR_DEATH.toTile().center());
+        tileResMap.set(RAGNAR_LOH_IDLE, hxd.Res.ragnar.loh.RAGNAR_IDLE.toTile().center());
+        tileResMap.set(RAGNAR_LOH_RUN, hxd.Res.ragnar.loh.RAGNAR_RUN.toTile().center());
+        tileResMap.set(RAGNAR_LOH_ATTACK, hxd.Res.ragnar.loh.RAGNAR_ATTACK.toTile().center());
+        tileResMap.set(RAGNAR_LOH_DEATH, hxd.Res.ragnar.loh.RAGNAR_DEATH.toTile().center());
+
+        tileResMap.set(RAGNAR_BEAST_IDLE, hxd.Res.ragnar.beast.RAGNAR_IDLE.toTile().center());
+        tileResMap.set(RAGNAR_BEAST_RUN, hxd.Res.ragnar.beast.RAGNAR_RUN.toTile().center());
+        tileResMap.set(RAGNAR_BEAST_ATTACK, hxd.Res.ragnar.beast.RAGNAR_ATTACK.toTile().center());
+        tileResMap.set(RAGNAR_BEAST_DEATH, hxd.Res.ragnar.beast.RAGNAR_DEATH.toTile().center());
 
         // ------------------------------------
         // SOUND
@@ -433,5 +444,22 @@ class Res {
         } else {
             return tileResMap.get(seidhResource).clone();
         }
+    }
+
+    public function getCharacterAnimationFrame(frame: Int, seidhResource:SeidhResource) {
+        final animationTile = Res.instance.getTileResource(seidhResource);
+        final th = 332;
+        final tw = 332;
+
+        final tiles = [];
+        for(x in 0 ... Std.int(animationTile.width / tw)) {
+            final tile = animationTile.sub(x * tw, 0, tw, th).center();
+            if (seidhResource == RAGNAR_LOH_IDLE) {
+                tile.dx += 30;
+            }
+            tiles.push(tile);
+        }
+        
+        return tiles[frame];
     }
 }

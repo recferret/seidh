@@ -1,9 +1,10 @@
-package engine.seidh;
+package engine.seidh.ai;
 
 import engine.base.EngineConfig;
 import engine.base.MathUtils;
 import engine.base.geometry.Point;
 import engine.base.types.TypesBaseEntity;
+
 import engine.seidh.types.TypesSeidhGame;
 
 typedef SpawnMonster = {
@@ -22,12 +23,12 @@ class AiManager {
     private var allowSpawnBoss = false;
     private var bossSpawned = false;
     private var bossKilled = false;
-    private var monstersMax = EngineConfig.MONSTERS_MAX;
-    private var monstersLeft = EngineConfig.MONSTERS_MAX;
+    private var monstersMax = SeidhConfig.MONSTERS_MAX;
+    private var monstersLeft = SeidhConfig.MONSTERS_MAX;
 
     private var monstersSpawned = 0;
     private var monstersLastSpawnTime = 0.0;
-    private var monstersSpawnDelayMs = EngineConfig.MONSTERS_SPAWN_DELAY;
+    private var monstersSpawnDelayMs = SeidhConfig.MONSTERS_SPAWN_DELAY;
     private var bossSpawnDelay = 3;
     private var bossSpawnStartCount = 0;
     private var secondsPassed = 0;
@@ -57,9 +58,9 @@ class AiManager {
     }
 
     public function secondPassed() {
-        monstersMax = EngineConfig.MONSTERS_MAX;
-        monstersSpawnDelayMs = EngineConfig.MONSTERS_SPAWN_DELAY;
-        allowSpawnMonsters = EngineConfig.MONSTERS_SPAWN_ENABLED;
+        monstersMax = SeidhConfig.MONSTERS_MAX;
+        monstersSpawnDelayMs = SeidhConfig.MONSTERS_SPAWN_DELAY;
+        allowSpawnMonsters = SeidhConfig.MONSTERS_SPAWN_ENABLED;
 
         secondsPassed++;
 

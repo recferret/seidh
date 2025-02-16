@@ -1,5 +1,6 @@
 package game.scene.impl;
 
+import game.entity.character.ClientCharacterFactory;
 import h3d.Engine;
 import hxd.Key in K;
 
@@ -31,7 +32,7 @@ class MapSceneTest extends BasicScene {
 		var zombieX = 2500;
 		var zombieY = 1550;
 
-		characters.push(new ClientCharacterEntity(this, SeidhEntityFactory.InitiateCharacter({
+		characters.push(ClientCharacterFactory.InitiateCharacter(this, SeidhEntityFactory.InitiateCharacter({
 			x: zombieX,
 			y: zombieY,
 			entityType: EntityType.RAGNAR_LOH,

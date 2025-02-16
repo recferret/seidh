@@ -1,5 +1,6 @@
 package game.fx;
 
+import game.tilemap.TilemapManager;
 import motion.Actuate;
 
 import engine.base.MathUtils;
@@ -34,11 +35,16 @@ class FxPool {
     private var zombieBoyRemainsNextIndex = 0;
     private var zombieGirlRemainsNextIndex = 0;
 
+    private final bloodTrailObjectsTotal = 300;
+    private var bloodTrailObjectsNextIndex = 0;
+
     private var ragnarGroundAttackObjects = new Array<h2d.Object>();
     private var floatingTweenTextObjects = new Array<h2d.Object>();
     private var zombieBloodObjects1 = new Array<h2d.Object>();
     private var zombieBloodObjects2 = new Array<h2d.Object>();
     private var glamrEyeExplosionObjects = new Array<h2d.Object>();
+
+    private var bloodTrailObjects = new Array<h2d.Object>();
 
     public function new(s2d:h2d.Scene) {
         final impactTile = Res.instance.getTileResource(SeidhResource.FX_IMPACT);
@@ -87,6 +93,14 @@ class FxPool {
             object.alpha = 0;
             s2d.addChildAt(object, 99);
             zombieBloodObjects2.push(object);
+        }
+
+        for (i in 0...bloodTrailObjectsTotal) {
+            final rnd = MathUtils.randomIntInRange(1, 2);
+            final object = new h2d.Bitmap(TilemapManager.instance.getTile(rnd == 1 ? TileType.BLOOD_1 : TileType.BLOOD_2));
+            object.alpha = 0;
+            s2d.addChildAt(object, 99);
+            bloodTrailObjects.push(object);
         }
 	}
 
@@ -167,6 +181,16 @@ class FxPool {
         }
     }
 
+    public function addBloodTrail(x:Float, y:Float) {
+        if (bloodTrailObjectsNextIndex + 1 == bloodTrailObjectsTotal) {
+            bloodTrailObjectsNextIndex = 0;
+        }
+
+        final bloodTrail = cast (bloodTrailObjects[bloodTrailObjectsNextIndex++], h2d.Bitmap);
+        bloodTrail.alpha = 1;
+        bloodTrail.setPosition(x, y);
+    }
+
     public function dispose() {
         for (value in ragnarGroundAttackObjects) {
             s2d.removeChild(value);
@@ -183,12 +207,16 @@ class FxPool {
         for (value in glamrEyeExplosionObjects) {
             s2d.removeChild(value);
         }
+        for (value in bloodTrailObjects) {
+            s2d.removeChild(value);
+        }
 
         ragnarGroundAttackObjects = [];
         floatingTweenTextObjects = [];
         zombieBloodObjects1 = [];
         zombieBloodObjects2 = [];
         glamrEyeExplosionObjects = [];
+        bloodTrailObjects = [];
     }
 
 }

@@ -3,89 +3,108 @@ package game.tilemap;
 import game.Res.SeidhResource;
 import hxd.res.TiledMap.TiledMapData;
 
-enum abstract TileType(Int) {
+enum abstract TileType(String) {
 
     // ---------------------------
     // Consumables
     // ---------------------------
 
-	var POTION_RED = 1;
-	var POTION_GREEN = 2;
-	var POTION_BLUE = 3;
-    var POTION_YELLOW = 4;
+	var POTION_RED = 'POTION_RED';
+	var POTION_GREEN = 'POTION_GREEN';
+	var POTION_BLUE = 'POTION_BLUE';
+    var POTION_YELLOW = 'POTION_YELLOW';
 
-    var COIN = 5;
-    var SALMON = 6;
-    var SWORD = 7;
+    var COIN = 'COIN';
+    var SALMON = 'SALMON';
+    var SWORD = 'SWORD';
 
     // ---------------------------
     // Runes
     // ---------------------------
 
-    var RUNE_TYPE_ANY_LVL_1 = 8;
+    var RUNE_TYPE_ANY_LVL_1 = 'RUNE_TYPE_ANY_LVL_1';
 
-    var RUNE_TYPE_1_LVL_2 = 9;
-    var RUNE_TYPE_1_LVL_3 = 10;
+    var RUNE_TYPE_1_LVL_2 = 'RUNE_TYPE_1_LVL_2';
+    var RUNE_TYPE_1_LVL_3 = 'RUNE_TYPE_1_LVL_3';
 
-    var RUNE_TYPE_2_LVL_2 = 11;
-    var RUNE_TYPE_2_LVL_3 = 12;
+    var RUNE_TYPE_2_LVL_2 = 'RUNE_TYPE_2_LVL_2';
+    var RUNE_TYPE_2_LVL_3 = 'RUNE_TYPE_2_LVL_3';
 
-    var RUNE_TYPE_3_LVL_2 = 13;
-    var RUNE_TYPE_3_LVL_3 = 14;
+    var RUNE_TYPE_3_LVL_2 = 'RUNE_TYPE_3_LVL_2';
+    var RUNE_TYPE_3_LVL_3 = 'RUNE_TYPE_3_LVL_3';
 
-    var RUNE_TYPE_4_LVL_2 = 15;
-    var RUNE_TYPE_4_LVL_3 = 16;
+    var RUNE_TYPE_4_LVL_2 = 'RUNE_TYPE_4_LVL_2';
+    var RUNE_TYPE_4_LVL_3 = 'RUNE_TYPE_4_LVL_3';
 
-    var RUNE_TYPE_5_LVL_2 = 17;
-    var RUNE_TYPE_5_LVL_3 = 18;
+    var RUNE_TYPE_5_LVL_2 = 'RUNE_TYPE_5_LVL_2';
+    var RUNE_TYPE_5_LVL_3 = 'RUNE_TYPE_5_LVL_3';
 
-    var RUNE_TYPE_6_LVL_2 = 19;
-    var RUNE_TYPE_6_LVL_3 = 20;
+    var RUNE_TYPE_6_LVL_2 = 'RUNE_TYPE_6_LVL_2';
+    var RUNE_TYPE_6_LVL_3 = 'RUNE_TYPE_6_LVL_3';
 
     // ---------------------------
     // Scrolls
     // ---------------------------
 
-    var SCROLL_TYPE_ANY_LVL_1 = 21;
+    var SCROLL_TYPE_ANY_LVL_1 = 'SCROLL_TYPE_ANY_LVL_1';
 
-    var SCROLL_TYPE_1_LVL_2 = 22;
-    var SCROLL_TYPE_1_LVL_3 = 23;
+    var SCROLL_TYPE_1_LVL_2 = 'SCROLL_TYPE_1_LVL_2';
+    var SCROLL_TYPE_1_LVL_3 = 'SCROLL_TYPE_1_LVL_3';
 
-    var SCROLL_TYPE_2_LVL_2 = 24;
-    var SCROLL_TYPE_2_LVL_3 = 25;
+    var SCROLL_TYPE_2_LVL_2 = 'SCROLL_TYPE_2_LVL_2';
+    var SCROLL_TYPE_2_LVL_3 = 'SCROLL_TYPE_2_LVL_3';
 
-    var SCROLL_TYPE_3_LVL_2 = 26;
-    var SCROLL_TYPE_3_LVL_3 = 27;
+    var SCROLL_TYPE_3_LVL_2 = 'SCROLL_TYPE_3_LVL_2';
+    var SCROLL_TYPE_3_LVL_3 = 'SCROLL_TYPE_3_LVL_3';
 
     // ---------------------------
     // Artifacts
     // ---------------------------
 
-    var ARTIFACT_1 = 28;
+    var ARTIFACT_1 = 'ARTIFACT_1';
 
     // ---------------------------
     // Icons
     // ---------------------------
 
-    var ICON_BOOST_BLACK = 29;
-    var ICON_SKILL_BACKGROUND = 30;
-    var ICON_CLOSE = 31;
-    var ICON_SCROLL = 32;
-    var ICON_BOOST_BROWN = 33;
+    var ICON_BOOST_BLACK = 'ICON_BOOST_BLACK';
+    var ICON_SKILL_BACKGROUND = 'ICON_SKILL_BACKGROUND';
+    var ICON_CLOSE = 'ICON_CLOSE';
+    var ICON_SCROLL = 'ICON_SCROLL';
+    var ICON_BOOST_BROWN = 'ICON_BOOST_BROWN';
 
     // ---------------------------
     // Skills
     // ---------------------------
 
-    var SKILL_ACTION_MAIN = 34;
+    var SKILL_ACTION_MAIN = 'SKILL_ACTION_MAIN';
 
     // ---------------------------
     // Wealth
     // ---------------------------
 
-    var WEALTH_COINS = 35;
-    var WEALTH_TEETH = 36;
-    var WEALTH_FRIENDS = 37;
+    var WEALTH_COINS = 'WEALTH_COINS';
+    var WEALTH_TEETH = 'WEALTH_TEETH';
+    var WEALTH_FRIENDS = 'WEALTH_FRIENDS';
+
+    // ---------------------------
+    // Projectiles
+    // ---------------------------
+
+    var PROJECTILE_AXE = 'PROJECTILE_AXE';
+    var PROJECTILE_AXE_BLOODED = 'PROJECTILE_AXE_BLOODED';
+    var PROJECTILE_SWORD = 'PROJECTILE_SWORD';
+    var PROJECTILE_SWORD_BLOODED = 'PROJECTILE_SWORD_BLOODED';
+
+    // ---------------------------
+    // Projectiles
+    // ---------------------------
+
+    var BLOOD_1 = 'BLOOD_1';
+    var BLOOD_2 = 'BLOOD_2';
+    var BLOOD_3 = 'BLOOD_3';
+    var BLOOD_4 = 'BLOOD_4';
+    var BLOOD_5 = 'BLOOD_5';
 }
 
 class TilemapManager {
@@ -156,6 +175,19 @@ class TilemapManager {
             tilesMap.set(TileType.WEALTH_COINS, stuffTilemapTile.sub(1 * tw, 6 * th, tw, th).center());
             tilesMap.set(TileType.WEALTH_TEETH, stuffTilemapTile.sub(2 * tw, 6 * th, tw, th).center());
             tilesMap.set(TileType.WEALTH_FRIENDS, stuffTilemapTile.sub(3 * tw, 6 * th, tw, th).center());
+
+            // Projectile
+            tilesMap.set(TileType.PROJECTILE_AXE, stuffTilemapTile.sub(1 * tw, 7 * th, tw, th).center());
+            tilesMap.set(TileType.PROJECTILE_AXE_BLOODED, stuffTilemapTile.sub(2 * tw, 7 * th, tw, th).center());
+            tilesMap.set(TileType.PROJECTILE_SWORD, stuffTilemapTile.sub(3 * tw, 7 * th, tw, th).center());
+            tilesMap.set(TileType.PROJECTILE_SWORD_BLOODED, stuffTilemapTile.sub(4 * tw, 7 * th, tw, th).center());
+
+            // Blood
+            tilesMap.set(TileType.BLOOD_1, stuffTilemapTile.sub(1 * tw, 8 * th, tw, th).center());
+            tilesMap.set(TileType.BLOOD_2, stuffTilemapTile.sub(2 * tw, 8 * th, tw, th).center());
+            tilesMap.set(TileType.BLOOD_3, stuffTilemapTile.sub(3 * tw, 8 * th, tw, th).center());
+            tilesMap.set(TileType.BLOOD_4, stuffTilemapTile.sub(4 * tw, 8 * th, tw, th).center());
+            tilesMap.set(TileType.BLOOD_5, stuffTilemapTile.sub(5 * tw, 8 * th, tw, th).center());
 
             initiated = true;
         }

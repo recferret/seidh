@@ -76,7 +76,7 @@ abstract class EngineBaseEntity {
 	}
 
 	public function isPlayer() {
-		return baseEntity.entityType == EntityType.RAGNAR_LOH;
+		return baseEntity.entityType == EntityType.RAGNAR_LOH || baseEntity.entityType == EntityType.RAGNAR_BEAST;
 	}
 
 	public function isMonster() {
@@ -84,7 +84,7 @@ abstract class EngineBaseEntity {
 	}
 
 	public function isBoss() {
-		return return baseEntity.entityType == EntityType.GLAMR;
+		return baseEntity.entityType == EntityType.GLAMR;
 	}
 
     // ------------------------------------------------

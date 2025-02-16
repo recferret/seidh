@@ -85,7 +85,7 @@ class PlayContent extends BasicHomeContent {
         // Ragnars
         // ------------------------------------
 
-        ragnarBaseTile = Res.instance.getTileResource(SeidhResource.RAGNAR_IDLE);
+        ragnarBaseTile = Res.instance.getCharacterAnimationFrame(0, SeidhResource.RAGNAR_LOH_IDLE);
 
         var th = 332;
         var tw = 332;

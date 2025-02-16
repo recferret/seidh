@@ -3,6 +3,7 @@ package engine.seidh.entity.factory;
 import engine.base.entity.impl.EngineConsumableEntity;
 import engine.base.types.TypesBaseEntity;
 import engine.seidh.entity.impl.GlamrEntity;
+import engine.seidh.entity.impl.RagnarBeastEntity;
 import engine.seidh.entity.impl.RagnarLohEntity;
 import engine.seidh.entity.impl.ZombieBoyEntity;
 import engine.seidh.entity.impl.ZombieGirlEntity;
@@ -15,6 +16,8 @@ class SeidhEntityFactory {
         switch (struct.entityType) {
             case RAGNAR_LOH:
                 entity = new RagnarLohEntity(RagnarLohEntity.GenerateObjectEntity(struct));
+            case RAGNAR_BEAST:
+                entity = new RagnarBeastEntity(RagnarBeastEntity.GenerateObjectEntity(struct));
             case ZOMBIE_BOY:
                 entity = new ZombieBoyEntity(ZombieBoyEntity.GenerateObjectEntity(struct));
             case ZOMBIE_GIRL:
@@ -31,6 +34,8 @@ class SeidhEntityFactory {
         switch (struct.base.entityType) {
             case RAGNAR_LOH:
                 entity = new RagnarLohEntity(new CharacterEntity(struct));
+            case RAGNAR_BEAST:
+                entity = new RagnarBeastEntity(new CharacterEntity(struct));
             case ZOMBIE_BOY:
                 entity = new ZombieBoyEntity(new CharacterEntity(struct));
             case ZOMBIE_GIRL:
