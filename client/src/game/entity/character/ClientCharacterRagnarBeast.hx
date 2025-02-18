@@ -1,5 +1,6 @@
 package game.entity.character;
 
+import game.Res.SeidhResource;
 import game.tilemap.TilemapManager;
 import engine.base.types.TypesBaseEntity.Side;
 import engine.base.entity.impl.EngineCharacterEntity;
@@ -15,16 +16,16 @@ class ClientCharacterRagnarBeast extends ClientCharacterEntity {
     public function new(s2d:h2d.Scene, engineEntity:EngineCharacterEntity) {
         super(s2d, engineEntity);
 
-        // final bloodTrailAnimation = new h2d.Anim(this);
-        // bloodTrailAnimation.setScale(1.3);
-        // final animationToPlay = new Array<h2d.Tile>();
-
-        // animationToPlay.push(TilemapManager.instance.getTile(TileType.BLOOD_3));
-        // animationToPlay.push(TilemapManager.instance.getTile(TileType.BLOOD_4));
-        // animationToPlay.push(TilemapManager.instance.getTile(TileType.BLOOD_5));
-
-        // bloodTrailAnimation.play(animationToPlay);
-        // bloodTrailAnimation.setPosition(0, 120);
+        // TODO reuse this
+        final bloodDropTile = Res.instance.getTileResource(SeidhResource.FX_BLOOD_DROP_1);
+        final bloodDropTiles = [];
+        for(x in 0 ... Std.int(bloodDropTile.width / 183)) {
+            final tile = bloodDropTile.sub(x * 183, 0, 183, 183).center();
+            bloodDropTiles.push(tile);
+        }
+        final bloodDropAnimation = new h2d.Anim(bloodDropTiles, this);
+        bloodDropAnimation.setScale(1.3);
+        bloodDropAnimation.setPosition(0, 140);
 
         function fxDelay() {
             haxe.Timer.delay(function delay() {
@@ -65,7 +66,5 @@ class ClientCharacterRagnarBeast extends ClientCharacterEntity {
 
     public override function update(dt:Float, fps:Float) {
         super.update(dt, fps);
-
- 
     }
 }

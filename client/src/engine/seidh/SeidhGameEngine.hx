@@ -130,6 +130,23 @@ class SeidhGameEngine extends BaseEngine {
             sendCharacterActionCallbacks(params);
         });
 
+        characterUpdate.setSummonCallback(function callback(params:SummonCallbackParams) {
+            final glamr_ = characterEntityManager.getEntityById(params.characterId);
+            final glamr = cast(glamr_, GlamrEntity);
+            final monsters = aiManager.spawnMonstersAroundPoint(glamr.getX(), glamr.getY(), glamr.monstersToSpawn);
+
+            for (monster in monsters) {
+                addToCharacterCreateQueue(SeidhEntityFactory.InitiateCharacter(
+                    {
+                        x: monster.positionX,
+                        y: monster.positionY,
+                        entityType: monster.entityType,
+                    }
+                ));
+                glamr.monsterSpawned();
+            }
+        });
+
         characterUpdate.setCreateProjectileCallback(function callback(params:CreateProjectileCallbackParams) {
             final character_ = characterEntityManager.getEntityById(params.characterId);
             final character = cast(character_, EngineCharacterEntity);
@@ -138,8 +155,11 @@ class SeidhGameEngine extends BaseEngine {
         });
 
         characterUpdate.setPlayerKilledCallback(function callback(params:CharacterKilledCallbackParams) {
-            if (params.characterId == localPlayerId) {
-                setGameState(GameState.LOSE);
+            // HACK ?
+            if (params.ownerId == localPlayerId) {
+                haxe.Timer.delay(function delay() {
+                    setGameState(GameState.LOSE);
+                }, 150);
             }
 
             addToCharacterDeleteQueue(params.characterId);
@@ -228,10 +248,10 @@ class SeidhGameEngine extends BaseEngine {
             for (e in projectileEntityManager.entities) {
                 final projectile = cast(e, EngineProjectileEntity);
 
-                if (projectile.allowMovement) {
-                    projectile.update(dt);
-                } else {
+                if (projectile.state == 'DISAPPEARED') {
                     addToProjectileDeleteQueue(projectile.getId());
+                } else {
+                    projectile.update(dt);
                 }
             }
 

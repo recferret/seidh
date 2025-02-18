@@ -67,18 +67,18 @@ class CharacterEntityConfig {
                     aoe: false,
                     damage: 10,
                     penetrating: true,
-                    speed: 700,
-                    travelDistance: 700,
+                    speed: 900,
+                    travelDistance: 400,
                     shape: {
-                        width: 50,
-                        height: 50,
+                        width: 100,
+                        height: 100,
                         rectOffsetX: 0,
                         rectOffsetY: 0,
                         radius: 0,
                     },
                 },
             },
-            health: 150,
+            health: 100,
         },
 
         zombieBoy: {

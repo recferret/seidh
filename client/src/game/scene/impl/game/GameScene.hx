@@ -410,9 +410,36 @@ class GameScene extends BasicScene implements EventListener {
 	}
 
 	public function absRender(e:Engine) {
-		for (character in clientCharacterEntities) {
-			if (GameClientConfig.instance.DebugDraw) {
-				character.debugDraw(debugGraphics);
+		if (GameClientConfig.instance.DebugDraw) {
+			for (line in seidhGameEngine.getLineColliders()) {
+				Utils.DrawLine(
+					debugGraphics,
+					line.x1,
+					line.y1,
+					line.x2,
+					line.y2, 
+					GameClientConfig.RedColor
+				);
+			}
+
+			for (entity in clientCharacterEntities) {
+				entity.debugDraw(debugGraphics);
+			}
+
+			for (entity in clientProjectileEntities) {
+				entity.debugDraw(debugGraphics);
+			}
+
+			for (entity in clientConsumableEntities) {
+				entity.debugDraw(debugGraphics);
+			}
+
+			for (spawnPoint in seidhGameEngine.getMonstersSpawnPoints()) {
+				Utils.DrawRectFilled(
+					debugGraphics,
+					new Rectangle(spawnPoint.x, spawnPoint.y, 50, 50, 0),
+					GameClientConfig.RedColor
+				);
 			}
 		}
 	}
@@ -531,34 +558,6 @@ class GameScene extends BasicScene implements EventListener {
 
 		for (projectile in clientProjectileEntities) {
 			projectile.update(dt, fps);
-		}
-
-		if (GameClientConfig.instance.DebugDraw) {
-			for (line in seidhGameEngine.getLineColliders()) {
-				Utils.DrawLine(
-					debugGraphics,
-					line.x1,
-					line.y1,
-					line.x2,
-					line.y2, 
-					GameClientConfig.RedColor
-				);
-			}
-
-			for (character in clientCharacterEntities) {
-			}
-
-			for (consumable in clientConsumableEntities) {
-				consumable.debugDraw(debugGraphics);
-			}
-
-			for (spawnPoint in seidhGameEngine.getMonstersSpawnPoints()) {
-				Utils.DrawRectFilled(
-					debugGraphics,
-					new Rectangle(spawnPoint.x, spawnPoint.y, 50, 50, 0),
-					GameClientConfig.RedColor
-				);
-			}
 		}
 
 		if (!DeviceInfo.IsMobile) {

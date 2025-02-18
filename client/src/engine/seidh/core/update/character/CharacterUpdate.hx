@@ -1,5 +1,6 @@
 package engine.seidh.core.update.character;
 
+import engine.base.types.TypesBaseEntity.EntityType;
 import engine.base.types.TypesBaseEntity.CharacterActionType;
 import engine.base.entity.impl.EngineProjectileEntity;
 import engine.base.entity.impl.EngineConsumableEntity;
@@ -21,8 +22,13 @@ typedef CreateProjectileCallbackParams = {
 
 typedef CharacterKilledCallbackParams = {
     characterId:String,
+    ownerId:String,
     killerCharacterId:String,
     killerOwnerId:String,
+};
+
+typedef SummonCallbackParams = {
+    characterId:String,
 };
 
 class CharacterUpdate extends BasicUpdate {
@@ -40,6 +46,7 @@ class CharacterUpdate extends BasicUpdate {
     private var playerKilledCallback:CharacterKilledCallbackParams->Void;
     private var monsterKilledCallback:CharacterKilledCallbackParams->Void;
     private var bossKilledCallback:CharacterKilledCallbackParams->Void;
+    private var summonCallback:SummonCallbackParams->Void;
 
     private var actionCallbacksDuringTick = new Array<CharacterActionCallbackParams>();
     private var pickedUpConsumablesDuringTick = new Array<PickedUpConsumable>();
@@ -76,6 +83,10 @@ class CharacterUpdate extends BasicUpdate {
 
     public function setBossKilledCallback(bossKilledCallback:CharacterKilledCallbackParams->Void) {
         this.bossKilledCallback = bossKilledCallback;
+    }
+
+    public function setSummonCallback(summonCallback:SummonCallbackParams->Void) {
+        this.summonCallback = summonCallback;
     }
 
     // ------------------------------------
@@ -171,14 +182,10 @@ class CharacterUpdate extends BasicUpdate {
                 playEffectAnim: false,
             };
 
-            if (character.actionToPerform.actionEffect == CharacterActionEffect.MELEE_ATTACK ||
-                character.actionToPerform.actionEffect == CharacterActionEffect.RANGE_ATTACK) {
-
-                if (character.actionToPerform.performDelayMs == 0) {
-                    instantAction(character, callbackParams);
-                } else {
-                    delayedAction(character, callbackParams);
-                }
+            if (character.actionToPerform.performDelayMs == 0) {
+                instantAction(character, callbackParams);
+            } else {
+                delayedAction(character, callbackParams);
             }
         }
 
@@ -215,7 +222,10 @@ class CharacterUpdate extends BasicUpdate {
             callbackParams.damage = damage;
             callbackParams.hurtEntities = hurtEntities;
             callbackParams.deadEntities = deadEntities;
-        }
+
+            character.actionToPerform = null;
+            actionCallbacksDuringTick.push(callbackParams);
+        } else
 
         if (character.actionToPerform.actionEffect == CharacterActionEffect.RANGE_ATTACK) {
             if (createProjectileCallback != null) {
@@ -223,11 +233,33 @@ class CharacterUpdate extends BasicUpdate {
                     characterId: character.getId(),
                 });
             }
+
+            character.actionToPerform = null;
+            actionCallbacksDuringTick.push(callbackParams);
+        } else 
+
+        if (character.actionToPerform.actionEffect == CharacterActionEffect.SUMMON) {
+            haxe.Timer.delay(function callback() {
+                summonCallback({
+                    characterId: character.getId(),
+                });
+
+                if (character.actionToPerform.postDelayMs != 0) {
+                    haxe.Timer.delay(function callback() {
+                        character.canChangeState = true;
+                        character.actionState = CharacterActionState.READY;
+                        character.actionToPerform = null;
+                    }, character.actionToPerform.postDelayMs);
+                } else {
+                    character.canChangeState = true;
+                    character.actionState = CharacterActionState.READY;
+                    character.actionToPerform = null;
+                }
+        
+                callbackParams.playActionAnim = true;
+                actionCallbacksDuringTick.push(callbackParams);
+            }, character.actionToPerform.performDelayMs);
         }
-
-        character.actionToPerform = null;
-
-        actionCallbacksDuringTick.push(callbackParams);
     }
 
     private function subtractHealthFromCharacter(character:EngineCharacterEntity, damage:Int, killerCharacterId:String, killerOwnerId:String) {
@@ -237,6 +269,7 @@ class CharacterUpdate extends BasicUpdate {
                 if (playerKilledCallback != null) {
                     playerKilledCallback({
                         characterId: character.getId(),
+                        ownerId: character.getOwnerId(),
                         killerCharacterId: killerCharacterId,
                         killerOwnerId: killerOwnerId,
                     });
@@ -247,6 +280,7 @@ class CharacterUpdate extends BasicUpdate {
                 if (bossKilledCallback != null) {
                     bossKilledCallback({
                         characterId: character.getId(),
+                        ownerId: character.getOwnerId(),
                         killerCharacterId: killerCharacterId,
                         killerOwnerId: killerOwnerId,
                     });
@@ -257,6 +291,7 @@ class CharacterUpdate extends BasicUpdate {
                 if (monsterKilledCallback != null) {
                     monsterKilledCallback({
                         characterId: character.getId(),
+                        ownerId: character.getOwnerId(),
                         killerCharacterId: killerCharacterId,
                         killerOwnerId: killerOwnerId,
                     });

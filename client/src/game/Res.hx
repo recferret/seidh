@@ -20,6 +20,12 @@ enum SeidhResource {
     FX_ZOMBIE_BLOOD_2;
     FX_GLAMR_EYE_EXP;
 
+    FX_BLOOD_DROP_1;
+    FX_BLOOD_DROP_2;
+
+    FX_BLOODY_AXE_MOVEMENT;
+    FX_BLOODY_AXE_DISAPPEAR;
+
     FX_NORMALMAP;
 
     // ------------------------------------
@@ -211,6 +217,12 @@ class Res {
         tileResMap.set(FX_ZOMBIE_BLOOD_2, hxd.Res.fx.zombie.FX_ZOMBIE_BLOOD_2.toTile().center());
 
         tileResMap.set(FX_GLAMR_EYE_EXP, hxd.Res.fx.glamr.FX_GLAMR_EYE_EXP.toTile().center());
+
+        tileResMap.set(FX_BLOOD_DROP_1, hxd.Res.fx.blood_drop.FX_BLOOD_DROP_1.toTile().center());
+        tileResMap.set(FX_BLOOD_DROP_2, hxd.Res.fx.blood_drop.FX_BLOOD_DROP_2.toTile().center());
+        
+        tileResMap.set(FX_BLOODY_AXE_MOVEMENT, hxd.Res.fx.bloody_axe.FX_BLOODY_AXE_MOVEMENT.toTile().center());
+        tileResMap.set(FX_BLOODY_AXE_DISAPPEAR, hxd.Res.fx.bloody_axe.FX_BLOODY_AXE_DISAPPEAR.toTile().center());
 
         tileResMap.set(FX_NORMALMAP, hxd.Res.fx.FX_NORMALMAP.toTile());
             

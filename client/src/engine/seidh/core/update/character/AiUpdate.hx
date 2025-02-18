@@ -20,8 +20,8 @@ class AiUpdate extends BasicUpdate {
                     
                 if (character1.isAlive && !character1.isPlayer()) {
                     // Find and set nearest player as a target
-                    final targetPlayer = getNearestPlayer(characters, character1);
-                    if (targetPlayer != null && character1.getTargetObject() != targetPlayer) {
+                    final targetPlayer = cast(getNearestPlayer(characters, character1), EngineCharacterEntity);
+                    if (targetPlayer != null && targetPlayer.isAlive && character1.getTargetObject() != targetPlayer) {
                         character1.setTargetObject(targetPlayer, true);
                     } else {
                         character1.clearTargetObject();

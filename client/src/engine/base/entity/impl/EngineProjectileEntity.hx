@@ -11,7 +11,11 @@ class EngineProjectileEntity extends EngineBaseEntity {
 	// General
 	// ------------------------------------------------
 
-    public var allowMovement = true;
+	public var state = 'MOVEMENT';
+	// 'START_DISAPPEARING';
+	// 'DISAPPEARING';
+	// 'DISAPPEARED';
+
     private var traveledDistance = 0.0;
 	private var projectileEntity:ProjectileEntity;
 
@@ -30,7 +34,7 @@ class EngineProjectileEntity extends EngineBaseEntity {
     }
 
     public function update(dt:Float) {
-		if (allowMovement) {
+		if (state != 'DISAPPEARED') {
 			final step = calculateAndGetFrameMoveStep(dt);
 			moveBy(step.dx, step.dy);
 		}
@@ -42,13 +46,12 @@ class EngineProjectileEntity extends EngineBaseEntity {
 		traveledDistance += Math.abs(dx + dy);
 
 		if (traveledDistance > projectileEntity.projectile.travelDistance) {
-			allowMovement = false;
+			state = 'START_DISAPPEARING';
 		}
 
 		return {
 			dx: dx,
 			dy: dy,
-			allowMovement: allowMovement
 		}
 	}
 
